@@ -1,7 +1,7 @@
 {
   "name": "graphql-compose-mongoose",
   "version": "0.0.1",
-  "description": "Plugin for `graphql-mongoose` which derive a graphql type from a mongoose model.",
+  "description": "Plugin for `graphql-compose` which derive a graphql type from a mongoose model.",
   "files": [
     "es",
     "lib"
@@ -13,8 +13,10 @@
     "build-cjs": "rimraf lib && BABEL_ENV=cjs babel src -d lib",
     "build-es": "rimraf es && BABEL_ENV=es babel src -d es",
     "lint": "eslint src test *.js",
-    "prepublish": "npm run build",
-    "test": "npm run lint"
+    "jest": "jest --watch",
+    "jestc": "jest --coverage",
+    "prepublish123": "npm run build",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,9 @@
   },
   "keywords": [
     "graphql",
-    "compose"
+    "compose",
+    "mongoose",
+    "mongodb"
   ],
   "license": "MIT",
   "bugs": {
@@ -31,12 +35,18 @@
   "homepage": "https://github.com/nodkz/graphql-compose-mongoose",
   "dependencies": {
     "babel-runtime": "^6.6.1",
-    "graphql": "^0.5.0"
+    "mongoose": "^4.5.0",
+    "object-path": "^0.9.2"
+  },
+  "peerDependencies": {
+    "graphql": "^0.5.0",
+    "graphql-compose": ">=0.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.7.7",
     "babel-core": "^6.7.7",
     "babel-eslint": "^6.0.3",
+    "babel-jest": "^12.1.0",
     "babel-loader": "^6.2.4",
     "babel-plugin-add-module-exports": "^0.1.2",
     "babel-plugin-dev-expression": "^0.2.1",
@@ -53,7 +63,20 @@
     "eslint-config-airbnb": "^7.0.0",
     "eslint-plugin-jsx-a11y": "^0.6.2",
     "eslint-plugin-react": "^4.3.0",
-    "graphql": "^0.4.18",
+    "flow": "^0.2.3",
+    "flow-bin": "^0.27.0",
+    "jest-cli": "^12.1.1",
     "rimraf": "^2.5.2"
+  },
+  "jest": {
+    "rootDir": "",
+    "coverageDirectory": "<rootDir>/src",
+    "testPathDirs": [
+      "<rootDir>/src"
+    ],
+    "unmockedModulePathPatterns": [
+      "<rootDir>/node_modules/graphql/",
+      "<rootDir>/node_modules/core-js/"
+    ]
   }
 }

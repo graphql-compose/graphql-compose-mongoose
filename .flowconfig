@@ -1,0 +1,17 @@
+[ignore]
+.*/__tests__/.*
+.*/__mocks__/.*
+.*/lib/.*
+.*/dist/.*
+.*/coverage/.*
+.*/resources/.*
+
+[include]
+../graphql-compose/src
+
+[libs]
+
+[options]
+esproposal.class_instance_fields=enable
+module.name_mapper='^graphql\(.*\)$' -> '<PROJECT_ROOT>/__forks__/graphql-js/src\1'
+module.name_mapper='graphql-compose\(.*\)$' -> '/Users/nod/www/_npm/graphql-compose\1'
