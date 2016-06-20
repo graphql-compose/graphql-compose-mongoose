@@ -83,7 +83,7 @@ export function dotPathsToEmbedded(fields: ObjectMap): ObjectMap {
       const name = fieldName.substr(0, dotIdx);
       if (!result.hasOwnProperty(name)) {
         result[name] = {
-          instance: 'pseudoEmbedded',
+          instance: 'Embedded',
           path: name,
           schema: {
             paths: {},
@@ -177,7 +177,7 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
   if (field instanceof mongoose.Schema.Types.DocumentArray) {
     return ComplexTypes.DOCUMENT_ARRAY;
   } else if (field instanceof mongoose.Schema.Types.Embedded
-    || fieldType === 'pseudoEmbedded'
+    || fieldType === 'Embedded'
     ) {
     return ComplexTypes.EMBEDDED;
   } else if (field instanceof mongoose.Schema.Types.Array
@@ -195,9 +195,22 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
   return ComplexTypes.SCALAR;
 }
 
+function removePseudoIdField(gqType: GraphQLOutputType): GraphQLOutputType {
+  // remove pseudo object id mongoose field
+  const composer = new TypeComposer(gqType);
+  const gqFields = composer.getFields();
+  Object.keys(gqFields).forEach(name => {
+    if (gqFields[name].type === GraphQLID) {
+      composer.removeField(name);
+    }
+  });
+
+  return composer.getType();
+}
+
 export function scalarToGraphQL(field: MongooseFieldT): GraphQLOutputType {
   const typeName = _getFieldType(field);
-  
+
   switch (typeName) {
     case 'String': return GraphQLString;
     case 'Number': return GraphQLFloat;
@@ -210,14 +223,12 @@ export function scalarToGraphQL(field: MongooseFieldT): GraphQLOutputType {
 }
 
 export function arrayToGraphQL(field: MongooseFieldT, prefix: string = ''): GraphQLOutputType {
-  const unwrappedField = Object.assign({}, field);
-
   if (!field.caster) {
     throw new Error('You provide incorrect mongoose field to `arrayToGraphQL()`. '
     + 'Correct field should contain `caster` property.');
   }
 
-  unwrappedField.instance = field.caster.instance;
+  const unwrappedField = Object.assign({}, field.caster);
   objectPath.set(
     unwrappedField,
     'options.ref',
@@ -235,14 +246,15 @@ export function embeddedToGraphQL(
   const fieldName = _getFieldName(field);
   const fieldType = _getFieldType(field);
 
-  if (fieldType !== 'pseudoEmbedded') {
+  if (fieldType !== 'Embedded') {
     throw new Error('You provide incorrect field to `embeddedToGraphQL()`. '
-    + 'This field should has `pseudoEmbedded` type. '
-    + 'This field is generated in `dotPathsToEmbedded()` method.');
+    + 'This field should has `Embedded` type. ');
   }
 
   const typeName = `${prefix}${capitalize(fieldName)}`;
-  return convertModelToGraphQL(field, typeName);
+  const gqType = convertModelToGraphQL(field, typeName);
+
+  return removePseudoIdField(gqType);
 }
 
 
@@ -281,7 +293,7 @@ export function documentArrayToGraphQL(
   const typeName = `${prefix}${capitalize(_getFieldName(field))}`;
 
   const outputType = convertModelToGraphQL(field, typeName);
-  return new GraphQLList(outputType);
+  return new GraphQLList(removePseudoIdField(outputType));
 }
 
 

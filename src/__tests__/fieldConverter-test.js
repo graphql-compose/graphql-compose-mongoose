@@ -4,14 +4,22 @@ import UserModel from '../__mocks__/userModel.js';
 import {
   deriveComplexType,
   getFieldsFromModel,
+  convertFieldToGraphQL,
   ComplexTypes,
   scalarToGraphQL,
+  arrayToGraphQL,
+  embeddedToGraphQL,
+  enumToGraphQL,
+  referenceToGraphQL,
+  documentArrayToGraphQL,
 } from '../fieldsConverter';
 
 import {
   GraphQLString,
   GraphQLFloat,
   GraphQLBoolean,
+  GraphQLList,
+  GraphQLEnumType,
   GraphQLID,
 } from 'graphql/type';
 
@@ -102,7 +110,13 @@ describe('fieldConverter', () => {
   });
 
   describe('convertFieldToGraphQL()', () => {
-
+    it('should convert any mongoose field to graphQL type', () => {
+      const mongooseField = {
+        path: 'strFieldName',
+        instance: 'String',
+      };
+      expect(convertFieldToGraphQL(mongooseField)).toEqual(GraphQLString);
+    });
   });
 
   describe('scalarToGraphQL()', () => {
@@ -121,34 +135,71 @@ describe('fieldConverter', () => {
   });
 
   describe('arrayToGraphQL()', () => {
+    const skillsType = arrayToGraphQL(fields.skills);
 
+    it('should produce GraphQLList', () => {
+      expect(skillsType instanceof GraphQLList).toBeTruthy();
+    });
+
+    it('should has string in ofType', () => {
+      expect(skillsType.ofType.name).toEqual('String');
+    });
   });
 
   describe('enumToGraphQL()', () => {
+    const genderEnum = enumToGraphQL(fields.gender);
 
-  });
+    it('should be instance of GraphQLEnumType', () => {
+      expect(genderEnum instanceof GraphQLEnumType).toBeTruthy();
+    });
 
-  describe('referenceToGraphQL()', () => {
+    it('should have type name `Enum${FieldName}`', () => {
+      expect(genderEnum.name).toEqual('EnumGender');
+    });
 
+    it('should pass all enum values to GQ type', () => {
+      expect(genderEnum._values.length).toEqual(fields.gender.enumValues.length);
+      expect(genderEnum._values[0].value).toEqual(fields.gender.enumValues[0]);
+    });
   });
 
   describe('embeddedToGraphQL()', () => {
+    const embeddedType = embeddedToGraphQL(fields.contacts);
+    const embeddedFields = embeddedType._typeConfig.fields();
 
+    it('should set name to graphql type', () => {
+      expect(embeddedType.name).toEqual('Contacts');
+    });
+
+    it('should have embedded fields', () => {
+      expect(embeddedFields.email).toBeDefined();
+    });
+
+    it('should skip pseudo mongoose _id field', () => {
+      expect(embeddedFields._id).toBeUndefined();
+    });
   });
 
   describe('documentArrayToGraphQL()', () => {
+    const languagesType = documentArrayToGraphQL(fields.languages);
+    const languagesFields = languagesType.ofType._typeConfig.fields();
 
+    it('should produce GraphQLList', () => {
+      expect(languagesType instanceof GraphQLList).toBeTruthy();
+    });
+
+    it('should has Languages type in ofType', () => {
+      expect(languagesType.ofType.name).toEqual('Languages');
+    });
+
+    it('should skip pseudo mongoose _id field in document', () => {
+      expect(languagesFields._id).toBeUndefined();
+    });
   });
 
-  // fieldNames.forEach((name) => {
-  //   console.log(
-  //     fields[name].getClassName(),
-  //     name,
-  //     fields[name].enumValues,
-  //     fields[name] instanceof mongoose.Schema.Types.Embedded,
-  //   );
-  // });
-  //
-  // console.log(fields.employment.caster);
-  // console.log(fields.languages.caster);
+  describe('referenceToGraphQL()', () => {
+    xit('', () => {
+
+    });
+  });
 });
