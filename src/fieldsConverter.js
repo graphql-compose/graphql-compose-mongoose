@@ -72,7 +72,7 @@ export function dotPathsToEmbedded(fields: ObjectMap): ObjectMap {
   // further when converting EmbeddedModel to GQL, it internally
   // call this method to extract deep fields with dots
 
-  const result = {};
+  const result: MongooseFieldMapT = {};
 
   Object.keys(fields).forEach((fieldName) => {
     const dotIdx = fieldName.indexOf('.');
@@ -81,14 +81,15 @@ export function dotPathsToEmbedded(fields: ObjectMap): ObjectMap {
     } else {
       // create pseudo sub-model
       const name = fieldName.substr(0, dotIdx);
-      if (!result.hasOwnProperty(name)) {
-        result[name] = {
+      if (!result[name]) {
+        const embeddedField: MongooseFieldT = {
           instance: 'Embedded',
           path: name,
           schema: {
             paths: {},
           },
         };
+        result[name] = embeddedField;
       }
       const subName = fieldName.substr(dotIdx + 1);
       result[name].schema.paths[subName] = Object.assign({}, fields[fieldName], { path: subName });
@@ -146,7 +147,9 @@ export function convertModelToGraphQL(
     };
   });
 
+  /* ::` */
   typeComposer.addFields(graphqlFields);
+  /* ::` */
   return typeComposer.getType();
 }
 
@@ -252,7 +255,8 @@ export function embeddedToGraphQL(
   }
 
   const typeName = `${prefix}${capitalize(fieldName)}`;
-  const gqType = convertModelToGraphQL(field, typeName);
+  const fieldAsModel: MongooseModelT = field;
+  const gqType = convertModelToGraphQL(fieldAsModel, typeName);
 
   return removePseudoIdField(gqType);
 }
