@@ -197,6 +197,7 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
 
 export function scalarToGraphQL(field: MongooseFieldT): GraphQLOutputType {
   const typeName = _getFieldType(field);
+  
   switch (typeName) {
     case 'String': return GraphQLString;
     case 'Number': return GraphQLFloat;

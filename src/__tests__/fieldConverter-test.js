@@ -44,8 +44,8 @@ describe('fieldConverter', () => {
     });
 
     it('should throw Exception, if model does `schema.path` property', () => {
-      const err =
-        new Error('You should provide corret mongoose model with `schema.path` property');
+      const err = new Error('You provide incorrect mongoose model to `getFieldsFromModel()`. '
+      + 'Correct model should contain `schema.paths` properties.');
 
       expect(() => { getFieldsFromModel({ a: 1 }); }).toThrow(err);
       expect(() => { getFieldsFromModel({ schema: {} }); }).toThrow(err);
@@ -54,7 +54,8 @@ describe('fieldConverter', () => {
 
   describe('deriveComplexType()', () => {
     it('should throw error on incorrect mongoose field', () => {
-      const err = new Error('You should provide correct mongoose field');
+      const err = new Error('You provide incorrect mongoose field to `deriveComplexType()`. '
+      + 'Correct field should contain `path` and `instance` properties.');
 
       expect(() => { deriveComplexType(); }).toThrow(err);
       expect(() => { deriveComplexType(123); }).toThrow(err);
@@ -71,10 +72,7 @@ describe('fieldConverter', () => {
       expect(deriveComplexType(fields.contacts))
         .toEqual(ComplexTypes.EMBEDDED);
 
-      expect(deriveComplexType(fields['subDoc.field1']))
-        .toEqual(ComplexTypes.EMBEDDED);
-
-      expect(deriveComplexType(fields['subDoc.field2.field21']))
+      expect(deriveComplexType(fields.subDoc))
         .toEqual(ComplexTypes.EMBEDDED);
     });
 
@@ -99,7 +97,7 @@ describe('fieldConverter', () => {
       expect(deriveComplexType(fields.createdAt)).toEqual(ComplexTypes.SCALAR);
 
       expect(deriveComplexType(fields.gender)).not.toEqual(ComplexTypes.SCALAR);
-      expect(deriveComplexType(fields['subDoc.field1'])).not.toEqual(ComplexTypes.SCALAR);
+      expect(deriveComplexType(fields.subDoc)).not.toEqual(ComplexTypes.SCALAR);
     });
   });
 
@@ -109,16 +107,16 @@ describe('fieldConverter', () => {
 
   describe('scalarToGraphQL()', () => {
     it('should properly convert mongoose scalar type to default graphQL types', () => {
-      expect(scalarToGraphQL('String')).toEqual(GraphQLString);
-      expect(scalarToGraphQL('Number')).toEqual(GraphQLFloat);
-      expect(scalarToGraphQL('Boolean')).toEqual(GraphQLBoolean);
-      expect(scalarToGraphQL('ObjectID')).toEqual(GraphQLID);
+      expect(scalarToGraphQL({ instance: 'String' })).toEqual(GraphQLString);
+      expect(scalarToGraphQL({ instance: 'Number' })).toEqual(GraphQLFloat);
+      expect(scalarToGraphQL({ instance: 'Boolean' })).toEqual(GraphQLBoolean);
+      expect(scalarToGraphQL({ instance: 'ObjectID' })).toEqual(GraphQLID);
     });
 
     it('should properly convert mongoose scalar type to scalar graphql-compose types', () => {
-      expect(scalarToGraphQL('Date')).toEqual(GraphQLDate);
-      expect(scalarToGraphQL('Buffer')).toEqual(GraphQLBuffer);
-      expect(scalarToGraphQL('abrakadabra')).toEqual(GraphQLGeneric);
+      expect(scalarToGraphQL({ instance: 'Date' })).toEqual(GraphQLDate);
+      expect(scalarToGraphQL({ instance: 'Buffer' })).toEqual(GraphQLBuffer);
+      expect(scalarToGraphQL({ instance: 'abrakadabra' })).toEqual(GraphQLGeneric);
     });
   });
 

@@ -16,7 +16,8 @@
     "jest": "jest --watch",
     "jestc": "jest --coverage",
     "prepublish123": "npm run build",
-    "test": "jest"
+    "test": "jest",
+    "watch:jest": "jest --watch"
   },
   "repository": {
     "type": "git",
