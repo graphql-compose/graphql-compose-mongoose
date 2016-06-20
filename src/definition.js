@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable */
 
-export type ObjectMap = { [optName: string]: mixed };
+export type ObjectMap = { [optName: string]: any };
 
 export type GraphQLOutputType = mixed;
 
@@ -29,3 +29,6 @@ export type MongooseFieldT = {
 } & MongooseModelT;
 
 export type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
+
+export type ResolverNames = 'byId' | 'byIds' | 'findOne' | 'findMany' |
+                            'updateOne' | 'updateMany' | 'removeOne' | 'removeMany';
