@@ -82,7 +82,7 @@ const UserSchema = new Schema(
 
     __secretField: {
       type: String,
-    }
+    },
   },
   {
     timestamps: true, // add createdAt, updatedAt fields
@@ -93,8 +93,8 @@ const UserSchema = new Schema(
 
 UserSchema.index({ name: 1, totalExperience: -1 });
 
-UserSchema.virtual('nameVirtual').get(function () {
-  return 'VirtualFieldValue' + this._id;
+UserSchema.virtual('nameVirtual').get(function () { // eslint-disable-line
+  return `VirtualFieldValue${this._id}`;
 });
 
 

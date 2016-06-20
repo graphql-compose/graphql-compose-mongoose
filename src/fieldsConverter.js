@@ -25,7 +25,6 @@ import type {
   MongooseModelT,
   MongooseFieldT,
   MongooseFieldMapT,
-  ObjectMap,
   ComplexTypesT,
   GraphQLOutputType,
 } from './definition';
@@ -67,7 +66,7 @@ function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function dotPathsToEmbedded(fields: ObjectMap): ObjectMap {
+export function dotPathsToEmbedded(fields: MongooseFieldMapT): MongooseFieldMapT {
   // convert only one dot-level on this step to EmbeddedModel
   // further when converting EmbeddedModel to GQL, it internally
   // call this method to extract deep fields with dots

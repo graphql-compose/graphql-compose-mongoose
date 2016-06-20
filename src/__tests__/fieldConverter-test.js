@@ -29,10 +29,10 @@ import {
   GraphQLGeneric,
 } from '../../../graphql-compose/src/type';
 
-Object.prototype.getClassName = function() {
-   var funcNameRegex = /function (.{1,})\(/;
-   var results = (funcNameRegex).exec((this).constructor.toString());
-   return (results && results.length > 1) ? results[1] : "";
+Object.prototype.getClassName = function getClassName() {
+  const funcNameRegex = /function (.{1,})\(/;
+  const results = (funcNameRegex).exec((this).constructor.toString());
+  return (results && results.length > 1) ? results[1] : '';
 };
 
 describe('fieldConverter', () => {
