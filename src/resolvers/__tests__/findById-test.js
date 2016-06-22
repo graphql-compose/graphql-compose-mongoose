@@ -1,87 +1,60 @@
-jest.disableAutomock();
-
-// import findById from '../findById';
-//jest.unmock('mongoose');
-// jest.unmock('events');
-// jest.unmock('async');
-// jest.unmock('bson');
-// jest.unmock('hooks-fixed');
-// jest.unmock('kareem');
-// jest.unmock('mongodb');
-// jest.unmock('mpath');
-// jest.unmock('mpromise');
-// jest.unmock('mquery');
-// jest.unmock('ms');
-// jest.unmock('muri');
-// jest.unmock('regexp-clone');
-// jest.unmock('sliced');
-jest.unmock('core-js/modules/_object-create');
-import ocreate from 'core-js/modules/_object-create';
+import { expect } from 'chai';
 import mongoose from 'mongoose';
-// import prepareMongo from '../../../scripts/jest-prepare-mongo';
-
-// import doc from 'mongoose/lib/document';
-// console.log(doc.prototype);
-
-const oc = Object.create;
-jest.unmock('../../__mocks__/userModel.js');
 import UserModel from '../../__mocks__/userModel.js';
+import findById from '../findById';
+import Resolver from '../../../../graphql-compose/src/resolver/resolver';
+import { GraphQLNonNull, GraphQLID } from 'graphql';
 
 describe('findById()', () => {
-//  prepareMongo(beforeEach, afterEach);
+  let user;
 
-  beforeAll((done) => {
+  before('prepare mongodb with fresh data', (done) => {
     mongoose.connect('mongodb://127.0.0.1:27017/gqc-mongoose-test');
 
-    const db = mongoose.connection;
-
-    db.on('error', (err) => {
-      done.fail(err);
+    mongoose.connection.on('error', (err) => {
+      throw new Error(err);
     });
 
-    db.once('open', () => {
+    mongoose.connection.once('open', async () => {
+      await UserModel.collection.drop();
+
+      user = new UserModel({ name: 'nodkz' });
+      await user.save();
+
       done();
     });
-
   });
-  /*
-  beforeEach(() => {
-    const schema = new mongoose.Schema({
-      title:  String,
-      author: String,
-      body:   String,
-    });
-    console.log('!!!!', schema);
+
+  it('should return Resolver', () => {
+    const resolver = findById(UserModel);
+    expect(resolver).to.be.instanceof(Resolver);
   });
-  */
 
+  it('should provide Promise for Resolver.resolve() if args.id is provided', () => {
+    const resolver = findById(UserModel);
+    expect(resolver.resolve({ args: { id: 1 } })).to.be.instanceof(mongoose.Promise);
+  });
 
-  it('should find records by id', () => {
-    // console.log(mongoose);
-    // const connection = mongoose.createConnection('mongodb://127.0.0.1:27017/gqc-mongoose-test');
-    const schema = new mongoose.Schema({
-      title:  String,
-      author: String,
-      body:   String,
-    });
-    // console.log(schema, '!!!!');
+  it('should provide `null` for Resolver.resolve() if args.id is empty', () => {
+    const resolver = findById(UserModel);
+    expect(resolver.resolve()).to.be.null;
+  });
 
-    const Um = mongoose.model('Um', schema);
-    // console.log(Um);
+  it('should have non-null `id` arg', () => {
+    const resolver = findById(UserModel);
+    expect(resolver.hasArg('id')).to.be.true;
+    const argConfig = resolver.getArg('id');
+    expect(argConfig.type).to.be.instanceof(GraphQLNonNull);
+    expect(argConfig.type.ofType).to.equal(GraphQLID);
+  });
 
-    Object.create = ocreate;
-    const u = new Um({ title: 'nod' });
-    console.log(u, '!!!!!!!!!!!!!');
-
-    Um.findOne({title: '1'}).exec((err, res) => {
-      console.log(err, res);
-    });
-
-    // const u2 = new UserModel({ title: 'nod' });
-    // console.log(u2, '!!!!!!!!!!!!!');
-
-    UserModel.findOne({title: '1'}).exec((err, res) => {
-      console.log(err, res);
-    });
+  it('should find record by id', (done) => {
+    const resolver = findById(UserModel);
+    resolver.resolve({ args: { id: user._id } }).then(res => {
+      expect(res).to.be.ok;
+      expect(res.name).to.equal(user.name);
+    })
+    .then(() => done())
+    .catch(err => { throw new Error(err); });
   });
 });
