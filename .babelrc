@@ -1,9 +1,12 @@
 {
   "presets": ["es2015", "stage-0"],
   "plugins": [
-    "dev-expression",
+    "syntax-async-functions",
+    "transform-class-properties",
+    "transform-flow-strip-types",
+    "transform-object-rest-spread",
+    "transform-regenerator",
     "transform-runtime",
-    "transform-flow-strip-types"
   ],
 
   "env": {

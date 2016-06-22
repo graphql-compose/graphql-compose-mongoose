@@ -3,10 +3,11 @@
   "parser": "babel-eslint",
   "rules": {
     "no-underscore-dangle": 0,
+    "no-unused-expressions": 0,
     "arrow-body-style": 0
   },
   "env": {
     "jasmine": true,
-    "jest": true
+    "mocha": true
   }
 }
