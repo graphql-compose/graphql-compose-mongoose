@@ -1,5 +1,5 @@
 jest.unmock('mongoose');
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
 
 const ContactsSchema = new Schema(
   {

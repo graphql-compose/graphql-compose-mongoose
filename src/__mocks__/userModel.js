@@ -1,18 +1,13 @@
-jest.unmock('mongoose');
+jest.disableAutomock();
 import mongoose, { Schema } from 'mongoose';
-
-jest.unmock('./contactsSchema');
 import ContactsSchema from './contactsSchema';
-
-jest.unmock('./enumEmployment');
 import enumEmployment from './enumEmployment';
-
-jest.unmock('./languagesSchema');
 import LanguagesSchema from './languagesSchema';
 
 const UserSchema = new Schema(
   {
-    subDoc: {
+    name: String,
+    /*subDoc: {
       field1: String,
       field2: {
         field21: String,
@@ -22,12 +17,12 @@ const UserSchema = new Schema(
 
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'UserModel',
     },
 
     users: {
       type: [Schema.Types.ObjectId],
-      ref: 'User',
+      ref: 'UserModel',
     },
 
     name: {
@@ -62,6 +57,7 @@ const UserSchema = new Schema(
 
     contacts: {
       type: ContactsSchema,
+      default: {},
       description: 'Contacts of person (phone, skype, mail and etc)',
     },
 
@@ -82,7 +78,7 @@ const UserSchema = new Schema(
 
     __secretField: {
       type: String,
-    },
+    }, */
   },
   {
     timestamps: true, // add createdAt, updatedAt fields
