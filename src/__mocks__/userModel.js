@@ -1,4 +1,3 @@
-jest.disableAutomock();
 import mongoose, { Schema } from 'mongoose';
 import ContactsSchema from './contactsSchema';
 import enumEmployment from './enumEmployment';
@@ -6,8 +5,7 @@ import LanguagesSchema from './languagesSchema';
 
 const UserSchema = new Schema(
   {
-    name: String,
-    /*subDoc: {
+    subDoc: {
       field1: String,
       field2: {
         field21: String,
@@ -78,7 +76,7 @@ const UserSchema = new Schema(
 
     __secretField: {
       type: String,
-    }, */
+    },
   },
   {
     timestamps: true, // add createdAt, updatedAt fields

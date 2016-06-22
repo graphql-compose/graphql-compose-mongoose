@@ -225,7 +225,7 @@ export function scalarToGraphQL(field: MongooseFieldT): GraphQLOutputType {
 }
 
 export function arrayToGraphQL(field: MongooseFieldT, prefix: string = ''): GraphQLOutputType {
-  if (!field.caster) {
+  if (!field || !field.caster) {
     throw new Error('You provide incorrect mongoose field to `arrayToGraphQL()`. '
     + 'Correct field should contain `caster` property.');
   }

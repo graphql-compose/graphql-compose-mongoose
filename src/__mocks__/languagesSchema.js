@@ -1,4 +1,3 @@
-jest.unmock('mongoose');
 import { Schema } from 'mongoose';
 
 // name: 'EnumLanguageName',
