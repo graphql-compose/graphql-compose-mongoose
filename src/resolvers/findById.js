@@ -23,7 +23,7 @@ export default function findById(model: MongooseModelT, outputType: GraphQLOutpu
       if (args && args.id) {
         return model.findById(args.id, projection).exec();
       }
-      return null;
+      return Promise.resolve(null);
     },
   });
 }

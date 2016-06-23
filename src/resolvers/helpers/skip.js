@@ -7,9 +7,9 @@ export const skipHelperArgs = {
   },
 };
 
-export function skipHelper(query, { skip }) {
-  if (skip > 0) {
-    query = query.skip(skip); // eslint-disable-line no-param-reassign
+export function skipHelper(query, args = {}) {
+  if (args.skip > 0) {
+    query = query.skip(args.skip); // eslint-disable-line no-param-reassign
   }
 
   return query;

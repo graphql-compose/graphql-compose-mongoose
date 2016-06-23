@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { Schema } from './mongooseCommon';
 
 // name: 'EnumLanguageName',
 // description: 'Language names (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)',

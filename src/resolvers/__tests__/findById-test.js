@@ -1,46 +1,27 @@
 import { expect } from 'chai';
-import mongoose from 'mongoose';
-import UserModel from '../../__mocks__/userModel.js';
+import { UserModel } from '../../__mocks__/userModel.js';
 import findById from '../findById';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
 import { GraphQLNonNull, GraphQLID } from 'graphql';
 
-describe('findById()', () => {
+describe('findById() ->', () => {
   let user;
 
-  before('prepare mongodb with fresh data', (done) => {
-    mongoose.connect('mongodb://127.0.0.1:27017/gqc-mongoose-test');
-
-    mongoose.connection.on('error', (err) => {
-      throw new Error(err);
-    });
-
-    mongoose.connection.once('open', async () => {
-      await UserModel.collection.drop();
-
-      user = new UserModel({ name: 'nodkz' });
-      await user.save();
-
-      done();
-    });
+  before('clear UserModel collection', (done) => {
+    UserModel.collection.drop(done);
   });
 
-  it('should return Resolver', () => {
+  before('add test user document to mongoDB', (done) => {
+    user = new UserModel({ name: 'nodkz' });
+    user.save(done);
+  });
+
+  it('should return Resolver object', () => {
     const resolver = findById(UserModel);
     expect(resolver).to.be.instanceof(Resolver);
   });
 
-  it('should provide Promise for Resolver.resolve() if args.id is provided', () => {
-    const resolver = findById(UserModel);
-    expect(resolver.resolve({ args: { id: 1 } })).to.be.instanceof(mongoose.Promise);
-  });
-
-  it('should provide `null` for Resolver.resolve() if args.id is empty', () => {
-    const resolver = findById(UserModel);
-    expect(resolver.resolve()).to.be.null;
-  });
-
-  it('should have non-null `id` arg', () => {
+  it('Resolver object should have non-null `id` arg', () => {
     const resolver = findById(UserModel);
     expect(resolver.hasArg('id')).to.be.true;
     const argConfig = resolver.getArg('id');
@@ -48,13 +29,25 @@ describe('findById()', () => {
     expect(argConfig.type.ofType).to.equal(GraphQLID);
   });
 
-  it('should find record by id', (done) => {
-    const resolver = findById(UserModel);
-    resolver.resolve({ args: { id: user._id } }).then(res => {
-      expect(res).to.be.ok;
-      expect(res.name).to.equal(user.name);
-    })
-    .then(() => done())
-    .catch(err => { throw new Error(err); });
+  describe('Resolver.resolve():Promise', () => {
+    it('should be fulfilled promise', async () => {
+      const result = findById(UserModel).resolve();
+      await expect(result).be.fulfilled;
+    });
+
+    it('should be rejected if args.id is not objectId', async () => {
+      const result = findById(UserModel).resolve({ args: { id: 1 } });
+      await expect(result).be.rejected;
+    });
+
+    it('should return null if args.id is empty', async () => {
+      const result = await findById(UserModel).resolve();
+      expect(result).equal(null);
+    });
+
+    it('should return document if provided existed id', async () => {
+      const result = await findById(UserModel).resolve({ args: { id: user._id } });
+      expect(result).have.property('name').that.equal(user.name);
+    });
   });
 });

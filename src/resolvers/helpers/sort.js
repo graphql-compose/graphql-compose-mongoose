@@ -1,8 +1,8 @@
 import { GraphQLInt } from 'graphql/type';
 
 export const sortHelperArgs = {
-  skip: {
-    name: 'skip',
+  sort: {
+    name: 'sort',
     type: GraphQLInt,
   },
 };

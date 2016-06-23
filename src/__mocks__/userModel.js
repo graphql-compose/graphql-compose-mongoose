@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import { mongoose, Schema } from './mongooseCommon';
 import ContactsSchema from './contactsSchema';
 import enumEmployment from './enumEmployment';
 import LanguagesSchema from './languagesSchema';
@@ -94,4 +94,7 @@ UserSchema.virtual('nameVirtual').get(function () { // eslint-disable-line
 
 const UserModel = mongoose.model('UserModel', UserSchema);
 
-export default UserModel;
+export {
+  UserSchema,
+  UserModel,
+};

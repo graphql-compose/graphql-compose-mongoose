@@ -120,18 +120,19 @@ function parseFiles(filepaths) {
 
 function runTests(filepaths) {
   console.log('\nRunning Tests');
-
-  return exec('babel-node', [
+  const cmd = [
     './node_modules/.bin/_mocha',
     '--compilers', 'js:babel-core/register',
     // '--reporter', 'progress',
-    '--reporte', 'dot',
+    '--reporter', 'dot',
     '--require', './resources/mocha-bootload',
   ].concat(
     allTests(filepaths) ?
       filepaths.map(srcPath) :
       ['src/**/__tests__/**/*-test.js']
-  )).catch(() => false);
+  );
+  // console.log(cmd);
+  return exec('node', cmd).catch(() => false);
 }
 
 function lintFiles(filepaths) {

@@ -10,7 +10,7 @@ export const filterHelperArgsGen = () => {
         fields: {
           age: {
             name: 'age',
-            type: GraphQLInt, // TODO just mock, should be shanged in future
+            type: GraphQLInt, // TODO just mock, should be changed in future
           },
         },
       }),
@@ -19,9 +19,9 @@ export const filterHelperArgsGen = () => {
   };
 };
 
-export function filterHelper(query, { filter }) {
-  if (filter && Object.keys(filter).length > 0) {
-    query = query.where(toDottedObject(filter)); // eslint-disable-line no-param-reassign
+export function filterHelper(query, args = {}) {
+  if (args.filter && Object.keys(args.filter).length > 0) {
+    query = query.where(toDottedObject(args.filter)); // eslint-disable-line no-param-reassign
   }
 
   return query;

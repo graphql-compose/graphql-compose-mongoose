@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import { Schema } from './mongooseCommon';
 
 const ContactsSchema = new Schema(
   {

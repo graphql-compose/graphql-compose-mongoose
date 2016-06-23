@@ -1,9 +1,9 @@
-var chai = require('chai');
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 
-// var chaiSubset = require('chai-subset');
-// chai.use(chaiSubset);
+chai.use(chaiAsPromised);
 
-process.on('unhandledRejection', function (error) {
+process.on('unhandledRejection', (error) => {
   console.error('Unhandled Promise Rejection:');
   console.error(error && error.stack || error);
 });

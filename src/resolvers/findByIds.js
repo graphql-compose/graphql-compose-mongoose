@@ -11,6 +11,8 @@ import {
   GraphQLID,
 } from 'graphql';
 
+import { limitHelperArgs, limitHelper } from './helpers/limit';
+import { sortHelperArgs, sortHelper } from './helpers/sort';
 
 export default function findByIds(model: MongooseModelT, outputType: GraphQLOutputType): Resolver {
   return new Resolver(outputType, {
@@ -20,18 +22,25 @@ export default function findByIds(model: MongooseModelT, outputType: GraphQLOutp
         name: 'ids',
         type: new GraphQLNonNull(new GraphQLList(GraphQLID)),
       },
+      ...limitHelperArgs,
+      ...sortHelperArgs,
     },
-    resolve: ({ args, projection }) => {
+    resolve: ({ args, projection } = {}) => {
       const selector = {};
-      if (args && args.ids && Array.isArray(args.ids)) {
+      if (args && Array.isArray(args.ids)) {
         selector._id = {
-          $in: args.ids.map((id) => mongoose.Types.ObjectId(id)), // eslint-disable-line
+          $in: args.ids
+            .filter(id => mongoose.Types.ObjectId.isValid(id))
+            .map(id => mongoose.Types.ObjectId(id)), // eslint-disable-line
         };
       } else {
-        return [];
+        return Promise.resolve([]);
       }
 
-      return model.find(selector).select(projection);
+      let cursor = model.find(selector).select(projection);
+      cursor = limitHelper(cursor, args || {});
+      cursor = sortHelper(cursor, args || {});
+      return cursor.exec();
     },
   });
 }

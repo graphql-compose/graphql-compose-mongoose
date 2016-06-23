@@ -1,8 +1,7 @@
 /* eslint-disable no-unused-expressions */
 
 import { expect } from 'chai';
-
-import UserModel from '../__mocks__/userModel.js';
+import { UserModel } from '../__mocks__/userModel.js';
 import {
   deriveComplexType,
   getFieldsFromModel,
@@ -31,11 +30,13 @@ import {
   GraphQLGeneric,
 } from '../../../graphql-compose/src/type';
 
+/*
 Object.prototype.getClassName = function getClassName() {
   const funcNameRegex = /function (.{1,})\(/;
   const results = (funcNameRegex).exec((this).constructor.toString());
   return (results && results.length > 1) ? results[1] : '';
 };
+*/
 
 describe('fieldConverter', () => {
   const fields = getFieldsFromModel(UserModel);
