@@ -9,6 +9,7 @@ import {
   GraphQLID,
 } from 'graphql';
 
+import { projectionHelper } from './helpers/projection';
 
 export default function findById(model: MongooseModelT, outputType: GraphQLOutputType): Resolver {
   return new Resolver(outputType, {
@@ -19,9 +20,13 @@ export default function findById(model: MongooseModelT, outputType: GraphQLOutpu
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    resolve: ({ args, projection } = {}) => {
-      if (args && args.id) {
-        return model.findById(args.id, projection).exec();
+    resolve: (resolveParams = {}) => {
+      const args = resolveParams.args || {};
+
+      if (args.id) {
+        resolveParams.cursor = model.findById(args.id); // eslint-disable-line
+        projectionHelper(resolveParams);
+        return resolveParams.cursor.exec();
       }
       return Promise.resolve(null);
     },

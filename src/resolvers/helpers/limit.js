@@ -8,10 +8,9 @@ export const limitHelperArgs = {
   },
 };
 
-export function limitHelper(query, { limit } = {}) {
+export function limitHelper(resolveParams) {
+  const limit = resolveParams.args && resolveParams.args.limit || 0;
   if (limit > 0) {
-    query = query.limit(limit); // eslint-disable-line no-param-reassign
+    resolveParams.cursor = resolveParams.cursor.limit(limit); // eslint-disable-line
   }
-
-  return query;
 }

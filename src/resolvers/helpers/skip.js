@@ -7,10 +7,9 @@ export const skipHelperArgs = {
   },
 };
 
-export function skipHelper(query, args = {}) {
-  if (args.skip > 0) {
-    query = query.skip(args.skip); // eslint-disable-line no-param-reassign
+export function skipHelper(resolveParams) {
+  const skip = resolveParams.args && resolveParams.args.skip;
+  if (skip > 0) {
+    resolveParams.cursor = resolveParams.cursor.skip(skip); // eslint-disable-line
   }
-
-  return query;
 }

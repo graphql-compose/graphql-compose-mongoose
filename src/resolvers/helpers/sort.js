@@ -7,10 +7,9 @@ export const sortHelperArgs = {
   },
 };
 
-export function sortHelper(query, { sort }) {
+export function sortHelper(resolveParams) {
+  const sort = resolveParams.args && resolveParams.args.sort;
   if (sort && Object.keys(sort).length > 0) {
-    query = query.sort(sort); // eslint-disable-line no-param-reassign
+    resolveParams.cursor = resolveParams.cursor.sort(sort); // eslint-disable-line
   }
-
-  return query;
 }

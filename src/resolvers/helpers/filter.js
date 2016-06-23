@@ -19,10 +19,9 @@ export const filterHelperArgsGen = () => {
   };
 };
 
-export function filterHelper(query, args = {}) {
-  if (args.filter && Object.keys(args.filter).length > 0) {
-    query = query.where(toDottedObject(args.filter)); // eslint-disable-line no-param-reassign
+export function filterHelper(resolveParams) {
+  const filter = resolveParams.args && resolveParams.args.filter;
+  if (filter && Object.keys(filter).length > 0) {
+    resolveParams.cursor = resolveParams.cursor.where(toDottedObject(filter)); // eslint-disable-line
   }
-
-  return query;
 }

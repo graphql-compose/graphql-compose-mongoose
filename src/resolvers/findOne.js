@@ -9,6 +9,7 @@ import Resolver from '../../../graphql-compose/src/resolver/resolver';
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { filterHelperArgsGen, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
+import { projectionHelper } from './helpers/projection';
 
 export default function findOne(model: MongooseModelT, outputType: GraphQLOutputType): Resolver {
   const filterHelperArgs = filterHelperArgsGen();
@@ -20,13 +21,14 @@ export default function findOne(model: MongooseModelT, outputType: GraphQLOutput
       ...skipHelperArgs,
       ...sortHelperArgs,
     },
-    resolve: ({ args, projection } = {}) => {
-      let cursor = model.findOne({}, projection);
-      cursor = filterHelper(cursor, args || {});
-      cursor = skipHelper(cursor, args || {});
-      cursor = sortHelper(cursor, args || {});
+    resolve: (resolveParams = {}) => {
+      resolveParams.cursor = model.findOne({}); // eslint-disable-line
+      filterHelper(resolveParams);
+      skipHelper(resolveParams);
+      sortHelper(resolveParams);
+      projectionHelper(resolveParams);
 
-      return cursor.exec();
+      return resolveParams.cursor.exec();
     },
   });
 }

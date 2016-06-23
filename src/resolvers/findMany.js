@@ -10,6 +10,7 @@ import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { filterHelperArgsGen, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
+import { projectionHelper } from './helpers/projection';
 
 export default function findMany(model: MongooseModelT, outputType: GraphQLOutputType): Resolver {
   const filterHelperArgs = filterHelperArgsGen();
@@ -22,14 +23,14 @@ export default function findMany(model: MongooseModelT, outputType: GraphQLOutpu
       ...limitHelperArgs,
       ...sortHelperArgs,
     },
-    resolve: ({ args, projection } = {}) => {
-      let cursor = model.find({}, projection);
-      cursor = filterHelper(cursor, args || {});
-      cursor = skipHelper(cursor, args || {});
-      cursor = limitHelper(cursor, args || {});
-      cursor = sortHelper(cursor, args || {});
-
-      return cursor.exec();
+    resolve: (resolveParams = {}) => {
+      resolveParams.cursor = model.find({}); // eslint-disable-line
+      filterHelper(resolveParams);
+      skipHelper(resolveParams);
+      limitHelper(resolveParams);
+      sortHelper(resolveParams);
+      projectionHelper(resolveParams);
+      return resolveParams.cursor.exec();
     },
   });
 }

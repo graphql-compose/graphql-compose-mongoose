@@ -13,6 +13,7 @@ import {
 
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
+import { projectionHelper } from './helpers/projection';
 
 export default function findByIds(model: MongooseModelT, outputType: GraphQLOutputType): Resolver {
   return new Resolver(outputType, {
@@ -25,9 +26,11 @@ export default function findByIds(model: MongooseModelT, outputType: GraphQLOutp
       ...limitHelperArgs,
       ...sortHelperArgs,
     },
-    resolve: ({ args, projection } = {}) => {
+    resolve: (resolveParams = {}) => {
+      const args = resolveParams.args || {};
+
       const selector = {};
-      if (args && Array.isArray(args.ids)) {
+      if (Array.isArray(args.ids)) {
         selector._id = {
           $in: args.ids
             .filter(id => mongoose.Types.ObjectId.isValid(id))
@@ -37,10 +40,11 @@ export default function findByIds(model: MongooseModelT, outputType: GraphQLOutp
         return Promise.resolve([]);
       }
 
-      let cursor = model.find(selector).select(projection);
-      cursor = limitHelper(cursor, args || {});
-      cursor = sortHelper(cursor, args || {});
-      return cursor.exec();
+      resolveParams.cursor = model.find(selector); // eslint-disable-line
+      projectionHelper(resolveParams);
+      limitHelper(resolveParams);
+      sortHelper(resolveParams);
+      return resolveParams.cursor.exec();
     },
   });
 }
