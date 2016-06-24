@@ -1,6 +1,6 @@
 import type {
   MongooseModelT,
-  GraphQLOutputType,
+  GraphQLObjectType,
 } from './definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
@@ -11,9 +11,11 @@ import {
 
 import { projectionHelper } from './helpers/projection';
 
-export default function findById(model: MongooseModelT, outputType: GraphQLOutputType): Resolver {
-  return new Resolver(outputType, {
+export default function findById(model: MongooseModelT, gqType: GraphQLObjectType): Resolver {
+  return new Resolver({
+    outputType: gqType,
     name: 'findById',
+    kind: 'query',
     args: {
       id: {
         name: 'id',

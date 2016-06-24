@@ -2,24 +2,26 @@
 
 import type {
   MongooseModelT,
-  GraphQLOutputType,
+  GraphQLObjectType,
 } from './definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { filterHelperArgsGen, filterHelper } from './helpers/filter';
-import { sortHelperArgs, sortHelper } from './helpers/sort';
+import { sortHelperArgsGen, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
 
-export default function findOne(model: MongooseModelT, outputType: GraphQLOutputType): Resolver {
+export default function findOne(model: MongooseModelT, gqType: GraphQLObjectType): Resolver {
   const filterHelperArgs = filterHelperArgsGen();
 
-  return new Resolver(outputType, {
+  return new Resolver({
+    outputType: gqType,
     name: 'findOne',
+    kind: 'query',
     args: {
       ...filterHelperArgs,
       ...skipHelperArgs,
-      ...sortHelperArgs,
+      ...sortHelperArgsGen(model),
     },
     resolve: (resolveParams = {}) => {
       resolveParams.cursor = model.findOne({}); // eslint-disable-line

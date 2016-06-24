@@ -2,7 +2,11 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findByIds from '../findByIds';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import { GraphQLNonNull, GraphQLID, GraphQLList } from 'graphql';
+import { GraphQLNonNull, GraphQLID, GraphQLList, GraphQLObjectType } from 'graphql';
+
+const UserType = new GraphQLObjectType({
+  name: 'MockUserType',
+});
 
 describe('findByIds() ->', () => {
   let user1;
@@ -26,12 +30,12 @@ describe('findByIds() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = findByIds(UserModel);
+    const resolver = findByIds(UserModel, UserType);
     expect(resolver).to.be.instanceof(Resolver);
   });
 
   it('should have non-null `ids` arg', () => {
-    const resolver = findByIds(UserModel);
+    const resolver = findByIds(UserModel, UserType);
     expect(resolver.hasArg('ids')).to.be.true;
     const argConfig = resolver.getArg('ids');
     expect(argConfig.type).to.be.instanceof(GraphQLNonNull);
@@ -40,35 +44,35 @@ describe('findByIds() ->', () => {
   });
 
   it('Resolver object should have `limit` arg', () => {
-    const resolver = findByIds(UserModel);
+    const resolver = findByIds(UserModel, UserType);
     expect(resolver.hasArg('limit')).to.be.true;
   });
 
   it('Resolver object should have `sort` arg', () => {
-    const resolver = findByIds(UserModel);
+    const resolver = findByIds(UserModel, UserType);
     expect(resolver.hasArg('sort')).to.be.true;
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled promise', async () => {
-      const result = findByIds(UserModel).resolve();
+      const result = findByIds(UserModel, UserType).resolve();
       await expect(result).be.fulfilled;
     });
 
     it('should return empty array if args.ids is empty', async () => {
-      const result = await findByIds(UserModel).resolve();
+      const result = await findByIds(UserModel, UserType).resolve();
       expect(result).to.be.instanceOf(Array);
       expect(result).to.be.empty;
     });
 
     it('should return empty array if args.ids is not valid objectIds', async () => {
-      const result = await findByIds(UserModel).resolve({ args: { ids: ['d', 'e'] } });
+      const result = await findByIds(UserModel, UserType).resolve({ args: { ids: ['d', 'e'] } });
       expect(result).to.be.instanceOf(Array);
       expect(result).to.be.empty;
     });
 
     it('should return array of documents', async () => {
-      const result = await findByIds(UserModel)
+      const result = await findByIds(UserModel, UserType)
         .resolve({ args: { ids: [user1._id, user2._id, user3._id] } });
 
       expect(result).to.be.instanceOf(Array);
@@ -79,7 +83,7 @@ describe('findByIds() ->', () => {
 
     it('should return array of documents if object id is string', async () => {
       const stringId = `${user1._id}`;
-      const result = await findByIds(UserModel)
+      const result = await findByIds(UserModel, UserType)
         .resolve({ args: { ids: [stringId] } });
 
       expect(result).to.be.instanceOf(Array);

@@ -19,6 +19,7 @@ import {
   GraphQLDate,
   GraphQLBuffer,
   GraphQLGeneric,
+  GQLReference,
 } from '../../graphql-compose/src/type';
 
 import type {
@@ -312,7 +313,9 @@ export function referenceToGraphQL(
 
   const refModelName = objectPath.get(field, 'options.ref');
   if (refModelName) {
-    throw new Error('Mongoose REFERENCE to graphQL TYPE not implemented yet.');
+    return GQLReference;
+    throw new Error('Mongoose REFERENCE to graphQL TYPE not implemented yet. '
+                    + `Field ${_getFieldName(field)}`);
     // Storage.UnresolvedRefs.setSubKey(parentTypeName, fieldName, { refModelName });
     // return GraphQLReference;
   }

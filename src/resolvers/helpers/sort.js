@@ -1,10 +1,12 @@
 import { GraphQLInt } from 'graphql/type';
 
-export const sortHelperArgs = {
-  sort: {
-    name: 'sort',
-    type: GraphQLInt,
-  },
+export const sortHelperArgsGen = (model) => {
+  return {
+    sort: {
+      name: 'sort',
+      type: GraphQLInt, // TODO
+    },
+  };
 };
 
 export function sortHelper(resolveParams) {

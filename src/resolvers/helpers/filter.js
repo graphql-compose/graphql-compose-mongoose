@@ -1,7 +1,7 @@
 import { GraphQLInt, GraphQLInputObjectType } from 'graphql/type';
 import { toDottedObject } from '../../utils';
 
-export const filterHelperArgsGen = () => {
+export const filterHelperArgsGen = (model) => {
   return {
     filter: {
       name: 'filter',

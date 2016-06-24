@@ -1,6 +1,6 @@
 import type {
   MongooseModelT,
-  GraphQLOutputType,
+  GraphQLObjectType,
 } from './definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 import mongoose from 'mongoose';
@@ -12,19 +12,21 @@ import {
 } from 'graphql';
 
 import { limitHelperArgs, limitHelper } from './helpers/limit';
-import { sortHelperArgs, sortHelper } from './helpers/sort';
+import { sortHelperArgsGen, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
 
-export default function findByIds(model: MongooseModelT, outputType: GraphQLOutputType): Resolver {
-  return new Resolver(outputType, {
+export default function findByIds(model: MongooseModelT, gqType: GraphQLObjectType): Resolver {
+  return new Resolver({
+    outputType: new GraphQLList(gqType),
     name: 'findByIds',
+    kind: 'query',
     args: {
       ids: {
         name: 'ids',
         type: new GraphQLNonNull(new GraphQLList(GraphQLID)),
       },
       ...limitHelperArgs,
-      ...sortHelperArgs,
+      ...sortHelperArgsGen(model),
     },
     resolve: (resolveParams = {}) => {
       const args = resolveParams.args || {};
