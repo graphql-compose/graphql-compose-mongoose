@@ -18,7 +18,7 @@ export default function updateOne(
   model: MongooseModelT,
   gqType: GraphQLObjectType,
 ): Resolver {
-  const findOneResolver = findOne(model);
+  const findOneResolver = findOne(model, gqType);
 
   return new Resolver({
     outputType: 'someCrazy',
