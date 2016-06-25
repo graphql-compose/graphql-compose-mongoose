@@ -1,7 +1,13 @@
+/* @flow */
+
 import { GraphQLInt, GraphQLInputObjectType } from 'graphql/type';
 import { toDottedObject } from '../../utils';
+import type {
+  GraphQLFieldConfigArgumentMap,
+  ExtendedResolveParams,
+} from '../../definition';
 
-export const filterHelperArgsGen = (model) => {
+export const filterHelperArgsGen = (): GraphQLFieldConfigArgumentMap => {
   return {
     filter: {
       name: 'filter',
@@ -19,9 +25,9 @@ export const filterHelperArgsGen = (model) => {
   };
 };
 
-export function filterHelper(resolveParams) {
+export function filterHelper(resolveParams: ExtendedResolveParams): void {
   const filter = resolveParams.args && resolveParams.args.filter;
-  if (filter && Object.keys(filter).length > 0) {
-    resolveParams.cursor = resolveParams.cursor.where(toDottedObject(filter)); // eslint-disable-line
+  if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
+    resolveParams.query = resolveParams.query.where(toDottedObject(filter)); // eslint-disable-line
   }
 }

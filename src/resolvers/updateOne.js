@@ -1,18 +1,24 @@
+/* @flow */
 /* eslint-disable no-param-reassign */
+
+import { skipHelperArgs } from './helpers/skip';
+import { inputHelperArgsGen } from './helpers/input';
+import { filterHelperArgsGen } from './helpers/filter';
+import { sortHelperArgsGen } from './helpers/sort';
+import findOne from './findOne';
 
 import type {
   MongooseModelT,
   GraphQLObjectType,
-} from './definition';
+  ExtendedResolveParams,
+  MongoseDocument,
+} from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
-import { skipHelperArgs, skipHelper } from './helpers/skip';
-import { filterHelperArgsGen, filterHelper } from './helpers/filter';
-import { sortHelperArgsGen, sortHelper } from './helpers/sort';
-import { projectionHelper } from './helpers/projection';
-import findOne from './findOne';
-
-export default function updateOne(model: MongooseModelT, gqType: GraphQLObjectType): Resolver {
+export default function updateOne(
+  model: MongooseModelT,
+  gqType: GraphQLObjectType,
+): Resolver {
   const findOneResolver = findOne(model);
 
   return new Resolver({
@@ -22,12 +28,15 @@ export default function updateOne(model: MongooseModelT, gqType: GraphQLObjectTy
     description: 'Find one document. Retrieve mongoose model document. Apply updates to document. '
                + 'Apply defaults, setters, hooks and validation. And save it.',
     args: {
-      ...inputHelperArgsGen(model, gqType),
+      ...inputHelperArgsGen(gqType, {
+        inputTypeName: `UpdateOne${gqType.name}Input`,
+        removeFields: ['id', '_id'],
+      }),
       ...filterHelperArgsGen(),
       ...sortHelperArgsGen(model, 'prefix'),
       ...skipHelperArgs,
     },
-    resolve: (resolveParams = {}) => {
+    resolve: (resolveParams: ExtendedResolveParams) => {
       const inputData = resolveParams.args && resolveParams.args.input || null;
 
       return findOneResolver.resolve(resolveParams)

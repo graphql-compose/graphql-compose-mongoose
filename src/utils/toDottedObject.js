@@ -1,25 +1,26 @@
+/* @flow */
+
 /**
  * Convert object to dotted-key/value pair
- *
+ * { a: { b: { c: 1 }}} ->  { 'a.b.c': 1 }
  * Usage:
  *   var dotObject(obj)
- *
  *   or
- *
- *   var tgt = {}
- *   dotObject(obj, target)
+ *   var target = {}; dotObject(obj, target)
  *
  * @param {Object} obj source object
  * @param {Object} target target object
  * @param {Array} path path array (internal)
  */
-export function toDottedObject(obj, target, path) {
+export function toDottedObject(
+  obj: Object,
+  target?: Object = {},
+  path?: string[] = []
+): { [dottedPath: string]: mixed } {
   /* eslint-disable */
-  target = target || {};
-  path = path || [];
   Object.keys(obj).forEach((key) => {
     if (Object(obj[key]) === obj[key]) {
-      return dotObject(obj[key], target, path.concat(key));
+      return toDottedObject(obj[key], target, path.concat(key));
     } else {
       target[path.concat(key).join('.')] = obj[key];
     }

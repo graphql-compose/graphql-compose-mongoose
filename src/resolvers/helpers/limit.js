@@ -1,6 +1,12 @@
-import { GraphQLInt } from 'graphql/type';
+/* @flow */
 
-export const limitHelperArgs = {
+import { GraphQLInt } from 'graphql/type';
+import type {
+  GraphQLFieldConfigArgumentMap,
+  ExtendedResolveParams,
+} from '../../definition';
+
+export const limitHelperArgs: GraphQLFieldConfigArgumentMap = {
   limit: {
     name: 'limit',
     type: GraphQLInt,
@@ -8,9 +14,9 @@ export const limitHelperArgs = {
   },
 };
 
-export function limitHelper(resolveParams) {
-  const limit = resolveParams.args && resolveParams.args.limit || 0;
+export function limitHelper(resolveParams: ExtendedResolveParams): void {
+  const limit = parseInt(resolveParams.args && resolveParams.args.limit, 10) || 0;
   if (limit > 0) {
-    resolveParams.cursor = resolveParams.cursor.limit(limit); // eslint-disable-line
+    resolveParams.query = resolveParams.query.limit(limit); // eslint-disable-line
   }
 }

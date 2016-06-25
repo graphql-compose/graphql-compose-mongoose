@@ -1,15 +1,22 @@
-import { GraphQLInt } from 'graphql/type';
+/* @flow */
 
-export const skipHelperArgs = {
+import { GraphQLInt } from 'graphql/type';
+import type {
+  GraphQLFieldConfigArgumentMap,
+  ExtendedResolveParams,
+} from '../../definition';
+
+
+export const skipHelperArgs: GraphQLFieldConfigArgumentMap = {
   skip: {
     name: 'skip',
     type: GraphQLInt,
   },
 };
 
-export function skipHelper(resolveParams) {
-  const skip = resolveParams.args && resolveParams.args.skip;
+export function skipHelper(resolveParams: ExtendedResolveParams): void {
+  const skip = parseInt(resolveParams.args && resolveParams.args.skip, 10);
   if (skip > 0) {
-    resolveParams.cursor = resolveParams.cursor.skip(skip); // eslint-disable-line
+    resolveParams.query = resolveParams.query.skip(skip); // eslint-disable-line
   }
 }
