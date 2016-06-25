@@ -12,7 +12,7 @@
  * @param {Object} target target object
  * @param {Array} path path array (internal)
  */
-export function toDottedObject(
+export default function toDottedObject(
   obj: Object,
   target?: Object = {},
   path?: string[] = []

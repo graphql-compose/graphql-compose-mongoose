@@ -39,18 +39,22 @@ export default function updateOne(
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
       const inputData = resolveParams.args && resolveParams.args.input || null;
+      const filterData = resolveParams.args && resolveParams.args.filter || {};
+
+      if (!(typeof filterData === 'object')
+        || Object.keys(filterData).length === 0
+      ) {
+        return Promise.reject(
+          new Error(`${gqType.name}.findOne resolver requires at least one value in args.filter`)
+        );
+      }
 
       return findOneResolver.resolve(resolveParams)
         // save changes to DB
         .then(doc => {
           if (inputData) {
             doc.set(inputData);
-            return doc.save().then(res => {
-              if (res.ok) {
-                return doc;
-              }
-              return null;
-            });
+            return doc.save();
           }
           return doc;
         })
@@ -59,7 +63,7 @@ export default function updateOne(
           if (record) {
             return {
               record: record.toObject(),
-              recordId: record._id,
+              recordId: record.id,
             };
           }
 
