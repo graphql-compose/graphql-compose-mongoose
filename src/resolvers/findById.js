@@ -1,7 +1,10 @@
+/* @flow */
+
 import type {
   MongooseModelT,
   GraphQLObjectType,
-} from './definition';
+  ExtendedResolveParams,
+} from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
 import {
@@ -22,13 +25,13 @@ export default function findById(model: MongooseModelT, gqType: GraphQLObjectTyp
         type: new GraphQLNonNull(GraphQLID),
       },
     },
-    resolve: (resolveParams = {}) => {
+    resolve: (resolveParams : ExtendedResolveParams = {}) => {
       const args = resolveParams.args || {};
 
       if (args.id) {
-        resolveParams.cursor = model.findById(args.id); // eslint-disable-line
+        resolveParams.query = model.findById(args.id); // eslint-disable-line
         projectionHelper(resolveParams);
-        return resolveParams.cursor.exec();
+        return resolveParams.query.exec();
       }
       return Promise.resolve(null);
     },

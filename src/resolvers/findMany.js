@@ -1,9 +1,11 @@
+/* @flow */
 /* eslint-disable no-param-reassign */
 
 import type {
   MongooseModelT,
   GraphQLObjectType,
-} from './definition';
+  ExtendedResolveParams,
+} from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 import {
   GraphQLList,
@@ -26,16 +28,18 @@ export default function findMany(model: MongooseModelT, gqType: GraphQLObjectTyp
       ...filterHelperArgs,
       ...skipHelperArgs,
       ...limitHelperArgs,
-      ...sortHelperArgsGen(model),
+      ...sortHelperArgsGen(model, {
+        sortTypeName: `Sort${gqType.name}Input`,
+      }),
     },
-    resolve: (resolveParams = {}) => {
-      resolveParams.cursor = model.find({}); // eslint-disable-line
+    resolve: (resolveParams : ExtendedResolveParams = {}) => {
+      resolveParams.query = model.find({}); // eslint-disable-line
       filterHelper(resolveParams);
       skipHelper(resolveParams);
       limitHelper(resolveParams);
       sortHelper(resolveParams);
       projectionHelper(resolveParams);
-      return resolveParams.cursor.exec();
+      return resolveParams.query.exec();
     },
   });
 }

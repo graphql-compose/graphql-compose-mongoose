@@ -1,3 +1,5 @@
+/* @flow */
+
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findMany from '../findMany';
@@ -65,12 +67,12 @@ describe('findMany() ->', () => {
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled Promise', async () => {
-      const result = findMany(UserModel, UserType).resolve();
+      const result = findMany(UserModel, UserType).resolve({});
       await expect(result).be.fulfilled;
     });
 
     it('should return array of documents if args is empty', async () => {
-      const result = await findMany(UserModel, UserType).resolve();
+      const result = await findMany(UserModel, UserType).resolve({});
 
       expect(result).to.be.instanceOf(Array);
       expect(result).to.have.lengthOf(2);

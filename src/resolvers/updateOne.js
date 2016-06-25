@@ -11,7 +11,6 @@ import type {
   MongooseModelT,
   GraphQLObjectType,
   ExtendedResolveParams,
-  MongoseDocument,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
@@ -33,7 +32,9 @@ export default function updateOne(
         removeFields: ['id', '_id'],
       }),
       ...filterHelperArgsGen(),
-      ...sortHelperArgsGen(model, 'prefix'),
+      ...sortHelperArgsGen(model, {
+        sortTypeName: `Sort${gqType.name}Input`,
+      }),
       ...skipHelperArgs,
     },
     resolve: (resolveParams: ExtendedResolveParams) => {

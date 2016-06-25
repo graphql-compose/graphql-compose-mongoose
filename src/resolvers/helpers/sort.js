@@ -32,7 +32,7 @@ export const sortHelperArgsGen = (
 };
 
 export function sortHelper(resolveParams: ExtendedResolveParams): void {
-  const sort = resolveParams.args && resolveParams.args.sort;
+  const sort = resolveParams && resolveParams.args && resolveParams.args.sort;
   if (sort && typeof sort === 'object' && Object.keys(sort).length > 0) {
     resolveParams.query = resolveParams.query.sort(sort); // eslint-disable-line
   }

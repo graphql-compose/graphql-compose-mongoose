@@ -1,7 +1,10 @@
+/* @flow */
+
 import type {
   MongooseModelT,
   GraphQLObjectType,
-} from './definition';
+  ExtendedResolveParams,
+} from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 import mongoose from 'mongoose';
 
@@ -26,9 +29,11 @@ export default function findByIds(model: MongooseModelT, gqType: GraphQLObjectTy
         type: new GraphQLNonNull(new GraphQLList(GraphQLID)),
       },
       ...limitHelperArgs,
-      ...sortHelperArgsGen(model),
+      ...sortHelperArgsGen(model, {
+        sortTypeName: `Sort${gqType.name}Input`,
+      }),
     },
-    resolve: (resolveParams = {}) => {
+    resolve: (resolveParams : ExtendedResolveParams = {}) => {
       const args = resolveParams.args || {};
 
       const selector = {};
@@ -42,11 +47,11 @@ export default function findByIds(model: MongooseModelT, gqType: GraphQLObjectTy
         return Promise.resolve([]);
       }
 
-      resolveParams.cursor = model.find(selector); // eslint-disable-line
+      resolveParams.query = model.find(selector); // eslint-disable-line
       projectionHelper(resolveParams);
       limitHelper(resolveParams);
       sortHelper(resolveParams);
-      return resolveParams.cursor.exec();
+      return resolveParams.query.exec();
     },
   });
 }

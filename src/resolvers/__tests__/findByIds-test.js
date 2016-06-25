@@ -1,3 +1,5 @@
+/* @flow */
+
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findByIds from '../findByIds';
@@ -55,12 +57,12 @@ describe('findByIds() ->', () => {
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled promise', async () => {
-      const result = findByIds(UserModel, UserType).resolve();
+      const result = findByIds(UserModel, UserType).resolve({});
       await expect(result).be.fulfilled;
     });
 
     it('should return empty array if args.ids is empty', async () => {
-      const result = await findByIds(UserModel, UserType).resolve();
+      const result = await findByIds(UserModel, UserType).resolve({});
       expect(result).to.be.instanceOf(Array);
       expect(result).to.be.empty;
     });

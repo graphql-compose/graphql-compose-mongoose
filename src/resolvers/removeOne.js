@@ -1,9 +1,10 @@
+/* @flow */
 /* eslint-disable no-param-reassign */
 
 import type {
   MongooseModelT,
   GraphQLObjectType,
-} from './definition';
+} from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
 import { skipHelperArgs, skipHelper } from './helpers/skip';
@@ -20,8 +21,8 @@ export default function removeOne(model: MongooseModelT, gqType: GraphQLObjectTy
       ...filterHelperArgs,
       ...skipHelperArgs,
     },
-    resolve: ({ args, projection }) => {
-      let cursor = model.findOneAndRemove({}, projection);
+    resolve: ({ args }) => {
+      let cursor = model.findOneAndRemove({});
       cursor = filterHelper(cursor, args);
       cursor = skipHelper(cursor, args);
 

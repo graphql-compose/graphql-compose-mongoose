@@ -27,9 +27,11 @@ export default function findOne(
     args: {
       ...filterHelperArgs,
       ...skipHelperArgs,
-      ...sortHelperArgsGen(model),
+      ...sortHelperArgsGen(model, {
+        sortTypeName: `Sort${gqType.name}Input`,
+      }),
     },
-    resolve: (resolveParams: ExtendedResolveParams) => {
+    resolve: (resolveParams : ExtendedResolveParams = {}) => {
       resolveParams.query = model.findOne({}); // eslint-disable-line
       filterHelper(resolveParams);
       skipHelper(resolveParams);

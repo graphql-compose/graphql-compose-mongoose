@@ -1,6 +1,4 @@
 [ignore]
-.*/__tests__/.*
-.*/__mocks__/.*
 .*/lib/.*
 .*/dist/.*
 .*/coverage/.*

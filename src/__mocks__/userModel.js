@@ -85,6 +85,7 @@ const UserSchema = new Schema(
   }
 );
 
+UserSchema.set('autoIndex', false);
 UserSchema.index({ name: 1, totalExperience: -1 });
 
 UserSchema.virtual('nameVirtual').get(function () { // eslint-disable-line

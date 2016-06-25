@@ -1,3 +1,5 @@
+/* @flow */
+
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findById from '../findById';
@@ -31,7 +33,7 @@ describe('findById() ->', () => {
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled promise', async () => {
-      const result = findById(UserModel).resolve();
+      const result = findById(UserModel).resolve({});
       await expect(result).be.fulfilled;
     });
 
@@ -41,7 +43,7 @@ describe('findById() ->', () => {
     });
 
     it('should return null if args.id is empty', async () => {
-      const result = await findById(UserModel).resolve();
+      const result = await findById(UserModel).resolve({});
       expect(result).equal(null);
     });
 
