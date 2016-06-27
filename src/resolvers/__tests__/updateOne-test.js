@@ -4,7 +4,6 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import updateOne from '../updateOne';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import { GraphQLObjectType } from 'graphql';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 
 const UserType = convertModelToGraphQL(UserModel, 'User');
@@ -29,7 +28,7 @@ describe('updateOne() ->', () => {
       name: 'userName2',
       skills: ['go', 'erlang'],
       gender: 'female',
-      relocation: false,
+      relocation: true,
     });
 
     return Promise.all([
@@ -70,7 +69,7 @@ describe('updateOne() ->', () => {
       await expect(result).be.rejectedWith(Error, 'at least one value in args.filter');
     });
 
-    it('should return recordId', async () => {
+    it('should return payload.recordId', async () => {
       const result = await updateOne(UserModel, UserType).resolve({
         args: { filter: { _id: user1.id } },
       });
@@ -87,34 +86,58 @@ describe('updateOne() ->', () => {
       expect(result).have.deep.property('record.name', 'newName');
     });
 
-    it('should change data via args.input in database', async () => {
-      const result = await updateOne(UserModel, UserType).resolve({
+    it('should change data via args.input in database', (done) => {
+      const checkedName = 'nameForMongoDB';
+      updateOne(UserModel, UserType).resolve({
         args: {
           filter: { _id: user1.id },
-          input: { name: 'newName' },
+          input: { name: checkedName },
+        },
+      }).then(() => {
+        UserModel.collection.findOne({ _id: user1._id }, (err, doc) => {
+          expect(doc.name).to.be.equal(checkedName);
+          done();
+        });
+      });
+    });
+
+    it('should return payload.record', async () => {
+      const result = await updateOne(UserModel, UserType).resolve({
+        args: { filter: { _id: user1.id } },
+      });
+      expect(result).have.deep.property('record.id', user1.id);
+    });
+
+    it('should skip records', async () => {
+      const result1 = await updateOne(UserModel, UserType).resolve({
+        args: {
+          filter: { relocation: true },
+          skip: 0,
         },
       });
-      throw new Error('TODO');
+      const result2 = await updateOne(UserModel, UserType).resolve({
+        args: {
+          filter: { relocation: true },
+          skip: 1,
+        },
+      });
+      expect(result1.record.id).to.not.equal(result2.record.id);
     });
 
-    xit('should return document if provided existed id', async () => {
-      const result = await updateOne(UserModel, UserType).resolve({ args: { id: user1._id } });
-      expect(result).have.property('name').that.equal(user1.name);
-    });
-
-    xit('should skip records', async () => {
-      const result = await updateOne(UserModel, UserType).resolve({ args: { skip: 2000 } });
-      expect(result).to.be.null;
-    });
-
-    xit('should sort records', async () => {
-      const result1 = await updateOne(UserModel, UserType)
-        .resolve({ args: { sort: { _id: 1 } } });
-
-      const result2 = await updateOne(UserModel, UserType)
-        .resolve({ args: { sort: { _id: -1 } } });
-
-      expect(`${result1._id}`).not.equal(`${result2._id}`);
+    it('should sort records', async () => {
+      const result1 = await updateOne(UserModel, UserType).resolve({
+        args: {
+          filter: { relocation: true },
+          sort: { _id: 1 },
+        },
+      });
+      const result2 = await updateOne(UserModel, UserType).resolve({
+        args: {
+          filter: { relocation: true },
+          sort: { _id: -1 },
+        },
+      });
+      expect(result1.record.id).to.not.equal(result2.record.id);
     });
   });
 });
