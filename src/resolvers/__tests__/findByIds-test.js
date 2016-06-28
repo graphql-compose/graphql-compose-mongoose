@@ -18,7 +18,9 @@ describe('findByIds() ->', () => {
   let user3;
 
   before('clear UserModel collection', (done) => {
-    UserModel.collection.drop(done);
+    UserModel.collection.drop(() => {
+      done();
+    });
   });
 
   before('add test users documents to mongoDB', (done) => {

@@ -12,7 +12,9 @@ describe('findById() ->', () => {
   let user;
 
   before('clear UserModel collection', (done) => {
-    UserModel.collection.drop(done);
+    UserModel.collection.drop(() => {
+      done();
+    });
   });
 
   before('add test user document to mongoDB', (done) => {
@@ -26,7 +28,7 @@ describe('findById() ->', () => {
   });
 
   describe('Resolver.args', () => {
-    it('should have non-null `id` arg', () => {
+    it('should have non-null `_id` arg', () => {
       const resolver = findById(UserModel);
       expect(resolver.hasArg('_id')).to.be.true;
       const argConfig = resolver.getArg('_id');

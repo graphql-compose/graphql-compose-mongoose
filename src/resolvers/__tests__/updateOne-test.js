@@ -7,6 +7,7 @@ import Resolver from '../../../../graphql-compose/src/resolver/resolver';
 import TypeComposer from '../../../../graphql-compose/src/typeComposer';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { GraphQLString } from 'graphql';
+import GraphQLMongoID from '../../types/mongoid';
 
 const UserType = convertModelToGraphQL(UserModel, 'User');
 
@@ -15,7 +16,9 @@ describe('updateOne() ->', () => {
   let user2;
 
   before('clear UserModel collection', (done) => {
-    UserModel.collection.drop(done);
+    UserModel.collection.drop(() => {
+      done();
+    });
   });
 
   before('add test user document to mongoDB', () => {
@@ -155,21 +158,19 @@ describe('updateOne() ->', () => {
   describe('Resolver.getOutputType()', () => {
     it('should have correct output type name', () => {
       const outputType = updateOne(UserModel, UserType).getOutputType();
-      expect(outputType.name).to.equal(`UpdateOne${UserType.name}Payload`);
+      expect(outputType).property('name').to.equal(`UpdateOne${UserType.name}Payload`);
     });
 
     it('should have recordId field', () => {
       const outputType = updateOne(UserModel, UserType).getOutputType();
-      const typeComposer = new TypeComposer(outputType);
-      expect(typeComposer.hasField('recordId')).to.be.true;
-      expect(typeComposer.getField('recordId').type).to.equal(GraphQLString);
+      const recordIdField = new TypeComposer(outputType).getField('recordId');
+      expect(recordIdField).property('type').to.equal(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType = updateOne(UserModel, UserType).getOutputType();
-      const typeComposer = new TypeComposer(outputType);
-      expect(typeComposer.hasField('record')).to.be.true;
-      expect(typeComposer.getField('record').type).to.equal(UserType);
+      const recordField = new TypeComposer(outputType).getField('record');
+      expect(recordField).property('type').to.equal(UserType);
     });
   });
 });

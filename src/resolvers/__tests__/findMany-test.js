@@ -16,7 +16,9 @@ describe('findMany() ->', () => {
   let user2;
 
   before('clear UserModel collection', (done) => {
-    UserModel.collection.drop(done);
+    UserModel.collection.drop(() => {
+      done();
+    });
   });
 
   before('add test user document to mongoDB', () => {

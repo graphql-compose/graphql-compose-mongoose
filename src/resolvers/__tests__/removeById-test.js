@@ -15,7 +15,9 @@ describe('removeById() ->', () => {
   let user;
 
   before('clear UserModel collection', (done) => {
-    UserModel.collection.drop(done);
+    UserModel.collection.drop(() => {
+      done();
+    });
   });
 
   beforeEach('add test user document to mongoDB', () => {
