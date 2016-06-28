@@ -5,7 +5,8 @@ import { inputHelperArgsGen } from './helpers/input';
 import { filterHelperArgsGen } from './helpers/filter';
 import { sortHelperArgsGen } from './helpers/sort';
 import findOne from './findOne';
-import { GraphQLObjectType, GraphQLString } from 'graphql';
+import { GraphQLObjectType } from 'graphql';
+import GraphQLMongoID from '../types/mongoid';
 
 import type {
   MongooseModelT,
@@ -31,7 +32,7 @@ export default function updateOne(
       name: `UpdateOne${gqType.name}Payload`,
       fields: {
         recordId: {
-          type: GraphQLString,
+          type: GraphQLMongoID,
           description: 'Updated document ID',
         },
         record: {

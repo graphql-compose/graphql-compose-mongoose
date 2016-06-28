@@ -2,7 +2,6 @@
 /* eslint-disable no-param-reassign */
 
 import { projectionHelper } from './helpers/projection';
-import findById from './findById';
 import {
   GraphQLObjectType,
   GraphQLNonNull,
@@ -23,9 +22,8 @@ export default function removeById(
     name: 'removeById',
     kind: 'mutation',
     description: 'Remove one document: '
-               + '1) Retrieve one document by findById. '
-               + '2) Remove mongoose document with hooks via findByIdAndRemove. '
-               + '3) Return removed document.',
+               + '1) Retrieve one document and remove with hooks via findByIdAndRemove. '
+               + '2) Return removed document.',
     outputType: new GraphQLObjectType({
       name: `RemoveById${gqType.name}Payload`,
       fields: {

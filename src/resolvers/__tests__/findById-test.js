@@ -4,7 +4,6 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findById from '../findById';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import InputTypeComposer from '../../../../graphql-compose/src/typeInputComposer';
 import { GraphQLNonNull } from 'graphql';
 import GraphQLMongoID from '../../types/mongoid';
 

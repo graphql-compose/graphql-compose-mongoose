@@ -6,7 +6,6 @@ import updateOne from '../updateOne';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
 import TypeComposer from '../../../../graphql-compose/src/typeComposer';
 import { convertModelToGraphQL } from '../../fieldsConverter';
-import { GraphQLString } from 'graphql';
 import GraphQLMongoID from '../../types/mongoid';
 
 const UserType = convertModelToGraphQL(UserModel, 'User');
