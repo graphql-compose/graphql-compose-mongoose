@@ -1,11 +1,10 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
-import { skipHelperArgs } from './helpers/skip';
+
 import { inputHelperArgsGen } from './helpers/input';
-import { filterHelperArgsGen } from './helpers/filter';
-import { sortHelperArgsGen } from './helpers/sort';
-import findOne from './findOne';
-import { GraphQLObjectType, GraphQLString } from 'graphql';
+import findById from './findById';
+import { GraphQLObjectType } from 'graphql';
+import GraphQLMongoID from '../types/mongoid';
 
 import type {
   MongooseModelT,
@@ -13,25 +12,25 @@ import type {
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
-export default function updateOne(
+export default function updateById(
   model: MongooseModelT,
   gqType: GraphQLObjectType,
 ): Resolver {
-  const findOneResolver = findOne(model, gqType);
+  const findByIdResolver = findById(model, gqType);
 
   const resolver = new Resolver({
-    name: 'updateOne',
+    name: 'updateById',
     kind: 'mutation',
     description: 'Update one document: '
-               + '1) Retrieve one document via findOne. '
+               + '1) Retrieve one document by findById. '
                + '2) Apply updates to mongoose document. '
                + '3) Mongoose applies defaults, setters, hooks and validation. '
                + '4) And save it.',
     outputType: new GraphQLObjectType({
-      name: `UpdateOne${gqType.name}Payload`,
+      name: `UpdateById${gqType.name}Payload`,
       fields: {
         recordId: {
-          type: GraphQLString,
+          type: GraphQLMongoID,
           description: 'Updated document ID',
         },
         record: {
@@ -42,30 +41,34 @@ export default function updateOne(
     }),
     args: {
       ...inputHelperArgsGen(gqType, {
-        inputTypeName: `UpdateOne${gqType.name}Input`,
-        removeFields: ['id', '_id'],
+        inputTypeName: `UpdateById${gqType.name}Input`,
+        requiredFields: ['_id'],
       }),
-      ...filterHelperArgsGen(),
-      ...sortHelperArgsGen(model, {
-        sortTypeName: `Sort${gqType.name}Input`,
-      }),
-      ...skipHelperArgs,
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const inputData = resolveParams.args && resolveParams.args.input || null;
-      const filterData = resolveParams.args && resolveParams.args.filter || {};
+      const inputData = resolveParams.args && resolveParams.args.input || {};
 
-      if (!(typeof filterData === 'object')
-        || Object.keys(filterData).length === 0
-      ) {
+      if (!(typeof inputData === 'object')) {
         return Promise.reject(
-          new Error(`${gqType.name}.findOne resolver requires at least one value in args.filter`)
+          new Error(`${gqType.name}.updateById resolver requires args.input value`)
         );
       }
 
-      return findOneResolver.resolve(resolveParams)
+      if (!inputData._id) {
+        return Promise.reject(
+          new Error(`${gqType.name}.updateById resolver requires args.input._id value`)
+        );
+      }
+
+      resolveParams.args._id = inputData._id;
+      delete inputData._id;
+
+      return findByIdResolver.resolve(resolveParams)
         // save changes to DB
         .then(doc => {
+          if (!doc) {
+            return Promise.reject('Document not found');
+          }
           if (inputData) {
             doc.set(inputData);
             return doc.save();

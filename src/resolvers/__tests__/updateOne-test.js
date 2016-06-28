@@ -4,7 +4,9 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import updateOne from '../updateOne';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
+import TypeComposer from '../../../../graphql-compose/src/typeComposer';
 import { convertModelToGraphQL } from '../../fieldsConverter';
+import { GraphQLString } from 'graphql';
 
 const UserType = convertModelToGraphQL(UserModel, 'User');
 
@@ -42,19 +44,28 @@ describe('updateOne() ->', () => {
     expect(resolver).to.be.instanceof(Resolver);
   });
 
-  it('Resolver object should have `filter` arg', () => {
-    const resolver = updateOne(UserModel, UserType);
-    expect(resolver.hasArg('filter')).to.be.true;
-  });
+  describe('Resolver.args', () => {
+    it('should have `filter` arg', () => {
+      const resolver = updateOne(UserModel, UserType);
+      expect(resolver.hasArg('filter')).to.be.true;
+    });
 
-  it('Resolver object should have `skip` arg', () => {
-    const resolver = updateOne(UserModel, UserType);
-    expect(resolver.hasArg('skip')).to.be.true;
-  });
+    it('should have `skip` arg', () => {
+      const resolver = updateOne(UserModel, UserType);
+      expect(resolver.hasArg('skip')).to.be.true;
+    });
 
-  it('Resolver object should have `sort` arg', () => {
-    const resolver = updateOne(UserModel, UserType);
-    expect(resolver.hasArg('sort')).to.be.true;
+    it('should have `sort` arg', () => {
+      const resolver = updateOne(UserModel, UserType);
+      expect(resolver.hasArg('sort')).to.be.true;
+    });
+
+    it('should have `input` arg', () => {
+      const resolver = updateOne(UserModel, UserType);
+      expect(resolver.hasArg('input')).to.be.true;
+      const argConfig = resolver.getArg('input');
+      expect(argConfig).has.deep.property('type.name', 'UpdateOneUserInput');
+    });
   });
 
   describe('Resolver.resolve():Promise', () => {
@@ -138,6 +149,27 @@ describe('updateOne() ->', () => {
         },
       });
       expect(result1.record.id).to.not.equal(result2.record.id);
+    });
+  });
+
+  describe('Resolver.getOutputType()', () => {
+    it('should have correct output type name', () => {
+      const outputType = updateOne(UserModel, UserType).getOutputType();
+      expect(outputType.name).to.equal(`UpdateOne${UserType.name}Payload`);
+    });
+
+    it('should have recordId field', () => {
+      const outputType = updateOne(UserModel, UserType).getOutputType();
+      const typeComposer = new TypeComposer(outputType);
+      expect(typeComposer.hasField('recordId')).to.be.true;
+      expect(typeComposer.getField('recordId').type).to.equal(GraphQLString);
+    });
+
+    it('should have record field', () => {
+      const outputType = updateOne(UserModel, UserType).getOutputType();
+      const typeComposer = new TypeComposer(outputType);
+      expect(typeComposer.hasField('record')).to.be.true;
+      expect(typeComposer.getField('record').type).to.equal(UserType);
     });
   });
 });
