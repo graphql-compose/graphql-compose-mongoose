@@ -33,7 +33,7 @@ export default function findMany(model: MongooseModelT, gqType: GraphQLObjectTyp
         sortTypeName: `Sort${gqType.name}Input`,
       }),
     },
-    resolve: (resolveParams : ExtendedResolveParams = {}) => {
+    resolve: (resolveParams : ExtendedResolveParams) => {
       resolveParams.query = model.find({}); // eslint-disable-line
       filterHelper(resolveParams);
       skipHelper(resolveParams);

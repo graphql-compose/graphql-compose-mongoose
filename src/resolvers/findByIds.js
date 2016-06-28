@@ -33,7 +33,7 @@ export default function findByIds(model: MongooseModelT, gqType: GraphQLObjectTy
         sortTypeName: `Sort${gqType.name}Input`,
       }),
     },
-    resolve: (resolveParams : ExtendedResolveParams = {}) => {
+    resolve: (resolveParams : ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
       const selector = {};

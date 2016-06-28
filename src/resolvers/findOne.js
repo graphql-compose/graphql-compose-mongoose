@@ -18,20 +18,18 @@ export default function findOne(
   model: MongooseModelT,
   gqType: GraphQLObjectType
 ): Resolver {
-  const filterHelperArgs = filterHelperArgsGen();
-
   return new Resolver({
     outputType: gqType,
     name: 'findOne',
     kind: 'query',
     args: {
-      ...filterHelperArgs,
+      ...filterHelperArgsGen(),
       ...skipHelperArgs,
       ...sortHelperArgsGen(model, {
         sortTypeName: `Sort${gqType.name}Input`,
       }),
     },
-    resolve: (resolveParams : ExtendedResolveParams = {}) => {
+    resolve: (resolveParams : ExtendedResolveParams) => {
       resolveParams.query = model.findOne({}); // eslint-disable-line
       filterHelper(resolveParams);
       skipHelper(resolveParams);

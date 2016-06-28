@@ -25,7 +25,7 @@ export default function findById(model: MongooseModelT, gqType: GraphQLObjectTyp
         type: new GraphQLNonNull(GraphQLMongoID),
       },
     },
-    resolve: (resolveParams : ExtendedResolveParams = {}) => {
+    resolve: (resolveParams : ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
       if (args._id) {
