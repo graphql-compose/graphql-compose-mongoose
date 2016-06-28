@@ -43,8 +43,10 @@ export type MongooseFieldT = {
 
 export type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
 
-export type ResolverNames = 'byId' | 'byIds' | 'findOne' | 'findMany' |
-                            'updateOne' | 'updateMany' | 'removeOne' | 'removeMany';
+export type ResolverNames = 'findById' | 'findByIds' | 'findOne' | 'findMany' |
+                            'updateById' | 'updateOne' | 'updateMany' |
+                            'removeById' | 'removeOne' | 'removeMany' |
+                            'createOne' | 'count';
 
 export type MongooseQuery = {
   exec(): Promise,

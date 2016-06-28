@@ -12,6 +12,7 @@ export type inputHelperArgsGenOpts = {
   inputTypeName: string,
   removeFields?: string | string[],
   requiredFields?: string | string[],
+  isRequired?: boolean,
 };
 
 export const inputHelperArgsGen = (
@@ -36,7 +37,9 @@ export const inputHelperArgsGen = (
   return {
     input: {
       name: 'input',
-      type: inputComposer.getType(),
+      type: opts.isRequired
+        ? new GraphQLNonNull(inputComposer.getType())
+        : inputComposer.getType(),
     },
   };
 };

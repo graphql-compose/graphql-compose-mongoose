@@ -43,6 +43,7 @@ export default function updateById(
       ...inputHelperArgsGen(gqType, {
         inputTypeName: `UpdateById${gqType.name}Input`,
         requiredFields: ['_id'],
+        isRequired: true,
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
