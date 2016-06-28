@@ -20,12 +20,13 @@ export type MonooseModelIndex = [
 
 export type MongooseModelT = {
   schema: MongooseModelSchemaT,
-  findOne(criteria: ?Object, projection?: Object): MongooseQuery,
+  findOne(conditions: ?Object, projection?: Object): MongooseQuery,
   findById(id: mixed, projection?: Object, options?: Object): MongooseQuery,
   find(conditions: ?Object, projection?: Object, options?: Object): MongooseQuery,
   findOneAndRemove(conditions: ?Object, options?: Object): MongooseQuery,
-  where(criteria: ObjectMap): MongooseQuery,
+  where(conditions: ObjectMap): MongooseQuery,
   findByIdAndRemove(id: mixed, options?: Object): MongooseQuery,
+  findOneAndRemove(conditions: ?Object, options?: Object): MongooseQuery,
 }
 
 export type MongooseFieldOptionsT = {

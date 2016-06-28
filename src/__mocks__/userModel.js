@@ -28,6 +28,11 @@ const UserSchema = new Schema(
       description: 'Person name',
     },
 
+    age: {
+      type: Number,
+      description: 'Full years',
+    },
+
     gender: {
       type: String,
       enum: ['male', 'female', 'ladyboy'],
@@ -63,11 +68,6 @@ const UserSchema = new Schema(
       type: [LanguagesSchema],
       default: [],
       description: 'Knowledge of languages',
-    },
-
-    totalExperience: {
-      type: Number,
-      description: 'Work experience in months',
     },
 
     // createdAt, created via option `timastamp: true`

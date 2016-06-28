@@ -94,7 +94,7 @@ describe('fieldConverter', () => {
     it('schould derive SCALAR', () => {
       expect(deriveComplexType(fields.name)).to.equal(ComplexTypes.SCALAR);
       expect(deriveComplexType(fields.relocation)).to.equal(ComplexTypes.SCALAR);
-      expect(deriveComplexType(fields.totalExperience)).to.equal(ComplexTypes.SCALAR);
+      expect(deriveComplexType(fields.age)).to.equal(ComplexTypes.SCALAR);
       expect(deriveComplexType(fields.createdAt)).to.equal(ComplexTypes.SCALAR);
 
       expect(deriveComplexType(fields.gender)).not.to.equal(ComplexTypes.SCALAR);
