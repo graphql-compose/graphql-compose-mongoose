@@ -37,6 +37,7 @@ export default function updateMany(
       ...inputHelperArgsGen(gqType, {
         inputTypeName: `UpdateMany${gqType.name}Input`,
         removeFields: ['id', '_id'],
+        isRequired: true,
       }),
       ...filterHelperArgsGen(model, {
         filterTypeName: `Filter${gqType.name}Input`,

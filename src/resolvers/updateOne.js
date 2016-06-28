@@ -45,6 +45,7 @@ export default function updateOne(
       ...inputHelperArgsGen(gqType, {
         inputTypeName: `UpdateOne${gqType.name}Input`,
         removeFields: ['id', '_id'],
+        isRequired: true,
       }),
       ...filterHelperArgsGen(model, {
         filterTypeName: `Filter${gqType.name}Input`,

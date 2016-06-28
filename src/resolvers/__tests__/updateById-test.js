@@ -55,17 +55,17 @@ describe('updateById() ->', () => {
   describe('Resolver.args', () => {
     it('should have `input` arg', () => {
       const resolver = updateById(UserModel, UserType);
-      expect(resolver.hasArg('input')).to.be.true;
       const argConfig = resolver.getArg('input');
-      expect(argConfig).has.deep.property('type.name', 'UpdateByIdUserInput');
+      expect(argConfig).property('type').instanceof(GraphQLNonNull);
+      expect(argConfig).deep.property('type.ofType.name', 'UpdateByIdUserInput');
     });
 
     it('should have `input._id` required arg', () => {
       const resolver = updateById(UserModel, UserType);
       const argConfig = resolver.getArg('input') || {};
-      expect(argConfig).property('type').instanceof(GraphQLInputObjectType);
-      if (argConfig.type) {
-        const _idFieldType = new InputTypeComposer(argConfig.type).getFieldType('_id');
+      expect(argConfig).deep.property('type.ofType').instanceof(GraphQLInputObjectType);
+      if (argConfig.type && argConfig.type.ofType) {
+        const _idFieldType = new InputTypeComposer(argConfig.type.ofType).getFieldType('_id');
         expect(_idFieldType).instanceof(GraphQLNonNull);
         expect(getNullableType(_idFieldType)).equal(GraphQLMongoID);
       }

@@ -6,7 +6,7 @@ import updateMany from '../updateMany';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
 import TypeComposer from '../../../../graphql-compose/src/typeComposer';
 import { convertModelToGraphQL } from '../../fieldsConverter';
-import { GraphQLInt } from 'graphql';
+import { GraphQLInt, GraphQLNonNull } from 'graphql';
 
 const UserType = convertModelToGraphQL(UserModel, 'User');
 
@@ -69,9 +69,9 @@ describe('updateMany() ->', () => {
 
     it('should have `input` arg', () => {
       const resolver = updateMany(UserModel, UserType);
-      expect(resolver.hasArg('input')).to.be.true;
       const argConfig = resolver.getArg('input');
-      expect(argConfig).has.deep.property('type.name', 'UpdateManyUserInput');
+      expect(argConfig).property('type').instanceof(GraphQLNonNull);
+      expect(argConfig).deep.property('type.ofType.name', 'UpdateManyUserInput');
     });
   });
 

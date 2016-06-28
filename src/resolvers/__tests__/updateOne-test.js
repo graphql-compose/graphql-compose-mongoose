@@ -7,6 +7,7 @@ import Resolver from '../../../../graphql-compose/src/resolver/resolver';
 import TypeComposer from '../../../../graphql-compose/src/typeComposer';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import GraphQLMongoID from '../../types/mongoid';
+import { GraphQLNonNull } from 'graphql/type';
 
 const UserType = convertModelToGraphQL(UserModel, 'User');
 
@@ -62,11 +63,11 @@ describe('updateOne() ->', () => {
       expect(resolver.hasArg('sort')).to.be.true;
     });
 
-    it('should have `input` arg', () => {
+    it('should have required `input` arg', () => {
       const resolver = updateOne(UserModel, UserType);
-      expect(resolver.hasArg('input')).to.be.true;
       const argConfig = resolver.getArg('input');
-      expect(argConfig).has.deep.property('type.name', 'UpdateOneUserInput');
+      expect(argConfig).property('type').instanceof(GraphQLNonNull);
+      expect(argConfig).deep.property('type.ofType.name', 'UpdateOneUserInput');
     });
   });
 
