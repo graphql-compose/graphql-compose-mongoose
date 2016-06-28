@@ -1,25 +1,39 @@
 /* @flow */
 
-import { GraphQLInt, GraphQLInputObjectType } from 'graphql/type';
+import { GraphQLInt, GraphQLInputObjectType, GraphQLNonNull } from 'graphql/type';
 import { toDottedObject } from '../../utils';
 import type {
   GraphQLFieldConfigArgumentMap,
   ExtendedResolveParams,
 } from '../../definition';
 
-export const filterHelperArgsGen = (): GraphQLFieldConfigArgumentMap => {
+export type filterHelperArgsGenOpts = {
+  filterTypeName: string,
+  isRequired?: boolean,
+};
+
+export const filterHelperArgsGen = (
+  model: MongooseModelT,
+  opts: filterHelperArgsGenOpts,
+): GraphQLFieldConfigArgumentMap => {
+  if (!opts.filterTypeName) {
+    throw new Error('You should provide `filterTypeName` in options.');
+  }
+
+  const filterType = new GraphQLInputObjectType({
+    name: opts.filterTypeName,
+    fields: {
+      age: {
+        name: 'age',
+        type: GraphQLInt, // TODO just mock, should be changed in future
+      },
+    },
+  });
+
   return {
     filter: {
       name: 'filter',
-      type: new GraphQLInputObjectType({
-        name: 'InputFilterSomeName',
-        fields: {
-          age: {
-            name: 'age',
-            type: GraphQLInt, // TODO just mock, should be changed in future
-          },
-        },
-      }),
+      type: opts.isRequired ? new GraphQLNonNull(filterType): filterType,
       description: 'Filter by indexed fields',
     },
   };

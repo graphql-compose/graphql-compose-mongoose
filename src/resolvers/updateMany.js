@@ -38,7 +38,9 @@ export default function updateMany(
         inputTypeName: `UpdateMany${gqType.name}Input`,
         removeFields: ['id', '_id'],
       }),
-      ...filterHelperArgsGen(),
+      ...filterHelperArgsGen(model, {
+        filterTypeName: `Filter${gqType.name}Input`,
+      }),
       ...sortHelperArgsGen(model, {
         sortTypeName: `Sort${gqType.name}Input`,
       }),
@@ -63,7 +65,7 @@ export default function updateMany(
       limitHelper(resolveParams);
 
       resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
-      resolveParams.query.update({ $set: inputData });
+      resolveParams.query.update({ $set: toDottedObject(inputData) });
 
       return resolveParams.query
         .exec()

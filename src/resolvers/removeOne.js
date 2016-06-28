@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType } from 'graphql';
+import { GraphQLObjectType, GraphQLNonNull } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
 import { skipHelperArgs, skipHelper } from './helpers/skip';
@@ -39,7 +39,9 @@ export default function removeOne(
       },
     }),
     args: {
-      ...filterHelperArgsGen(),
+      ...filterHelperArgsGen(model, {
+        filterTypeName: `Filter${gqType.name}Input`,
+      }),
       ...sortHelperArgsGen(model, {
         sortTypeName: `Sort${gqType.name}Input`,
       }),

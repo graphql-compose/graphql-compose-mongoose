@@ -23,7 +23,9 @@ export default function findOne(
     name: 'findOne',
     kind: 'query',
     args: {
-      ...filterHelperArgsGen(),
+      ...filterHelperArgsGen(model, {
+        filterTypeName: `Filter${gqType.name}Input`,
+      }),
       ...skipHelperArgs,
       ...sortHelperArgsGen(model, {
         sortTypeName: `Sort${gqType.name}Input`,

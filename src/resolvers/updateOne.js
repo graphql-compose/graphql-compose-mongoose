@@ -46,7 +46,9 @@ export default function updateOne(
         inputTypeName: `UpdateOne${gqType.name}Input`,
         removeFields: ['id', '_id'],
       }),
-      ...filterHelperArgsGen(),
+      ...filterHelperArgsGen(model, {
+        filterTypeName: `Filter${gqType.name}Input`,
+      }),
       ...sortHelperArgsGen(model, {
         sortTypeName: `Sort${gqType.name}Input`,
       }),

@@ -19,14 +19,14 @@ import { sortHelperArgsGen, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
 
 export default function findMany(model: MongooseModelT, gqType: GraphQLObjectType): Resolver {
-  const filterHelperArgs = filterHelperArgsGen();
-
   return new Resolver({
     outputType: new GraphQLList(gqType),
     name: 'findMany',
     kind: 'query',
     args: {
-      ...filterHelperArgs,
+      ...filterHelperArgsGen(model, {
+        filterTypeName: `Filter${gqType.name}Input`,
+      }),
       ...skipHelperArgs,
       ...limitHelperArgs,
       ...sortHelperArgsGen(model, {
