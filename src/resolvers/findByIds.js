@@ -11,8 +11,8 @@ import mongoose from 'mongoose';
 import {
   GraphQLNonNull,
   GraphQLList,
-  GraphQLID,
 } from 'graphql';
+import GraphQLMongoID from '../types/mongoid';
 
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { sortHelperArgsGen, sortHelper } from './helpers/sort';
@@ -24,9 +24,9 @@ export default function findByIds(model: MongooseModelT, gqType: GraphQLObjectTy
     name: 'findByIds',
     kind: 'query',
     args: {
-      ids: {
-        name: 'ids',
-        type: new GraphQLNonNull(new GraphQLList(GraphQLID)),
+      _ids: {
+        name: '_ids',
+        type: new GraphQLNonNull(new GraphQLList(GraphQLMongoID)),
       },
       ...limitHelperArgs,
       ...sortHelperArgsGen(model, {
@@ -37,9 +37,9 @@ export default function findByIds(model: MongooseModelT, gqType: GraphQLObjectTy
       const args = resolveParams.args || {};
 
       const selector = {};
-      if (Array.isArray(args.ids)) {
+      if (Array.isArray(args._ids)) {
         selector._id = {
-          $in: args.ids
+          $in: args._ids
             .filter(id => mongoose.Types.ObjectId.isValid(id))
             .map(id => mongoose.Types.ObjectId(id)), // eslint-disable-line
         };

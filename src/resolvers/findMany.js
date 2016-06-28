@@ -10,6 +10,7 @@ import Resolver from '../../../graphql-compose/src/resolver/resolver';
 import {
   GraphQLList,
 } from 'graphql';
+import GraphQLMongoID from '../types/mongoid';
 
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';

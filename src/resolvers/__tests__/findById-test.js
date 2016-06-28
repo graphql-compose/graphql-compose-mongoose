@@ -4,7 +4,9 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findById from '../findById';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import { GraphQLNonNull, GraphQLID } from 'graphql';
+import InputTypeComposer from '../../../../graphql-compose/src/typeInputComposer';
+import { GraphQLNonNull } from 'graphql';
+import GraphQLMongoID from '../../types/mongoid';
 
 describe('findById() ->', () => {
   let user;
@@ -23,12 +25,14 @@ describe('findById() ->', () => {
     expect(resolver).to.be.instanceof(Resolver);
   });
 
-  it('Resolver object should have non-null `id` arg', () => {
-    const resolver = findById(UserModel);
-    expect(resolver.hasArg('id')).to.be.true;
-    const argConfig = resolver.getArg('id');
-    expect(argConfig.type).to.be.instanceof(GraphQLNonNull);
-    expect(argConfig.type.ofType).to.equal(GraphQLID);
+  describe('Resolver.args', () => {
+    it('should have non-null `id` arg', () => {
+      const resolver = findById(UserModel);
+      expect(resolver.hasArg('_id')).to.be.true;
+      const argConfig = resolver.getArg('_id');
+      expect(argConfig).property('type').that.instanceof(GraphQLNonNull);
+      expect(argConfig).deep.property('type.ofType').that.equal(GraphQLMongoID);
+    });
   });
 
   describe('Resolver.resolve():Promise', () => {
@@ -38,7 +42,7 @@ describe('findById() ->', () => {
     });
 
     it('should be rejected if args.id is not objectId', async () => {
-      const result = findById(UserModel).resolve({ args: { id: 1 } });
+      const result = findById(UserModel).resolve({ args: { _id: 1 } });
       await expect(result).be.rejected;
     });
 
@@ -48,7 +52,7 @@ describe('findById() ->', () => {
     });
 
     it('should return document if provided existed id', async () => {
-      const result = await findById(UserModel).resolve({ args: { id: user._id } });
+      const result = await findById(UserModel).resolve({ args: { _id: user._id } });
       expect(result).have.property('name').that.equal(user.name);
     });
   });

@@ -9,11 +9,11 @@ import {
   GraphQLString,
   GraphQLFloat,
   GraphQLBoolean,
-  GraphQLID,
   GraphQLList,
   GraphQLEnumType,
   GraphQLObjectType,
 } from 'graphql/type';
+import GraphQLMongoID from './types/mongoid';
 
 import {
   GraphQLDate,
@@ -203,7 +203,7 @@ function removePseudoIdField(gqType: GraphQLOutputType): GraphQLOutputType {
   const composer = new TypeComposer(gqType);
   const gqFields = composer.getFields();
   Object.keys(gqFields).forEach(name => {
-    if (gqFields[name].type === GraphQLID) {
+    if (gqFields[name].type === GraphQLMongoID) {
       composer.removeField(name);
     }
   });
@@ -220,7 +220,7 @@ export function scalarToGraphQL(field: MongooseFieldT): GraphQLOutputType {
     case 'Date': return GraphQLDate;
     case 'Buffer': return GraphQLBuffer;
     case 'Boolean': return GraphQLBoolean;
-    case 'ObjectID': return GraphQLID;
+    case 'ObjectID': return GraphQLMongoID;
     default: return GraphQLGeneric;
   }
 }
