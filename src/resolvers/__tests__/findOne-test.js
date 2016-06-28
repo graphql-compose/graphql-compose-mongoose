@@ -44,19 +44,21 @@ describe('findOne() ->', () => {
     expect(resolver).to.be.instanceof(Resolver);
   });
 
-  it('Resolver object should have `filter` arg', () => {
-    const resolver = findOne(UserModel, UserType);
-    expect(resolver.hasArg('filter')).to.be.true;
-  });
+  describe('Resolver.args', () => {
+    it('should have `filter` arg', () => {
+      const resolver = findOne(UserModel, UserType);
+      expect(resolver.hasArg('filter')).to.be.true;
+    });
 
-  it('Resolver object should have `skip` arg', () => {
-    const resolver = findOne(UserModel, UserType);
-    expect(resolver.hasArg('skip')).to.be.true;
-  });
+    it('should have `skip` arg', () => {
+      const resolver = findOne(UserModel, UserType);
+      expect(resolver.hasArg('skip')).to.be.true;
+    });
 
-  it('Resolver object should have `sort` arg', () => {
-    const resolver = findOne(UserModel, UserType);
-    expect(resolver.hasArg('sort')).to.be.true;
+    it('should have `sort` arg', () => {
+      const resolver = findOne(UserModel, UserType);
+      expect(resolver.hasArg('sort')).to.be.true;
+    });
   });
 
   describe('Resolver.resolve():Promise', () => {
@@ -89,6 +91,13 @@ describe('findOne() ->', () => {
         .resolve({ args: { sort: { _id: -1 } } });
 
       expect(`${result1._id}`).not.equal(`${result2._id}`);
+    });
+  });
+
+  describe('Resolver.getOutputType()', () => {
+    it('should return model type', () => {
+      const outputType = findOne(UserModel, UserType).getOutputType();
+      expect(outputType).to.equal(UserType);
     });
   });
 });

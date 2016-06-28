@@ -1,6 +1,7 @@
 /* @flow */
 
 import TypeComposer from '../../../../graphql-compose/src/typeComposer';
+import { GraphQLNonNull } from 'graphql';
 
 import type {
   GraphQLObjectType,
@@ -10,6 +11,7 @@ import type {
 export type inputHelperArgsGenOpts = {
   inputTypeName: string,
   removeFields?: string | string[],
+  requiredFields?: string | string[],
 };
 
 export const inputHelperArgsGen = (
@@ -25,6 +27,10 @@ export const inputHelperArgsGen = (
   const inputComposer = composer.getInputTypeComposer().clone(opts.inputTypeName);
   if (opts.removeFields) {
     inputComposer.removeField(opts.removeFields);
+  }
+
+  if (opts.requiredFields) {
+    inputComposer.makeFieldsRequired(opts.requiredFields);
   }
 
   return {

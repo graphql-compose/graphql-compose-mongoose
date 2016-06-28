@@ -21,8 +21,8 @@ import {
   GraphQLBoolean,
   GraphQLList,
   GraphQLEnumType,
-  GraphQLID,
 } from 'graphql/type';
+import GraphQLMongoID from '../types/mongoid';
 
 import {
   GraphQLDate,
@@ -117,7 +117,7 @@ describe('fieldConverter', () => {
       expect(scalarToGraphQL({ instance: 'String' })).to.equal(GraphQLString);
       expect(scalarToGraphQL({ instance: 'Number' })).to.equal(GraphQLFloat);
       expect(scalarToGraphQL({ instance: 'Boolean' })).to.equal(GraphQLBoolean);
-      expect(scalarToGraphQL({ instance: 'ObjectID' })).to.equal(GraphQLID);
+      expect(scalarToGraphQL({ instance: 'ObjectID' })).to.equal(GraphQLMongoID);
     });
 
     it('should properly convert mongoose scalar type to scalar graphql-compose types', () => {

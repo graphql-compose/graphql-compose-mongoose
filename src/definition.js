@@ -24,6 +24,8 @@ export type MongooseModelT = {
   findById(id: mixed, projection?: Object, options?: Object): MongooseQuery,
   find(conditions: ?Object, projection?: Object, options?: Object): MongooseQuery,
   findOneAndRemove(conditions: ?Object, options?: Object): MongooseQuery,
+  where(criteria: ObjectMap): MongooseQuery,
+  findByIdAndRemove(id: mixed, options?: Object): MongooseQuery,
 }
 
 export type MongooseFieldOptionsT = {
@@ -52,6 +54,8 @@ export type MongooseQuery = {
   limit(num: number): MongooseQuery,
   select(projection: ObjectMap): MongooseQuery,
   sort(fields: ObjectMap): MongooseQuery,
+  setOptions(opts: ObjectMap): MongooseQuery,
+  update(data: ObjectMap): MongooseQuery,
 };
 
 export type MongoseDocument = {
