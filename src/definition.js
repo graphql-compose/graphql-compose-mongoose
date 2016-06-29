@@ -20,6 +20,7 @@ export type MonooseModelIndex = [
 
 export type MongooseModelT = {
   schema: MongooseModelSchemaT,
+  create(doc: Object | Object[]): Promise,
   findOne(conditions: ?Object, projection?: Object): MongooseQuery,
   findById(id: mixed, projection?: Object, options?: Object): MongooseQuery,
   find(conditions: ?Object, projection?: Object, options?: Object): MongooseQuery,
