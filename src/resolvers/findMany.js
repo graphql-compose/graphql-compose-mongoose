@@ -10,7 +10,6 @@ import Resolver from '../../../graphql-compose/src/resolver/resolver';
 import {
   GraphQLList,
 } from 'graphql';
-import GraphQLMongoID from '../types/mongoid';
 
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
@@ -34,7 +33,7 @@ export default function findMany(model: MongooseModelT, gqType: GraphQLObjectTyp
       }),
     },
     resolve: (resolveParams : ExtendedResolveParams) => {
-      resolveParams.query = model.find({}); // eslint-disable-line
+      resolveParams.query = model.find();
       filterHelper(resolveParams);
       skipHelper(resolveParams);
       limitHelper(resolveParams);

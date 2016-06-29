@@ -11,7 +11,6 @@ import {
   arrayToGraphQL,
   embeddedToGraphQL,
   enumToGraphQL,
-  referenceToGraphQL,
   documentArrayToGraphQL,
 } from '../fieldsConverter';
 

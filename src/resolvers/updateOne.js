@@ -63,7 +63,7 @@ export default function updateOne(
         || Object.keys(filterData).length === 0
       ) {
         return Promise.reject(
-          new Error(`${gqType.name}.findOne resolver requires at least one value in args.filter`)
+          new Error(`${gqType.name}.updateOne resolver requires at least one value in args.filter`)
         );
       }
 
