@@ -39,7 +39,8 @@ export type MongooseFieldT = {
   caster?: ?MongooseFieldT,
   options?: ?MongooseFieldOptionsT,
   enumValues?: ?string[],
-} | MongooseModelT;
+  schema: MongooseModelSchemaT,
+};
 
 export type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
 
@@ -59,6 +60,7 @@ export type MongooseQuery = {
   sort(fields: ObjectMap): MongooseQuery,
   setOptions(opts: ObjectMap): MongooseQuery,
   update(data: ObjectMap): MongooseQuery,
+  remove(conditions: ?Object, options?: Object): MongooseQuery,
 };
 
 export type MongoseDocument = {
@@ -74,6 +76,7 @@ import type {
   ResolveParams as _ResolveParams,
   GraphQLFieldConfigArgumentMap as _GraphQLFieldConfigArgumentMap,
   ResolverMWResolveFn as _ResolverMWResolveFn,
+  GraphQLResolveInfo as _GraphQLResolveInfo,
 } from '../../graphql-compose/src/definition';
 
 export type GraphQLObjectType = _GraphQLObjectType;
@@ -81,6 +84,7 @@ export type GraphQLOutputType = _GraphQLOutputType;
 export type InputObjectConfigFieldMap = _InputObjectConfigFieldMap;
 export type GraphQLFieldConfigArgumentMap = _GraphQLFieldConfigArgumentMap;
 export type ResolveParams = _ResolveParams;
+export type GraphQLResolveInfo = _GraphQLResolveInfo;
 export type ResolverMWResolveFn = _ResolverMWResolveFn;
 export type ExtendedResolveParams = ResolveParams & {
   query: MongooseQuery,

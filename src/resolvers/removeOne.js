@@ -1,10 +1,9 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType, GraphQLNonNull } from 'graphql';
+import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
-import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { filterHelperArgsGen, filterHelper } from './helpers/filter';
 import { sortHelperArgsGen, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
