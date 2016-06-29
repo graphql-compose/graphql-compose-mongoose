@@ -147,9 +147,7 @@ export function convertModelToGraphQL(
     };
   });
 
-  /* ::` */
   typeComposer.addFields(graphqlFields);
-  /* ::` */
   return typeComposer.getType();
 }
 
@@ -198,7 +196,7 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
   return ComplexTypes.SCALAR;
 }
 
-function removePseudoIdField(gqType: GraphQLOutputType): GraphQLOutputType {
+function removePseudoIdField(gqType: GraphQLObjectType): GraphQLObjectType {
   // remove pseudo object id mongoose field
   const composer = new TypeComposer(gqType);
   const gqFields = composer.getFields();
@@ -255,10 +253,15 @@ export function embeddedToGraphQL(
   }
 
   const typeName = `${prefix}${capitalize(fieldName)}`;
+  // $FlowFixMe
   const fieldAsModel: MongooseModelT = field;
-  const gqType = convertModelToGraphQL(fieldAsModel, typeName);
+  let gqType = convertModelToGraphQL(fieldAsModel, typeName);
 
-  return removePseudoIdField(gqType);
+  if (gqType instanceof GraphQLObjectType) {
+    gqType = removePseudoIdField(gqType);
+  }
+
+  return gqType;
 }
 
 
@@ -296,8 +299,11 @@ export function documentArrayToGraphQL(
 
   const typeName = `${prefix}${capitalize(_getFieldName(field))}`;
 
-  const outputType = convertModelToGraphQL(field, typeName);
-  return new GraphQLList(removePseudoIdField(outputType));
+  let outputType = convertModelToGraphQL(field, typeName);
+  if (outputType instanceof GraphQLObjectType) {
+    outputType = removePseudoIdField(outputType);
+  }
+  return new GraphQLList(outputType);
 }
 
 
@@ -314,8 +320,8 @@ export function referenceToGraphQL(
   const refModelName = objectPath.get(field, 'options.ref');
   if (refModelName) {
     return GQLReference;
-    throw new Error('Mongoose REFERENCE to graphQL TYPE not implemented yet. '
-                    + `Field ${_getFieldName(field)}`);
+    // throw new Error('Mongoose REFERENCE to graphQL TYPE not implemented yet. '
+    //                + `Field ${_getFieldName(field)}`);
     // Storage.UnresolvedRefs.setSubKey(parentTypeName, fieldName, { refModelName });
     // return GraphQLReference;
   }

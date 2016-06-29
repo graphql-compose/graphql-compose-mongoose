@@ -59,7 +59,7 @@ export default function updateMany(
         );
       }
 
-      resolveParams.query = model.where({}); // eslint-disable-line
+      resolveParams.query = model.find();
       filterHelper(resolveParams);
       skipHelper(resolveParams);
       sortHelper(resolveParams);

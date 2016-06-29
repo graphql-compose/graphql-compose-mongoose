@@ -1,15 +1,19 @@
 [ignore]
+.*/__tests__/.*
 .*/lib/.*
 .*/dist/.*
 .*/coverage/.*
 .*/resources/.*
+.*/node_modules/graphql.*
 
 [include]
 ../graphql-compose/src
+../graphql-compose/__forks__/graphql-js/src
 
 [libs]
 
 [options]
 esproposal.class_instance_fields=enable
+suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
 module.name_mapper='^graphql\(.*\)$' -> '/Users/nod/www/_npm/graphql-compose/__forks__/graphql-js/src\1'
 module.name_mapper='graphql-compose\(.*\)$' -> '/Users/nod/www/_npm/graphql-compose\1'

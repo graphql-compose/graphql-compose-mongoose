@@ -5,6 +5,7 @@ import { toDottedObject } from '../../utils';
 import type {
   GraphQLFieldConfigArgumentMap,
   ExtendedResolveParams,
+  MongooseModelT,
 } from '../../definition';
 
 export type filterHelperArgsGenOpts = {
@@ -33,7 +34,7 @@ export const filterHelperArgsGen = (
   return {
     filter: {
       name: 'filter',
-      type: opts.isRequired ? new GraphQLNonNull(filterType): filterType,
+      type: opts.isRequired ? new GraphQLNonNull(filterType) : filterType,
       description: 'Filter by indexed fields',
     },
   };
