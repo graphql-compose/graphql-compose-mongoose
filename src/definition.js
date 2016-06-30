@@ -109,8 +109,8 @@ export type sortHelperArgsOpts = {
 
 export type inputHelperArgsOpts = {
   inputTypeName?: string,
-  removeFields?: string | string[],
-  requiredFields?: string | string[],
+  removeFields?: string[],
+  requiredFields?: string[],
   isRequired?: boolean,
 };
 

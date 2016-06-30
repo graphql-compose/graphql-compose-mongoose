@@ -4,12 +4,11 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findByIds from '../findByIds';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import { GraphQLNonNull, GraphQLList, GraphQLObjectType } from 'graphql';
+import { GraphQLNonNull, GraphQLList } from 'graphql';
 import GraphQLMongoID from '../../types/mongoid';
+import { convertModelToGraphQL } from '../../fieldsConverter';
 
-const UserType = new GraphQLObjectType({
-  name: 'MockUserType',
-});
+const UserType = convertModelToGraphQL(UserModel, 'User');
 
 describe('findByIds() ->', () => {
   let user1;

@@ -5,7 +5,7 @@ import { UserModel } from '../../__mocks__/userModel.js';
 import updateById from '../updateById';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
 import TypeComposer from '../../../../graphql-compose/src/typeComposer';
-import InputTypeComposer from '../../../../graphql-compose/src/typeInputComposer';
+import InputTypeComposer from '../../../../graphql-compose/src/inputTypeComposer';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import {
   GraphQLNonNull,

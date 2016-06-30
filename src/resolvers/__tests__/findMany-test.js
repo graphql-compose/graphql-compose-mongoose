@@ -4,11 +4,9 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findMany from '../findMany';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import { GraphQLObjectType } from 'graphql';
+import { convertModelToGraphQL } from '../../fieldsConverter';
 
-const UserType = new GraphQLObjectType({
-  name: 'MockUserType',
-});
+const UserType = convertModelToGraphQL(UserModel, 'User');
 
 
 describe('findMany() ->', () => {
