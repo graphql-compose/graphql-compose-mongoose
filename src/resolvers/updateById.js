@@ -18,6 +18,18 @@ export default function updateById(
   gqType: GraphQLObjectType,
   opts?: genResolverOpts,
 ): Resolver {
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for Resolver updateById() should be instance of Mongoose Model.'
+    );
+  }
+
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error(
+      'Second arg for Resolver updateById() should be instance of GraphQLObjectType.'
+    );
+  }
+
   const findByIdResolver = findById(model, gqType);
 
   const resolver = new Resolver({

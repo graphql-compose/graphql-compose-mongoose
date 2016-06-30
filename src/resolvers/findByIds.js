@@ -2,7 +2,6 @@
 
 import type {
   MongooseModelT,
-  GraphQLObjectType,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
@@ -12,6 +11,7 @@ import mongoose from 'mongoose';
 import {
   GraphQLNonNull,
   GraphQLList,
+  GraphQLObjectType,
 } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
@@ -24,6 +24,16 @@ export default function findByIds(
   gqType: GraphQLObjectType,
   opts?: genResolverOpts
 ): Resolver {
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for Resolver findByIds() should be instance of Mongoose Model.'
+    );
+  }
+
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error('Second arg for Resolver findByIds() should be instance of GraphQLObjectType.');
+  }
+
   return new Resolver({
     outputType: new GraphQLList(gqType),
     name: 'findByIds',

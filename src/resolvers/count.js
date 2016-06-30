@@ -3,12 +3,11 @@
 
 import type {
   MongooseModelT,
-  GraphQLObjectType,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
-import { GraphQLInt } from 'graphql';
+import { GraphQLInt, GraphQLObjectType } from 'graphql';
 
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 
@@ -18,6 +17,16 @@ export default function count(
   gqType: GraphQLObjectType,
   opts?: genResolverOpts,
 ): Resolver {
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for Resolver count() should be instance of Mongoose Model.'
+    );
+  }
+
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error('Second arg for Resolver count() should be instance of GraphQLObjectType.');
+  }
+
   return new Resolver({
     outputType: GraphQLInt,
     name: 'count',

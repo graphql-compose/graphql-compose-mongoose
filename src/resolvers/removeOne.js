@@ -21,6 +21,18 @@ export default function removeOne(
   gqType: GraphQLObjectType,
   opts?: genResolverOpts,
 ): Resolver {
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for Resolver removeOne() should be instance of Mongoose Model.'
+    );
+  }
+
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error(
+      'Second arg for Resolver removeOne() should be instance of GraphQLObjectType.'
+    );
+  }
+
   const resolver = new Resolver({
     name: 'removeOne',
     kind: 'mutation',

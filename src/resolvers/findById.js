@@ -2,7 +2,6 @@
 
 import type {
   MongooseModelT,
-  GraphQLObjectType,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
@@ -10,6 +9,7 @@ import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
 import {
   GraphQLNonNull,
+  GraphQLObjectType,
 } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
@@ -20,6 +20,16 @@ export default function findById(
   gqType: GraphQLObjectType,
   opts?: genResolverOpts // eslint-disable-line no-unused-vars
 ): Resolver {
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for Resolver findById() should be instance of Mongoose Model.'
+    );
+  }
+
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error('Second arg for Resolver findById() should be instance of GraphQLObjectType.');
+  }
+
   return new Resolver({
     outputType: gqType,
     name: 'findById',

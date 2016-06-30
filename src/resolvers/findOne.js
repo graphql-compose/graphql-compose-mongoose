@@ -7,10 +7,10 @@ import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
+import { GraphQLObjectType } from 'graphql';
 
 import type {
   MongooseModelT,
-  GraphQLObjectType,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
@@ -21,6 +21,16 @@ export default function findOne(
   gqType: GraphQLObjectType,
   opts?: genResolverOpts,
 ): Resolver {
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for Resolver findOne() should be instance of Mongoose Model.'
+    );
+  }
+
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error('Second arg for Resolver findOne() should be instance of GraphQLObjectType.');
+  }
+
   return new Resolver({
     outputType: gqType,
     name: 'findOne',

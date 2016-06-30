@@ -17,6 +17,16 @@ export default function createOne(
   gqType: GraphQLObjectType,
   opts?: genResolverOpts,
 ): Resolver {
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for Resolver createOne() should be instance of Mongoose Model.'
+    );
+  }
+
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error('Second arg for Resolver createOne() should be instance of GraphQLObjectType.');
+  }
+
   const resolver = new Resolver({
     name: 'createOne',
     kind: 'mutation',

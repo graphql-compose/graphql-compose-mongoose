@@ -21,6 +21,17 @@ export default function updateOne(
   gqType: GraphQLObjectType,
   opts?: genResolverOpts,
 ): Resolver {
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for Resolver updateOne() should be instance of Mongoose Model.'
+    );
+  }
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error(
+      'Second arg for Resolver updateOne() should be instance of GraphQLObjectType.'
+    );
+  }
+
   const findOneResolver = findOne(model, gqType, opts);
 
   const resolver = new Resolver({

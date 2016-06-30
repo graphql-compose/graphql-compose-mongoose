@@ -20,6 +20,18 @@ export default function removeById(
   gqType: GraphQLObjectType,
   opts?: genResolverOpts, // eslint-disable-line no-unused-vars
 ): Resolver {
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for Resolver removeById() should be instance of Mongoose Model.'
+    );
+  }
+
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error(
+      'Second arg for Resolver removeById() should be instance of GraphQLObjectType.'
+    );
+  }
+
   const resolver = new Resolver({
     name: 'removeById',
     kind: 'mutation',
