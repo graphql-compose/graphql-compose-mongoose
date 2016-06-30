@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { inputHelperArgsGen } from './helpers/input';
+import { inputHelperArgs } from './helpers/input';
 import findById from './findById';
 import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
@@ -9,12 +9,14 @@ import GraphQLMongoID from '../types/mongoid';
 import type {
   MongooseModelT,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
 export default function updateById(
   model: MongooseModelT,
   gqType: GraphQLObjectType,
+  opts?: genResolverOpts,
 ): Resolver {
   const findByIdResolver = findById(model, gqType);
 
@@ -40,10 +42,11 @@ export default function updateById(
       },
     }),
     args: {
-      ...inputHelperArgsGen(gqType, {
+      ...inputHelperArgs(gqType, {
         inputTypeName: `UpdateById${gqType.name}Input`,
         requiredFields: ['_id'],
         isRequired: true,
+        ...(opts && opts.input),
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {

@@ -1,22 +1,25 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
-import { inputHelperArgsGen } from './helpers/input';
+import { inputHelperArgs } from './helpers/input';
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
-import { filterHelperArgsGen, filterHelper } from './helpers/filter';
-import { sortHelperArgsGen, sortHelper } from './helpers/sort';
+import { filterHelperArgs, filterHelper } from './helpers/filter';
+import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { GraphQLObjectType, GraphQLInt } from 'graphql';
 import toDottedObject from '../utils/toDottedObject';
 
 import type {
   MongooseModelT,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
+
 
 export default function updateMany(
   model: MongooseModelT,
   gqType: GraphQLObjectType,
+  opts?: genResolverOpts,
 ): Resolver {
   const resolver = new Resolver({
     name: 'updateMany',
@@ -34,19 +37,25 @@ export default function updateMany(
       },
     }),
     args: {
-      ...inputHelperArgsGen(gqType, {
+      ...inputHelperArgs(gqType, {
         inputTypeName: `UpdateMany${gqType.name}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
+        ...(opts && opts.input),
       }),
-      ...filterHelperArgsGen(model, {
+      ...filterHelperArgs(gqType, {
         filterTypeName: `Filter${gqType.name}Input`,
+        model,
+        ...(opts && opts.filter),
       }),
-      ...sortHelperArgsGen(model, {
+      ...sortHelperArgs(model, {
         sortTypeName: `Sort${gqType.name}Input`,
+        ...(opts && opts.sort),
       }),
-      ...skipHelperArgs,
-      ...limitHelperArgs,
+      ...skipHelperArgs(),
+      ...limitHelperArgs({
+        ...(opts && opts.limit),
+      }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
       const inputData = resolveParams.args && resolveParams.args.input || {};

@@ -4,19 +4,22 @@
 import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
-import { filterHelperArgsGen, filterHelper } from './helpers/filter';
-import { sortHelperArgsGen, sortHelper } from './helpers/sort';
+import { filterHelperArgs, filterHelper } from './helpers/filter';
+import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
 
 import type {
   MongooseModelT,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
+
 
 export default function removeOne(
   model: MongooseModelT,
   gqType: GraphQLObjectType,
+  opts?: genResolverOpts,
 ): Resolver {
   const resolver = new Resolver({
     name: 'removeOne',
@@ -38,11 +41,14 @@ export default function removeOne(
       },
     }),
     args: {
-      ...filterHelperArgsGen(model, {
+      ...filterHelperArgs(gqType, {
         filterTypeName: `Filter${gqType.name}Input`,
+        model,
+        ...(opts && opts.filter),
       }),
-      ...sortHelperArgsGen(model, {
+      ...sortHelperArgs(model, {
         sortTypeName: `Sort${gqType.name}Input`,
+        ...(opts && opts.sort),
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {

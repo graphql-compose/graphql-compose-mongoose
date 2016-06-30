@@ -4,11 +4,10 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findOne from '../findOne';
 import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import { GraphQLObjectType } from 'graphql';
+import { convertModelToGraphQL } from '../../fieldsConverter';
+import { GraphQLNonNull } from 'graphql';
 
-const UserType = new GraphQLObjectType({
-  name: 'MockUserType',
-});
+const UserType = convertModelToGraphQL(UserModel, 'User');
 
 describe('findOne() ->', () => {
   let user1;
@@ -50,6 +49,18 @@ describe('findOne() ->', () => {
     it('should have `filter` arg', () => {
       const resolver = findOne(UserModel, UserType);
       expect(resolver.hasArg('filter')).to.be.true;
+    });
+
+    it('should have `filter` arg only with indexed fields', async () => {
+      const result = findOne(UserModel, UserType, { filter: { onlyIndexed: true } });
+      const filterFields = result.args.filter.type._typeConfig.fields();
+      expect(filterFields).all.keys(['_id', 'name', 'employment']);
+    });
+
+    it('should have `filter` arg with required `name` field', async () => {
+      const result = findOne(UserModel, UserType, { filter: { requiredFields: 'name' } });
+      const filterFields = result.args.filter.type._typeConfig.fields();
+      expect(filterFields).deep.property('name.type').instanceof(GraphQLNonNull);
     });
 
     it('should have `skip` arg', () => {

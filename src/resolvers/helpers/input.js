@@ -6,18 +6,12 @@ import { GraphQLNonNull } from 'graphql';
 import type {
   GraphQLObjectType,
   GraphQLFieldConfigArgumentMap,
+  inputHelperArgsOpts,
 } from '../../definition';
 
-export type inputHelperArgsGenOpts = {
-  inputTypeName: string,
-  removeFields?: string | string[],
-  requiredFields?: string | string[],
-  isRequired?: boolean,
-};
-
-export const inputHelperArgsGen = (
+export const inputHelperArgs = (
   gqType: GraphQLObjectType,
-  opts: inputHelperArgsGenOpts
+  opts: inputHelperArgsOpts
 ): GraphQLFieldConfigArgumentMap => {
   const composer = new TypeComposer(gqType);
 

@@ -11,12 +11,14 @@ import GraphQLMongoID from '../types/mongoid';
 import type {
   MongooseModelT,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
 export default function removeById(
   model: MongooseModelT,
   gqType: GraphQLObjectType,
+  opts?: genResolverOpts, // eslint-disable-line no-unused-vars
 ): Resolver {
   const resolver = new Resolver({
     name: 'removeById',

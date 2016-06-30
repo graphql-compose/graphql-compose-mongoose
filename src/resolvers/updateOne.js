@@ -1,9 +1,9 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 import { skipHelperArgs } from './helpers/skip';
-import { inputHelperArgsGen } from './helpers/input';
-import { filterHelperArgsGen } from './helpers/filter';
-import { sortHelperArgsGen } from './helpers/sort';
+import { inputHelperArgs } from './helpers/input';
+import { filterHelperArgs } from './helpers/filter';
+import { sortHelperArgs } from './helpers/sort';
 import findOne from './findOne';
 import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
@@ -11,14 +11,17 @@ import GraphQLMongoID from '../types/mongoid';
 import type {
   MongooseModelT,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
+
 
 export default function updateOne(
   model: MongooseModelT,
   gqType: GraphQLObjectType,
+  opts?: genResolverOpts,
 ): Resolver {
-  const findOneResolver = findOne(model, gqType);
+  const findOneResolver = findOne(model, gqType, opts);
 
   const resolver = new Resolver({
     name: 'updateOne',
@@ -42,18 +45,22 @@ export default function updateOne(
       },
     }),
     args: {
-      ...inputHelperArgsGen(gqType, {
+      ...inputHelperArgs(gqType, {
         inputTypeName: `UpdateOne${gqType.name}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
+        ...(opts && opts.input),
       }),
-      ...filterHelperArgsGen(model, {
+      ...filterHelperArgs(gqType, {
         filterTypeName: `Filter${gqType.name}Input`,
+        model,
+        ...(opts && opts.filter),
       }),
-      ...sortHelperArgsGen(model, {
+      ...sortHelperArgs(model, {
         sortTypeName: `Sort${gqType.name}Input`,
+        ...(opts && opts.sort),
       }),
-      ...skipHelperArgs,
+      ...skipHelperArgs(),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
       const inputData = resolveParams.args && resolveParams.args.input || null;

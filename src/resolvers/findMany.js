@@ -5,6 +5,7 @@ import type {
   MongooseModelT,
   GraphQLObjectType,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 import {
@@ -13,23 +14,33 @@ import {
 
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
-import { filterHelperArgsGen, filterHelper } from './helpers/filter';
-import { sortHelperArgsGen, sortHelper } from './helpers/sort';
+import { filterHelperArgs, filterHelper } from './helpers/filter';
+import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
 
-export default function findMany(model: MongooseModelT, gqType: GraphQLObjectType): Resolver {
+
+export default function findMany(
+  model: MongooseModelT,
+  gqType: GraphQLObjectType,
+  opts?: genResolverOpts,
+): Resolver {
   return new Resolver({
     outputType: new GraphQLList(gqType),
     name: 'findMany',
     kind: 'query',
     args: {
-      ...filterHelperArgsGen(model, {
+      ...filterHelperArgs(gqType, {
         filterTypeName: `Filter${gqType.name}Input`,
+        model,
+        ...(opts && opts.filter),
       }),
-      ...skipHelperArgs,
-      ...limitHelperArgs,
-      ...sortHelperArgsGen(model, {
+      ...skipHelperArgs(),
+      ...limitHelperArgs({
+        ...(opts && opts.limit),
+      }),
+      ...sortHelperArgs(model, {
         sortTypeName: `Sort${gqType.name}Input`,
+        ...(opts && opts.sort),
       }),
     },
     resolve: (resolveParams : ExtendedResolveParams) => {

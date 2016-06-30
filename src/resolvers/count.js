@@ -5,20 +5,28 @@ import type {
   MongooseModelT,
   GraphQLObjectType,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 import { GraphQLInt } from 'graphql';
 
-import { filterHelperArgsGen, filterHelper } from './helpers/filter';
+import { filterHelperArgs, filterHelper } from './helpers/filter';
 
-export default function count(model: MongooseModelT, gqType: GraphQLObjectType): Resolver {
+
+export default function count(
+  model: MongooseModelT,
+  gqType: GraphQLObjectType,
+  opts?: genResolverOpts,
+): Resolver {
   return new Resolver({
     outputType: GraphQLInt,
     name: 'count',
     kind: 'query',
     args: {
-      ...filterHelperArgsGen(model, {
+      ...filterHelperArgs(gqType, {
         filterTypeName: `Filter${gqType.name}Input`,
+        model,
+        ...(opts && opts.filter),
       }),
     },
     resolve: (resolveParams : ExtendedResolveParams) => {

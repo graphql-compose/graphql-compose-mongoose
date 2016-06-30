@@ -91,3 +91,36 @@ export type ResolverMWResolveFn = _ResolverMWResolveFn;
 export type ExtendedResolveParams = ResolveParams & {
   query: MongooseQuery,
 };
+
+
+// HELPERS OPTIONS
+
+export type filterHelperArgsOpts = {
+  filterTypeName?: string,
+  isRequired?: boolean,
+  onlyIndexed?: boolean,
+  model?: MongooseModelT,
+  requiredFields?: string | string[],
+};
+
+export type sortHelperArgsOpts = {
+  sortTypeName?: string,
+};
+
+export type inputHelperArgsOpts = {
+  inputTypeName?: string,
+  removeFields?: string | string[],
+  requiredFields?: string | string[],
+  isRequired?: boolean,
+};
+
+export type limitHelperArgsOpts = {
+  defaultValue?: number,
+};
+
+export type genResolverOpts = {
+  filter?: filterHelperArgsOpts,
+  sort?: sortHelperArgsOpts,
+  input?: inputHelperArgsOpts,
+  limit?: limitHelperArgsOpts,
+}

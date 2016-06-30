@@ -4,6 +4,7 @@ import type {
   MongooseModelT,
   GraphQLObjectType,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 
@@ -14,7 +15,11 @@ import GraphQLMongoID from '../types/mongoid';
 
 import { projectionHelper } from './helpers/projection';
 
-export default function findById(model: MongooseModelT, gqType: GraphQLObjectType): Resolver {
+export default function findById(
+  model: MongooseModelT,
+  gqType: GraphQLObjectType,
+  opts?: genResolverOpts // eslint-disable-line no-unused-vars
+): Resolver {
   return new Resolver({
     outputType: gqType,
     name: 'findById',

@@ -4,6 +4,7 @@ import type {
   MongooseModelT,
   GraphQLObjectType,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
 import mongoose from 'mongoose';
@@ -15,10 +16,14 @@ import {
 import GraphQLMongoID from '../types/mongoid';
 
 import { limitHelperArgs, limitHelper } from './helpers/limit';
-import { sortHelperArgsGen, sortHelper } from './helpers/sort';
+import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
 
-export default function findByIds(model: MongooseModelT, gqType: GraphQLObjectType): Resolver {
+export default function findByIds(
+  model: MongooseModelT,
+  gqType: GraphQLObjectType,
+  opts?: genResolverOpts
+): Resolver {
   return new Resolver({
     outputType: new GraphQLList(gqType),
     name: 'findByIds',
@@ -28,9 +33,12 @@ export default function findByIds(model: MongooseModelT, gqType: GraphQLObjectTy
         name: '_ids',
         type: new GraphQLNonNull(new GraphQLList(GraphQLMongoID)),
       },
-      ...limitHelperArgs,
-      ...sortHelperArgsGen(model, {
+      ...limitHelperArgs({
+        ...(opts && opts.limit),
+      }),
+      ...sortHelperArgs(model, {
         sortTypeName: `Sort${gqType.name}Input`,
+        ...(opts && opts.sort),
       }),
     },
     resolve: (resolveParams : ExtendedResolveParams) => {

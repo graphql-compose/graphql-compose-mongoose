@@ -4,14 +4,19 @@ import { GraphQLInt } from 'graphql/type';
 import type {
   GraphQLFieldConfigArgumentMap,
   ExtendedResolveParams,
+  limitHelperArgsOpts,
 } from '../../definition';
 
-export const limitHelperArgs: GraphQLFieldConfigArgumentMap = {
-  limit: {
-    name: 'limit',
-    type: GraphQLInt,
-    defaultValue: 1000,
-  },
+export const limitHelperArgs = (
+  opts: limitHelperArgsOpts
+):GraphQLFieldConfigArgumentMap => {
+  return {
+    limit: {
+      name: 'limit',
+      type: GraphQLInt,
+      defaultValue: (opts && opts.defaultValue) || 1000,
+    },
+  };
 };
 
 export function limitHelper(resolveParams: ExtendedResolveParams): void {

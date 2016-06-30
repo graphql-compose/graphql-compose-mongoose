@@ -1,17 +1,20 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
-import { filterHelperArgsGen, filterHelper } from './helpers/filter';
+import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { GraphQLObjectType, GraphQLInt } from 'graphql';
 
 import type {
   MongooseModelT,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
+
 
 export default function removeMany(
   model: MongooseModelT,
   gqType: GraphQLObjectType,
+  opts?: genResolverOpts,
 ): Resolver {
   const resolver = new Resolver({
     name: 'removeMany',
@@ -29,9 +32,11 @@ export default function removeMany(
       },
     }),
     args: {
-      ...filterHelperArgsGen(model, {
+      ...filterHelperArgs(gqType, {
         filterTypeName: `Filter${gqType.name}Input`,
         isRequired: true,
+        model,
+        ...(opts && opts.filter),
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {

@@ -7,15 +7,13 @@ import type {
   ExtendedResolveParams,
   GraphQLFieldConfigArgumentMap,
   MongooseModelT,
+  sortHelperArgsOpts,
 } from '../../definition';
 
-export type sortHelperArgsGenOpts = {
-  sortTypeName: string,
-};
 
-export const sortHelperArgsGen = (
+export const sortHelperArgs = (
   model: MongooseModelT,
-  opts: sortHelperArgsGenOpts,
+  opts: sortHelperArgsOpts,
 ): GraphQLFieldConfigArgumentMap => {
   if (!opts.sortTypeName) {
     throw new Error('You should provide `sortTypeName` in options.');
@@ -40,28 +38,28 @@ export function sortHelper(resolveParams: ExtendedResolveParams): void {
 
 
 export function getSortTypeFromModel(
-  sortTypeName: string,
-  mongooseModel: MongooseModelT
+  typeName: string,
+  model: MongooseModelT
 ): GraphQLEnumType {
-  const fields = getIndexesFromModel(mongooseModel);
+  const indexes = getIndexesFromModel(model);
 
   const sortEnumValues = {};
-  fields.forEach((sortData) => {
-    const keys = Object.keys(sortData);
+  indexes.forEach((indexData) => {
+    const keys = Object.keys(indexData);
     let name = keys.join('__').toUpperCase().replace('.', '__');
-    if (sortData[keys[0]] === 1) {
+    if (indexData[keys[0]] === 1) {
       name = `${name}_ASC`;
-    } else if (sortData[keys[0]] === -1) {
+    } else if (indexData[keys[0]] === -1) {
       name = `${name}_DESC`;
     }
     sortEnumValues[name] = {
       name,
-      value: sortData,
+      value: indexData,
     };
   });
 
   const sortType = new GraphQLEnumType({
-    name: sortTypeName,
+    name: typeName,
     values: sortEnumValues,
   });
 

@@ -1,18 +1,21 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
-import { inputHelperArgsGen } from './helpers/input';
+import { inputHelperArgs } from './helpers/input';
 import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
 import type {
   MongooseModelT,
   ExtendedResolveParams,
+  genResolverOpts,
 } from '../definition';
 import Resolver from '../../../graphql-compose/src/resolver/resolver';
+
 
 export default function createOne(
   model: MongooseModelT,
   gqType: GraphQLObjectType,
+  opts?: genResolverOpts,
 ): Resolver {
   const resolver = new Resolver({
     name: 'createOne',
@@ -32,10 +35,11 @@ export default function createOne(
       },
     }),
     args: {
-      ...inputHelperArgsGen(gqType, {
+      ...inputHelperArgs(gqType, {
         inputTypeName: `CreateOne${gqType.name}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
+        ...(opts && opts.input),
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
