@@ -7,11 +7,13 @@ import type {
 } from '../../definition';
 
 
-export const skipHelperArgs: GraphQLFieldConfigArgumentMap = {
-  skip: {
-    name: 'skip',
-    type: GraphQLInt,
-  },
+export const skipHelperArgs = ():GraphQLFieldConfigArgumentMap => {
+  return {
+    skip: {
+      name: 'skip',
+      type: GraphQLInt,
+    },
+  };
 };
 
 export function skipHelper(resolveParams: ExtendedResolveParams): void {

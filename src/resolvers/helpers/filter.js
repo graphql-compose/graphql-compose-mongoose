@@ -2,14 +2,13 @@
 /* eslint-disable no-use-before-define */
 
 import TypeComposer from '../../../../graphql-compose/src/typeComposer';
-import { GraphQLNonNull } from 'graphql/type';
+import { GraphQLNonNull, GraphQLObjectType } from 'graphql/type';
 import getIndexesFromModel from '../../utils/getIndexesFromModel';
 import { toDottedObject } from '../../utils';
 import type {
   GraphQLFieldConfigArgumentMap,
   ExtendedResolveParams,
   MongooseModelT,
-  GraphQLObjectType,
   filterHelperArgsOpts,
 } from '../../definition';
 
@@ -17,8 +16,12 @@ export const filterHelperArgs = (
   gqType: GraphQLObjectType,
   opts: filterHelperArgsOpts,
 ): GraphQLFieldConfigArgumentMap => {
-  if (!opts.filterTypeName) {
-    throw new Error('You should provide `filterTypeName` in options.');
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error('First arg for filterHelperArgs() should be instance of GraphQLObjectType.');
+  }
+
+  if (!opts || !opts.filterTypeName) {
+    throw new Error('You should provide non-empty `filterTypeName` in options.');
   }
   const composer = new TypeComposer(gqType);
 
@@ -45,8 +48,8 @@ export const filterHelperArgs = (
     });
   }
 
-
-  const inputComposer = composer.getInputTypeComposer().clone(opts.filterTypeName);
+  const filterTypeName: string = opts.filterTypeName;
+  const inputComposer = composer.getInputTypeComposer().clone(filterTypeName);
   inputComposer.removeField(removeFields);
 
   if (opts.requiredFields) {

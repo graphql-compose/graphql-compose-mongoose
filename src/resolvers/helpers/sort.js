@@ -8,6 +8,7 @@ import type {
   GraphQLFieldConfigArgumentMap,
   MongooseModelT,
   sortHelperArgsOpts,
+  ObjectMap,
 } from '../../definition';
 
 
@@ -15,8 +16,14 @@ export const sortHelperArgs = (
   model: MongooseModelT,
   opts: sortHelperArgsOpts,
 ): GraphQLFieldConfigArgumentMap => {
-  if (!opts.sortTypeName) {
-    throw new Error('You should provide `sortTypeName` in options.');
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'First arg for sortHelperArgs() should be instance of Mongoose Model.'
+    );
+  }
+
+  if (!opts || !opts.sortTypeName) {
+    throw new Error('You should provide non-empty `sortTypeName` in options for sortHelperArgs().');
   }
 
   const gqSortType = getSortTypeFromModel(opts.sortTypeName, model);
@@ -41,7 +48,7 @@ export function getSortTypeFromModel(
   typeName: string,
   model: MongooseModelT
 ): GraphQLEnumType {
-  const indexes = getIndexesFromModel(model);
+  const indexes = getIndexesFromModelWithReverse(model);
 
   const sortEnumValues = {};
   indexes.forEach((indexData) => {
@@ -64,4 +71,28 @@ export function getSortTypeFromModel(
   });
 
   return sortType;
+}
+
+
+export function getIndexesFromModelWithReverse(model: MongooseModelT) {
+  const indexes = getIndexesFromModel(model);
+  const result: ObjectMap[] = [];
+
+  indexes.forEach((indexObj) => {
+    let hasSpecificIndex = false;
+    // https://docs.mongodb.org/manual/tutorial/sort-results-with-indexes/#sort-on-multiple-fields
+    const reversedIndexObj = Object.assign({}, indexObj);
+    Object.keys(reversedIndexObj).forEach((f) => {
+      if (reversedIndexObj[f] === 1) reversedIndexObj[f] = -1;
+      else if (reversedIndexObj[f] === -1) reversedIndexObj[f] = 1;
+      else hasSpecificIndex = true;
+    });
+
+    result.push(indexObj);
+    if (!hasSpecificIndex) {
+      result.push(reversedIndexObj);
+    }
+  });
+
+  return result;
 }

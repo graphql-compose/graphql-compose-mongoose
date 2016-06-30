@@ -1,10 +1,9 @@
 /* @flow */
 
 import TypeComposer from '../../../../graphql-compose/src/typeComposer';
-import { GraphQLNonNull } from 'graphql';
+import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
 
 import type {
-  GraphQLObjectType,
   GraphQLFieldConfigArgumentMap,
   inputHelperArgsOpts,
 } from '../../definition';
@@ -13,18 +12,23 @@ export const inputHelperArgs = (
   gqType: GraphQLObjectType,
   opts: inputHelperArgsOpts
 ): GraphQLFieldConfigArgumentMap => {
-  const composer = new TypeComposer(gqType);
-
-  if (!opts.inputTypeName) {
-    throw new Error('You should provide `inputTypeName` in options.');
+  if (!(gqType instanceof GraphQLObjectType)) {
+    throw new Error('First arg for inputHelperArgs() should be instance of GraphQLObjectType.');
   }
 
-  const inputComposer = composer.getInputTypeComposer().clone(opts.inputTypeName);
-  if (opts.removeFields) {
+  if (!opts || !opts.inputTypeName) {
+    throw new Error('You should provide non-empty `inputTypeName` in options.');
+  }
+
+  const composer = new TypeComposer(gqType);
+
+  const inputTypeName: string = opts.inputTypeName;
+  const inputComposer = composer.getInputTypeComposer().clone(inputTypeName);
+  if (opts && opts.removeFields) {
     inputComposer.removeField(opts.removeFields);
   }
 
-  if (opts.requiredFields) {
+  if (opts && opts.requiredFields) {
     inputComposer.makeFieldsRequired(opts.requiredFields);
   }
 
