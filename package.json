@@ -64,6 +64,7 @@
     "babel-relay-plugin": "^0.8.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
+    "chai-spies": "^0.7.1",
     "eslint": "^2.8.0",
     "eslint-config-airbnb": "^7.0.0",
     "eslint-plugin-jsx-a11y": "^0.6.2",
