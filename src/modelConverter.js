@@ -2,8 +2,8 @@
 /* eslint-disable no-use-before-define */
 
 import { convertModelToGraphQL } from './fieldsConverter';
-import TypeComposer from '../../graphql-compose/src/typeComposer';
-import type InputTypeComposer from '../../graphql-compose/src/inputTypeComposer';
+import TypeComposer from 'graphql-compose/lib/typeComposer';
+import type InputTypeComposer from 'graphql-compose/lib/inputTypeComposer';
 import * as resolvers from './resolvers';
 
 import type {

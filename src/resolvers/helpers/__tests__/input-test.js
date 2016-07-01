@@ -5,7 +5,7 @@ import { inputHelperArgs } from '../input';
 import { UserModel } from '../../../__mocks__/userModel.js';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
 import { convertModelToGraphQL } from '../../../fieldsConverter';
-import InputTypeComposer from '../../../../../graphql-compose/src/inputTypeComposer';
+import InputTypeComposer from 'graphql-compose/lib/inputTypeComposer';
 
 const UserType = convertModelToGraphQL(UserModel, 'User');
 

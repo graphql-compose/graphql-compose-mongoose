@@ -3,7 +3,7 @@
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findMany from '../findMany';
-import Resolver from '../../../../graphql-compose/src/resolver/resolver';
+import Resolver from 'graphql-compose/lib/resolver/resolver';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 
 const UserType = convertModelToGraphQL(UserModel, 'User');

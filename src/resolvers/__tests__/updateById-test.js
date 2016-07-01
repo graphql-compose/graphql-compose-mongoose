@@ -3,9 +3,9 @@
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import updateById from '../updateById';
-import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import TypeComposer from '../../../../graphql-compose/src/typeComposer';
-import InputTypeComposer from '../../../../graphql-compose/src/inputTypeComposer';
+import Resolver from 'graphql-compose/lib/resolver/resolver';
+import TypeComposer from 'graphql-compose/lib/typeComposer';
+import InputTypeComposer from 'graphql-compose/lib/inputTypeComposer';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import {
   GraphQLNonNull,

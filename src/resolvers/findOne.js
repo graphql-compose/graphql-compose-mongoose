@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import Resolver from '../../../graphql-compose/src/resolver/resolver';
+import Resolver from 'graphql-compose/lib/resolver/resolver';
 
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { filterHelperArgs, filterHelper } from './helpers/filter';

@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import TypeComposer from '../../../../graphql-compose/src/typeComposer';
+import TypeComposer from 'graphql-compose/lib/typeComposer';
 import { GraphQLNonNull, GraphQLObjectType } from 'graphql/type';
 import getIndexesFromModel from '../../utils/getIndexesFromModel';
 import { toDottedObject } from '../../utils';

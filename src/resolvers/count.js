@@ -6,7 +6,7 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import Resolver from '../../../graphql-compose/src/resolver/resolver';
+import Resolver from 'graphql-compose/lib/resolver/resolver';
 import { GraphQLInt, GraphQLObjectType } from 'graphql';
 
 import { filterHelperArgs, filterHelper } from './helpers/filter';

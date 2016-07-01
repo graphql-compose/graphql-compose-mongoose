@@ -3,7 +3,7 @@
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import count from '../count';
-import Resolver from '../../../../graphql-compose/src/resolver/resolver';
+import Resolver from 'graphql-compose/lib/resolver/resolver';
 import { GraphQLObjectType, GraphQLInt } from 'graphql';
 
 const UserType = new GraphQLObjectType({

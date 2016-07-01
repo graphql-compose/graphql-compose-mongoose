@@ -3,7 +3,7 @@
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findOne from '../findOne';
-import Resolver from '../../../../graphql-compose/src/resolver/resolver';
+import Resolver from 'graphql-compose/lib/resolver/resolver';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { GraphQLNonNull } from 'graphql';
 

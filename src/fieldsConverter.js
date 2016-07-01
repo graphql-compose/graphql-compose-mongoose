@@ -3,7 +3,7 @@
 
 import mongoose from 'mongoose';
 import objectPath from 'object-path';
-import TypeComposer from '../../graphql-compose/src/typeComposer';
+import TypeComposer from 'graphql-compose/lib/typeComposer';
 
 import {
   GraphQLString,
@@ -20,7 +20,7 @@ import {
   GraphQLBuffer,
   GraphQLGeneric,
   GQLReference,
-} from '../../graphql-compose/src/type';
+} from 'graphql-compose/lib/type';
 
 import type {
   MongooseModelT,

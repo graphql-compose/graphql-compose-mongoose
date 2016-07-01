@@ -3,8 +3,8 @@
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import createOne from '../createOne';
-import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import TypeComposer from '../../../../graphql-compose/src/typeComposer';
+import Resolver from 'graphql-compose/lib/resolver/resolver';
+import TypeComposer from 'graphql-compose/lib/typeComposer';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import GraphQLMongoID from '../../types/mongoid';
 import { GraphQLNonNull } from 'graphql/type';
