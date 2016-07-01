@@ -54,12 +54,12 @@ export default function removeOne(
     }),
     args: {
       ...filterHelperArgs(gqType, {
-        filterTypeName: `Filter${gqType.name}Input`,
+        filterTypeName: `FilterRemoveOne${gqType.name}Input`,
         model,
         ...(opts && opts.filter),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `Sort${gqType.name}Input`,
+        sortTypeName: `SortRemoveOne${gqType.name}Input`,
         ...(opts && opts.sort),
       }),
     },

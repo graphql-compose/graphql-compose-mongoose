@@ -37,13 +37,13 @@ export default function findOne(
     kind: 'query',
     args: {
       ...filterHelperArgs(gqType, {
-        filterTypeName: `Filter${gqType.name}Input`,
+        filterTypeName: `FilterFindOne${gqType.name}Input`,
         model,
         ...(opts && opts.filter),
       }),
       ...skipHelperArgs(),
       ...sortHelperArgs(model, {
-        sortTypeName: `Sort${gqType.name}Input`,
+        sortTypeName: `SortFindOne${gqType.name}Input`,
         ...(opts && opts.sort),
       }),
     },

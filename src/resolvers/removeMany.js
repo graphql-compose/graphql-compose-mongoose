@@ -45,7 +45,7 @@ export default function removeMany(
     }),
     args: {
       ...filterHelperArgs(gqType, {
-        filterTypeName: `Filter${gqType.name}Input`,
+        filterTypeName: `FilterRemoveMany${gqType.name}Input`,
         isRequired: true,
         model,
         ...(opts && opts.filter),

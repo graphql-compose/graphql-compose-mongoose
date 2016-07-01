@@ -63,12 +63,12 @@ export default function updateOne(
         ...(opts && opts.input),
       }),
       ...filterHelperArgs(gqType, {
-        filterTypeName: `Filter${gqType.name}Input`,
+        filterTypeName: `FilterUpdateOne${gqType.name}Input`,
         model,
         ...(opts && opts.filter),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `Sort${gqType.name}Input`,
+        sortTypeName: `SortUpdateOne${gqType.name}Input`,
         ...(opts && opts.sort),
       }),
       ...skipHelperArgs(),

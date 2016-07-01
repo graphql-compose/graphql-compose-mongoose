@@ -47,7 +47,7 @@ export default function findByIds(
         ...(opts && opts.limit),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `Sort${gqType.name}Input`,
+        sortTypeName: `SortFindByIds${gqType.name}Input`,
         ...(opts && opts.sort),
       }),
     },

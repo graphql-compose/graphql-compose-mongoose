@@ -40,7 +40,7 @@ export default function findMany(
     kind: 'query',
     args: {
       ...filterHelperArgs(gqType, {
-        filterTypeName: `Filter${gqType.name}Input`,
+        filterTypeName: `FilterFindMany${gqType.name}Input`,
         model,
         ...(opts && opts.filter),
       }),
@@ -49,7 +49,7 @@ export default function findMany(
         ...(opts && opts.limit),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `Sort${gqType.name}Input`,
+        sortTypeName: `SortFindMany${gqType.name}Input`,
         ...(opts && opts.sort),
       }),
     },

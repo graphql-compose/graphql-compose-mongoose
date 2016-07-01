@@ -96,29 +96,6 @@ export type ExtendedResolveParams = ResolveParams & {
 
 // HELPERS OPTIONS
 
-export type filterHelperArgsOpts = {
-  filterTypeName?: string,
-  isRequired?: boolean,
-  onlyIndexed?: boolean,
-  requiredFields?: string | string[],
-  model?: MongooseModelT,
-};
-
-export type sortHelperArgsOpts = {
-  sortTypeName?: string,
-};
-
-export type inputHelperArgsOpts = {
-  inputTypeName?: string,
-  isRequired?: boolean,
-  removeFields?: string[],
-  requiredFields?: string[],
-};
-
-export type limitHelperArgsOpts = {
-  defaultValue?: number,
-};
-
 export type genResolverOpts = {
   filter?: filterHelperArgsOpts,
   sort?: sortHelperArgsOpts,
@@ -196,4 +173,27 @@ export type typeConverterResolversOpts = {
   count?: false | {
     filter?: filterHelperArgsOpts | false,
   },
-}
+};
+
+export type filterHelperArgsOpts = {
+  filterTypeName?: string,
+  isRequired?: boolean,
+  onlyIndexed?: boolean,
+  requiredFields?: string | string[],
+  model?: MongooseModelT,
+};
+
+export type sortHelperArgsOpts = {
+  sortTypeName?: string,
+};
+
+export type inputHelperArgsOpts = {
+  inputTypeName?: string,
+  isRequired?: boolean,
+  removeFields?: string[],
+  requiredFields?: string[],
+};
+
+export type limitHelperArgsOpts = {
+  defaultValue?: number,
+};

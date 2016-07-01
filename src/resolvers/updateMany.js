@@ -55,12 +55,12 @@ export default function updateMany(
         ...(opts && opts.input),
       }),
       ...filterHelperArgs(gqType, {
-        filterTypeName: `Filter${gqType.name}Input`,
+        filterTypeName: `FilterUpdateMany${gqType.name}Input`,
         model,
         ...(opts && opts.filter),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `Sort${gqType.name}Input`,
+        sortTypeName: `SortUpdateMany${gqType.name}Input`,
         ...(opts && opts.sort),
       }),
       ...skipHelperArgs(),
