@@ -1,6 +1,6 @@
 {
   "name": "graphql-compose-mongoose",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Plugin for `graphql-compose` which derive a graphql type from a mongoose model.",
   "files": [
     "es",
@@ -13,7 +13,7 @@
     "build-cjs": "rimraf lib && BABEL_ENV=cjs babel src -d lib",
     "build-es": "rimraf es && BABEL_ENV=es babel src -d es",
     "lint": "eslint src test *.js",
-    "prepublish123": "npm run build",
+    "prepublish": "npm run build",
     "test": "mocha --compilers js:babel-core/register",
     "test:opts_example": "mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive --watch",
     "watch": "babel-node ./resources/watch.js"
@@ -35,12 +35,12 @@
   "homepage": "https://github.com/nodkz/graphql-compose-mongoose",
   "dependencies": {
     "babel-runtime": "^6.6.1",
+    "graphql-compose": ">=0.0.2",
     "mongoose": "^4.4.20",
     "object-path": "^0.9.2"
   },
   "peerDependencies": {
-    "graphql": "^0.5.0",
-    "graphql-compose": ">=0.0.1"
+    "graphql": "^0.5.0"
   },
   "devDependencies": {
     "babel-cli": "^6.7.7",
