@@ -51,11 +51,6 @@ const resolvers = typeComposer.getResolvers();
 // typeComposer from (graphql-compose) provide bunch if useful methods
 // for modifying GraphQL Types (eg. add/remove fields, relate with other types,
 // restrict access due context).
-// Also will be available such plugins
-// - GraphQL Connection Type
-// - Relay Type Wrapper (adds clientMutationId, node interface, generate global ids)
-// - DataLoader Wrapper and much much more
-
 
 
 // STEP 3: CREATE CRAZY GraphQL SCHEMA WITH ALL CRUD USER OPERATIONS
@@ -203,6 +198,22 @@ export type limitHelperArgsOpts = {
   defaultValue?: number, // set your default limit, if it not provided in query (default: 1000)
 };
 ```
+
+What's next?
+============
+Read about [graphql-compose](https://github.com/nodkz/graphql-compose).
+This module in near future allow to combine any complexity of your GraphQL schema.
+- From different data-sources, eg. `Mongoose`, `Sequelize`, some RESTfull APIs.
+- Restrict access to fields due context.
+- Wraps any resolver with additional business logic.
+- Relate different type with each other (build graph).
+- Prepare schemas for `Relay` (adds clientMutationId, node interface, generate global ids)
+- Add caching via `DataLoader`
+- Add supporting of GraphQL Connection Type
+- And may be using graphql on server side for API calls to different services (have such amazing thoughts ;).
+- and much much more
+
+## SO, FUTURE OF CRAZY GRAPHQL SCHEMAS NOT SO FAR
 
 
 TODO
