@@ -39,21 +39,27 @@ const UserSchema = new Schema({
   },
 });
 const UserModel = mongoose.model('UserModel', UserSchema);
-export default UserModel;
 
 
 
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
-const typeComposer = mongooseToTypeComposer(UserModel);
+const customizationOptions = {}; // left it empty for simplicity
+const typeComposer = mongooseToTypeComposer(UserModel, customizationOptions);
 // get list of 12 Resolvers (findById, updateMany and others)
 const resolvers = typeComposer.getResolvers();
 
 // typeComposer from (graphql-compose) provide bunch if useful methods
-// for modifying GraphQL Types (eg. add/remove fields, relate with other types)
+// for modifying GraphQL Types (eg. add/remove fields, relate with other types,
+// restrict access due context).
+// Also will be available such plugins
+// - GraphQL Connection Type
+// - Relay Type Wrapper (adds clientMutationId, node interface, generate global ids)
+// - DataLoader Wrapper and much much more
 
 
 
 // STEP 3: CREATE CRAZY GraphQL SCHEMA WITH ALL CRUD USER OPERATIONS
+// via graphql-compose it will be much much easier, with less typing
 const graphqlSchema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'RootQuery',
@@ -79,10 +85,124 @@ const graphqlSchema = new GraphQLSchema({
   }),
 });
 ```
+That's all!
+You think that is to much code?
+I don't think so, because by default internally was created about 30 graphql types (for input, sorting, filtering). So you will need much-much more lines of code to implement all this CRUD operations by hands.
 
-mongooseToTypeComposer options
-==============================
-will be described
+
+Customization options
+=====================
+When we convert model `const typeComposer = mongooseToTypeComposer(UserModel, customizationOptions);` you may tune every piece of future derived types and resolvers.
+
+### Here is flow typed definition of this options:
+
+This is top level of customization options. Here you setup name and description for main type, remove fields or leave only desired fields from mongoose model.
+```js
+export type typeConverterOpts = {
+  name?: string,
+  description?: string,
+  fields?: {
+    only?: string[],
+    remove?: string[],
+  },
+  inputType?: typeConverterInputTypeOpts,
+  resolvers?: false | typeConverterResolversOpts,
+};
+```
+
+This is `opts.inputType` level of options for default InputTypeObject which will be provided to all resolvers for `filter` and `input` args.
+```js
+export type typeConverterInputTypeOpts = {
+  name?: string,
+  description?: string,
+  fields?: {
+    only?: string[],
+    remove?: string[],
+    required?: string[]
+  },
+};
+```
+
+This is `opts.resolvers` level of options.
+If you set option to `false` it will disable resolver or some of its input args.
+Every resolver's arg has it own options. They described below.
+```js
+export type typeConverterResolversOpts = {
+  findById?: false,
+  findByIds?: false | {
+    limit?: limitHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+  },
+  findOne?: false | {
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+    skip?: false,
+  },
+  findMany?: false | {
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+    limit?: limitHelperArgsOpts | false,
+    skip?: false,
+  },
+  updateById?: false | {
+    input?: inputHelperArgsOpts | false,
+  },
+  updateOne?: false | {
+    input?: inputHelperArgsOpts | false,
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+    skip?: false,
+  },
+  updateMany?: false | {
+    input?: inputHelperArgsOpts | false,
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+    limit?: limitHelperArgsOpts | false,
+    skip?: false,
+  },
+  removeById?: false,
+  removeOne?: false | {
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+  },
+  removeMany?: false | {
+    filter?: filterHelperArgsOpts | false,
+  },
+  createOne?: false | {
+    input?: inputHelperArgsOpts | false,
+  },
+  count?: false | {
+    filter?: filterHelperArgsOpts | false,
+  },
+};
+```
+
+This is `opts.resolvers.[resolverName].[filter|sort|input|limit]` level of options.
+You may tune every resolver's args independently as you wish.
+Here you may setup every argument and override some fields from the default input object type, described above in `opts.inputType`.
+```js
+export type filterHelperArgsOpts = {
+  filterTypeName?: string, // type name for `filter`
+  isRequired?: boolean, // set `filter` arg as required (wraps in GraphQLNonNull)
+  onlyIndexed?: boolean, // leave only that fields, which is indexed in mongodb
+  requiredFields?: string | string[], // provide fieldNames, that should be required
+};
+
+export type sortHelperArgsOpts = {
+  sortTypeName?: string, // type name for `sort`
+};
+
+export type inputHelperArgsOpts = {
+  inputTypeName?: string, // type name for `input`
+  isRequired?: boolean, // set `input` arg as required (wraps in GraphQLNonNull)
+  removeFields?: string[], // provide fieldNames, that should be removed
+  requiredFields?: string[], // provide fieldNames, that should be required
+};
+
+export type limitHelperArgsOpts = {
+  defaultValue?: number, // set your default limit, if it not provided in query (default: 1000)
+};
+```
 
 
 TODO
