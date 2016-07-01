@@ -4,14 +4,14 @@ This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose)
 
 Example
 =======
-
+Can be found here https://github.com/nodkz/graphql-compose-mongoose-example
 ```js
-import { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 import mongooseToTypeComposer from 'graphql-compose-mongoose';
 import { GraphQLSchema, GraphQLObjectType } from 'graphql';
 
 // STEP 1: DEFINE MONGOOSE SCHEMA AND MODEL
-const LanguagesSchema = new Schema({
+const LanguagesSchema = new mongoose.Schema({
   language: String,
   skill: {
     type: String,
@@ -19,12 +19,12 @@ const LanguagesSchema = new Schema({
   },
 });
 
-const UserSchema = new Schema({
+const UserSchema = new mongoose.Schema({
   name: String, // standard types
   age: {
     type: Number,
     index: true,
-  }
+  },
   languages: {
     type: [LanguagesSchema], // you may include other schemas (here included as array of embedded documents)
     default: [],
@@ -79,6 +79,8 @@ const graphqlSchema = new GraphQLSchema({
     },
   }),
 });
+
+export default graphqlSchema;
 ```
 That's all!
 You think that is to much code?
@@ -213,7 +215,7 @@ This module in near future allow to combine any complexity of your GraphQL schem
 - And may be using graphql on server side for API calls to different services (have such amazing thoughts ;).
 - and much much more
 
-## SO, FUTURE OF CRAZY GRAPHQL SCHEMAS NOT SO FAR
+## SO, THE FUTURE OF CRAZY GRAPHQL SCHEMAS IS NOT SO FAR
 
 
 TODO
