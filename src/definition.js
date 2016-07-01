@@ -19,6 +19,7 @@ export type MonooseModelIndex = [
 ];
 
 export type MongooseModelT = {
+  modelName: string,
   schema: MongooseModelSchemaT,
   create(doc: Object | Object[]): Promise,
   findOne(conditions: ?Object, projection?: Object): MongooseQuery,
@@ -99,8 +100,8 @@ export type filterHelperArgsOpts = {
   filterTypeName?: string,
   isRequired?: boolean,
   onlyIndexed?: boolean,
-  model?: MongooseModelT,
   requiredFields?: string | string[],
+  model?: MongooseModelT,
 };
 
 export type sortHelperArgsOpts = {
@@ -109,9 +110,9 @@ export type sortHelperArgsOpts = {
 
 export type inputHelperArgsOpts = {
   inputTypeName?: string,
+  isRequired?: boolean,
   removeFields?: string[],
   requiredFields?: string[],
-  isRequired?: boolean,
 };
 
 export type limitHelperArgsOpts = {
@@ -123,4 +124,76 @@ export type genResolverOpts = {
   sort?: sortHelperArgsOpts,
   input?: inputHelperArgsOpts,
   limit?: limitHelperArgsOpts,
+}
+
+
+export type typeConverterOpts = {
+  name?: string,
+  description?: string,
+  fields?: {
+    only?: string[],
+    // rename?: { [oldName: string]: string },
+    remove?: string[],
+  },
+  inputType?: typeConverterInputTypeOpts,
+  resolvers?: false | typeConverterResolversOpts,
+};
+
+export type typeConverterInputTypeOpts = {
+  name?: string,
+  description?: string,
+  fields?: {
+    only?: string[],
+    remove?: string[],
+    required?: string[]
+  },
+};
+
+export type typeConverterResolversOpts = {
+  findById?: false,
+  findByIds?: false | {
+    limit?: limitHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+  },
+  findOne?: false | {
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+    skip?: false,
+  },
+  findMany?: false | {
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+    limit?: limitHelperArgsOpts | false,
+    skip?: false,
+  },
+  updateById?: false | {
+    input?: inputHelperArgsOpts | false,
+  },
+  updateOne?: false | {
+    input?: inputHelperArgsOpts | false,
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+    skip?: false,
+  },
+  updateMany?: false | {
+    input?: inputHelperArgsOpts | false,
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+    limit?: limitHelperArgsOpts | false,
+    skip?: false,
+  },
+  removeById?: false,
+  removeOne?: false | {
+    filter?: filterHelperArgsOpts | false,
+    sort?: sortHelperArgsOpts | false,
+  },
+  removeMany?: false | {
+    filter?: filterHelperArgsOpts | false,
+  },
+  createOne?: false | {
+    input?: inputHelperArgsOpts | false,
+  },
+  count?: false | {
+    filter?: filterHelperArgsOpts | false,
+  },
 }
