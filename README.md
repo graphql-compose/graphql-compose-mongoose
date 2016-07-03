@@ -5,6 +5,7 @@ This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose)
 Example
 =======
 Live demo: [https://graphql-compose-mongoose.herokuapp.com/](https://graphql-compose-mongoose.herokuapp.com/?query=%7B%0A%20%20userMany(limit%3A%205)%20%7B%0A%20%20%20%20_id%0A%20%20%20%20name%0A%20%20%20%20age%0A%20%20%7D%0A%7D)
+
 Source code: https://github.com/nodkz/graphql-compose-mongoose-example
 ```js
 import mongoose from 'mongoose';
