@@ -7,7 +7,7 @@ import Resolver from 'graphql-compose/lib/resolver/resolver';
 import TypeComposer from 'graphql-compose/lib/typeComposer';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import GraphQLMongoID from '../../types/mongoid';
-import { GraphQLNonNull } from 'graphql/type';
+import { GraphQLNonNull } from 'graphql';
 
 const UserType = convertModelToGraphQL(UserModel, 'User');
 

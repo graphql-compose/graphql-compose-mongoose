@@ -11,7 +11,7 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import Resolver from 'graphql-compose/lib/resolver/resolver';
+import { Resolver } from 'graphql-compose';
 
 export default function updateById(
   model: MongooseModelT,

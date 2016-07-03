@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import { GraphQLEnumType } from 'graphql/type';
+import { GraphQLEnumType } from 'graphql';
 import getIndexesFromModel from '../../utils/getIndexesFromModel';
 import type {
   ExtendedResolveParams,

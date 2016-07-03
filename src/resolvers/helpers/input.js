@@ -1,6 +1,6 @@
 /* @flow */
 
-import TypeComposer from 'graphql-compose/lib/typeComposer';
+import { TypeComposer } from 'graphql-compose';
 import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
 
 import type {

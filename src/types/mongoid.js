@@ -1,4 +1,4 @@
-import { GraphQLScalarType } from 'graphql/type';
+import { GraphQLScalarType } from 'graphql';
 import { Kind } from 'graphql/language';
 
 const GraphQLMongoID = new GraphQLScalarType({

@@ -20,7 +20,7 @@ import {
   GraphQLBoolean,
   GraphQLList,
   GraphQLEnumType,
-} from 'graphql/type';
+} from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
 import {
