@@ -34,7 +34,7 @@ export default function updateOne(
 
   const findOneResolver = findOne(model, typeComposer, opts);
 
-  const resolver = new Resolver({
+  const resolver = new Resolver(typeComposer, {
     name: 'updateOne',
     kind: 'mutation',
     description: 'Update one document: '

@@ -27,7 +27,7 @@ export default function createOne(
     throw new Error('Second arg for Resolver createOne() should be instance of TypeComposer.');
   }
 
-  const resolver = new Resolver({
+  const resolver = new Resolver(typeComposer, {
     name: 'createOne',
     kind: 'mutation',
     description: 'Create one document with mongoose defaults, setters, hooks and validation',

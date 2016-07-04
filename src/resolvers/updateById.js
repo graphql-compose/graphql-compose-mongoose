@@ -32,7 +32,7 @@ export default function updateById(
 
   const findByIdResolver = findById(model, typeComposer);
 
-  const resolver = new Resolver({
+  const resolver = new Resolver(typeComposer, {
     name: 'updateById',
     kind: 'mutation',
     description: 'Update one document: '

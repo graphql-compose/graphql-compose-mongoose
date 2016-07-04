@@ -72,7 +72,8 @@ describe('findByIds() ->', () => {
     });
 
     it('should return empty array if args._ids is not valid objectIds', async () => {
-      const result = await findByIds(UserModel, UserTypeComposer).resolve({ args: { _ids: ['d', 'e'] } });
+      const result = await findByIds(UserModel, UserTypeComposer)
+        .resolve({ args: { _ids: ['d', 'e'] } });
       expect(result).to.be.instanceOf(Array);
       expect(result).to.be.empty;
     });

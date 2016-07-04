@@ -30,7 +30,7 @@ export default function findOne(
     throw new Error('Second arg for Resolver findOne() should be instance of TypeComposer.');
   }
 
-  return new Resolver({
+  return new Resolver(typeComposer, {
     outputType: typeComposer.getType(),
     name: 'findOne',
     kind: 'query',

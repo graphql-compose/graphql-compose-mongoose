@@ -33,7 +33,7 @@ export default function removeOne(
     );
   }
 
-  const resolver = new Resolver({
+  const resolver = new Resolver(typeComposer, {
     name: 'removeOne',
     kind: 'mutation',
     description: 'Remove one document: '

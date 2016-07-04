@@ -9,7 +9,6 @@ import type {
   MongooseModelT,
   typeConverterOpts,
   typeConverterResolversOpts,
-  GraphQLObjectType,
   typeConverterInputTypeOpts,
 } from './definition';
 

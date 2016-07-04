@@ -28,7 +28,7 @@ export default function removeMany(
     );
   }
 
-  const resolver = new Resolver({
+  const resolver = new Resolver(typeComposer, {
     name: 'removeMany',
     kind: 'mutation',
     description: 'Remove many documents without returning them: '
