@@ -11,11 +11,11 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import Resolver from '../../../graphql-compose/src/resolver/resolver';
+import { Resolver, TypeComposer } from 'graphql-compose';
 
 export default function updateById(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts,
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -24,15 +24,15 @@ export default function updateById(
     );
   }
 
-  if (!(gqType instanceof GraphQLObjectType)) {
+  if (!(typeComposer instanceof TypeComposer)) {
     throw new Error(
-      'Second arg for Resolver updateById() should be instance of GraphQLObjectType.'
+      'Second arg for Resolver updateById() should be instance of TypeComposer.'
     );
   }
 
-  const findByIdResolver = findById(model, gqType);
+  const findByIdResolver = findById(model, typeComposer);
 
-  const resolver = new Resolver({
+  const resolver = new Resolver(typeComposer, {
     name: 'updateById',
     kind: 'mutation',
     description: 'Update one document: '
@@ -41,21 +41,21 @@ export default function updateById(
                + '3) Mongoose applies defaults, setters, hooks and validation. '
                + '4) And save it.',
     outputType: new GraphQLObjectType({
-      name: `UpdateById${gqType.name}Payload`,
+      name: `UpdateById${typeComposer.getTypeName()}Payload`,
       fields: {
         recordId: {
           type: GraphQLMongoID,
           description: 'Updated document ID',
         },
         record: {
-          type: gqType,
+          type: typeComposer.getType(),
           description: 'Updated document',
         },
       },
     }),
     args: {
-      ...inputHelperArgs(gqType, {
-        inputTypeName: `UpdateById${gqType.name}Input`,
+      ...inputHelperArgs(typeComposer, {
+        inputTypeName: `UpdateById${typeComposer.getTypeName()}Input`,
         requiredFields: ['_id'],
         isRequired: true,
         ...(opts && opts.input),
@@ -66,13 +66,15 @@ export default function updateById(
 
       if (!(typeof inputData === 'object')) {
         return Promise.reject(
-          new Error(`${gqType.name}.updateById resolver requires args.input value`)
+          new Error(`${typeComposer.getTypeName()}.updateById resolver requires args.input value`)
         );
       }
 
       if (!inputData._id) {
         return Promise.reject(
-          new Error(`${gqType.name}.updateById resolver requires args.input._id value`)
+          new Error(
+            `${typeComposer.getTypeName()}.updateById resolver requires args.input._id value`
+          )
         );
       }
 
@@ -96,7 +98,7 @@ export default function updateById(
           if (record) {
             return {
               record: record.toObject(),
-              recordId: record.id,
+              recordId: typeComposer.getRecordIdFn()(record),
             };
           }
 

@@ -1,6 +1,6 @@
 /* @flow */
 
-import { GraphQLInt } from 'graphql/type';
+import { GraphQLInt } from 'graphql';
 import type {
   GraphQLFieldConfigArgumentMap,
   ExtendedResolveParams,

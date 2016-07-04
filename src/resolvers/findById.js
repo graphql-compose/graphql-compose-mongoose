@@ -5,19 +5,16 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import Resolver from '../../../graphql-compose/src/resolver/resolver';
+import { Resolver, TypeComposer } from 'graphql-compose';
 
-import {
-  GraphQLNonNull,
-  GraphQLObjectType,
-} from 'graphql';
+import { GraphQLNonNull } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
 import { projectionHelper } from './helpers/projection';
 
 export default function findById(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts // eslint-disable-line no-unused-vars
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -26,12 +23,12 @@ export default function findById(
     );
   }
 
-  if (!(gqType instanceof GraphQLObjectType)) {
-    throw new Error('Second arg for Resolver findById() should be instance of GraphQLObjectType.');
+  if (!(typeComposer instanceof TypeComposer)) {
+    throw new Error('Second arg for Resolver findById() should be instance of TypeComposer.');
   }
 
-  return new Resolver({
-    outputType: gqType,
+  return new Resolver(typeComposer, {
+    outputType: typeComposer.getType(),
     name: 'findById',
     kind: 'query',
     args: {

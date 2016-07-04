@@ -8,12 +8,12 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import Resolver from '../../../graphql-compose/src/resolver/resolver';
+import { Resolver, TypeComposer } from 'graphql-compose';
 
 
 export default function removeMany(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts,
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -22,20 +22,20 @@ export default function removeMany(
     );
   }
 
-  if (!(gqType instanceof GraphQLObjectType)) {
+  if (!(typeComposer instanceof TypeComposer)) {
     throw new Error(
-      'Second arg for Resolver removeMany() should be instance of GraphQLObjectType.'
+      'Second arg for Resolver removeMany() should be instance of TypeComposer.'
     );
   }
 
-  const resolver = new Resolver({
+  const resolver = new Resolver(typeComposer, {
     name: 'removeMany',
     kind: 'mutation',
     description: 'Remove many documents without returning them: '
                + 'Use Query.remove mongoose method. '
                + 'Do not apply mongoose defaults, setters, hooks and validation. ',
     outputType: new GraphQLObjectType({
-      name: `RemoveMany${gqType.name}Payload`,
+      name: `RemoveMany${typeComposer.getTypeName()}Payload`,
       fields: {
         numAffected: {
           type: GraphQLInt,
@@ -44,8 +44,8 @@ export default function removeMany(
       },
     }),
     args: {
-      ...filterHelperArgs(gqType, {
-        filterTypeName: `FilterRemoveMany${gqType.name}Input`,
+      ...filterHelperArgs(typeComposer, {
+        filterTypeName: `FilterRemoveMany${typeComposer.getTypeName()}Input`,
         isRequired: true,
         model,
         ...(opts && opts.filter),
@@ -58,7 +58,8 @@ export default function removeMany(
         || Object.keys(filterData).length === 0
       ) {
         return Promise.reject(
-          new Error(`${gqType.name}.removeMany resolver requires at least one value in args.filter`)
+          new Error(`${typeComposer.getTypeName()}.removeMany resolver requires `
+                  + 'at least one value in args.filter')
         );
       }
 

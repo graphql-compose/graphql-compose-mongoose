@@ -3,11 +3,10 @@
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findMany from '../findMany';
-import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import { convertModelToGraphQL } from '../../fieldsConverter';
+import { Resolver } from 'graphql-compose';
+import { mongooseModelToTypeComposer } from '../../modelConverter';
 
-const UserType = convertModelToGraphQL(UserModel, 'User');
-
+const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
 
 describe('findMany() ->', () => {
   let user1;
@@ -41,38 +40,38 @@ describe('findMany() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = findMany(UserModel, UserType);
+    const resolver = findMany(UserModel, UserTypeComposer);
     expect(resolver).to.be.instanceof(Resolver);
   });
 
   it('Resolver object should have `filter` arg', () => {
-    const resolver = findMany(UserModel, UserType);
+    const resolver = findMany(UserModel, UserTypeComposer);
     expect(resolver.hasArg('filter')).to.be.true;
   });
 
   it('Resolver object should have `limit` arg', () => {
-    const resolver = findMany(UserModel, UserType);
+    const resolver = findMany(UserModel, UserTypeComposer);
     expect(resolver.hasArg('limit')).to.be.true;
   });
 
   it('Resolver object should have `skip` arg', () => {
-    const resolver = findMany(UserModel, UserType);
+    const resolver = findMany(UserModel, UserTypeComposer);
     expect(resolver.hasArg('skip')).to.be.true;
   });
 
   it('Resolver object should have `sort` arg', () => {
-    const resolver = findMany(UserModel, UserType);
+    const resolver = findMany(UserModel, UserTypeComposer);
     expect(resolver.hasArg('sort')).to.be.true;
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled Promise', async () => {
-      const result = findMany(UserModel, UserType).resolve({});
+      const result = findMany(UserModel, UserTypeComposer).resolve({});
       await expect(result).be.fulfilled;
     });
 
     it('should return array of documents if args is empty', async () => {
-      const result = await findMany(UserModel, UserType).resolve({});
+      const result = await findMany(UserModel, UserTypeComposer).resolve({});
 
       expect(result).to.be.instanceOf(Array);
       expect(result).to.have.lengthOf(2);
@@ -80,7 +79,7 @@ describe('findMany() ->', () => {
     });
 
     it('should limit records', async () => {
-      const result = await findMany(UserModel, UserType)
+      const result = await findMany(UserModel, UserTypeComposer)
         .resolve({ args: { limit: 1 } });
 
       expect(result).to.be.instanceOf(Array);
@@ -88,7 +87,7 @@ describe('findMany() ->', () => {
     });
 
     it('should skip records', async () => {
-      const result = await findMany(UserModel, UserType)
+      const result = await findMany(UserModel, UserTypeComposer)
         .resolve({ args: { skip: 1000 } });
 
       expect(result).instanceOf(Array);
@@ -96,10 +95,10 @@ describe('findMany() ->', () => {
     });
 
     it('should sort records', async () => {
-      const result1 = await findMany(UserModel, UserType)
+      const result1 = await findMany(UserModel, UserTypeComposer)
         .resolve({ args: { sort: { _id: 1 } } });
 
-      const result2 = await findMany(UserModel, UserType)
+      const result2 = await findMany(UserModel, UserTypeComposer)
         .resolve({ args: { sort: { _id: -1 } } });
 
       expect(`${result1[0]._id}`).not.equal(`${result2[0]._id}`);

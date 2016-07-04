@@ -20,14 +20,14 @@ import {
   GraphQLBoolean,
   GraphQLList,
   GraphQLEnumType,
-} from 'graphql/type';
+} from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
 import {
   GraphQLDate,
   GraphQLBuffer,
   GraphQLGeneric,
-} from '../../../graphql-compose/src/type';
+} from 'graphql-compose';
 
 /*
 Object.prototype.getClassName = function getClassName() {

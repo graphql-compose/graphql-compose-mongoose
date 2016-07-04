@@ -1,8 +1,8 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import TypeComposer from '../../../../graphql-compose/src/typeComposer';
-import { GraphQLNonNull, GraphQLObjectType } from 'graphql/type';
+import { TypeComposer } from 'graphql-compose';
+import { GraphQLNonNull } from 'graphql';
 import getIndexesFromModel from '../../utils/getIndexesFromModel';
 import { toDottedObject } from '../../utils';
 import type {
@@ -13,17 +13,16 @@ import type {
 } from '../../definition';
 
 export const filterHelperArgs = (
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts: filterHelperArgsOpts,
 ): GraphQLFieldConfigArgumentMap => {
-  if (!(gqType instanceof GraphQLObjectType)) {
-    throw new Error('First arg for filterHelperArgs() should be instance of GraphQLObjectType.');
+  if (!(typeComposer instanceof TypeComposer)) {
+    throw new Error('First arg for filterHelperArgs() should be instance of TypeComposer.');
   }
 
   if (!opts || !opts.filterTypeName) {
     throw new Error('You should provide non-empty `filterTypeName` in options.');
   }
-  const composer = new TypeComposer(gqType);
 
   const removeFields = [];
   if (opts.removeFields) {
@@ -41,7 +40,7 @@ export const filterHelperArgs = (
     }
 
     const indexedFieldNames = getIndexedFieldNames(opts.model);
-    Object.keys(composer.getFields()).forEach(fieldName => {
+    Object.keys(typeComposer.getFields()).forEach(fieldName => {
       if (indexedFieldNames.indexOf(fieldName) === -1) {
         removeFields.push(fieldName);
       }
@@ -49,7 +48,7 @@ export const filterHelperArgs = (
   }
 
   const filterTypeName: string = opts.filterTypeName;
-  const inputComposer = composer.getInputTypeComposer().clone(filterTypeName);
+  const inputComposer = typeComposer.getInputTypeComposer().clone(filterTypeName);
   inputComposer.removeField(removeFields);
 
   if (opts.requiredFields) {

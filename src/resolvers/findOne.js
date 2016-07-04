@@ -1,13 +1,12 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import Resolver from '../../../graphql-compose/src/resolver/resolver';
+import { Resolver, TypeComposer } from 'graphql-compose';
 
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
-import { GraphQLObjectType } from 'graphql';
 
 import type {
   MongooseModelT,
@@ -18,7 +17,7 @@ import type {
 
 export default function findOne(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts,
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -27,23 +26,23 @@ export default function findOne(
     );
   }
 
-  if (!(gqType instanceof GraphQLObjectType)) {
-    throw new Error('Second arg for Resolver findOne() should be instance of GraphQLObjectType.');
+  if (!(typeComposer instanceof TypeComposer)) {
+    throw new Error('Second arg for Resolver findOne() should be instance of TypeComposer.');
   }
 
-  return new Resolver({
-    outputType: gqType,
+  return new Resolver(typeComposer, {
+    outputType: typeComposer.getType(),
     name: 'findOne',
     kind: 'query',
     args: {
-      ...filterHelperArgs(gqType, {
-        filterTypeName: `FilterFindOne${gqType.name}Input`,
+      ...filterHelperArgs(typeComposer, {
+        filterTypeName: `FilterFindOne${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),
       }),
       ...skipHelperArgs(),
       ...sortHelperArgs(model, {
-        sortTypeName: `SortFindOne${gqType.name}Input`,
+        sortTypeName: `SortFindOne${typeComposer.getTypeName()}Input`,
         ...(opts && opts.sort),
       }),
     },

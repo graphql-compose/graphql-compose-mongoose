@@ -13,12 +13,12 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import Resolver from '../../../graphql-compose/src/resolver/resolver';
+import { Resolver, TypeComposer } from 'graphql-compose';
 
 
 export default function updateMany(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts,
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -26,20 +26,20 @@ export default function updateMany(
       'First arg for Resolver updateMany() should be instance of Mongoose Model.'
     );
   }
-  if (!(gqType instanceof GraphQLObjectType)) {
+  if (!(typeComposer instanceof TypeComposer)) {
     throw new Error(
-      'Second arg for Resolver updateMany() should be instance of GraphQLObjectType.'
+      'Second arg for Resolver updateMany() should be instance of TypeComposer.'
     );
   }
 
-  const resolver = new Resolver({
+  const resolver = new Resolver(typeComposer, {
     name: 'updateMany',
     kind: 'mutation',
     description: 'Update many documents without returning them: '
                + 'Use Query.update mongoose method. '
                + 'Do not apply mongoose defaults, setters, hooks and validation. ',
     outputType: new GraphQLObjectType({
-      name: `UpdateMany${gqType.name}Payload`,
+      name: `UpdateMany${typeComposer.getTypeName()}Payload`,
       fields: {
         numAffected: {
           type: GraphQLInt,
@@ -48,19 +48,19 @@ export default function updateMany(
       },
     }),
     args: {
-      ...inputHelperArgs(gqType, {
-        inputTypeName: `UpdateMany${gqType.name}Input`,
+      ...inputHelperArgs(typeComposer, {
+        inputTypeName: `UpdateMany${typeComposer.getTypeName()}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
         ...(opts && opts.input),
       }),
-      ...filterHelperArgs(gqType, {
-        filterTypeName: `FilterUpdateMany${gqType.name}Input`,
+      ...filterHelperArgs(typeComposer, {
+        filterTypeName: `FilterUpdateMany${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `SortUpdateMany${gqType.name}Input`,
+        sortTypeName: `SortUpdateMany${typeComposer.getTypeName()}Input`,
         ...(opts && opts.sort),
       }),
       ...skipHelperArgs(),
@@ -75,7 +75,8 @@ export default function updateMany(
         || Object.keys(inputData).length === 0
       ) {
         return Promise.reject(
-          new Error(`${gqType.name}.updateMany resolver requires at least one value in args.input`)
+          new Error(`${typeComposer.getTypeName()}.updateMany resolver requires `
+                  + 'at least one value in args.input')
         );
       }
 

@@ -80,7 +80,7 @@ import type {
   GraphQLFieldConfigArgumentMap as _GraphQLFieldConfigArgumentMap,
   ResolverMWResolveFn as _ResolverMWResolveFn,
   GraphQLResolveInfo as _GraphQLResolveInfo,
-} from '../../graphql-compose/src/definition';
+} from 'graphql-compose/lib/definition.js';
 
 export type GraphQLObjectType = _GraphQLObjectType;
 export type GraphQLOutputType = _GraphQLOutputType;

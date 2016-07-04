@@ -8,10 +8,10 @@ import {
 } from '../filter';
 import { UserModel } from '../../../__mocks__/userModel.js';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
-import { convertModelToGraphQL } from '../../../fieldsConverter';
-import InputTypeComposer from '../../../../../graphql-compose/src/inputTypeComposer';
+import { InputTypeComposer } from 'graphql-compose';
+import { mongooseModelToTypeComposer } from '../../../modelConverter';
 
-const UserType = convertModelToGraphQL(UserModel, 'User');
+const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
 
 describe('Resolver helper `filter` ->', () => {
   describe('getIndexedFieldNames()', () => {
@@ -28,12 +28,12 @@ describe('Resolver helper `filter` ->', () => {
 
   describe('filterHelperArgs()', () => {
     it('should throw error if `filterTypeName` not provided in opts', () => {
-      expect(() => filterHelperArgs(UserType))
+      expect(() => filterHelperArgs(UserTypeComposer))
         .to.throw('provide non-empty `filterTypeName`');
     });
 
     it('should return filter field', () => {
-      const args = filterHelperArgs(UserType, {
+      const args = filterHelperArgs(UserTypeComposer, {
         filterTypeName: 'FilterUserType',
       });
       expect(args).has.property('filter');
@@ -42,7 +42,7 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
-      const args = filterHelperArgs(UserType, {
+      const args = filterHelperArgs(UserTypeComposer, {
         filterTypeName: 'FilterUserType',
         isRequired: true,
       });
@@ -52,7 +52,7 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should remove fields via opts.removeFields', () => {
-      const args = filterHelperArgs(UserType, {
+      const args = filterHelperArgs(UserTypeComposer, {
         filterTypeName: 'FilterUserType',
         removeFields: ['name', 'age'],
       });
@@ -63,7 +63,7 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should set required fields via opts.requiredFields', () => {
-      const args = filterHelperArgs(UserType, {
+      const args = filterHelperArgs(UserTypeComposer, {
         filterTypeName: 'FilterUserType',
         requiredFields: ['name', 'age'],
       });
@@ -75,7 +75,7 @@ describe('Resolver helper `filter` ->', () => {
 
     it('should throw error if opts.onlyIndexed=true and opts.model not provided', () => {
       expect(() => {
-        filterHelperArgs(UserType, {
+        filterHelperArgs(UserTypeComposer, {
           filterTypeName: 'FilterUserType',
           onlyIndexed: true,
         });
@@ -83,7 +83,7 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should leave only indexed fields if opts.onlyIndexed=true', () => {
-      const args = filterHelperArgs(UserType, {
+      const args = filterHelperArgs(UserTypeComposer, {
         filterTypeName: 'FilterUserType',
         onlyIndexed: true,
         model: UserModel,
@@ -96,7 +96,7 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should opts.onlyIndexed=true and opts.removeFields works together', () => {
-      const args = filterHelperArgs(UserType, {
+      const args = filterHelperArgs(UserTypeComposer, {
         filterTypeName: 'FilterUserType',
         onlyIndexed: true,
         model: UserModel,

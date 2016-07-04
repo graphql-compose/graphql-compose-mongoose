@@ -3,12 +3,11 @@
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import count from '../count';
-import Resolver from '../../../../graphql-compose/src/resolver/resolver';
-import { GraphQLObjectType, GraphQLInt } from 'graphql';
+import { Resolver } from 'graphql-compose';
+import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { GraphQLInt } from 'graphql';
 
-const UserType = new GraphQLObjectType({
-  name: 'MockUserType',
-});
+const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
 
 describe('count() ->', () => {
   let user1;
@@ -42,30 +41,30 @@ describe('count() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = count(UserModel, UserType);
+    const resolver = count(UserModel, UserTypeComposer);
     expect(resolver).to.be.instanceof(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have `filter` arg', () => {
-      const resolver = count(UserModel, UserType);
+      const resolver = count(UserModel, UserTypeComposer);
       expect(resolver.hasArg('filter')).to.be.true;
     });
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled promise', async () => {
-      const result = count(UserModel, UserType).resolve({});
+      const result = count(UserModel, UserTypeComposer).resolve({});
       await expect(result).be.fulfilled;
     });
 
     it('should return total number of documents in collection if args is empty', async () => {
-      const result = await count(UserModel, UserType).resolve({ args: {} });
+      const result = await count(UserModel, UserTypeComposer).resolve({ args: {} });
       expect(result).to.equal(2);
     });
 
     it('should return number of document by filter data', async () => {
-      const result = await count(UserModel, UserType).resolve(
+      const result = await count(UserModel, UserTypeComposer).resolve(
         { args: { filter: { gender: 'male' } } }
       );
       expect(result).to.equal(1);
@@ -74,7 +73,7 @@ describe('count() ->', () => {
 
   describe('Resolver.getOutputType()', () => {
     it('should return GraphQLInt type', () => {
-      const outputType = count(UserModel, UserType).getOutputType();
+      const outputType = count(UserModel, UserTypeComposer).getOutputType();
       expect(outputType).to.equal(GraphQLInt);
     });
   });

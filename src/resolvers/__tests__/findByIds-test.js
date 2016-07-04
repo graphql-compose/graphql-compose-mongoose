@@ -3,12 +3,12 @@
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findByIds from '../findByIds';
-import Resolver from '../../../../graphql-compose/src/resolver/resolver';
+import { Resolver } from 'graphql-compose';
 import { GraphQLNonNull, GraphQLList } from 'graphql';
 import GraphQLMongoID from '../../types/mongoid';
-import { convertModelToGraphQL } from '../../fieldsConverter';
+import { mongooseModelToTypeComposer } from '../../modelConverter';
 
-const UserType = convertModelToGraphQL(UserModel, 'User');
+const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
 
 describe('findByIds() ->', () => {
   let user1;
@@ -34,13 +34,13 @@ describe('findByIds() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = findByIds(UserModel, UserType);
+    const resolver = findByIds(UserModel, UserTypeComposer);
     expect(resolver).to.be.instanceof(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have non-null `_ids` arg', () => {
-      const resolver = findByIds(UserModel, UserType);
+      const resolver = findByIds(UserModel, UserTypeComposer);
       expect(resolver.hasArg('_ids')).to.be.true;
       const argConfig = resolver.getArg('_ids');
       expect(argConfig).property('type').that.instanceof(GraphQLNonNull);
@@ -49,36 +49,37 @@ describe('findByIds() ->', () => {
     });
 
     it('should have `limit` arg', () => {
-      const resolver = findByIds(UserModel, UserType);
+      const resolver = findByIds(UserModel, UserTypeComposer);
       expect(resolver.hasArg('limit')).to.be.true;
     });
 
     it('should have `sort` arg', () => {
-      const resolver = findByIds(UserModel, UserType);
+      const resolver = findByIds(UserModel, UserTypeComposer);
       expect(resolver.hasArg('sort')).to.be.true;
     });
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled promise', async () => {
-      const result = findByIds(UserModel, UserType).resolve({});
+      const result = findByIds(UserModel, UserTypeComposer).resolve({});
       await expect(result).be.fulfilled;
     });
 
     it('should return empty array if args._ids is empty', async () => {
-      const result = await findByIds(UserModel, UserType).resolve({});
+      const result = await findByIds(UserModel, UserTypeComposer).resolve({});
       expect(result).to.be.instanceOf(Array);
       expect(result).to.be.empty;
     });
 
     it('should return empty array if args._ids is not valid objectIds', async () => {
-      const result = await findByIds(UserModel, UserType).resolve({ args: { _ids: ['d', 'e'] } });
+      const result = await findByIds(UserModel, UserTypeComposer)
+        .resolve({ args: { _ids: ['d', 'e'] } });
       expect(result).to.be.instanceOf(Array);
       expect(result).to.be.empty;
     });
 
     it('should return array of documents', async () => {
-      const result = await findByIds(UserModel, UserType)
+      const result = await findByIds(UserModel, UserTypeComposer)
         .resolve({ args: { _ids: [user1._id, user2._id, user3._id] } });
 
       expect(result).to.be.instanceOf(Array);
@@ -89,7 +90,7 @@ describe('findByIds() ->', () => {
 
     it('should return array of documents if object id is string', async () => {
       const stringId = `${user1._id}`;
-      const result = await findByIds(UserModel, UserType)
+      const result = await findByIds(UserModel, UserTypeComposer)
         .resolve({ args: { _ids: [stringId] } });
 
       expect(result).to.be.instanceOf(Array);

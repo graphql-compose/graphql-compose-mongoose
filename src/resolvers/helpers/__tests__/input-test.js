@@ -4,20 +4,20 @@ import { expect } from 'chai';
 import { inputHelperArgs } from '../input';
 import { UserModel } from '../../../__mocks__/userModel.js';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
-import { convertModelToGraphQL } from '../../../fieldsConverter';
-import InputTypeComposer from '../../../../../graphql-compose/src/inputTypeComposer';
+import { InputTypeComposer } from 'graphql-compose';
+import { mongooseModelToTypeComposer } from '../../../modelConverter';
 
-const UserType = convertModelToGraphQL(UserModel, 'User');
+const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
 
 describe('Resolver helper `input` ->', () => {
   describe('inputHelperArgs()', () => {
     it('should throw error if `inputTypeName` not provided in opts', () => {
-      expect(() => inputHelperArgs(UserType))
+      expect(() => inputHelperArgs(UserTypeComposer))
         .to.throw('provide non-empty `inputTypeName`');
     });
 
     it('should return input field', () => {
-      const args = inputHelperArgs(UserType, {
+      const args = inputHelperArgs(UserTypeComposer, {
         inputTypeName: 'InputUserType',
       });
       expect(args).has.property('input');
@@ -26,7 +26,7 @@ describe('Resolver helper `input` ->', () => {
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
-      const args = inputHelperArgs(UserType, {
+      const args = inputHelperArgs(UserTypeComposer, {
         inputTypeName: 'InputUserType',
         isRequired: true,
       });
@@ -36,7 +36,7 @@ describe('Resolver helper `input` ->', () => {
     });
 
     it('should remove fields via opts.removeFields', () => {
-      const args = inputHelperArgs(UserType, {
+      const args = inputHelperArgs(UserTypeComposer, {
         inputTypeName: 'InputUserType',
         removeFields: ['name', 'age'],
       });
@@ -47,7 +47,7 @@ describe('Resolver helper `input` ->', () => {
     });
 
     it('should set required fields via opts.requiredFields', () => {
-      const args = inputHelperArgs(UserType, {
+      const args = inputHelperArgs(UserTypeComposer, {
         inputTypeName: 'InputUserType',
         requiredFields: ['name', 'age'],
       });

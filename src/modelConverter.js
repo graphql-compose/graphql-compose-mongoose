@@ -2,15 +2,13 @@
 /* eslint-disable no-use-before-define */
 
 import { convertModelToGraphQL } from './fieldsConverter';
-import TypeComposer from '../../graphql-compose/src/typeComposer';
-import type InputTypeComposer from '../../graphql-compose/src/inputTypeComposer';
+import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import * as resolvers from './resolvers';
 
 import type {
   MongooseModelT,
   typeConverterOpts,
   typeConverterResolversOpts,
-  GraphQLObjectType,
   typeConverterInputTypeOpts,
 } from './definition';
 
@@ -18,7 +16,7 @@ import type {
 export function mongooseModelToTypeComposer(
   model: MongooseModelT,
   opts: typeConverterOpts = {}
-): GraphQLObjectType {
+): TypeComposer {
   const name: string = (opts && opts.name) || model.modelName;
 
   const type = convertModelToGraphQL(model, name);
@@ -31,6 +29,8 @@ export function mongooseModelToTypeComposer(
   if (opts.fields) {
     prepareFields(typeComposer, opts.fields);
   }
+
+  typeComposer.setRecordIdFn((source) => `${source._id}`);
 
   createInputType(typeComposer, opts.inputType);
 
@@ -113,7 +113,7 @@ export function createResolvers(
       const createResolverFn = resolvers[resolverName];
       const resolver = createResolverFn(
         model,
-        typeComposer.getType(),
+        typeComposer,
         opts[resolverName] || {}
       );
       typeComposer.setResolver(resolver);
