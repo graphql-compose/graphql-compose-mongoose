@@ -3,13 +3,12 @@
 import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import removeOne from '../removeOne';
-import Resolver from 'graphql-compose/lib/resolver/resolver';
-import TypeComposer from 'graphql-compose/lib/typeComposer';
-import { convertModelToGraphQL } from '../../fieldsConverter';
+import { Resolver, TypeComposer } from 'graphql-compose';
 import GraphQLMongoID from '../../types/mongoid';
 import { mongoose } from '../../__mocks__/mongooseCommon';
+import { mongooseModelToTypeComposer } from '../../modelConverter';
 
-const UserType = convertModelToGraphQL(UserModel, 'User');
+const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
 
 describe('removeOne() ->', () => {
   let user1;
@@ -52,24 +51,24 @@ describe('removeOne() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = removeOne(UserModel, UserType);
+    const resolver = removeOne(UserModel, UserTypeComposer);
     expect(resolver).to.be.instanceof(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have `filter` arg', () => {
-      const resolver = removeOne(UserModel, UserType);
+      const resolver = removeOne(UserModel, UserTypeComposer);
       expect(resolver.hasArg('filter')).to.be.true;
     });
 
     it('should not have `skip` arg due mongoose error: '
      + 'skip cannot be used with findOneAndRemove', () => {
-      const resolver = removeOne(UserModel, UserType);
+      const resolver = removeOne(UserModel, UserTypeComposer);
       expect(resolver.hasArg('skip')).to.be.false;
     });
 
     it('should have `sort` arg', () => {
-      const resolver = removeOne(UserModel, UserType);
+      const resolver = removeOne(UserModel, UserTypeComposer);
       expect(resolver.hasArg('sort')).to.be.true;
     });
   });
@@ -80,13 +79,13 @@ describe('removeOne() ->', () => {
       // needs to set explicitly Promise object
       // otherwise it returns Promise object, but it not instanse of global Promise
       mongoose.Promise = Promise; // eslint-disable-line
-      const result = removeOne(UserModel, UserType).resolve({});
+      const result = removeOne(UserModel, UserTypeComposer).resolve({});
       expect(result).instanceof(Promise);
       result.catch(() => 'catch error if appears, hide it from mocha');
     });
 
     it('should return payload.recordId if record existed in db', async () => {
-      const result = await removeOne(UserModel, UserType).resolve({
+      const result = await removeOne(UserModel, UserTypeComposer).resolve({
         args: { filter: { _id: user1.id } },
       });
       expect(result).have.property('recordId', user1.id);
@@ -94,7 +93,7 @@ describe('removeOne() ->', () => {
 
     it('should remove document in database', (done) => {
       const checkedName = 'nameForMongoDB';
-      removeOne(UserModel, UserType).resolve({
+      removeOne(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { _id: user1.id },
           input: { name: checkedName },
@@ -109,14 +108,14 @@ describe('removeOne() ->', () => {
     });
 
     it('should return payload.record', async () => {
-      const result = await removeOne(UserModel, UserType).resolve({
+      const result = await removeOne(UserModel, UserTypeComposer).resolve({
         args: { filter: { _id: user1.id } },
       });
       expect(result).have.deep.property('record.id', user1.id);
     });
 
     it('should sort records', async () => {
-      const result1 = await removeOne(UserModel, UserType).resolve({
+      const result1 = await removeOne(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { relocation: true },
           sort: { age: 1 },
@@ -124,7 +123,7 @@ describe('removeOne() ->', () => {
       });
       expect(result1).have.deep.property('record.age', user1.age);
 
-      const result2 = await removeOne(UserModel, UserType).resolve({
+      const result2 = await removeOne(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { relocation: true },
           sort: { age: -1 },
@@ -136,20 +135,21 @@ describe('removeOne() ->', () => {
 
   describe('Resolver.getOutputType()', () => {
     it('should have correct output type name', () => {
-      const outputType = removeOne(UserModel, UserType).getOutputType();
-      expect(outputType).property('name').to.equal(`RemoveOne${UserType.name}Payload`);
+      const outputType = removeOne(UserModel, UserTypeComposer).getOutputType();
+      expect(outputType).property('name')
+        .to.equal(`RemoveOne${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
-      const outputType = removeOne(UserModel, UserType).getOutputType();
+      const outputType = removeOne(UserModel, UserTypeComposer).getOutputType();
       const recordIdField = new TypeComposer(outputType).getField('recordId');
       expect(recordIdField).property('type').to.equal(GraphQLMongoID);
     });
 
     it('should have record field', () => {
-      const outputType = removeOne(UserModel, UserType).getOutputType();
+      const outputType = removeOne(UserModel, UserTypeComposer).getOutputType();
       const recordField = new TypeComposer(outputType).getField('record');
-      expect(recordField).property('type').to.equal(UserType);
+      expect(recordField).property('type').to.equal(UserTypeComposer.getType());
     });
   });
 });

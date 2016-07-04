@@ -17,7 +17,7 @@ import type {
 export function mongooseModelToTypeComposer(
   model: MongooseModelT,
   opts: typeConverterOpts = {}
-): GraphQLObjectType {
+): TypeComposer {
   const name: string = (opts && opts.name) || model.modelName;
 
   const type = convertModelToGraphQL(model, name);
@@ -30,6 +30,8 @@ export function mongooseModelToTypeComposer(
   if (opts.fields) {
     prepareFields(typeComposer, opts.fields);
   }
+
+  typeComposer.setRecordIdFn((source) => `${source._id}`);
 
   createInputType(typeComposer, opts.inputType);
 
@@ -112,7 +114,7 @@ export function createResolvers(
       const createResolverFn = resolvers[resolverName];
       const resolver = createResolverFn(
         model,
-        typeComposer.getType(),
+        typeComposer,
         opts[resolverName] || {}
       );
       typeComposer.setResolver(resolver);

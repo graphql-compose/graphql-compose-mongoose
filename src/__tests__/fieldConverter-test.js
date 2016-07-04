@@ -27,7 +27,7 @@ import {
   GraphQLDate,
   GraphQLBuffer,
   GraphQLGeneric,
-} from '../../../graphql-compose/src/type';
+} from 'graphql-compose';
 
 /*
 Object.prototype.getClassName = function getClassName() {

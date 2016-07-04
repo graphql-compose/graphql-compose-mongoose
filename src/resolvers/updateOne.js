@@ -13,12 +13,12 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver } from 'graphql-compose';
+import { Resolver, TypeComposer } from 'graphql-compose';
 
 
 export default function updateOne(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts,
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -26,13 +26,13 @@ export default function updateOne(
       'First arg for Resolver updateOne() should be instance of Mongoose Model.'
     );
   }
-  if (!(gqType instanceof GraphQLObjectType)) {
+  if (!(typeComposer instanceof TypeComposer)) {
     throw new Error(
-      'Second arg for Resolver updateOne() should be instance of GraphQLObjectType.'
+      'Second arg for Resolver updateOne() should be instance of TypeComposer.'
     );
   }
 
-  const findOneResolver = findOne(model, gqType, opts);
+  const findOneResolver = findOne(model, typeComposer, opts);
 
   const resolver = new Resolver({
     name: 'updateOne',
@@ -43,32 +43,32 @@ export default function updateOne(
                + '3) Mongoose applies defaults, setters, hooks and validation. '
                + '4) And save it.',
     outputType: new GraphQLObjectType({
-      name: `UpdateOne${gqType.name}Payload`,
+      name: `UpdateOne${typeComposer.getTypeName()}Payload`,
       fields: {
         recordId: {
           type: GraphQLMongoID,
           description: 'Updated document ID',
         },
         record: {
-          type: gqType,
+          type: typeComposer.getType(),
           description: 'Updated document',
         },
       },
     }),
     args: {
-      ...inputHelperArgs(gqType, {
-        inputTypeName: `UpdateOne${gqType.name}Input`,
+      ...inputHelperArgs(typeComposer, {
+        inputTypeName: `UpdateOne${typeComposer.getTypeName()}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
         ...(opts && opts.input),
       }),
-      ...filterHelperArgs(gqType, {
-        filterTypeName: `FilterUpdateOne${gqType.name}Input`,
+      ...filterHelperArgs(typeComposer, {
+        filterTypeName: `FilterUpdateOne${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `SortUpdateOne${gqType.name}Input`,
+        sortTypeName: `SortUpdateOne${typeComposer.getTypeName()}Input`,
         ...(opts && opts.sort),
       }),
       ...skipHelperArgs(),
@@ -81,7 +81,8 @@ export default function updateOne(
         || Object.keys(filterData).length === 0
       ) {
         return Promise.reject(
-          new Error(`${gqType.name}.updateOne resolver requires at least one value in args.filter`)
+          new Error(`${typeComposer.getTypeName()}.updateOne resolver requires `
+                  + 'at least one value in args.filter')
         );
       }
 
@@ -99,7 +100,7 @@ export default function updateOne(
           if (record) {
             return {
               record: record.toObject(),
-              recordId: record.id,
+              recordId: typeComposer.getRecordIdFn()(record),
             };
           }
 

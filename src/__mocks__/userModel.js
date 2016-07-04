@@ -93,7 +93,7 @@ UserSchema.virtual('nameVirtual').get(function () { // eslint-disable-line
 });
 
 
-const UserModel = mongoose.model('UserModel', UserSchema);
+const UserModel = mongoose.model('User', UserSchema);
 
 export {
   UserSchema,

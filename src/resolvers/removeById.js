@@ -13,11 +13,11 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver } from 'graphql-compose';
+import { Resolver, TypeComposer } from 'graphql-compose';
 
 export default function removeById(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts, // eslint-disable-line no-unused-vars
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -26,9 +26,9 @@ export default function removeById(
     );
   }
 
-  if (!(gqType instanceof GraphQLObjectType)) {
+  if (!(typeComposer instanceof TypeComposer)) {
     throw new Error(
-      'Second arg for Resolver removeById() should be instance of GraphQLObjectType.'
+      'Second arg for Resolver removeById() should be instance of TypeComposer.'
     );
   }
 
@@ -39,14 +39,14 @@ export default function removeById(
                + '1) Retrieve one document and remove with hooks via findByIdAndRemove. '
                + '2) Return removed document.',
     outputType: new GraphQLObjectType({
-      name: `RemoveById${gqType.name}Payload`,
+      name: `RemoveById${typeComposer.getTypeName()}Payload`,
       fields: {
         recordId: {
           type: GraphQLMongoID,
           description: 'Removed document ID',
         },
         record: {
-          type: gqType,
+          type: typeComposer.getType(),
           description: 'Removed document',
         },
       },
@@ -62,7 +62,7 @@ export default function removeById(
 
       if (!args._id) {
         return Promise.reject(
-          new Error(`${gqType.name}.removeById resolver requires args._id value`)
+          new Error(`${typeComposer.getTypeName()}.removeById resolver requires args._id value`)
         );
       }
 
@@ -74,7 +74,7 @@ export default function removeById(
           if (res) {
             return {
               record: res.toObject(),
-              recordId: res.id,
+              recordId: typeComposer.getRecordIdFn()(res),
             };
           }
 

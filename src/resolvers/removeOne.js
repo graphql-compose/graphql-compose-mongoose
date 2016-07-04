@@ -13,12 +13,12 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver } from 'graphql-compose';
+import { Resolver, TypeComposer } from 'graphql-compose';
 
 
 export default function removeOne(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts,
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -27,9 +27,9 @@ export default function removeOne(
     );
   }
 
-  if (!(gqType instanceof GraphQLObjectType)) {
+  if (!(typeComposer instanceof TypeComposer)) {
     throw new Error(
-      'Second arg for Resolver removeOne() should be instance of GraphQLObjectType.'
+      'Second arg for Resolver removeOne() should be instance of TypeComposer.'
     );
   }
 
@@ -40,26 +40,26 @@ export default function removeOne(
                + '1) Remove with hooks via findOneAndRemove. '
                + '2) Return removed document.',
     outputType: new GraphQLObjectType({
-      name: `RemoveOne${gqType.name}Payload`,
+      name: `RemoveOne${typeComposer.getTypeName()}Payload`,
       fields: {
         recordId: {
           type: GraphQLMongoID,
           description: 'Removed document ID',
         },
         record: {
-          type: gqType,
+          type: typeComposer.getType(),
           description: 'Removed document',
         },
       },
     }),
     args: {
-      ...filterHelperArgs(gqType, {
-        filterTypeName: `FilterRemoveOne${gqType.name}Input`,
+      ...filterHelperArgs(typeComposer, {
+        filterTypeName: `FilterRemoveOne${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `SortRemoveOne${gqType.name}Input`,
+        sortTypeName: `SortRemoveOne${typeComposer.getTypeName()}Input`,
         ...(opts && opts.sort),
       }),
     },
@@ -75,7 +75,7 @@ export default function removeOne(
           if (res) {
             return {
               record: res.toObject(),
-              recordId: res.id,
+              recordId: typeComposer.getRecordIdFn()(res),
             };
           }
 

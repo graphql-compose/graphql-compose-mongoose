@@ -9,12 +9,12 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver } from 'graphql-compose';
+import { Resolver, TypeComposer } from 'graphql-compose';
 
 
 export default function createOne(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts,
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -23,8 +23,8 @@ export default function createOne(
     );
   }
 
-  if (!(gqType instanceof GraphQLObjectType)) {
-    throw new Error('Second arg for Resolver createOne() should be instance of GraphQLObjectType.');
+  if (!(typeComposer instanceof TypeComposer)) {
+    throw new Error('Second arg for Resolver createOne() should be instance of TypeComposer.');
   }
 
   const resolver = new Resolver({
@@ -32,21 +32,21 @@ export default function createOne(
     kind: 'mutation',
     description: 'Create one document with mongoose defaults, setters, hooks and validation',
     outputType: new GraphQLObjectType({
-      name: `CreateOne${gqType.name}Payload`,
+      name: `CreateOne${typeComposer.getTypeName()}Payload`,
       fields: {
         recordId: {
           type: GraphQLMongoID,
           description: 'Created document ID',
         },
         record: {
-          type: gqType,
+          type: typeComposer.getType(),
           description: 'Created document',
         },
       },
     }),
     args: {
-      ...inputHelperArgs(gqType, {
-        inputTypeName: `CreateOne${gqType.name}Input`,
+      ...inputHelperArgs(typeComposer, {
+        inputTypeName: `CreateOne${typeComposer.getTypeName()}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
         ...(opts && opts.input),
@@ -59,7 +59,8 @@ export default function createOne(
         || Object.keys(inputData).length === 0
       ) {
         return Promise.reject(
-          new Error(`${gqType.name}.createOne resolver requires at least one value in args.input`)
+          new Error(`${typeComposer.getTypeName()}.createOne resolver requires `
+                    + 'at least one value in args.input')
         );
       }
 
@@ -68,7 +69,7 @@ export default function createOne(
           if (record) {
             return {
               record: record.toObject(),
-              recordId: record.id,
+              recordId: typeComposer.getRecordIdFn()(record),
             };
           }
 

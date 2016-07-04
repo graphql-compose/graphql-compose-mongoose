@@ -3,9 +3,7 @@
 import { expect } from 'chai';
 import { UserModel } from '../__mocks__/userModel.js';
 import { mongooseModelToTypeComposer as mm2tc } from '../modelConverter';
-
-import TypeComposer from 'graphql-compose/lib/typeComposer';
-import InputTypeComposer from 'graphql-compose/lib/inputTypeComposer';
+import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 
 
 describe('modelConverter', () => {

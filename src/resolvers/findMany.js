@@ -6,11 +6,8 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver } from 'graphql-compose';
-import {
-  GraphQLList,
-  GraphQLObjectType,
-} from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import { GraphQLList } from 'graphql';
 
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
@@ -21,7 +18,7 @@ import { projectionHelper } from './helpers/projection';
 
 export default function findMany(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts,
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -30,17 +27,17 @@ export default function findMany(
     );
   }
 
-  if (!(gqType instanceof GraphQLObjectType)) {
-    throw new Error('Second arg for Resolver findMany() should be instance of GraphQLObjectType.');
+  if (!(typeComposer instanceof TypeComposer)) {
+    throw new Error('Second arg for Resolver findMany() should be instance of TypeComposer.');
   }
 
   return new Resolver({
-    outputType: new GraphQLList(gqType),
+    outputType: new GraphQLList(typeComposer.getType()),
     name: 'findMany',
     kind: 'query',
     args: {
-      ...filterHelperArgs(gqType, {
-        filterTypeName: `FilterFindMany${gqType.name}Input`,
+      ...filterHelperArgs(typeComposer, {
+        filterTypeName: `FilterFindMany${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),
       }),
@@ -49,7 +46,7 @@ export default function findMany(
         ...(opts && opts.limit),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `SortFindMany${gqType.name}Input`,
+        sortTypeName: `SortFindMany${typeComposer.getTypeName()}Input`,
         ...(opts && opts.sort),
       }),
     },

@@ -5,14 +5,10 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver } from 'graphql-compose';
+import { Resolver, TypeComposer } from 'graphql-compose';
 import mongoose from 'mongoose';
 
-import {
-  GraphQLNonNull,
-  GraphQLList,
-  GraphQLObjectType,
-} from 'graphql';
+import { GraphQLNonNull, GraphQLList } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
 import { limitHelperArgs, limitHelper } from './helpers/limit';
@@ -21,7 +17,7 @@ import { projectionHelper } from './helpers/projection';
 
 export default function findByIds(
   model: MongooseModelT,
-  gqType: GraphQLObjectType,
+  typeComposer: TypeComposer,
   opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
@@ -30,12 +26,12 @@ export default function findByIds(
     );
   }
 
-  if (!(gqType instanceof GraphQLObjectType)) {
-    throw new Error('Second arg for Resolver findByIds() should be instance of GraphQLObjectType.');
+  if (!(typeComposer instanceof TypeComposer)) {
+    throw new Error('Second arg for Resolver findByIds() should be instance of TypeComposer.');
   }
 
   return new Resolver({
-    outputType: new GraphQLList(gqType),
+    outputType: new GraphQLList(typeComposer.getType()),
     name: 'findByIds',
     kind: 'query',
     args: {
@@ -47,23 +43,23 @@ export default function findByIds(
         ...(opts && opts.limit),
       }),
       ...sortHelperArgs(model, {
-        sortTypeName: `SortFindByIds${gqType.name}Input`,
+        sortTypeName: `SortFindByIds${typeComposer.getTypeName()}Input`,
         ...(opts && opts.sort),
       }),
     },
     resolve: (resolveParams : ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
-      const selector = {};
-      if (Array.isArray(args._ids)) {
-        selector._id = {
-          $in: args._ids
-            .filter(id => mongoose.Types.ObjectId.isValid(id))
-            .map(id => mongoose.Types.ObjectId(id)), // eslint-disable-line
-        };
-      } else {
+      if (!Array.isArray(args._ids)) {
         return Promise.resolve([]);
       }
+
+      const selector = {};
+      selector._id = {
+        $in: args._ids
+          .filter(id => mongoose.Types.ObjectId.isValid(id))
+          .map(id => mongoose.Types.ObjectId(id)), // eslint-disable-line
+      };
 
       resolveParams.query = model.find(selector); // eslint-disable-line
       projectionHelper(resolveParams);
