@@ -8,16 +8,6 @@
   ],
   "main": "lib/index.js",
   "jsnext:main": "es/index.js",
-  "scripts": {
-    "build": "npm run build-cjs && npm run build-es",
-    "build-cjs": "rimraf lib && BABEL_ENV=cjs babel src -d lib",
-    "build-es": "rimraf es && BABEL_ENV=es babel src -d es",
-    "lint": "eslint src test *.js",
-    "prepublish": "npm run build",
-    "test": "mocha --compilers js:babel-core/register",
-    "test:opts_example": "mocha --compilers js:babel-core/register --require ./test/test_helper.js --recursive --watch",
-    "watch": "babel-node ./resources/watch.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nodkz/graphql-compose-mongoose.git"
@@ -61,7 +51,6 @@
     "babel-preset-es2015-loose-native-modules": "^1.0.0",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.7.2",
-    "babel-relay-plugin": "^0.8.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.3.0",
     "chai-spies": "^0.7.1",
@@ -71,10 +60,17 @@
     "eslint-plugin-react": "^4.3.0",
     "flow": "^0.2.3",
     "flow-bin": "^0.27.0",
-    "i": "^0.3.5",
     "mocha": "^2.5.3",
-    "npm": "^3.9.6",
     "rimraf": "^2.5.2",
     "sane": "^1.3.4"
+  },
+  "scripts": {
+    "build": "npm run build-cjs && npm run build-es",
+    "build-cjs": "rimraf lib && BABEL_ENV=cjs babel src -d lib && cp src/definition.js lib/definition.js",
+    "build-es": "rimraf es && BABEL_ENV=es babel src -d es && cp src/definition.js es/definition.js",
+    "lint": "eslint src test *.js",
+    "prepublish": "npm run build",
+    "test": "mocha --compilers js:babel-core/register --reporter dot --require ./resources/mocha-bootload src/**/__tests__/**/*-test.js",
+    "watch": "babel-node ./resources/watch.js"
   }
 }
