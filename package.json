@@ -66,8 +66,8 @@
   },
   "scripts": {
     "build": "npm run build-cjs && npm run build-es",
-    "build-cjs": "rimraf lib && BABEL_ENV=cjs babel src -d lib && cp src/definition.js lib/definition.js",
-    "build-es": "rimraf es && BABEL_ENV=es babel src -d es && cp src/definition.js es/definition.js",
+    "build-cjs": "rimraf lib && BABEL_ENV=cjs babel src --ignore __tests__,__mocks__ -d lib && cp src/definition.js lib/definition.js",
+    "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es && cp src/definition.js es/definition.js",
     "lint": "eslint src test *.js",
     "prepublish": "npm run build",
     "test": "mocha --compilers js:babel-core/register --reporter dot --require ./resources/mocha-bootload src/**/__tests__/**/*-test.js",
