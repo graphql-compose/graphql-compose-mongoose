@@ -1,25 +1,16 @@
 [ignore]
-.*/es/.*
 .*/__tests__/.*
-.*/lib/.*
-.*/dist/.*
+.*/__mocks__/.*
 .*/coverage/.*
 .*/resources/.*
-.*/node_modules/graphql/.*
 
 [include]
-../graphql-compose/src
-../graphql-js/src
 
 [libs]
 
 [options]
 esproposal.class_instance_fields=enable
 suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
-module.name_mapper='^graphql-compose/lib/definition.js$' -> '/Users/nod/www/_npm/graphql-compose/src/definition.js'
-module.name_mapper='^graphql-compose\(.*\)$' -> '/Users/nod/www/_npm/graphql-compose/src\1'
-module.name_mapper='^graphql$' -> '/Users/nod/www/_npm/graphql-js/src'
-module.name_mapper='^graphql/type/definition.js$' -> '/Users/nod/www/_npm/graphql-js/src/type/definition.js'
 
 [version]
 0.28.0
