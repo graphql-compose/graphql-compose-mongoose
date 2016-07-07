@@ -1,8 +1,8 @@
 /* eslint-disable */
 
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
-import chaiSpies from 'chai-spies';
+var chai = require('chai');
+var chaiAsPromised = require('chai-as-promised');
+var chaiSpies = require('chai-spies');
 
 chai.use(chaiAsPromised);
 chai.use(chaiSpies);

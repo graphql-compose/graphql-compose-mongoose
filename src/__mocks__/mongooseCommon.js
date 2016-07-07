@@ -3,6 +3,7 @@ import mongoose, { Schema } from 'mongoose';
 const dbName = 'gqc-mongoose-test';
 const uri = `mongodb://127.0.0.1:27017/${dbName}`;
 
+mongoose.Promise = Promise;
 mongoose.connect(uri);
 
 mongoose.connection.on('error', (err) => {

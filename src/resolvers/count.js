@@ -15,7 +15,7 @@ import { filterHelperArgs, filterHelper } from './helpers/filter';
 export default function count(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts,
+  opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(

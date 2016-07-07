@@ -7,7 +7,6 @@
     "arrow-body-style": 0
   },
   "env": {
-    "jasmine": true,
     "mocha": true
   }
 }

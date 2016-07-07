@@ -14,7 +14,7 @@ import type {
 
 export const filterHelperArgs = (
   typeComposer: TypeComposer,
-  opts: filterHelperArgsOpts,
+  opts: filterHelperArgsOpts
 ): GraphQLFieldConfigArgumentMap => {
   if (!(typeComposer instanceof TypeComposer)) {
     throw new Error('First arg for filterHelperArgs() should be instance of TypeComposer.');

@@ -1,1 +1,5 @@
-export toDottedObject from './toDottedObject';
+import toDottedObject from './toDottedObject';
+
+export {
+  toDottedObject,
+};

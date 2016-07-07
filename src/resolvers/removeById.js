@@ -18,7 +18,7 @@ import { Resolver, TypeComposer } from 'graphql-compose';
 export default function removeById(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts, // eslint-disable-line no-unused-vars
+  opts?: genResolverOpts // eslint-disable-line no-unused-vars
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(

@@ -13,7 +13,10 @@ function exec(command, options) {
   return new Promise((resolve, reject) => {
     var child = spawn(command, options, {
       cmd: cmd,
-      env: process.env,
+      env: {
+        ...process.env,
+        BABEL_ENV: 'cjs',
+      },
       stdio: 'inherit'
     });
     child.on('exit', code => {

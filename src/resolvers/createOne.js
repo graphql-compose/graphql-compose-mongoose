@@ -15,7 +15,7 @@ import { Resolver, TypeComposer } from 'graphql-compose';
 export default function createOne(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts,
+  opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(

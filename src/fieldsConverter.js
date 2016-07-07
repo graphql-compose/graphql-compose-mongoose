@@ -119,7 +119,7 @@ export function getFieldsFromModel(model: MongooseModelT): MongooseFieldMapT {
 
 export function convertModelToGraphQL(
   model: MongooseModelT,
-  typeName: string,
+  typeName: string
 ): GraphQLOutputType {
   if (!typeName) {
     throw new Error('You provide empty name for type. '
@@ -241,7 +241,7 @@ export function arrayToGraphQL(field: MongooseFieldT, prefix: string = ''): Grap
 
 export function embeddedToGraphQL(
   field: MongooseFieldT,
-  prefix: string = '',
+  prefix: string = ''
 ): GraphQLOutputType {
   const fieldName = _getFieldName(field);
   const fieldType = _getFieldType(field);
@@ -266,7 +266,7 @@ export function embeddedToGraphQL(
 
 export function enumToGraphQL(
   field: MongooseFieldT,
-  prefix: string = '',
+  prefix: string = ''
 ): GraphQLOutputType {
   const valueList = _getFieldEnums(field);
   if (!valueList) {
@@ -289,7 +289,7 @@ export function enumToGraphQL(
 
 export function documentArrayToGraphQL(
   field: MongooseFieldT,
-  prefix: string = '',
+  prefix: string = ''
 ): GraphQLOutputType {
   if (!(field instanceof mongoose.Schema.Types.DocumentArray)) {
     throw new Error('You provide incorrect mongoose field to `documentArrayToGraphQL()`. '
@@ -308,7 +308,7 @@ export function documentArrayToGraphQL(
 
 export function referenceToGraphQL(
   field: MongooseFieldT,
-  prefix: string = '',
+  prefix: string = ''
 ): GraphQLOutputType {
   const fieldType = _getFieldType(field);
   if (fieldType !== 'ObjectID') {

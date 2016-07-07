@@ -137,7 +137,7 @@ describe('modelConverter', () => {
       it('should not provide resolver if opts.resolvers.[resolverName] === false', () => {
         const tc2 = mm2tc(UserModel, {
           resolvers: {
-            findById: false,
+            count: false,
             removeById: false,
             findMany: {},
             updateOne: {
@@ -146,7 +146,7 @@ describe('modelConverter', () => {
           },
         });
         const resolverKeys = tc2.getResolvers().getKeys();
-        expect(resolverKeys).to.not.include('findById');
+        expect(resolverKeys).to.not.include('count');
         expect(resolverKeys).to.not.include('removeById');
         expect(resolverKeys).include.members(['findMany', 'updateOne', 'updateMany']);
       });

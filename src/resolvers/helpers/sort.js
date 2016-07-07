@@ -14,7 +14,7 @@ import type {
 
 export const sortHelperArgs = (
   model: MongooseModelT,
-  opts: sortHelperArgsOpts,
+  opts: sortHelperArgsOpts
 ): GraphQLFieldConfigArgumentMap => {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(

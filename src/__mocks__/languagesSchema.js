@@ -26,7 +26,7 @@ const LanguagesSchema = new Schema(
       description: 'Language skills',
       enum: Object.keys(enumLanguageSkill),
     },
-  },
+  }
 );
 
 export default LanguagesSchema;

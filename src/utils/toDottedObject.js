@@ -12,7 +12,7 @@
  * @param {Object} target target object
  * @param {Array} path path array (internal)
  */
-export default function toDottedObject(
+function toDottedObject(
   obj: Object,
   target?: Object = {},
   path?: string[] = []
@@ -28,3 +28,5 @@ export default function toDottedObject(
   return target;
   /* eslint-enable */
 }
+
+export default toDottedObject;

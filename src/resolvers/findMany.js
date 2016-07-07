@@ -19,7 +19,7 @@ import { projectionHelper } from './helpers/projection';
 export default function findMany(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts,
+  opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(
