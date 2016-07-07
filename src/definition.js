@@ -21,7 +21,7 @@ export type MonooseModelIndex = [
 export type MongooseModelT = {
   modelName: string,
   schema: MongooseModelSchemaT,
-  create(doc: Object | Object[]): Promise,
+  create(doc: Object | Object[]): Promise<Object>,
   findOne(conditions: ?Object, projection?: Object): MongooseQuery,
   findById(id: mixed, projection?: Object, options?: Object): MongooseQuery,
   find(conditions: ?Object, projection?: Object, options?: Object): MongooseQuery,
@@ -52,7 +52,7 @@ export type ResolverNames = 'findById' | 'findByIds' | 'findOne' | 'findMany' |
                             'createOne' | 'count';
 
 export type MongooseQuery = {
-  exec(): Promise,
+  exec(): Promise<any>,
   where(criteria: ObjectMap): MongooseQuery,
   where(fieldName: string, equalTo: string): MongooseQuery,
   where(fieldName: string): MongooseQuery,
@@ -68,7 +68,7 @@ export type MongooseQuery = {
 
 export type MongoseDocument = {
   set(values: ObjectMap): void,
-  save(): Promise,
+  save(): Promise<Object>,
 }
 
 // RE-EXPORT graphql-compose definitions
