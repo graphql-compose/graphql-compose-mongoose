@@ -62,9 +62,9 @@ describe('updateOne() ->', () => {
       expect(resolver.hasArg('sort')).to.be.true;
     });
 
-    it('should have required `input` arg', () => {
+    it('should have required `record` arg', () => {
       const resolver = updateOne(UserModel, UserTypeComposer);
-      const argConfig = resolver.getArg('input');
+      const argConfig = resolver.getArg('record');
       expect(argConfig).property('type').instanceof(GraphQLNonNull);
       expect(argConfig).deep.property('type.ofType.name', 'UpdateOneUserInput');
     });
@@ -89,22 +89,22 @@ describe('updateOne() ->', () => {
       expect(result).have.property('recordId', user1.id);
     });
 
-    it('should change data via args.input in model', async () => {
+    it('should change data via args.record in model', async () => {
       const result = await updateOne(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { _id: user1.id },
-          input: { name: 'newName' },
+          record: { name: 'newName' },
         },
       });
       expect(result).have.deep.property('record.name', 'newName');
     });
 
-    it('should change data via args.input in database', (done) => {
+    it('should change data via args.record in database', (done) => {
       const checkedName = 'nameForMongoDB';
       updateOne(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { _id: user1.id },
-          input: { name: checkedName },
+          record: { name: checkedName },
         },
       }).then(() => {
         UserModel.collection.findOne({ _id: user1._id }, (err, doc) => {

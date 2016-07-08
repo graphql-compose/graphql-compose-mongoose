@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 import { skipHelperArgs } from './helpers/skip';
-import { inputHelperArgs } from './helpers/input';
+import { recordHelperArgs } from './helpers/record';
 import { filterHelperArgs } from './helpers/filter';
 import { sortHelperArgs } from './helpers/sort';
 import findOne from './findOne';
@@ -56,11 +56,11 @@ export default function updateOne(
       },
     }),
     args: {
-      ...inputHelperArgs(typeComposer, {
-        inputTypeName: `UpdateOne${typeComposer.getTypeName()}Input`,
+      ...recordHelperArgs(typeComposer, {
+        recordTypeName: `UpdateOne${typeComposer.getTypeName()}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
-        ...(opts && opts.input),
+        ...(opts && opts.record),
       }),
       ...filterHelperArgs(typeComposer, {
         filterTypeName: `FilterUpdateOne${typeComposer.getTypeName()}Input`,
@@ -74,7 +74,7 @@ export default function updateOne(
       ...skipHelperArgs(),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const inputData = resolveParams.args && resolveParams.args.input || null;
+      const recordData = resolveParams.args && resolveParams.args.record || null;
       const filterData = resolveParams.args && resolveParams.args.filter || {};
 
       if (!(typeof filterData === 'object')
@@ -89,8 +89,8 @@ export default function updateOne(
       return findOneResolver.resolve(resolveParams)
         // save changes to DB
         .then(doc => {
-          if (inputData) {
-            doc.set(inputData);
+          if (recordData) {
+            doc.set(recordData);
             return doc.save();
           }
           return doc;

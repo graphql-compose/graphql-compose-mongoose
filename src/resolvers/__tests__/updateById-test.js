@@ -51,16 +51,16 @@ describe('updateById() ->', () => {
   });
 
   describe('Resolver.args', () => {
-    it('should have `input` arg', () => {
+    it('should have `record` arg', () => {
       const resolver = updateById(UserModel, UserTypeComposer);
-      const argConfig = resolver.getArg('input');
+      const argConfig = resolver.getArg('record');
       expect(argConfig).property('type').instanceof(GraphQLNonNull);
       expect(argConfig).deep.property('type.ofType.name', 'UpdateByIdUserInput');
     });
 
-    it('should have `input._id` required arg', () => {
+    it('should have `record._id` required arg', () => {
       const resolver = updateById(UserModel, UserTypeComposer);
-      const argConfig = resolver.getArg('input') || {};
+      const argConfig = resolver.getArg('record') || {};
       expect(argConfig).deep.property('type.ofType').instanceof(GraphQLInputObjectType);
       if (argConfig.type && argConfig.type.ofType) {
         const _idFieldType = new InputTypeComposer(argConfig.type.ofType).getFieldType('_id');
@@ -77,34 +77,34 @@ describe('updateById() ->', () => {
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
-    it('should rejected with Error if args.input._id is empty', async () => {
-      const result = updateById(UserModel, UserTypeComposer).resolve({ args: { input: {} } });
-      await expect(result).be.rejectedWith(Error, 'requires args.input._id');
+    it('should rejected with Error if args.record._id is empty', async () => {
+      const result = updateById(UserModel, UserTypeComposer).resolve({ args: { record: {} } });
+      await expect(result).be.rejectedWith(Error, 'requires args.record._id');
     });
 
     it('should return payload.recordId', async () => {
       const result = await updateById(UserModel, UserTypeComposer).resolve({
         args: {
-          input: { _id: user1.id, name: 'some name' },
+          record: { _id: user1.id, name: 'some name' },
         },
       });
       expect(result).have.property('recordId', user1.id);
     });
 
-    it('should change data via args.input in model', async () => {
+    it('should change data via args.record in model', async () => {
       const result = await updateById(UserModel, UserTypeComposer).resolve({
         args: {
-          input: { _id: user1.id, name: 'newName' },
+          record: { _id: user1.id, name: 'newName' },
         },
       });
       expect(result).have.deep.property('record.name', 'newName');
     });
 
-    it('should change data via args.input in database', (done) => {
+    it('should change data via args.record in database', (done) => {
       const checkedName = 'nameForMongoDB';
       updateById(UserModel, UserTypeComposer).resolve({
         args: {
-          input: { _id: user1.id, name: checkedName },
+          record: { _id: user1.id, name: checkedName },
         },
       }).then(() => {
         UserModel.collection.findOne({ _id: user1._id }, (err, doc) => {
@@ -118,7 +118,7 @@ describe('updateById() ->', () => {
       const checkedName = 'anyName123';
       const result = await updateById(UserModel, UserTypeComposer).resolve({
         args: {
-          input: { _id: user1.id, name: checkedName },
+          record: { _id: user1.id, name: checkedName },
         },
       });
       expect(result).have.deep.property('record.id', user1.id);

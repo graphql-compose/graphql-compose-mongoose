@@ -99,7 +99,7 @@ export type ExtendedResolveParams = ResolveParams & {
 export type genResolverOpts = {
   filter?: filterHelperArgsOpts,
   sort?: sortHelperArgsOpts,
-  input?: inputHelperArgsOpts,
+  record?: recordHelperArgsOpts,
   limit?: limitHelperArgsOpts,
 }
 
@@ -144,16 +144,16 @@ export type typeConverterResolversOpts = {
     skip?: false,
   },
   updateById?: false | {
-    input?: inputHelperArgsOpts | false,
+    input?: recordHelperArgsOpts | false,
   },
   updateOne?: false | {
-    input?: inputHelperArgsOpts | false,
+    input?: recordHelperArgsOpts | false,
     filter?: filterHelperArgsOpts | false,
     sort?: sortHelperArgsOpts | false,
     skip?: false,
   },
   updateMany?: false | {
-    input?: inputHelperArgsOpts | false,
+    input?: recordHelperArgsOpts | false,
     filter?: filterHelperArgsOpts | false,
     sort?: sortHelperArgsOpts | false,
     limit?: limitHelperArgsOpts | false,
@@ -168,7 +168,7 @@ export type typeConverterResolversOpts = {
     filter?: filterHelperArgsOpts | false,
   },
   createOne?: false | {
-    input?: inputHelperArgsOpts | false,
+    input?: recordHelperArgsOpts | false,
   },
   count?: false | {
     filter?: filterHelperArgsOpts | false,
@@ -187,8 +187,8 @@ export type sortHelperArgsOpts = {
   sortTypeName?: string,
 };
 
-export type inputHelperArgsOpts = {
-  inputTypeName?: string,
+export type recordHelperArgsOpts = {
+  recordTypeName?: string,
   isRequired?: boolean,
   removeFields?: string[],
   requiredFields?: string[],

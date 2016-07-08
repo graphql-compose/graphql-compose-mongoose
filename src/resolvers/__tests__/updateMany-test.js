@@ -67,9 +67,9 @@ describe('updateMany() ->', () => {
       expect(resolver.hasArg('sort')).to.be.true;
     });
 
-    it('should have `input` arg', () => {
+    it('should have `record` arg', () => {
       const resolver = updateMany(UserModel, UserTypeComposer);
-      const argConfig = resolver.getArg('input');
+      const argConfig = resolver.getArg('record');
       expect(argConfig).property('type').instanceof(GraphQLNonNull);
       expect(argConfig).deep.property('type.ofType.name', 'UpdateManyUserInput');
     });
@@ -82,17 +82,17 @@ describe('updateMany() ->', () => {
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
-    it('should rejected with Error if args.input is empty', async () => {
+    it('should rejected with Error if args.record is empty', async () => {
       const result = updateMany(UserModel, UserTypeComposer).resolve({ args: {} });
-      await expect(result).be.rejectedWith(Error, 'at least one value in args.input');
+      await expect(result).be.rejectedWith(Error, 'at least one value in args.record');
     });
 
-    it('should change data via args.input in database', (done) => {
+    it('should change data via args.record in database', (done) => {
       const checkedName = 'nameForMongoDB';
       updateMany(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { _id: user1.id },
-          input: { name: checkedName },
+          record: { name: checkedName },
         },
       }).then(() => {
         UserModel.collection.findOne({ _id: user1._id }, (err, doc) => {
@@ -105,7 +105,7 @@ describe('updateMany() ->', () => {
     it('should return payload.numAffected', async () => {
       const result = await updateMany(UserModel, UserTypeComposer).resolve({
         args: {
-          input: { gender: 'female' },
+          record: { gender: 'female' },
         },
       });
       expect(result).have.deep.property('numAffected', 2);

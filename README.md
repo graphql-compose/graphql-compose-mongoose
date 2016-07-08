@@ -145,16 +145,16 @@ export type typeConverterResolversOpts = {
     skip?: false,
   },
   updateById?: false | {
-    input?: inputHelperArgsOpts | false,
+    record?: recordHelperArgsOpts | false,
   },
   updateOne?: false | {
-    input?: inputHelperArgsOpts | false,
+    record?: recordHelperArgsOpts | false,
     filter?: filterHelperArgsOpts | false,
     sort?: sortHelperArgsOpts | false,
     skip?: false,
   },
   updateMany?: false | {
-    input?: inputHelperArgsOpts | false,
+    record?: recordHelperArgsOpts | false,
     filter?: filterHelperArgsOpts | false,
     sort?: sortHelperArgsOpts | false,
     limit?: limitHelperArgsOpts | false,
@@ -169,7 +169,7 @@ export type typeConverterResolversOpts = {
     filter?: filterHelperArgsOpts | false,
   },
   createOne?: false | {
-    input?: inputHelperArgsOpts | false,
+    record?: recordHelperArgsOpts | false,
   },
   count?: false | {
     filter?: filterHelperArgsOpts | false,
@@ -177,7 +177,7 @@ export type typeConverterResolversOpts = {
 };
 ```
 
-This is `opts.resolvers.[resolverName].[filter|sort|input|limit]` level of options.
+This is `opts.resolvers.[resolverName].[filter|sort|record|limit]` level of options.
 You may tune every resolver's args independently as you wish.
 Here you may setup every argument and override some fields from the default input object type, described above in `opts.inputType`.
 ```js
@@ -192,9 +192,9 @@ export type sortHelperArgsOpts = {
   sortTypeName?: string, // type name for `sort`
 };
 
-export type inputHelperArgsOpts = {
-  inputTypeName?: string, // type name for `input`
-  isRequired?: boolean, // set `input` arg as required (wraps in GraphQLNonNull)
+export type recordHelperArgsOpts = {
+  recordTypeName?: string, // type name for `record`
+  isRequired?: boolean, // set `record` arg as required (wraps in GraphQLNonNull)
   removeFields?: string[], // provide fieldNames, that should be removed
   requiredFields?: string[], // provide fieldNames, that should be required
 };

@@ -23,9 +23,9 @@ describe('createOne() ->', () => {
   });
 
   describe('Resolver.args', () => {
-    it('should have required `input` arg', () => {
+    it('should have required `record` arg', () => {
       const resolver = createOne(UserModel, UserTypeComposer);
-      const argConfig = resolver.getArg('input');
+      const argConfig = resolver.getArg('record');
       expect(argConfig).property('type').instanceof(GraphQLNonNull);
       expect(argConfig).deep.property('type.ofType.name', 'CreateOneUserInput');
     });
@@ -38,24 +38,24 @@ describe('createOne() ->', () => {
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
-    it('should rejected with Error if args.input is empty', async () => {
+    it('should rejected with Error if args.record is empty', async () => {
       const result = createOne(UserModel, UserTypeComposer).resolve({ args: {} });
-      await expect(result).be.rejectedWith(Error, 'at least one value in args.input');
+      await expect(result).be.rejectedWith(Error, 'at least one value in args.record');
     });
 
     it('should return payload.recordId', async () => {
       const result = await createOne(UserModel, UserTypeComposer).resolve({
         args: {
-          input: { name: 'newName' },
+          record: { name: 'newName' },
         },
       });
       expect(result).property('recordId').to.be.ok;
     });
 
-    it('should create document with args.input', async () => {
+    it('should create document with args.record', async () => {
       const result = await createOne(UserModel, UserTypeComposer).resolve({
         args: {
-          input: { name: 'newName' },
+          record: { name: 'newName' },
         },
       });
       expect(result).have.deep.property('record.name', 'newName');
@@ -65,7 +65,7 @@ describe('createOne() ->', () => {
       const checkedName = 'nameForMongoDB';
       createOne(UserModel, UserTypeComposer).resolve({
         args: {
-          input: { name: checkedName },
+          record: { name: checkedName },
         },
       }).then((res) => {
         UserModel.collection.findOne({ _id: res.record._id }, (err, doc) => {
@@ -78,7 +78,7 @@ describe('createOne() ->', () => {
     it('should return payload.record', async () => {
       const result = await createOne(UserModel, UserTypeComposer).resolve({
         args: {
-          input: { name: 'NewUser' },
+          record: { name: 'NewUser' },
         },
       });
       expect(result).have.deep.property('record.id', result.recordId);

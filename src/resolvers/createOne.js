@@ -1,6 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
-import { inputHelperArgs } from './helpers/input';
+import { recordHelperArgs } from './helpers/record';
 import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 
@@ -45,26 +45,26 @@ export default function createOne(
       },
     }),
     args: {
-      ...inputHelperArgs(typeComposer, {
-        inputTypeName: `CreateOne${typeComposer.getTypeName()}Input`,
+      ...recordHelperArgs(typeComposer, {
+        recordTypeName: `CreateOne${typeComposer.getTypeName()}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
-        ...(opts && opts.input),
+        ...(opts && opts.record),
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const inputData = resolveParams.args && resolveParams.args.input || {};
+      const recordData = resolveParams.args && resolveParams.args.record || {};
 
-      if (!(typeof inputData === 'object')
-        || Object.keys(inputData).length === 0
+      if (!(typeof recordData === 'object')
+        || Object.keys(recordData).length === 0
       ) {
         return Promise.reject(
           new Error(`${typeComposer.getTypeName()}.createOne resolver requires `
-                    + 'at least one value in args.input')
+                    + 'at least one value in args.record')
         );
       }
 
-      return model.create(inputData)
+      return model.create(recordData)
         .then(record => {
           if (record) {
             return {

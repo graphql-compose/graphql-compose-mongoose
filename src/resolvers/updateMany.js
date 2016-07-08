@@ -1,6 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
-import { inputHelperArgs } from './helpers/input';
+import { recordHelperArgs } from './helpers/record';
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
@@ -48,11 +48,11 @@ export default function updateMany(
       },
     }),
     args: {
-      ...inputHelperArgs(typeComposer, {
-        inputTypeName: `UpdateMany${typeComposer.getTypeName()}Input`,
+      ...recordHelperArgs(typeComposer, {
+        recordTypeName: `UpdateMany${typeComposer.getTypeName()}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
-        ...(opts && opts.input),
+        ...(opts && opts.record),
       }),
       ...filterHelperArgs(typeComposer, {
         filterTypeName: `FilterUpdateMany${typeComposer.getTypeName()}Input`,
@@ -69,14 +69,14 @@ export default function updateMany(
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const inputData = resolveParams.args && resolveParams.args.input || {};
+      const recordData = resolveParams.args && resolveParams.args.record || {};
 
-      if (!(typeof inputData === 'object')
-        || Object.keys(inputData).length === 0
+      if (!(typeof recordData === 'object')
+        || Object.keys(recordData).length === 0
       ) {
         return Promise.reject(
           new Error(`${typeComposer.getTypeName()}.updateMany resolver requires `
-                  + 'at least one value in args.input')
+                  + 'at least one value in args.record')
         );
       }
 
@@ -87,7 +87,7 @@ export default function updateMany(
       limitHelper(resolveParams);
 
       resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
-      resolveParams.query.update({ $set: toDottedObject(inputData) });
+      resolveParams.query.update({ $set: toDottedObject(recordData) });
 
       return resolveParams.query
         .exec()

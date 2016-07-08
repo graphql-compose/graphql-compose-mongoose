@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { inputHelperArgs } from './helpers/input';
+import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
 import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
@@ -54,32 +54,32 @@ export default function updateById(
       },
     }),
     args: {
-      ...inputHelperArgs(typeComposer, {
-        inputTypeName: `UpdateById${typeComposer.getTypeName()}Input`,
+      ...recordHelperArgs(typeComposer, {
+        recordTypeName: `UpdateById${typeComposer.getTypeName()}Input`,
         requiredFields: ['_id'],
         isRequired: true,
-        ...(opts && opts.input),
+        ...(opts && opts.record),
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const inputData = resolveParams.args && resolveParams.args.input || {};
+      const recordData = resolveParams.args && resolveParams.args.record || {};
 
-      if (!(typeof inputData === 'object')) {
+      if (!(typeof recordData === 'object')) {
         return Promise.reject(
-          new Error(`${typeComposer.getTypeName()}.updateById resolver requires args.input value`)
+          new Error(`${typeComposer.getTypeName()}.updateById resolver requires args.record value`)
         );
       }
 
-      if (!inputData._id) {
+      if (!recordData._id) {
         return Promise.reject(
           new Error(
-            `${typeComposer.getTypeName()}.updateById resolver requires args.input._id value`
+            `${typeComposer.getTypeName()}.updateById resolver requires args.record._id value`
           )
         );
       }
 
-      resolveParams.args._id = inputData._id;
-      delete inputData._id;
+      resolveParams.args._id = recordData._id;
+      delete recordData._id;
 
       return findByIdResolver.resolve(resolveParams)
         // save changes to DB
@@ -87,8 +87,8 @@ export default function updateById(
           if (!doc) {
             return Promise.reject('Document not found');
           }
-          if (inputData) {
-            doc.set(inputData);
+          if (recordData) {
+            doc.set(recordData);
             return doc.save();
           }
           return doc;
