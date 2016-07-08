@@ -1,5 +1,9 @@
 ## master
 
+## 0.0.6 (July 08, 2016)
+* rename `input` argument to `record` for mutations (due `graphql-compose-relay` compatibility).
+`input` is a reserved name for mutations' arg in Relay, and may contains not only document/record data (eg. clientMutationId, sort and filter args). So better solution for `graphql-compose-mongoose` do not use this name, cause `graphql-compose-relay` get all args from mongoose resolvers and put them to `input` arg.
+
 ## 0.0.5 (July 07, 2016)
 * refactor Resolvers due changes in graphql-compose api
 * exports flow annotations
