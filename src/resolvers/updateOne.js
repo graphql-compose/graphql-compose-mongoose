@@ -62,7 +62,7 @@ export default function updateOne(
         isRequired: true,
         ...(opts && opts.record),
       }),
-      ...filterHelperArgs(typeComposer, {
+      ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterUpdateOne${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),

@@ -35,7 +35,7 @@ export default function findOne(
     name: 'findOne',
     kind: 'query',
     args: {
-      ...filterHelperArgs(typeComposer, {
+      ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterFindOne${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),

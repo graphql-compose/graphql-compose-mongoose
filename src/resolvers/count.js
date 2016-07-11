@@ -32,7 +32,7 @@ export default function count(
     name: 'count',
     kind: 'query',
     args: {
-      ...filterHelperArgs(typeComposer, {
+      ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `Filter${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),

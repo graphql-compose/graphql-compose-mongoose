@@ -54,7 +54,7 @@ export default function updateMany(
         isRequired: true,
         ...(opts && opts.record),
       }),
-      ...filterHelperArgs(typeComposer, {
+      ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterUpdateMany${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),

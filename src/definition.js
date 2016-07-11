@@ -180,7 +180,13 @@ export type filterHelperArgsOpts = {
   isRequired?: boolean,
   onlyIndexed?: boolean,
   requiredFields?: string | string[],
-  model?: MongooseModelT,
+  operators?: filterOperatorsOpts | false,
+};
+
+export type filterOperatorNames =  'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
+
+export type filterOperatorsOpts = {
+  [fieldName: string]: filterOperatorNames[] | false,
 };
 
 export type sortHelperArgsOpts = {

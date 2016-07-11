@@ -1,23 +1,40 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import { TypeComposer } from 'graphql-compose';
-import { GraphQLNonNull } from 'graphql';
+import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import {
+  GraphQLNonNull,
+  GraphQLInputObjectType,
+  GraphQLList,
+  getNamedType,
+} from 'graphql';
 import getIndexesFromModel from '../../utils/getIndexesFromModel';
-import { toDottedObject } from '../../utils';
+import { toDottedObject, upperFirst } from '../../utils';
 import type {
   GraphQLFieldConfigArgumentMap,
   ExtendedResolveParams,
   MongooseModelT,
   filterHelperArgsOpts,
+  filterOperatorsOpts,
+  filterOperatorNames,
 } from '../../definition';
+
+export const OPERATORS_FIELDNAME = '_operators';
+
 
 export const filterHelperArgs = (
   typeComposer: TypeComposer,
+  model: MongooseModelT,
   opts: filterHelperArgsOpts
 ): GraphQLFieldConfigArgumentMap => {
   if (!(typeComposer instanceof TypeComposer)) {
     throw new Error('First arg for filterHelperArgs() should be instance of TypeComposer.');
+  }
+
+  if (!model || !model.modelName || !model.schema) {
+    throw new Error(
+      'Second arg for filterHelperArgs() should be instance of Mongoose Model.'
+    );
   }
 
   if (!opts || !opts.filterTypeName) {
@@ -34,12 +51,7 @@ export const filterHelperArgs = (
   }
 
   if (opts.onlyIndexed) {
-    if (!opts.model) {
-      throw new Error('You should provide `model` in options with mongoose model '
-                    + 'for deriving index fields.');
-    }
-
-    const indexedFieldNames = getIndexedFieldNames(opts.model);
+    const indexedFieldNames = getIndexedFieldNames(model);
     Object.keys(typeComposer.getFields()).forEach(fieldName => {
       if (indexedFieldNames.indexOf(fieldName) === -1) {
         removeFields.push(fieldName);
@@ -49,10 +61,21 @@ export const filterHelperArgs = (
 
   const filterTypeName: string = opts.filterTypeName;
   const inputComposer = typeComposer.getInputTypeComposer().clone(filterTypeName);
+  inputComposer.makeFieldsOptional(inputComposer.getFieldNames());
   inputComposer.removeField(removeFields);
 
   if (opts.requiredFields) {
     inputComposer.makeFieldsRequired(opts.requiredFields);
+  }
+
+  if (!opts.hasOwnProperty('operators') || opts.operators !== false) {
+    addFieldsWithOperator(
+      // $FlowFixMe
+      `Operators${opts.filterTypeName}`,
+      inputComposer,
+      model,
+      opts.operators || {}
+    );
   }
 
   return {
@@ -71,7 +94,30 @@ export const filterHelperArgs = (
 export function filterHelper(resolveParams: ExtendedResolveParams): void {
   const filter = resolveParams.args && resolveParams.args.filter;
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
-    resolveParams.query = resolveParams.query.where(toDottedObject(filter)); // eslint-disable-line
+    if (!filter[OPERATORS_FIELDNAME]) {
+      resolveParams.query = resolveParams.query.where(toDottedObject(filter)); // eslint-disable-line
+    } else {
+      const operatorFields = Object.assign({}, filter[OPERATORS_FIELDNAME]);
+      const simpleFields = Object.assign({}, filter);
+      delete simpleFields[OPERATORS_FIELDNAME];
+
+      if (Object.keys(simpleFields).length > 0) {
+        resolveParams.query = resolveParams.query.where(toDottedObject(simpleFields)); // eslint-disable-line
+      }
+      Object.keys(operatorFields).forEach(fieldName => {
+        const fieldOperators = Object.assign({}, operatorFields[fieldName]);
+        const criteria = {};
+        Object.keys(fieldOperators).forEach(operatorName => {
+          criteria[`$${operatorName}`] = fieldOperators[operatorName];
+        });
+        if (Object.keys(criteria).length > 0) {
+          // $FlowFixMe
+          resolveParams.query = resolveParams.query.find({ // eslint-disable-line
+            [fieldName]: criteria,
+          });
+        }
+      });
+    }
   }
 }
 
@@ -85,4 +131,68 @@ export function getIndexedFieldNames(model: MongooseModelT): string[] {
   });
 
   return fieldNames;
+}
+
+export function addFieldsWithOperator(
+  typeName: string,
+  inputComposer: InputTypeComposer,
+  model: MongooseModelT,
+  operatorsOpts: filterOperatorsOpts
+) {
+  const operatorsComposer = new InputTypeComposer(new GraphQLInputObjectType({
+    name: typeName,
+    fields: {},
+  }));
+
+  const availableOperators: filterOperatorNames[]
+    = ['gt', 'gte', 'lt', 'lte', 'ne', 'in[]', 'nin[]'];
+
+  // if `opts.resolvers.[resolverName].filter.operators` is empty and not disabled via `false`
+  // then fill it up with indexed fields
+  const indexedFields = getIndexedFieldNames(model);
+  if (operatorsOpts !== false && Object.keys(operatorsOpts).length === 0) {
+    indexedFields.forEach(fieldName => {
+      operatorsOpts[fieldName] = availableOperators; // eslint-disable-line
+    });
+  }
+
+  const existedFields = inputComposer.getFields();
+  Object.keys(existedFields).forEach(fieldName => {
+    if (operatorsOpts[fieldName] && operatorsOpts[fieldName] !== false) {
+      const fields = {};
+      let operators;
+      if (operatorsOpts[fieldName] && Array.isArray(operatorsOpts[fieldName])) {
+        operators = operatorsOpts[fieldName];
+      } else {
+        operators = availableOperators;
+      }
+      operators.forEach(operatorName => {
+        if (operatorName.slice(-2) === '[]') {
+          fields[operatorName.slice(0, -2)] = {
+            ...existedFields[fieldName],
+            // $FlowFixMe
+            type: new GraphQLList(getNamedType(existedFields[fieldName].type)),
+          };
+        } else {
+          fields[operatorName] = getNamedType(existedFields[fieldName]);
+        }
+      });
+      if (Object.keys(fields).length > 0) {
+        operatorsComposer.addField(fieldName, {
+          type: new GraphQLInputObjectType({
+            name: `${upperFirst(fieldName)}${typeName}`,
+            fields,
+          }),
+          description: 'Filter value by operator(s)',
+        });
+      }
+    }
+  });
+
+  if (Object.keys(operatorsComposer.getFields()).length > 0) {
+    inputComposer.addField(OPERATORS_FIELDNAME, {
+      type: operatorsComposer.getType(),
+      description: 'List of fields that can be filtered via operators',
+    });
+  }
 }

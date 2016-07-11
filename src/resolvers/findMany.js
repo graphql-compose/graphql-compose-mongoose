@@ -36,7 +36,7 @@ export default function findMany(
     name: 'findMany',
     kind: 'query',
     args: {
-      ...filterHelperArgs(typeComposer, {
+      ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterFindMany${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),

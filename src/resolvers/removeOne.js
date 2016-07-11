@@ -53,7 +53,7 @@ export default function removeOne(
       },
     }),
     args: {
-      ...filterHelperArgs(typeComposer, {
+      ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterRemoveOne${typeComposer.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),

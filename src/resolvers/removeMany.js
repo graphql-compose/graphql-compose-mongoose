@@ -44,7 +44,7 @@ export default function removeMany(
       },
     }),
     args: {
-      ...filterHelperArgs(typeComposer, {
+      ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterRemoveMany${typeComposer.getTypeName()}Input`,
         isRequired: true,
         model,
