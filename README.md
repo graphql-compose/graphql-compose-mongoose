@@ -4,7 +4,7 @@ This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose)
 
 Example
 =======
-Live demo: [https://graphql-compose-mongoose.herokuapp.com/](https://graphql-compose-mongoose.herokuapp.com/?query=%7B%0A%20%20userMany(limit%3A%205)%20%7B%0A%20%20%20%20_id%0A%20%20%20%20name%0A%20%20%20%20age%0A%20%20%7D%0A%7D)
+Live demo: [https://graphql-compose-mongoose.herokuapp.com/](https://graphql-compose-mongoose.herokuapp.com/)
 
 Source code: https://github.com/nodkz/graphql-compose-mongoose-example
 
@@ -186,7 +186,12 @@ export type filterHelperArgsOpts = {
   isRequired?: boolean, // set `filter` arg as required (wraps in GraphQLNonNull)
   onlyIndexed?: boolean, // leave only that fields, which is indexed in mongodb
   requiredFields?: string | string[], // provide fieldNames, that should be required
+  operators?: filterOperatorsOpts | false, // provide filtering fields by operators, eg. $lt, $gt
 };
+
+// supported operators names in filter `arg`
+export type filterOperatorNames =  'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
+export type filterOperatorsOpts = { [fieldName: string]: filterOperatorNames[] | false };
 
 export type sortHelperArgsOpts = {
   sortTypeName?: string, // type name for `sort`
@@ -223,7 +228,7 @@ This module in near future allow to combine any complexity of your GraphQL schem
 
 TODO
 ====
-- [ ] for `filter` arg add support for $lt, $gt and other selector's operators
+- [ ] for `filter._operators` arg add support for $regexp
 
 [CHANGELOG](https://github.com/nodkz/graphql-compose-mongoose/blob/master/CHANGELOG.md)
 

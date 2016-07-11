@@ -1,4 +1,5 @@
 ## master
+* add support for filtering with operators $gt, $gte, $lt, $lte, $ne, $in, $nin
 
 ## 0.0.6 (July 08, 2016)
 * rename `input` argument to `record` for mutations (due `graphql-compose-relay` compatibility).
