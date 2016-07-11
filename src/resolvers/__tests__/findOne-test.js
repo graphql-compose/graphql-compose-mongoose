@@ -52,7 +52,9 @@ describe('findOne() ->', () => {
     });
 
     it('should have `filter` arg only with indexed fields', async () => {
-      const result = findOne(UserModel, UserTypeComposer, { filter: { onlyIndexed: true } });
+      const result = findOne(UserModel, UserTypeComposer,
+        { filter: { onlyIndexed: true, operators: false } }
+      );
       const filterFields = result.args.filter.type._typeConfig.fields();
       expect(filterFields).all.keys(['_id', 'name', 'employment']);
     });

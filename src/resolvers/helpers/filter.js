@@ -33,7 +33,7 @@ export const filterHelperArgs = (
 
   if (!model || !model.modelName || !model.schema) {
     throw new Error(
-      'Second arg for filterHelperArgs() should be instance of Mongoose Model.'
+      'Second arg for filterHelperArgs() should be instance of MongooseModel.'
     );
   }
 
@@ -61,7 +61,6 @@ export const filterHelperArgs = (
 
   const filterTypeName: string = opts.filterTypeName;
   const inputComposer = typeComposer.getInputTypeComposer().clone(filterTypeName);
-  inputComposer.makeFieldsOptional(inputComposer.getFieldNames());
   inputComposer.removeField(removeFields);
 
   if (opts.requiredFields) {
