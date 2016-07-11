@@ -28,15 +28,44 @@ describe('Resolver helper `filter` ->', () => {
     });
   });
 
-  // describe('addFieldsWithOperator()', () => {
-  //   it('should add OPERATORS_FIELDNAME to filterType', () => {
-  //     const args = filterHelperArgs(UserTypeComposer, UserModel, {
-  //       filterTypeName: 'FilterUserType',
-  //     });
-  //     const inputTypeComposer = new InputTypeComposer(args.filter.type);
-  //     addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, {});
-  //   });
-  // });
+  describe('addFieldsWithOperator()', () => {
+    let args;
+    let inputTypeComposer;
+
+    beforeEach(() => {
+      args = filterHelperArgs(UserTypeComposer, UserModel, {
+        filterTypeName: 'FilterUserType',
+      });
+      inputTypeComposer = new InputTypeComposer(args.filter.type);
+    });
+
+    it('should add OPERATORS_FIELDNAME to filterType', () => {
+      addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, {});
+      expect(inputTypeComposer.hasField(OPERATORS_FIELDNAME)).to.be.true;
+    });
+
+    it('should by default have only indexed fields', () => {
+      addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, {});
+      const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
+      const opComposer = new InputTypeComposer(operatorsType);
+      expect(opComposer.getFieldNames()).to.have.members(['name', '_id', 'employment']);
+    });
+
+    it('should have only provided fields via options', () => {
+      addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, { age: ['lt'] });
+      const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
+      const opComposer = new InputTypeComposer(operatorsType);
+      expect(opComposer.getFieldNames()).to.have.members(['age']);
+    });
+
+    it('should have only provided operators via options for field', () => {
+      addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, { age: ['lt', 'gte'] });
+      const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
+      const opComposer = new InputTypeComposer(operatorsType);
+      const ageComposer = new InputTypeComposer(opComposer.getFieldType('age'));
+      expect(ageComposer.getFieldNames()).to.have.members(['lt', 'gte']);
+    });
+  });
 
   describe('filterHelperArgs()', () => {
     it('should throw error if first arg is not TypeComposer', () => {
@@ -124,29 +153,34 @@ describe('Resolver helper `filter` ->', () => {
   });
 
   describe('filterHelper()', () => {
-    let spyFn;
+    let spyWhereFn;
+    let spyFindFn;
     let resolveParams;
 
     beforeEach(() => {
-      spyFn = spy();
+      spyWhereFn = spy();
+      spyFindFn = spy();
       resolveParams = {
         query: {
-          where: spyFn,
+          where: spyWhereFn,
+          find: spyFindFn,
         },
       };
     });
 
     it('should not call query.where if args.filter is empty', () => {
       filterHelper(resolveParams);
-      expect(spyFn).to.have.not.been.called();
+      expect(spyWhereFn).to.have.not.been.called();
     });
+
     it('should call query.where if args.filter is provided', () => {
       resolveParams.args = {
         filter: { name: 'nodkz' },
       };
       filterHelper(resolveParams);
-      expect(spyFn).to.have.been.called.with({ name: 'nodkz' });
+      expect(spyWhereFn).to.have.been.called.with({ name: 'nodkz' });
     });
+
     it('should convert deep object in args.filter to dotted object', () => {
       resolveParams.args = {
         filter: {
@@ -157,10 +191,22 @@ describe('Resolver helper `filter` ->', () => {
         },
       };
       filterHelper(resolveParams);
-      expect(spyFn).to.have.been.called.with({
+      expect(spyWhereFn).to.have.been.called.with({
         'name.first': 'Pavel',
         age: 30,
       });
+    });
+
+    it('should call query.find if args.filter.OPERATORS_FIELDNAME is provided', () => {
+      resolveParams.args = {
+        filter: {
+          [OPERATORS_FIELDNAME]: { age: { gt: 10, lt: 20 } },
+        },
+      };
+      filterHelper(resolveParams);
+      expect(spyFindFn).to.have.been.called.with(
+        { age: { $gt: 10, $lt: 20 } }
+      );
     });
   });
 });
