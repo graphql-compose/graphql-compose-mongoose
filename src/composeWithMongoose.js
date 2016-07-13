@@ -4,6 +4,8 @@
 import { convertModelToGraphQL } from './fieldsConverter';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import * as resolvers from './resolvers';
+import composeWithConnection from 'graphql-compose-connection';
+import { OPERATORS_FIELDNAME } from './resolvers/helpers/filter';
 
 import type {
   MongooseModelT,
@@ -13,7 +15,7 @@ import type {
 } from './definition';
 
 
-export function mongooseModelToTypeComposer(
+export function composeWithMongoose(
   model: MongooseModelT,
   opts: typeConverterOpts = {}
 ): TypeComposer {
@@ -111,12 +113,55 @@ export function createResolvers(
   names.forEach(resolverName => {
     if (!opts.hasOwnProperty(resolverName) || opts[resolverName] !== false) {
       const createResolverFn = resolvers[resolverName];
-      const resolver = createResolverFn(
-        model,
-        typeComposer,
-        opts[resolverName] || {}
-      );
-      typeComposer.setResolver(resolver);
+      if (createResolverFn) {
+        const resolver = createResolverFn(
+          model,
+          typeComposer,
+          opts[resolverName] || {}
+        );
+        typeComposer.setResolver(resolver);
+      }
     }
   });
+
+  if (!opts.hasOwnProperty('connection') || opts['connection'] !== false) {
+    prepareConnectionResolver(typeComposer, opts['connection']);
+  }
+}
+
+export function prepareConnectionResolver(typeComposer: TypeComposer, opts) {
+  composeWithConnection(typeComposer, {
+    findResolverName: 'findMany',
+    countResolverName: 'count',
+    sort: {
+      _ID_DESC: {
+        uniqueFields: ['_id'],
+        sortValue: { _id: -1 },
+        directionFilter: (cursorData, filter, isBefore) => {
+          filter[OPERATORS_FIELDNAME] = filter[OPERATORS_FIELDNAME] || {};
+          filter[OPERATORS_FIELDNAME]._id = filter[OPERATORS_FIELDNAME]._id || {};
+          if (isBefore) {
+            filter[OPERATORS_FIELDNAME]._id.gt = cursorData._id;
+          } else {
+            filter[OPERATORS_FIELDNAME]._id.lt = cursorData._id;
+          }
+          return filter;
+        },
+      },
+      _ID_ASC: {
+        uniqueFields: ['_id'],
+        sortValue: { _id: 1 },
+        directionFilter: (cursorData, filter, isBefore) => {
+          filter[OPERATORS_FIELDNAME] = filter[OPERATORS_FIELDNAME] || {};
+          filter[OPERATORS_FIELDNAME]._id = filter[OPERATORS_FIELDNAME]._id || {};
+          if (isBefore) {
+            filter[OPERATORS_FIELDNAME]._id.lt = cursorData._id;
+          } else {
+            filter[OPERATORS_FIELDNAME]._id.gt = cursorData._id;
+          }
+          return filter;
+        },
+      }
+    },
+  })
 }

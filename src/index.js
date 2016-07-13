@@ -1,5 +1,5 @@
 /* @flow */
 
-import { mongooseModelToTypeComposer } from './modelConverter';
+import { composeWithMongoose } from './composeWithMongoose';
 
-export default mongooseModelToTypeComposer;
+export default composeWithMongoose;

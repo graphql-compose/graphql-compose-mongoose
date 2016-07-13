@@ -49,13 +49,12 @@ export type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
 export type ResolverNames = 'findById' | 'findByIds' | 'findOne' | 'findMany' |
                             'updateById' | 'updateOne' | 'updateMany' |
                             'removeById' | 'removeOne' | 'removeMany' |
-                            'createOne' | 'count';
+                            'createOne' | 'count' | 'connection';
 
 export type MongooseQuery = {
   exec(): Promise<any>,
-  where(criteria: ObjectMap): MongooseQuery,
+  where(criteriaOrFieldName: ObjectMap | string): MongooseQuery,
   where(fieldName: string, equalTo: string): MongooseQuery,
-  where(fieldName: string): MongooseQuery,
   skip(num: number): MongooseQuery,
   limit(num: number): MongooseQuery,
   select(projection: ObjectMap): MongooseQuery,
@@ -173,6 +172,7 @@ export type typeConverterResolversOpts = {
   count?: false | {
     filter?: filterHelperArgsOpts | false,
   },
+  connection?: false,
 };
 
 export type filterHelperArgsOpts = {

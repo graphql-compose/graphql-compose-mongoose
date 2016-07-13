@@ -26,6 +26,7 @@
   "dependencies": {
     "graphql": "^0.5.0",
     "graphql-compose": ">=0.0.2",
+    "graphql-compose-connection": "^0.0.1",
     "object-path": "^0.9.2",
     "mongoose": "^4.4.20"
   },
