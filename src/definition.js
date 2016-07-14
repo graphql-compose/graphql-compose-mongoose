@@ -1,6 +1,9 @@
 /* @flow */
 /* eslint-disable */
 
+import type { connectionSortMapOpts as _connectionSortMapOpts} from 'graphql-compose-connection/lib/definition';
+export type connectionSortMapOpts = _connectionSortMapOpts;
+
 export type ObjectMap = { [optName: string]: any };
 
 export type ComplexTypesT =
@@ -172,7 +175,7 @@ export type typeConverterResolversOpts = {
   count?: false | {
     filter?: filterHelperArgsOpts | false,
   },
-  connection?: false,
+  connection?: connectionSortMapOpts | false,
 };
 
 export type filterHelperArgsOpts = {

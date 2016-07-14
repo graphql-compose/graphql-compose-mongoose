@@ -1,5 +1,5 @@
 /* @flow */
-/* eslint-disable no-use-before-define */
+/* eslint-disable no-use-before-define, no-param-reassign */
 
 import { convertModelToGraphQL } from './fieldsConverter';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
@@ -12,6 +12,7 @@ import type {
   typeConverterOpts,
   typeConverterResolversOpts,
   typeConverterInputTypeOpts,
+  connectionSortMapOpts,
 } from './definition';
 
 
@@ -124,12 +125,15 @@ export function createResolvers(
     }
   });
 
-  if (!opts.hasOwnProperty('connection') || opts['connection'] !== false) {
-    prepareConnectionResolver(typeComposer, opts['connection']);
+  if (!opts.hasOwnProperty('connection') || opts.connection !== false) {
+    prepareConnectionResolver(typeComposer, opts.connection);
   }
 }
 
-export function prepareConnectionResolver(typeComposer: TypeComposer, opts) {
+export function prepareConnectionResolver(
+  typeComposer: TypeComposer,
+  opts: connectionSortMapOpts
+) {
   composeWithConnection(typeComposer, {
     findResolverName: 'findMany',
     countResolverName: 'count',
@@ -137,7 +141,7 @@ export function prepareConnectionResolver(typeComposer: TypeComposer, opts) {
       _ID_DESC: {
         uniqueFields: ['_id'],
         sortValue: { _id: -1 },
-        directionFilter: (cursorData, filter, isBefore) => {
+        directionFilter: (filter, cursorData, isBefore) => {
           filter[OPERATORS_FIELDNAME] = filter[OPERATORS_FIELDNAME] || {};
           filter[OPERATORS_FIELDNAME]._id = filter[OPERATORS_FIELDNAME]._id || {};
           if (isBefore) {
@@ -151,7 +155,7 @@ export function prepareConnectionResolver(typeComposer: TypeComposer, opts) {
       _ID_ASC: {
         uniqueFields: ['_id'],
         sortValue: { _id: 1 },
-        directionFilter: (cursorData, filter, isBefore) => {
+        directionFilter: (filter, cursorData, isBefore) => {
           filter[OPERATORS_FIELDNAME] = filter[OPERATORS_FIELDNAME] || {};
           filter[OPERATORS_FIELDNAME]._id = filter[OPERATORS_FIELDNAME]._id || {};
           if (isBefore) {
@@ -161,7 +165,8 @@ export function prepareConnectionResolver(typeComposer: TypeComposer, opts) {
           }
           return filter;
         },
-      }
+      },
+      ...opts,
     },
-  })
+  });
 }
