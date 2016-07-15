@@ -1,5 +1,9 @@
 ## master
+
+## 1.0.0 (July 15, 2016)
+* add connection resolver
 * add support for filtering with operators $gt, $gte, $lt, $lte, $ne, $in, $nin
+* small fixes
 
 ## 0.0.6 (July 08, 2016)
 * rename `input` argument to `record` for mutations (due `graphql-compose-relay` compatibility).
