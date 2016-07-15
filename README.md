@@ -10,7 +10,7 @@ Source code: https://github.com/nodkz/graphql-compose-mongoose-example
 
 ```js
 import mongoose from 'mongoose';
-import mongooseToTypeComposer from 'graphql-compose-mongoose';
+import composeWithMongoose from 'graphql-compose-mongoose';
 import { GraphQLSchema, GraphQLObjectType } from 'graphql';
 
 // STEP 1: DEFINE MONGOOSE SCHEMA AND MODEL
@@ -47,7 +47,7 @@ const UserModel = mongoose.model('UserModel', UserSchema);
 
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity
-const typeComposer = mongooseToTypeComposer(UserModel, customizationOptions);
+const typeComposer = composeWithMongoose(UserModel, customizationOptions);
 // get list of 12 Resolvers (findById, updateMany and others)
 const resolvers = typeComposer.getResolvers();
 
@@ -67,6 +67,7 @@ const graphqlSchema = new GraphQLSchema({
       userOne: resolvers.get('findOne').getFieldConfig(),
       userMany: resolvers.get('findMany').getFieldConfig(),
       userTotal: resolvers.get('count').getFieldConfig(),
+      userConnection: resolvers.get('connection').getFieldConfig(),
     },
   }),
   mutation: new GraphQLObjectType({
