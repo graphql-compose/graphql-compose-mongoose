@@ -166,15 +166,21 @@ export function addFieldsWithOperator(
         operators = availableOperators;
       }
       operators.forEach(operatorName => {
+        // unwrap from GraphQLNonNull and GraphQLList, if present
         const namedType = getNamedType(existedFields[fieldName].type);
         if (namedType) {
           if (operatorName.slice(-2) === '[]') {
-            fields[operatorName.slice(0, -2)] = {
+            // wrap with GraphQLList, if operator required this with `[]`
+            const newName = operatorName.slice(0, -2);
+            fields[newName] = {
               ...existedFields[fieldName],
               type: new GraphQLList(namedType),
             };
           } else {
-            fields[operatorName] = namedType;
+            fields[operatorName] = {
+              ...existedFields[fieldName],
+              type: namedType,
+            };
           }
         }
       });
