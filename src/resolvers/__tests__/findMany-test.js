@@ -4,9 +4,9 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findMany from '../findMany';
 import { Resolver } from 'graphql-compose';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('findMany() ->', () => {
   let user1;

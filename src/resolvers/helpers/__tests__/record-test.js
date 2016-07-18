@@ -5,9 +5,9 @@ import { recordHelperArgs } from '../record';
 import { UserModel } from '../../../__mocks__/userModel.js';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
 import { InputTypeComposer } from 'graphql-compose';
-import { mongooseModelToTypeComposer } from '../../../modelConverter';
+import { composeWithMongoose } from '../../../composeWithMongoose';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('Resolver helper `record` ->', () => {
   describe('recordHelperArgs()', () => {

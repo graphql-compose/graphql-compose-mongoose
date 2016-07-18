@@ -5,9 +5,9 @@ import { UserModel } from '../../__mocks__/userModel.js';
 import updateMany from '../updateMany';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { GraphQLInt, GraphQLNonNull } from 'graphql';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 
 describe('updateMany() ->', () => {

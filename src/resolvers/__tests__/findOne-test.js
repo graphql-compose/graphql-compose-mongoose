@@ -5,9 +5,9 @@ import { UserModel } from '../../__mocks__/userModel.js';
 import findOne from '../findOne';
 import { Resolver } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('findOne() ->', () => {
   let user1;

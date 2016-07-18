@@ -6,9 +6,9 @@ import updateOne from '../updateOne';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import GraphQLMongoID from '../../types/mongoid';
 import { GraphQLNonNull } from 'graphql';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('updateOne() ->', () => {
   let user1;

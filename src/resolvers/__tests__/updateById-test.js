@@ -10,9 +10,9 @@ import {
   getNullableType,
 } from 'graphql';
 import GraphQLMongoID from '../../types/mongoid';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('updateById() ->', () => {
   let user1;

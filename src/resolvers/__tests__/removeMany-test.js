@@ -6,9 +6,9 @@ import removeMany from '../removeMany';
 import Resolver from 'graphql-compose/lib/resolver/resolver';
 import TypeComposer from 'graphql-compose/lib/typeComposer';
 import { GraphQLInt, GraphQLNonNull } from 'graphql';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('removeMany() ->', () => {
   let user1;

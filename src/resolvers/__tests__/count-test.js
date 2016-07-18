@@ -4,10 +4,10 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import count from '../count';
 import { Resolver } from 'graphql-compose';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 import { GraphQLInt } from 'graphql';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('count() ->', () => {
   let user1;

@@ -4,11 +4,11 @@ import { expect } from 'chai';
 import { UserModel } from '../../__mocks__/userModel.js';
 import createOne from '../createOne';
 import { Resolver, TypeComposer } from 'graphql-compose';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 import GraphQLMongoID from '../../types/mongoid';
 import { GraphQLNonNull } from 'graphql';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('createOne() ->', () => {
   before('clear UserModel collection', (done) => {

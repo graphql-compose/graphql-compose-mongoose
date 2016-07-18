@@ -6,9 +6,9 @@ import removeOne from '../removeOne';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import GraphQLMongoID from '../../types/mongoid';
 import { mongoose } from '../../__mocks__/mongooseCommon';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('removeOne() ->', () => {
   let user1;

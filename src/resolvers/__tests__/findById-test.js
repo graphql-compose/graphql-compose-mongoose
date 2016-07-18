@@ -6,9 +6,9 @@ import findById from '../findById';
 import { Resolver } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql';
 import GraphQLMongoID from '../../types/mongoid';
-import { mongooseModelToTypeComposer } from '../../modelConverter';
+import { composeWithMongoose } from '../../composeWithMongoose';
 
-const UserTypeComposer = mongooseModelToTypeComposer(UserModel);
+const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('findById() ->', () => {
   let user;
