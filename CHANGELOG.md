@@ -1,5 +1,10 @@
 ## master
 
+## 1.0.1 (July 18, 2016)
+* Fix `peerDependencies`
+* Update `flow` till 0.29
+* Other small fixes
+
 ## 1.0.0 (July 15, 2016)
 * add connection resolver
 * add support for filtering with operators $gt, $gte, $lt, $lte, $ne, $in, $nin

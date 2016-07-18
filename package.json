@@ -1,6 +1,6 @@
 {
   "name": "graphql-compose-mongoose",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Plugin for `graphql-compose` which derive a graphql type from a mongoose model.",
   "files": [
     "es",
