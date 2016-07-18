@@ -2,6 +2,15 @@ graphql-compose-mongoose
 ======================
 This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose), which derives a bunch of GraphQL types and resolvers from mongoose models.
 
+
+Installation
+============
+```
+npm install graphql graphql-compose graphql-compose-connection mongoose graphql-compose-mongoose --save
+```
+Modules `graphql`, `graphql-compose`, `graphql-compose-connection`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
+
+
 Example
 =======
 Live demo: [https://graphql-compose-mongoose.herokuapp.com/](https://graphql-compose-mongoose.herokuapp.com/)
