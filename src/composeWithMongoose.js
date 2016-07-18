@@ -22,8 +22,7 @@ export function composeWithMongoose(
 ): TypeComposer {
   const name: string = (opts && opts.name) || model.modelName;
 
-  const type = convertModelToGraphQL(model, name);
-  const typeComposer = new TypeComposer(type);
+  const typeComposer = convertModelToGraphQL(model, name);
 
   if (opts.description) {
     typeComposer.setDescription(opts.description);
@@ -33,7 +32,8 @@ export function composeWithMongoose(
     prepareFields(typeComposer, opts.fields);
   }
 
-  typeComposer.setRecordIdFn((source) => `${source._id}`);
+  // $FlowFixMe
+  typeComposer.setRecordIdFn(source => (source ? `${source._id}` : ''));
 
   createInputType(typeComposer, opts.inputType);
 
@@ -125,7 +125,7 @@ export function createResolvers(
     }
   });
 
-  if (!opts.hasOwnProperty('connection') || opts.connection !== false) {
+  if ((!opts.hasOwnProperty('connection') || opts.connection !== false) && opts.connection) {
     prepareConnectionResolver(typeComposer, opts.connection);
   }
 }
@@ -142,13 +142,16 @@ export function prepareConnectionResolver(
         uniqueFields: ['_id'],
         sortValue: { _id: -1 },
         directionFilter: (filter, cursorData, isBefore) => {
+          // $FlowFixMe
           filter[OPERATORS_FIELDNAME] = filter[OPERATORS_FIELDNAME] || {};
+          // $FlowFixMe
           filter[OPERATORS_FIELDNAME]._id = filter[OPERATORS_FIELDNAME]._id || {};
           if (isBefore) {
             filter[OPERATORS_FIELDNAME]._id.gt = cursorData._id;
           } else {
             filter[OPERATORS_FIELDNAME]._id.lt = cursorData._id;
           }
+          // $FlowFixMe
           return filter;
         },
       },
@@ -156,13 +159,16 @@ export function prepareConnectionResolver(
         uniqueFields: ['_id'],
         sortValue: { _id: 1 },
         directionFilter: (filter, cursorData, isBefore) => {
+          // $FlowFixMe
           filter[OPERATORS_FIELDNAME] = filter[OPERATORS_FIELDNAME] || {};
+          // $FlowFixMe
           filter[OPERATORS_FIELDNAME]._id = filter[OPERATORS_FIELDNAME]._id || {};
           if (isBefore) {
             filter[OPERATORS_FIELDNAME]._id.lt = cursorData._id;
           } else {
             filter[OPERATORS_FIELDNAME]._id.gt = cursorData._id;
           }
+          // $FlowFixMe
           return filter;
         },
       },

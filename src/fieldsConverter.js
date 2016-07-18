@@ -120,10 +120,10 @@ export function getFieldsFromModel(model: MongooseModelT): MongooseFieldMapT {
 export function convertModelToGraphQL(
   model: MongooseModelT,
   typeName: string
-): GraphQLOutputType {
+): TypeComposer {
   if (!typeName) {
     throw new Error('You provide empty name for type. '
-    + '`typeName` argument should be non-empty string.');
+    + '`name` argument should be non-empty string.');
   }
 
   const typeComposer = new TypeComposer(
@@ -147,7 +147,7 @@ export function convertModelToGraphQL(
   });
 
   typeComposer.addFields(graphqlFields);
-  return typeComposer.getType();
+  return typeComposer;
 }
 
 export function convertFieldToGraphQL(
@@ -195,17 +195,14 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
   return ComplexTypes.SCALAR;
 }
 
-function removePseudoIdField(gqType: GraphQLObjectType): GraphQLObjectType {
+function removePseudoIdField(typeComposer: TypeComposer): void {
   // remove pseudo object id mongoose field
-  const composer = new TypeComposer(gqType);
-  const gqFields = composer.getFields();
+  const gqFields = typeComposer.getFields();
   Object.keys(gqFields).forEach(name => {
     if (gqFields[name].type === GraphQLMongoID) {
-      composer.removeField(name);
+      typeComposer.removeField(name);
     }
   });
-
-  return composer.getType();
 }
 
 export function scalarToGraphQL(field: MongooseFieldT): GraphQLOutputType {
@@ -254,13 +251,10 @@ export function embeddedToGraphQL(
   const typeName = `${prefix}${capitalize(fieldName)}`;
   // $FlowFixMe
   const fieldAsModel: MongooseModelT = field;
-  let gqType = convertModelToGraphQL(fieldAsModel, typeName);
+  const typeComposer = convertModelToGraphQL(fieldAsModel, typeName);
+  removePseudoIdField(typeComposer);
 
-  if (gqType instanceof GraphQLObjectType) {
-    gqType = removePseudoIdField(gqType);
-  }
-
-  return gqType;
+  return typeComposer.getType();
 }
 
 
@@ -298,11 +292,10 @@ export function documentArrayToGraphQL(
 
   const typeName = `${prefix}${capitalize(_getFieldName(field))}`;
 
-  let outputType = convertModelToGraphQL(field, typeName);
-  if (outputType instanceof GraphQLObjectType) {
-    outputType = removePseudoIdField(outputType);
-  }
-  return new GraphQLList(outputType);
+  const typeComposer = convertModelToGraphQL(field, typeName);
+  removePseudoIdField(typeComposer);
+
+  return new GraphQLList(typeComposer.getType());
 }
 
 

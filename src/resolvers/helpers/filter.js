@@ -166,14 +166,16 @@ export function addFieldsWithOperator(
         operators = availableOperators;
       }
       operators.forEach(operatorName => {
-        if (operatorName.slice(-2) === '[]') {
-          fields[operatorName.slice(0, -2)] = {
-            ...existedFields[fieldName],
-            // $FlowFixMe
-            type: new GraphQLList(getNamedType(existedFields[fieldName].type)),
-          };
-        } else {
-          fields[operatorName] = getNamedType(existedFields[fieldName]);
+        const namedType = getNamedType(existedFields[fieldName].type);
+        if (namedType) {
+          if (operatorName.slice(-2) === '[]') {
+            fields[operatorName.slice(0, -2)] = {
+              ...existedFields[fieldName],
+              type: new GraphQLList(namedType),
+            };
+          } else {
+            fields[operatorName] = namedType;
+          }
         }
       });
       if (Object.keys(fields).length > 0) {
