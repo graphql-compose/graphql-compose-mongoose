@@ -57,7 +57,7 @@ export type ResolverNames = 'findById' | 'findByIds' | 'findOne' | 'findMany' |
 export type MongooseQuery = {
   exec(): Promise<any>,
   where(criteriaOrFieldName: ObjectMap | string): MongooseQuery,
-  where(fieldName: string, equalTo: string): MongooseQuery,
+  // where(fieldName: string, equalTo: string): MongooseQuery,
   skip(num: number): MongooseQuery,
   limit(num: number): MongooseQuery,
   select(projection: ObjectMap): MongooseQuery,
