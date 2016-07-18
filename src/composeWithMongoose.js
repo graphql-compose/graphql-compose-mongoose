@@ -125,8 +125,8 @@ export function createResolvers(
     }
   });
 
-  if ((!opts.hasOwnProperty('connection') || opts.connection !== false) && opts.connection) {
-    prepareConnectionResolver(typeComposer, opts.connection);
+  if (!opts.hasOwnProperty('connection') || opts.connection !== false) {
+    prepareConnectionResolver(typeComposer, opts.connection ? opts.connection : {});
   }
 }
 

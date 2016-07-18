@@ -1,5 +1,8 @@
 ## master
 
+## 1.0.2 (July 18, 2016)
+* HotFix for connection resolver
+
 ## 1.0.1 (July 18, 2016)
 * Fix `peerDependencies`
 * Update `flow` till 0.29
