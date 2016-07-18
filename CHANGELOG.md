@@ -1,7 +1,8 @@
 ## master
 
-## 1.0.2 (July 18, 2016)
+## 1.0.3 (July 18, 2016)
 * HotFix for connection resolver
+* HotFix for operators' types in `filter` helper
 
 ## 1.0.1 (July 18, 2016)
 * Fix `peerDependencies`
