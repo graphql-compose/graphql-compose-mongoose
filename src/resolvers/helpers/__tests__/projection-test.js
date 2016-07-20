@@ -24,7 +24,7 @@ describe('Resolver helper `projection` ->', () => {
     it('should call query.select if projection is provided', () => {
       resolveParams.projection = { name: 1, age: 1 };
       projectionHelper(resolveParams);
-      expect(spyFn).to.have.been.called.with(resolveParams.projection);
+      expect(spyFn).to.have.been.called.with({ name: true, age: true });
     });
   });
 });
