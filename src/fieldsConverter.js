@@ -23,6 +23,8 @@ import GraphQLMongoID from './types/mongoid';
 
 import type {
   MongooseModelT,
+  MongooseModelSchemaT,
+  MongoosePseudoModelT,
   MongooseFieldT,
   MongooseFieldMapT,
   ComplexTypesT,
@@ -98,7 +100,9 @@ export function dotPathsToEmbedded(fields: MongooseFieldMapT): MongooseFieldMapT
   return result;
 }
 
-export function getFieldsFromModel(model: MongooseModelT): MongooseFieldMapT {
+export function getFieldsFromModel(
+  model: MongooseModelT | MongoosePseudoModelT
+): MongooseFieldMapT {
   if (!model || !model.schema || !model.schema.paths) {
     throw new Error('You provide incorrect mongoose model to `getFieldsFromModel()`. '
     + 'Correct model should contain `schema.paths` properties.');
@@ -118,16 +122,12 @@ export function getFieldsFromModel(model: MongooseModelT): MongooseFieldMapT {
 }
 
 export function convertModelToGraphQL(
-  model: MongooseModelT,
+  model: MongooseModelT | MongoosePseudoModelT,
   typeName: string
 ): TypeComposer {
   if (!typeName) {
     throw new Error('You provide empty name for type. '
     + '`name` argument should be non-empty string.');
-  }
-
-  if (model._gqcTypeComposer) {
-    return model._gqcTypeComposer;
   }
 
   const typeComposer = new TypeComposer(
@@ -138,8 +138,6 @@ export function convertModelToGraphQL(
       fields: {},
     })
   );
-
-  model._gqcTypeComposer = typeComposer; // eslint-disable-line
 
   const mongooseFields = getFieldsFromModel(model, typeName);
   const graphqlFields = {};
@@ -154,6 +152,27 @@ export function convertModelToGraphQL(
 
   typeComposer.addFields(graphqlFields);
   return typeComposer;
+}
+
+export function convertSchemaToGraphQL(
+  schema: MongooseModelSchemaT,
+  typeName: string
+) {
+  if (!typeName) {
+    throw new Error('You provide empty name for type. '
+    + '`name` argument should be non-empty string.');
+  }
+
+  if (schema._gqcTypeComposer) {
+    return schema._gqcTypeComposer;
+  }
+
+  const tc = convertModelToGraphQL({ schema }, typeName);
+  // also generate InputType
+  tc.getInputTypeComposer();
+
+  schema._gqcTypeComposer = tc; // eslint-disable-line
+  return tc;
 }
 
 export function convertFieldToGraphQL(
@@ -255,9 +274,7 @@ export function embeddedToGraphQL(
   }
 
   const typeName = `${prefix}${capitalize(fieldName)}`;
-  // $FlowFixMe
-  const fieldAsModel: MongooseModelT = field;
-  const typeComposer = convertModelToGraphQL(fieldAsModel, typeName);
+  const typeComposer = convertSchemaToGraphQL(field.schema, typeName);
   removePseudoIdField(typeComposer);
 
   return typeComposer.getType();

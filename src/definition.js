@@ -15,6 +15,7 @@ export type MongooseModelSchemaT = {
     [optName: string]: MongooseFieldT,
   },
   _indexes?: MonooseModelIndex[],
+  _gqcTypeComposer?: TypeComposer,
 }
 
 export type MonooseModelIndex = [
@@ -22,8 +23,13 @@ export type MonooseModelIndex = [
   { [optionName: string]: mixed },
 ];
 
+export type MongoosePseudoModelT = {
+  _gqcTypeComposer?: TypeComposer,
+  schema: MongooseModelSchemaT,
+}
+
 export type MongooseModelT = {
-  _gqcTypeComposer: TypeComposer,
+  _gqcTypeComposer?: TypeComposer,
   modelName: string,
   schema: MongooseModelSchemaT,
   create(doc: Object | Object[]): Promise<Object>,
