@@ -7,6 +7,10 @@ import type {
 export function projectionHelper(resolveParams: ExtendedResolveParams): void {
   const projection = resolveParams.projection;
   if (projection) {
-    resolveParams.query = resolveParams.query.select(projection); // eslint-disable-line
+    const flatProjection = {};
+    Object.keys(projection).forEach(key => {
+      flatProjection[key] = !!projection[key];
+    });
+    resolveParams.query = resolveParams.query.select(flatProjection); // eslint-disable-line
   }
 }
