@@ -29,7 +29,6 @@ export type MongoosePseudoModelT = {
 }
 
 export type MongooseModelT = {
-  _gqcTypeComposer?: TypeComposer,
   modelName: string,
   schema: MongooseModelSchemaT,
   create(doc: Object | Object[]): Promise<Object>,
