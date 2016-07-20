@@ -1,6 +1,7 @@
 /* @flow */
 /* eslint-disable */
 
+import type { TypeComposer } from 'graphql-compose';
 import type { connectionSortMapOpts as _connectionSortMapOpts} from 'graphql-compose-connection/lib/definition';
 export type connectionSortMapOpts = _connectionSortMapOpts;
 
@@ -22,6 +23,7 @@ export type MonooseModelIndex = [
 ];
 
 export type MongooseModelT = {
+  _gqcTypeComposer: TypeComposer,
   modelName: string,
   schema: MongooseModelSchemaT,
   create(doc: Object | Object[]): Promise<Object>,

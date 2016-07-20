@@ -126,6 +126,10 @@ export function convertModelToGraphQL(
     + '`name` argument should be non-empty string.');
   }
 
+  if (model._gqcTypeComposer) {
+    return model._gqcTypeComposer;
+  }
+
   const typeComposer = new TypeComposer(
     new GraphQLObjectType({
       name: typeName,
@@ -134,6 +138,8 @@ export function convertModelToGraphQL(
       fields: {},
     })
   );
+
+  model._gqcTypeComposer = typeComposer; // eslint-disable-line
 
   const mongooseFields = getFieldsFromModel(model, typeName);
   const graphqlFields = {};
