@@ -77,6 +77,10 @@ export const filterHelperArgs = (
     );
   }
 
+  if (inputComposer.getFieldNames().length === 0) {
+    return {};
+  }
+
   return {
     filter: {
       name: 'filter',
