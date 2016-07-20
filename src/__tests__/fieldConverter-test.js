@@ -84,6 +84,8 @@ describe('fieldConverter', () => {
 
     it('schould derive ENUM', () => {
       expect(deriveComplexType(fields.gender)).to.equal(ComplexTypes.ENUM);
+      expect(deriveComplexType(fields.languages.schema.paths.ln)).to.equal(ComplexTypes.ENUM);
+      expect(deriveComplexType(fields.languages.schema.paths.sk)).to.equal(ComplexTypes.ENUM);
     });
 
     it('schould derive REFERENCE', () => {
