@@ -1,5 +1,11 @@
 ## master
 
+## 1.0.4 (July 20, 2016)
+* expose `fieldsConverter` methods
+* fix filterHelper: if `filter` InputType without fields, then do not add it to args
+* fix projectionHelper: make projection flat, before passing to mongoose
+* add `convertSchemaToGraphQL` method for creating cached graphql type from MongooseSchema
+
 ## 1.0.3 (July 18, 2016)
 * HotFix for connection resolver
 * HotFix for operators' types in `filter` helper
