@@ -1,6 +1,6 @@
 graphql-compose-mongoose
 ======================
-This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internal GraphQL Types. Provide all CRUD resolvers, including `graphql connection`.
+This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internal GraphQL Types. Provide all CRUD resolvers, including `graphql connection`, also provided basic search via operators ($lt, $gt and so on).
 
 Installation
 ============
@@ -53,7 +53,7 @@ const UserModel = mongoose.model('UserModel', UserSchema);
 
 
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
-const customizationOptions = {}; // left it empty for simplicity
+const customizationOptions = {}; // left it empty for simplicity, described below
 const typeComposer = composeWithMongoose(UserModel, customizationOptions);
 // get list of 12 Resolvers (findById, updateMany and others)
 const resolvers = typeComposer.getResolvers();
@@ -95,12 +95,12 @@ export default graphqlSchema;
 ```
 That's all!
 You think that is to much code?
-I don't think so, because by default internally was created about 30 graphql types (for input, sorting, filtering). So you will need much much more lines of code to implement all these CRUD operations by hands.
+I don't think so, because by default internally was created about 55 graphql types (for input, sorting, filtering). So you will need much much more lines of code to implement all these CRUD operations by hands.
 
 
 Customization options
 =====================
-When we convert model `const typeComposer = mongooseToTypeComposer(UserModel, customizationOptions);` you may tune every piece of future derived types and resolvers.
+When we convert model `const typeComposer = composeWithMongoose(UserModel, customizationOptions);` you may tune every piece of future derived types and resolvers.
 
 ### Here is flow typed definition of this options:
 
