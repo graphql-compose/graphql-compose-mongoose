@@ -1,7 +1,6 @@
 graphql-compose-mongoose
 ======================
-This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose), which derives a bunch of GraphQL types and resolvers from mongoose models.
-
+This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internals GraphQL Types. Provide all CRUD resolvers, including `graphql connection`.
 
 Installation
 ============
@@ -9,7 +8,6 @@ Installation
 npm install graphql graphql-compose graphql-compose-connection mongoose graphql-compose-mongoose --save
 ```
 Modules `graphql`, `graphql-compose`, `graphql-compose-connection`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
-
 
 Example
 =======
@@ -97,7 +95,7 @@ export default graphqlSchema;
 ```
 That's all!
 You think that is to much code?
-I don't think so, because by default internally was created about 30 graphql types (for input, sorting, filtering). So you will need much-much more lines of code to implement all this CRUD operations by hands.
+I don't think so, because by default internally was created about 30 graphql types (for input, sorting, filtering). So you will need much much more lines of code to implement all these CRUD operations by hands.
 
 
 Customization options
@@ -106,7 +104,7 @@ When we convert model `const typeComposer = mongooseToTypeComposer(UserModel, cu
 
 ### Here is flow typed definition of this options:
 
-This is top level of customization options. Here you setup name and description for main type, remove fields or leave only desired fields from mongoose model.
+The top level of customization options. Here you setup name and description for the main type, remove fields or leave only desired fields.
 ```js
 export type typeConverterOpts = {
   name?: string,
@@ -134,7 +132,7 @@ export type typeConverterInputTypeOpts = {
 ```
 
 This is `opts.resolvers` level of options.
-If you set option to `false` it will disable resolver or some of its input args.
+If you set the option to `false` it will disable resolver or some of its input args.
 Every resolver's arg has it own options. They described below.
 ```js
 export type typeConverterResolversOpts = {
@@ -184,6 +182,11 @@ export type typeConverterResolversOpts = {
   count?: false | {
     filter?: filterHelperArgsOpts | false,
   },
+  connection?: false | {
+    uniqueFields: string[],
+    sortValue: mixed,
+    directionFilter: (<T>(filterArg: T, cursorData: CursorDataType, isBefore: boolean) => T),
+  };
 };
 ```
 
@@ -219,22 +222,15 @@ export type limitHelperArgsOpts = {
 };
 ```
 
-What's next?
+Used plugins
 ============
-Read about [graphql-compose](https://github.com/nodkz/graphql-compose).
-This module in near future allow to combine any complexity of your GraphQL schema.
-- From different data-sources, eg. `Mongoose`, `Sequelize`, some RESTfull APIs.
-- Restrict access to fields due context.
-- Wraps any resolver with additional business logic.
-- Relate different type with each other (build graph).
-- Prepare schemas for `Relay` (adds clientMutationId, node interface, generate global ids)
-- Add caching via `DataLoader`
-- Add supporting of GraphQL Connection Type
-- And may be using graphql on server side for API calls to different services (have such amazing thoughts ;).
-- and much much more
+### [graphql-compose-connection](https://github.com/nodkz/graphql-compose-connection)
+This plugin add `connection` resolver. Build in mechanism allows sort by any unique indexes (not only by id). Also supported compound sorting (by several fields).
 
-## SO, THE FUTURE OF CRAZY GRAPHQL SCHEMAS IS NOT SO FAR
-
+Besides standard connection arguments `first`, `last`, `before` and `after`, also added great arguments:
+* `filter` arg - for filtering records
+* `sort` arg - for sorting records
+This plugin completely follows to [Relay Cursor Connections Specification](https://facebook.github.io/relay/graphql/connections.htm).
 
 TODO
 ====
