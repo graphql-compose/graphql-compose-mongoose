@@ -1,7 +1,8 @@
 /* @flow */
 
-import { TypeComposer } from 'graphql-compose';
+import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql';
+import typeStorage from '../../typeStorage';
 
 import type {
   GraphQLFieldConfigArgumentMap,
@@ -21,7 +22,13 @@ export const recordHelperArgs = (
   }
 
   const recordTypeName: string = opts.recordTypeName;
-  const recordComposer = typeComposer.getInputTypeComposer().clone(recordTypeName);
+
+  const recordComposer = new InputTypeComposer(
+    typeStorage.getOrSet(
+      recordTypeName,
+      typeComposer.getInputTypeComposer().clone(recordTypeName).getType()
+    )
+  );
   if (opts && opts.removeFields) {
     recordComposer.removeField(opts.removeFields);
   }

@@ -12,6 +12,7 @@ import { UserModel } from '../../../__mocks__/userModel.js';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
 import { InputTypeComposer } from 'graphql-compose';
 import { composeWithMongoose } from '../../../composeWithMongoose';
+import typeStorage from '../../../typeStorage';
 
 const UserTypeComposer = composeWithMongoose(UserModel);
 
@@ -33,6 +34,7 @@ describe('Resolver helper `filter` ->', () => {
     let inputTypeComposer;
 
     beforeEach(() => {
+      typeStorage.clear();
       args = filterHelperArgs(UserTypeComposer, UserModel, {
         filterTypeName: 'FilterUserType',
       });
@@ -64,6 +66,17 @@ describe('Resolver helper `filter` ->', () => {
       const opComposer = new InputTypeComposer(operatorsType);
       const ageComposer = new InputTypeComposer(opComposer.getFieldType('age'));
       expect(ageComposer.getFieldNames()).to.have.members(['lt', 'gte']);
+    });
+
+    it('should reuse existed operatorsType', () => {
+      const existedType = new GraphQLInputObjectType({
+        name: 'ExistedType',
+        fields: {},
+      });
+      typeStorage.set('ExistedType', existedType);
+      addFieldsWithOperator('ExistedType', inputTypeComposer, UserModel, { age: ['lt'] });
+      const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
+      expect(operatorsType).to.equal(existedType);
     });
   });
 

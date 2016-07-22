@@ -7,6 +7,7 @@ import Resolver from 'graphql-compose/lib/resolver/resolver';
 import TypeComposer from 'graphql-compose/lib/typeComposer';
 import { GraphQLInt, GraphQLNonNull } from 'graphql';
 import { composeWithMongoose } from '../../composeWithMongoose';
+import typeStorage from '../../typeStorage';
 
 const UserTypeComposer = composeWithMongoose(UserModel);
 
@@ -14,6 +15,10 @@ describe('removeMany() ->', () => {
   let user1;
   let user2;
   let user3;
+
+  beforeEach(() => {
+    typeStorage.clear();
+  });
 
   beforeEach('clear UserModel collection', (done) => {
     UserModel.collection.drop(() => {
@@ -125,6 +130,13 @@ describe('removeMany() ->', () => {
       const outputType = removeMany(UserModel, UserTypeComposer).getOutputType();
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
       expect(numAffectedField).property('type').to.equal(GraphQLInt);
+    });
+
+    it('should reuse existed outputType', () => {
+      const outputTypeName = `RemoveMany${UserTypeComposer.getTypeName()}Payload`;
+      typeStorage.set(outputTypeName, 'EXISTED_TYPE');
+      const outputType = removeMany(UserModel, UserTypeComposer).getOutputType();
+      expect(outputType).to.equal('EXISTED_TYPE');
     });
   });
 });

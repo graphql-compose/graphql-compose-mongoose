@@ -3,6 +3,7 @@
 
 import { GraphQLEnumType } from 'graphql';
 import getIndexesFromModel from '../../utils/getIndexesFromModel';
+import typeStorage from '../../typeStorage';
 import type {
   ExtendedResolveParams,
   GraphQLFieldConfigArgumentMap,
@@ -65,12 +66,13 @@ export function getSortTypeFromModel(
     };
   });
 
-  const sortType = new GraphQLEnumType({
-    name: typeName,
-    values: sortEnumValues,
-  });
-
-  return sortType;
+  return typeStorage.getOrSet(
+    typeName,
+    new GraphQLEnumType({
+      name: typeName,
+      values: sortEnumValues,
+    })
+  );
 }
 
 

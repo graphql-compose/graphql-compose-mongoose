@@ -9,14 +9,26 @@ import {
 import { UserModel } from '../../../__mocks__/userModel.js';
 import { GraphQLEnumType } from 'graphql';
 import getIndexesFromModel from '../../../utils/getIndexesFromModel';
+import typeStorage from '../../../typeStorage';
 
 describe('Resolver helper `sort` ->', () => {
+  beforeEach(() => {
+    typeStorage.clear();
+  });
+
   describe('getSortTypeFromModel()', () => {
     it('should return EnumType', () => {
       const typeName = 'SortType';
       const type = getSortTypeFromModel(typeName, UserModel);
       expect(type).to.be.instanceof(GraphQLEnumType);
       expect(type).have.property('name', typeName);
+    });
+
+    it('should reuse existed EnumType', () => {
+      const typeName = 'SortType';
+      typeStorage.set(typeName, 'EXISTED_TYPE');
+      const type = getSortTypeFromModel(typeName, UserModel);
+      expect(type).to.equal('EXISTED_TYPE');
     });
 
     it('should have proper enum values', () => {

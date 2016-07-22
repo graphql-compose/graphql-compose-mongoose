@@ -6,6 +6,7 @@ import updateMany from '../updateMany';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { GraphQLInt, GraphQLNonNull } from 'graphql';
 import { composeWithMongoose } from '../../composeWithMongoose';
+import typeStorage from '../../typeStorage';
 
 const UserTypeComposer = composeWithMongoose(UserModel);
 
@@ -39,6 +40,10 @@ describe('updateMany() ->', () => {
       user1.save(),
       user2.save(),
     ]);
+  });
+
+  beforeEach(() => {
+    typeStorage.clear();
   });
 
   it('should return Resolver object', () => {
@@ -123,6 +128,13 @@ describe('updateMany() ->', () => {
       const outputType = updateMany(UserModel, UserTypeComposer).getOutputType();
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
       expect(numAffectedField).property('type').to.equal(GraphQLInt);
+    });
+
+    it('should reuse existed outputType', () => {
+      const outputTypeName = `UpdateMany${UserTypeComposer.getTypeName()}Payload`;
+      typeStorage.set(outputTypeName, 'EXISTED_TYPE');
+      const outputType = updateMany(UserModel, UserTypeComposer).getOutputType();
+      expect(outputType).to.equal('EXISTED_TYPE');
     });
   });
 });

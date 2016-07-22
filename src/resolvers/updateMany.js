@@ -7,6 +7,7 @@ import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { GraphQLObjectType, GraphQLInt } from 'graphql';
 import toDottedObject from '../utils/toDottedObject';
+import typeStorage from '../typeStorage';
 
 import type {
   MongooseModelT,
@@ -32,21 +33,27 @@ export default function updateMany(
     );
   }
 
-  const resolver = new Resolver(typeComposer, {
-    name: 'updateMany',
-    kind: 'mutation',
-    description: 'Update many documents without returning them: '
-               + 'Use Query.update mongoose method. '
-               + 'Do not apply mongoose defaults, setters, hooks and validation. ',
-    outputType: new GraphQLObjectType({
-      name: `UpdateMany${typeComposer.getTypeName()}Payload`,
+  const outputTypeName = `UpdateMany${typeComposer.getTypeName()}Payload`;
+  const outputType = typeStorage.getOrSet(
+    outputTypeName,
+    new GraphQLObjectType({
+      name: outputTypeName,
       fields: {
         numAffected: {
           type: GraphQLInt,
           description: 'Affected documents number',
         },
       },
-    }),
+    })
+  );
+
+  const resolver = new Resolver(typeComposer, {
+    name: 'updateMany',
+    kind: 'mutation',
+    description: 'Update many documents without returning them: '
+               + 'Use Query.update mongoose method. '
+               + 'Do not apply mongoose defaults, setters, hooks and validation. ',
+    outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
         recordTypeName: `UpdateMany${typeComposer.getTypeName()}Input`,

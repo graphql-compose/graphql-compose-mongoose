@@ -7,6 +7,7 @@ import {
   GraphQLNonNull,
 } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
+import typeStorage from '../typeStorage';
 
 import type {
   MongooseModelT,
@@ -32,14 +33,11 @@ export default function removeById(
     );
   }
 
-  const resolver = new Resolver(typeComposer, {
-    name: 'removeById',
-    kind: 'mutation',
-    description: 'Remove one document: '
-               + '1) Retrieve one document and remove with hooks via findByIdAndRemove. '
-               + '2) Return removed document.',
-    outputType: new GraphQLObjectType({
-      name: `RemoveById${typeComposer.getTypeName()}Payload`,
+  const outputTypeName = `RemoveById${typeComposer.getTypeName()}Payload`;
+  const outputType = typeStorage.getOrSet(
+    outputTypeName,
+    new GraphQLObjectType({
+      name: outputTypeName,
       fields: {
         recordId: {
           type: GraphQLMongoID,
@@ -50,7 +48,16 @@ export default function removeById(
           description: 'Removed document',
         },
       },
-    }),
+    })
+  );
+
+  const resolver = new Resolver(typeComposer, {
+    name: 'removeById',
+    kind: 'mutation',
+    description: 'Remove one document: '
+               + '1) Retrieve one document and remove with hooks via findByIdAndRemove. '
+               + '2) Return removed document.',
+    outputType,
     args: {
       _id: {
         name: '_id',

@@ -5,6 +5,7 @@ import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
 import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
+import typeStorage from '../typeStorage';
 
 import type {
   MongooseModelT,
@@ -32,16 +33,11 @@ export default function updateById(
 
   const findByIdResolver = findById(model, typeComposer);
 
-  const resolver = new Resolver(typeComposer, {
-    name: 'updateById',
-    kind: 'mutation',
-    description: 'Update one document: '
-               + '1) Retrieve one document by findById. '
-               + '2) Apply updates to mongoose document. '
-               + '3) Mongoose applies defaults, setters, hooks and validation. '
-               + '4) And save it.',
-    outputType: new GraphQLObjectType({
-      name: `UpdateById${typeComposer.getTypeName()}Payload`,
+  const outputTypeName = `UpdateById${typeComposer.getTypeName()}Payload`;
+  const outputType = typeStorage.getOrSet(
+    outputTypeName,
+    new GraphQLObjectType({
+      name: outputTypeName,
       fields: {
         recordId: {
           type: GraphQLMongoID,
@@ -52,7 +48,18 @@ export default function updateById(
           description: 'Updated document',
         },
       },
-    }),
+    })
+  );
+
+  const resolver = new Resolver(typeComposer, {
+    name: 'updateById',
+    kind: 'mutation',
+    description: 'Update one document: '
+               + '1) Retrieve one document by findById. '
+               + '2) Apply updates to mongoose document. '
+               + '3) Mongoose applies defaults, setters, hooks and validation. '
+               + '4) And save it.',
+    outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
         recordTypeName: `UpdateById${typeComposer.getTypeName()}Input`,

@@ -3,6 +3,7 @@
 
 import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
+import typeStorage from '../typeStorage';
 
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
@@ -33,14 +34,11 @@ export default function removeOne(
     );
   }
 
-  const resolver = new Resolver(typeComposer, {
-    name: 'removeOne',
-    kind: 'mutation',
-    description: 'Remove one document: '
-               + '1) Remove with hooks via findOneAndRemove. '
-               + '2) Return removed document.',
-    outputType: new GraphQLObjectType({
-      name: `RemoveOne${typeComposer.getTypeName()}Payload`,
+  const outputTypeName = `RemoveOne${typeComposer.getTypeName()}Payload`;
+  const outputType = typeStorage.getOrSet(
+    outputTypeName,
+    new GraphQLObjectType({
+      name: outputTypeName,
       fields: {
         recordId: {
           type: GraphQLMongoID,
@@ -51,7 +49,16 @@ export default function removeOne(
           description: 'Removed document',
         },
       },
-    }),
+    })
+  );
+
+  const resolver = new Resolver(typeComposer, {
+    name: 'removeOne',
+    kind: 'mutation',
+    description: 'Remove one document: '
+               + '1) Remove with hooks via findOneAndRemove. '
+               + '2) Return removed document.',
+    outputType,
     args: {
       ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterRemoveOne${typeComposer.getTypeName()}Input`,

@@ -10,6 +10,7 @@ import {
 } from 'graphql';
 import getIndexesFromModel from '../../utils/getIndexesFromModel';
 import { toDottedObject, upperFirst } from '../../utils';
+import typeStorage from '../../typeStorage';
 import type {
   GraphQLFieldConfigArgumentMap,
   ExtendedResolveParams,
@@ -141,11 +142,16 @@ export function addFieldsWithOperator(
   inputComposer: InputTypeComposer,
   model: MongooseModelT,
   operatorsOpts: filterOperatorsOpts
-) {
-  const operatorsComposer = new InputTypeComposer(new GraphQLInputObjectType({
-    name: typeName,
-    fields: {},
-  }));
+): InputTypeComposer {
+  const operatorsComposer = new InputTypeComposer(
+    typeStorage.getOrSet(
+      typeName,
+      new GraphQLInputObjectType({
+        name: typeName,
+        fields: {},
+      })
+    )
+  );
 
   const availableOperators: filterOperatorNames[]
     = ['gt', 'gte', 'lt', 'lte', 'ne', 'in[]', 'nin[]'];
@@ -189,11 +195,15 @@ export function addFieldsWithOperator(
         }
       });
       if (Object.keys(fields).length > 0) {
+        const operatorTypeName = `${upperFirst(fieldName)}${typeName}`;
         operatorsComposer.addField(fieldName, {
-          type: new GraphQLInputObjectType({
-            name: `${upperFirst(fieldName)}${typeName}`,
-            fields,
-          }),
+          type: typeStorage.getOrSet(
+            operatorTypeName,
+            new GraphQLInputObjectType({
+              name: operatorTypeName,
+              fields,
+            })
+          ),
           description: 'Filter value by operator(s)',
         });
       }

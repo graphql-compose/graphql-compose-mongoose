@@ -10,6 +10,7 @@ import type {
   genResolverOpts,
 } from '../definition';
 import { Resolver, TypeComposer } from 'graphql-compose';
+import typeStorage from '../typeStorage';
 
 
 export default function createOne(
@@ -27,12 +28,11 @@ export default function createOne(
     throw new Error('Second arg for Resolver createOne() should be instance of TypeComposer.');
   }
 
-  const resolver = new Resolver(typeComposer, {
-    name: 'createOne',
-    kind: 'mutation',
-    description: 'Create one document with mongoose defaults, setters, hooks and validation',
-    outputType: new GraphQLObjectType({
-      name: `CreateOne${typeComposer.getTypeName()}Payload`,
+  const outputTypeName = `CreateOne${typeComposer.getTypeName()}Payload`;
+  const outputType = typeStorage.getOrSet(
+    outputTypeName,
+    new GraphQLObjectType({
+      name: outputTypeName,
       fields: {
         recordId: {
           type: GraphQLMongoID,
@@ -43,7 +43,14 @@ export default function createOne(
           description: 'Created document',
         },
       },
-    }),
+    })
+  );
+
+  const resolver = new Resolver(typeComposer, {
+    name: 'createOne',
+    kind: 'mutation',
+    description: 'Create one document with mongoose defaults, setters, hooks and validation',
+    outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
         recordTypeName: `CreateOne${typeComposer.getTypeName()}Input`,
@@ -60,7 +67,7 @@ export default function createOne(
       ) {
         return Promise.reject(
           new Error(`${typeComposer.getTypeName()}.createOne resolver requires `
-                    + 'at least one value in args.record')
+                  + 'at least one value in args.record')
         );
       }
 

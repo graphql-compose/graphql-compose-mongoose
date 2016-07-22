@@ -7,6 +7,7 @@ import { Resolver, TypeComposer } from 'graphql-compose';
 import GraphQLMongoID from '../../types/mongoid';
 import { mongoose } from '../../__mocks__/mongooseCommon';
 import { composeWithMongoose } from '../../composeWithMongoose';
+import typeStorage from '../../typeStorage';
 
 const UserTypeComposer = composeWithMongoose(UserModel);
 
@@ -19,6 +20,10 @@ describe('removeOne() ->', () => {
     UserModel.collection.drop(() => {
       done();
     });
+  });
+
+  beforeEach(() => {
+    typeStorage.clear();
   });
 
   beforeEach('add test user document to mongoDB', () => {
@@ -150,6 +155,13 @@ describe('removeOne() ->', () => {
       const outputType = removeOne(UserModel, UserTypeComposer).getOutputType();
       const recordField = new TypeComposer(outputType).getField('record');
       expect(recordField).property('type').to.equal(UserTypeComposer.getType());
+    });
+
+    it('should reuse existed outputType', () => {
+      const outputTypeName = `RemoveOne${UserTypeComposer.getTypeName()}Payload`;
+      typeStorage.set(outputTypeName, 'EXISTED_TYPE');
+      const outputType = removeOne(UserModel, UserTypeComposer).getOutputType();
+      expect(outputType).to.equal('EXISTED_TYPE');
     });
   });
 });

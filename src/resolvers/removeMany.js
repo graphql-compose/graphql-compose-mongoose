@@ -2,6 +2,7 @@
 /* eslint-disable no-param-reassign */
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { GraphQLObjectType, GraphQLInt } from 'graphql';
+import typeStorage from '../typeStorage';
 
 import type {
   MongooseModelT,
@@ -28,21 +29,27 @@ export default function removeMany(
     );
   }
 
-  const resolver = new Resolver(typeComposer, {
-    name: 'removeMany',
-    kind: 'mutation',
-    description: 'Remove many documents without returning them: '
-               + 'Use Query.remove mongoose method. '
-               + 'Do not apply mongoose defaults, setters, hooks and validation. ',
-    outputType: new GraphQLObjectType({
-      name: `RemoveMany${typeComposer.getTypeName()}Payload`,
+  const outputTypeName = `RemoveMany${typeComposer.getTypeName()}Payload`;
+  const outputType = typeStorage.getOrSet(
+    outputTypeName,
+    new GraphQLObjectType({
+      name: outputTypeName,
       fields: {
         numAffected: {
           type: GraphQLInt,
           description: 'Affected documents number',
         },
       },
-    }),
+    })
+  );
+
+  const resolver = new Resolver(typeComposer, {
+    name: 'removeMany',
+    kind: 'mutation',
+    description: 'Remove many documents without returning them: '
+               + 'Use Query.remove mongoose method. '
+               + 'Do not apply mongoose defaults, setters, hooks and validation. ',
+    outputType,
     args: {
       ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterRemoveMany${typeComposer.getTypeName()}Input`,

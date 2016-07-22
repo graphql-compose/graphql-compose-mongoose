@@ -7,6 +7,7 @@ import { sortHelperArgs } from './helpers/sort';
 import findOne from './findOne';
 import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
+import typeStorage from '../typeStorage';
 
 import type {
   MongooseModelT,
@@ -34,16 +35,11 @@ export default function updateOne(
 
   const findOneResolver = findOne(model, typeComposer, opts);
 
-  const resolver = new Resolver(typeComposer, {
-    name: 'updateOne',
-    kind: 'mutation',
-    description: 'Update one document: '
-               + '1) Retrieve one document via findOne. '
-               + '2) Apply updates to mongoose document. '
-               + '3) Mongoose applies defaults, setters, hooks and validation. '
-               + '4) And save it.',
-    outputType: new GraphQLObjectType({
-      name: `UpdateOne${typeComposer.getTypeName()}Payload`,
+  const outputTypeName = `UpdateOne${typeComposer.getTypeName()}Payload`;
+  const outputType = typeStorage.getOrSet(
+    outputTypeName,
+    new GraphQLObjectType({
+      name: outputTypeName,
       fields: {
         recordId: {
           type: GraphQLMongoID,
@@ -54,7 +50,18 @@ export default function updateOne(
           description: 'Updated document',
         },
       },
-    }),
+    })
+  );
+
+  const resolver = new Resolver(typeComposer, {
+    name: 'updateOne',
+    kind: 'mutation',
+    description: 'Update one document: '
+               + '1) Retrieve one document via findOne. '
+               + '2) Apply updates to mongoose document. '
+               + '3) Mongoose applies defaults, setters, hooks and validation. '
+               + '4) And save it.',
+    outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
         recordTypeName: `UpdateOne${typeComposer.getTypeName()}Input`,

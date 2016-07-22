@@ -7,6 +7,7 @@ import { Resolver, TypeComposer } from 'graphql-compose';
 import GraphQLMongoID from '../../types/mongoid';
 import { GraphQLNonNull } from 'graphql';
 import { composeWithMongoose } from '../../composeWithMongoose';
+import typeStorage from '../../typeStorage';
 
 const UserTypeComposer = composeWithMongoose(UserModel);
 
@@ -39,6 +40,10 @@ describe('updateOne() ->', () => {
       user1.save(),
       user2.save(),
     ]);
+  });
+
+  beforeEach(() => {
+    typeStorage.clear();
   });
 
   it('should return Resolver object', () => {
@@ -171,6 +176,13 @@ describe('updateOne() ->', () => {
       const outputType = updateOne(UserModel, UserTypeComposer).getOutputType();
       const recordField = new TypeComposer(outputType).getField('record');
       expect(recordField).property('type').to.equal(UserTypeComposer.getType());
+    });
+
+    it('should reuse existed outputType', () => {
+      const outputTypeName = `UpdateOne${UserTypeComposer.getTypeName()}Payload`;
+      typeStorage.set(outputTypeName, 'EXISTED_TYPE');
+      const outputType = updateOne(UserModel, UserTypeComposer).getOutputType();
+      expect(outputType).to.equal('EXISTED_TYPE');
     });
   });
 });
