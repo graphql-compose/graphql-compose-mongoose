@@ -1,6 +1,6 @@
 graphql-compose-mongoose
 ======================
-This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internals GraphQL Types. Provide all CRUD resolvers, including `graphql connection`.
+This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internal GraphQL Types. Provide all CRUD resolvers, including `graphql connection`.
 
 Installation
 ============
@@ -225,11 +225,12 @@ export type limitHelperArgsOpts = {
 Used plugins
 ============
 ### [graphql-compose-connection](https://github.com/nodkz/graphql-compose-connection)
-This plugin add `connection` resolver. Build in mechanism allows sort by any unique indexes (not only by id). Also supported compound sorting (by several fields).
+This plugin adds `connection` resolver. Build in mechanism allows sort by any unique indexes (not only by id). Also supported compound sorting (by several fields).
 
 Besides standard connection arguments `first`, `last`, `before` and `after`, also added great arguments:
 * `filter` arg - for filtering records
 * `sort` arg - for sorting records
+
 This plugin completely follows to [Relay Cursor Connections Specification](https://facebook.github.io/relay/graphql/connections.htm).
 
 TODO
