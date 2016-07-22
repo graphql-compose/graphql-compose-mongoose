@@ -1,5 +1,8 @@
 ## master
 
+## 1.0.5 (July 22, 2016)
+- Added typeStorage. If you create resolver in second time, it should reuse existed internal types
+
 ## 1.0.4 (July 20, 2016)
 * expose `fieldsConverter` methods
 * fix filterHelper: if `filter` InputType without fields, then do not add it to args

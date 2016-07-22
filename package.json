@@ -1,6 +1,6 @@
 {
   "name": "graphql-compose-mongoose",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Plugin for `graphql-compose` which derive a graphql type from a mongoose model.",
   "files": [
     "es",
@@ -62,7 +62,7 @@
     "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es",
     "build-flow": "find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\\/src\\\//\\\/lib\\\//g'`.flow; done",
     "lint": "eslint src test *.js",
-    "prepublish": "npm run build",
+    "prepublish": "npm run test && npm run build",
     "test": "babel-node ./node_modules/.bin/_mocha --compilers js:babel-core/register --reporter dot --require ./resources/mocha-bootload src/**/__tests__/**/*-test.js",
     "watch": "babel-node ./resources/watch.js"
   }
