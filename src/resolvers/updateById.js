@@ -87,6 +87,8 @@ export default function updateById(
 
       resolveParams.args._id = recordData._id;
       delete recordData._id;
+      resolveParams.projection =
+        resolveParams.projection && resolveParams.projection.record || {};
 
       return findByIdResolver.resolve(resolveParams)
         // save changes to DB
