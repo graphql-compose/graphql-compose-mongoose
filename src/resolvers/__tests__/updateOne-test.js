@@ -157,6 +157,24 @@ describe('updateOne() ->', () => {
       });
       expect(result1.record.id).to.not.equal(result2.record.id);
     });
+
+    it('should extract projection from record for findOne', async () => {
+      const result = await updateOne(UserModel, UserTypeComposer).resolve({
+        args: {
+          filter: { _id: user1.id },
+        },
+        projection: {
+          record: {
+            name: true,
+            gender: true,
+          },
+          skills: true,
+        },
+      });
+      expect(result).have.deep.property('record.id', user1.id);
+      expect(result).have.deep.property('record.gender');
+      expect(result).not.have.deep.property('record.skills');
+    });
   });
 
   describe('Resolver.getOutputType()', () => {

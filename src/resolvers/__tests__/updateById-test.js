@@ -129,6 +129,28 @@ describe('updateById() ->', () => {
       expect(result).have.deep.property('record.id', user1.id);
       expect(result).have.deep.property('record.name', checkedName);
     });
+
+    it('should extract projection from record for findById', async () => {
+      const checkedName = 'anyName123';
+      const result = await updateById(UserModel, UserTypeComposer).resolve({
+        args: {
+          record: {
+            _id: user1.id,
+            name: checkedName,
+          },
+        },
+        projection: {
+          record: {
+            name: true,
+            gender: true,
+          },
+          skills: true,
+        },
+      });
+      expect(result).have.deep.property('record.id', user1.id);
+      expect(result).have.deep.property('record.gender');
+      expect(result).not.have.deep.property('record.skills');
+    });
   });
 
   describe('Resolver.getOutputType()', () => {
