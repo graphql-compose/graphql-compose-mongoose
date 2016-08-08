@@ -4,9 +4,13 @@ import { expect } from 'chai';
 import { UserModel } from '../__mocks__/userModel.js';
 import { composeWithMongoose } from '../composeWithMongoose';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import typeStorage from '../typeStorage';
 
+describe('composeWithMongoose ->', () => {
+  beforeEach(() => {
+    typeStorage.clear();
+  });
 
-describe('modelConverter', () => {
   describe('mongooseModelToTypeComposer()', () => {
     describe('basics', () => {
       it('should return TypeComposer', () => {

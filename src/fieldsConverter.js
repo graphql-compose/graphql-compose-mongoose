@@ -20,6 +20,7 @@ import {
   GraphQLObjectType,
 } from 'graphql';
 import GraphQLMongoID from './types/mongoid';
+import typeStorage from './typeStorage';
 
 import type {
   MongooseModelT,
@@ -131,12 +132,15 @@ export function convertModelToGraphQL(
   }
 
   const typeComposer = new TypeComposer(
-    new GraphQLObjectType({
-      name: typeName,
-      interfaces: [],
-      description: undefined,
-      fields: {},
-    })
+    typeStorage.getOrSet(
+      typeName,
+      new GraphQLObjectType({
+        name: typeName,
+        interfaces: [],
+        description: undefined,
+        fields: {},
+      })
+    )
   );
 
   const mongooseFields = getFieldsFromModel(model, typeName);
@@ -296,11 +300,15 @@ export function enumToGraphQL(
     return result;
   }, {});
 
-  return new GraphQLEnumType({
-    name: `Enum${prefix}${capitalize(_getFieldName(field))}`,
-    description: _getFieldDescription(field),
-    values: graphQLEnumValues,
-  });
+  const typeName = `Enum${prefix}${capitalize(_getFieldName(field))}`;
+  return typeStorage.getOrSet(
+    typeName,
+    new GraphQLEnumType({
+      name: typeName,
+      description: _getFieldDescription(field),
+      values: graphQLEnumValues,
+    })
+  );
 }
 
 
