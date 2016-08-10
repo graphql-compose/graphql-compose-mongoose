@@ -1,5 +1,8 @@
 ## master
 
+## 1.0.7 (August 10, 2016)
+- Update packages, add `babel-plugin-transform-runtime` for build process. Fix [issue](https://github.com/nodkz/graphql-compose-connection/issues/2) for vanilla node.js users without babel (thanks @jacobbubu).
+
 ## 1.0.6 (August 8, 2016)
 - Fix `projection` extraction from `record` for `updateById` and `updateOne` resolvers.
 - Intermediate types now passed to TypeStorage (Enums, SubSchemas) when converting mongoose models.
