@@ -1,5 +1,8 @@
 ## master
 
+## 1.0.8 (August 13, 2016)
+- fix: babel build process
+
 ## 1.0.7 (August 10, 2016)
 - Update packages, add `babel-plugin-transform-runtime` for build process. Fix [issue](https://github.com/nodkz/graphql-compose-connection/issues/2) for vanilla node.js users without babel (thanks @jacobbubu).
 

@@ -8,5 +8,8 @@
   },
   "env": {
     "mocha": true
-  }
+  },
+  "plugins": [
+    "flowtype"
+  ]
 }
