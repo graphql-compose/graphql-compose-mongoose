@@ -1,5 +1,8 @@
 ## master
 
+## 1.0.9 (August 15, 2016)
+- fix: babel build via the workaround https://phabricator.babeljs.io/T2877#78089 Huh, it's to tricky to use Map/Set in ES5.
+
 ## 1.0.8 (August 13, 2016)
 - fix: babel build process
 
