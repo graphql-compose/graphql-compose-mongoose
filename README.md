@@ -11,7 +11,7 @@ Modules `graphql`, `graphql-compose`, `graphql-compose-connection`, `mongoose` a
 
 Example
 =======
-Live demo: [https://graphql-compose-mongoose.herokuapp.com/](https://graphql-compose-mongoose.herokuapp.com/)
+Live demo: [https://graphql-compose.herokuapp.com/](https://graphql-compose.herokuapp.com/)
 
 Source code: https://github.com/nodkz/graphql-compose-mongoose-example
 
