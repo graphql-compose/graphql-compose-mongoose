@@ -53,7 +53,9 @@ export default function findOne(
       sortHelper(resolveParams);
       projectionHelper(resolveParams);
 
-      return resolveParams.query.exec();
+      return resolveParams.query.exec().then(res =>
+        (res && !resolveParams.returnMongooseDoc ? res.toObject() : res)
+      );
     },
   });
 }

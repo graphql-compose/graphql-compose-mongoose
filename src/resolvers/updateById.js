@@ -90,6 +90,8 @@ export default function updateById(
       resolveParams.projection =
         resolveParams.projection && resolveParams.projection.record || {};
 
+      resolveParams.returnMongooseDoc = true;
+
       return findByIdResolver.resolve(resolveParams)
         // save changes to DB
         .then(doc => {

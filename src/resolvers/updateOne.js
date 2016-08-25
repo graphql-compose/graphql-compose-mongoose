@@ -96,6 +96,8 @@ export default function updateOne(
       resolveParams.projection =
         resolveParams.projection && resolveParams.projection.record || {};
 
+      resolveParams.returnMongooseDoc = true;
+
       return findOneResolver.resolve(resolveParams)
         // save changes to DB
         .then(doc => {

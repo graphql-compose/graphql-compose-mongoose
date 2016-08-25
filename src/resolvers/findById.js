@@ -37,13 +37,15 @@ export default function findById(
         type: new GraphQLNonNull(GraphQLMongoID),
       },
     },
-    resolve: (resolveParams : ExtendedResolveParams) => {
+    resolve: (resolveParams: ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
       if (args._id) {
         resolveParams.query = model.findById(args._id); // eslint-disable-line
         projectionHelper(resolveParams);
-        return resolveParams.query.exec();
+        return resolveParams.query.exec().then(res =>
+          (res && !resolveParams.returnMongooseDoc ? res.toObject() : res)
+        );
       }
       return Promise.resolve(null);
     },

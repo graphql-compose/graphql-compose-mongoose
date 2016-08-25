@@ -100,6 +100,7 @@ export type GraphQLResolveInfo = _GraphQLResolveInfo;
 export type ResolverMWResolveFn = _ResolverMWResolveFn;
 export type ExtendedResolveParams = ResolveParams & {
   query: MongooseQuery,
+  returnMongooseDoc: boolean,
 };
 
 
