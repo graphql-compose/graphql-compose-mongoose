@@ -1,5 +1,8 @@
 ## master
 
+## 1.0.10 (August 25, 2016)
+- Resolvers `findOne` and `findById` now by default return object with data, not mongoose document.
+
 ## 1.0.9 (August 15, 2016)
 - fix: babel build via the workaround https://phabricator.babeljs.io/T2877#78089 Huh, it's too tricky to use Map/Set in ES5.
 
