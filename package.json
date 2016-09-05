@@ -25,7 +25,8 @@
   "homepage": "https://github.com/nodkz/graphql-compose-mongoose",
   "dependencies": {
     "babel-runtime": "6.11.6",
-    "object-path": "^0.11.0"
+    "graphql-type-json": "0.1.2",
+    "object-path": "0.11.0"
   },
   "peerDependencies": {
     "graphql": ">=0.5.0 || >=0.6.0",

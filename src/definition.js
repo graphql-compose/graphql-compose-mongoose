@@ -8,7 +8,7 @@ export type connectionSortMapOpts = _connectionSortMapOpts;
 export type ObjectMap = { [optName: string]: any };
 
 export type ComplexTypesT =
- 'ARRAY' | 'EMBEDDED' | 'DOCUMENT_ARRAY' | 'ENUM' | 'REFERENCE' | 'SCALAR';
+ 'ARRAY' | 'EMBEDDED' | 'DOCUMENT_ARRAY' | 'ENUM' | 'REFERENCE' | 'MIXED' | 'SCALAR';
 
 export type MongooseModelSchemaT = {
   paths: {

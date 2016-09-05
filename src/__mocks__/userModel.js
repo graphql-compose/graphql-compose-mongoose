@@ -70,13 +70,17 @@ const UserSchema = new Schema(
       description: 'Knowledge of languages',
     },
 
-    // createdAt, created via option `timastamp: true`
-
-    // updatedAt, created via option `timastamp: true`
-
     __secretField: {
       type: String,
     },
+
+    someDynamic: {
+      type: Schema.Types.Mixed,
+      description: 'Some mixed value, that served with @taion\'s `graphql-type-json`',
+    },
+
+    // createdAt, created via option `timastamp: true` (see bottom)
+    // updatedAt, created via option `timastamp: true` (see bottom)
   },
   {
     timestamps: true, // add createdAt, updatedAt fields

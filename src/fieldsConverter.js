@@ -19,6 +19,7 @@ import {
   GraphQLEnumType,
   GraphQLObjectType,
 } from 'graphql';
+import GraphQLJSON from 'graphql-type-json';
 import GraphQLMongoID from './types/mongoid';
 import typeStorage from './typeStorage';
 
@@ -39,6 +40,7 @@ export const ComplexTypes = {
   ENUM: 'ENUM',
   REFERENCE: 'REFERENCE',
   SCALAR: 'SCALAR',
+  MIXED: 'MIXED',
 };
 
 function _getFieldName(field: MongooseFieldT): string {
@@ -191,6 +193,7 @@ export function convertFieldToGraphQL(
     case ComplexTypes.ENUM: return enumToGraphQL(field, prefix);
     case ComplexTypes.REFERENCE: return referenceToGraphQL(field, prefix);
     case ComplexTypes.DOCUMENT_ARRAY: return documentArrayToGraphQL(field, prefix);
+    case ComplexTypes.MIXED: return mixedToGraphQL(field);
     default: return scalarToGraphQL(field);
   }
 }
@@ -212,6 +215,8 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
   } else if (field instanceof mongoose.Schema.Types.Array
     || objectPath.has(field, 'caster.instance')) {
     return ComplexTypes.ARRAY;
+  } else if (field instanceof mongoose.Schema.Types.Mixed) {
+    return ComplexTypes.MIXED;
   } else if (fieldType === 'ObjectID') {
     return ComplexTypes.REFERENCE;
   }
@@ -351,4 +356,15 @@ export function referenceToGraphQL(
 
   // this is mongo id field
   return scalarToGraphQL(field, prefix);
+}
+
+export function mixedToGraphQL(
+  field: MongooseFieldT
+): GraphQLOutputType {
+  if (!(field instanceof mongoose.Schema.Types.Mixed)) {
+    throw new Error('You provide incorrect mongoose field to `mixedToGraphQL()`. '
+    + 'Correct field should be instance of `mongoose.Schema.Types.Mixed`');
+  }
+
+  return GraphQLJSON;
 }

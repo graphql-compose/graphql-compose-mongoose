@@ -1,6 +1,22 @@
 /* eslint-disable no-unused-expressions */
 
 import { expect } from 'chai';
+import {
+  GraphQLString,
+  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLList,
+  GraphQLEnumType,
+  GraphQLSchema,
+  GraphQLObjectType,
+  graphql,
+} from 'graphql';
+import GraphQLJSON from 'graphql-type-json';
+import {
+  GraphQLDate,
+  GraphQLBuffer,
+  GraphQLGeneric,
+} from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel.js';
 import {
   deriveComplexType,
@@ -12,22 +28,10 @@ import {
   embeddedToGraphQL,
   enumToGraphQL,
   documentArrayToGraphQL,
+  mixedToGraphQL,
 } from '../fieldsConverter';
-
-import {
-  GraphQLString,
-  GraphQLFloat,
-  GraphQLBoolean,
-  GraphQLList,
-  GraphQLEnumType,
-} from 'graphql';
+import { composeWithMongoose } from '../composeWithMongoose';
 import GraphQLMongoID from '../types/mongoid';
-
-import {
-  GraphQLDate,
-  GraphQLBuffer,
-  GraphQLGeneric,
-} from 'graphql-compose';
 
 /*
 Object.prototype.getClassName = function getClassName() {
@@ -100,6 +104,10 @@ describe('fieldConverter', () => {
 
       expect(deriveComplexType(fields.gender)).not.to.equal(ComplexTypes.SCALAR);
       expect(deriveComplexType(fields.subDoc)).not.to.equal(ComplexTypes.SCALAR);
+    });
+
+    it('schould derive MIXED mongoose type', () => {
+      expect(deriveComplexType(fields.someDynamic)).to.equal(ComplexTypes.MIXED);
     });
   });
 
@@ -188,6 +196,53 @@ describe('fieldConverter', () => {
 
     it('should skip pseudo mongoose _id field in document', () => {
       expect(languagesFields._id).to.be.undefined;
+    });
+  });
+
+  describe('mixedToGraphQL()', () => {
+    let user;
+    const UserTC = composeWithMongoose(UserModel);
+
+    before('add test user document to mongoDB', (done) => {
+      user = new UserModel({
+        name: 'nodkz',
+        someDynamic: {
+          a: 123,
+          b: [1, 2],
+          c: { c: 1 },
+          d: null,
+          e: 'str',
+        },
+      });
+      user.save(done);
+    });
+
+    it('should produce GraphQLJSON', () => {
+      const someDynamicType = mixedToGraphQL(fields.someDynamic);
+      expect(someDynamicType).to.equal(GraphQLJSON);
+    });
+
+    it('should properly return data via graphql query', async () => {
+      const schema = new GraphQLSchema({
+        query: new GraphQLObjectType({
+          name: 'Query',
+          fields: {
+            user: UserTC.getResolver('findById').getFieldConfig(),
+          },
+        }),
+      });
+
+      const query = `{
+        user(_id: "${user._id}") {
+          name
+          someDynamic
+        }
+      }`;
+      const result = await graphql(schema, query);
+      expect(result).deep.property('data.user.name').to.equals(user.name);
+      expect(result)
+        .deep.property('data.user.someDynamic')
+        .deep.equals(user.someDynamic);
     });
   });
 
