@@ -47,6 +47,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     enum: ['male', 'female', 'ladyboy'],
   },
+  someMixed: {
+    type: mongoose.Schema.Types.Mixed,
+    description: 'Can be any mixed type, that will be treated as JSON GraphQL Scalar Type',
+  },
 });
 const UserModel = mongoose.model('UserModel', UserSchema);
 
