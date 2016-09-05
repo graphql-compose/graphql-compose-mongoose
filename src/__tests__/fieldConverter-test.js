@@ -208,10 +208,12 @@ describe('fieldConverter', () => {
         name: 'nodkz',
         someDynamic: {
           a: 123,
-          b: [1, 2],
+          b: [1, 2, true, false, 'ok'],
           c: { c: 1 },
           d: null,
           e: 'str',
+          f: true,
+          g: false,
         },
       });
       user.save(done);
