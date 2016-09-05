@@ -1,5 +1,8 @@
 ## master
 
+## 1.0.11 (September 5, 2016)
+- Add support for `mongoose.Schema.Types.Mixed` type. Many thanks to @taion for his [graphql-type-json](https://github.com/taion/graphql-type-json) package.
+
 ## 1.0.10 (August 25, 2016)
 - Resolvers `findOne` and `findById` now by default return object with data, not mongoose document.
 
