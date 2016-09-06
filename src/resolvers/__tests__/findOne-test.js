@@ -108,6 +108,13 @@ describe('findOne() ->', () => {
 
       expect(`${result1._id}`).not.equal(`${result2._id}`);
     });
+
+    it('should return mongoose document', async () => {
+      const result = await findOne(UserModel, UserTypeComposer).resolve({
+        args: { _id: user1._id },
+      });
+      expect(result).instanceof(UserModel);
+    });
   });
 
   describe('Resolver.getOutputType()', () => {

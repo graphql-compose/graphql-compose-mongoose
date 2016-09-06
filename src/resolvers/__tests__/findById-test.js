@@ -60,5 +60,12 @@ describe('findById() ->', () => {
         .resolve({ args: { _id: user._id } });
       expect(result).have.property('name').that.equal(user.name);
     });
+
+    it('should return mongoose document', async () => {
+      const result = await findById(UserModel, UserTypeComposer).resolve({
+        args: { _id: user._id },
+      });
+      expect(result).instanceof(UserModel);
+    });
   });
 });

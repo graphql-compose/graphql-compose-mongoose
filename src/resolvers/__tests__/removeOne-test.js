@@ -136,6 +136,13 @@ describe('removeOne() ->', () => {
       });
       expect(result2).have.deep.property('record.age', user3.age);
     });
+
+    it('should return mongoose document', async () => {
+      const result = await removeOne(UserModel, UserTypeComposer).resolve({
+        args: { },
+      });
+      expect(result.record).instanceof(UserModel);
+    });
   });
 
   describe('Resolver.getOutputType()', () => {

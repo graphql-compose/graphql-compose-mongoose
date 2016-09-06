@@ -88,6 +88,13 @@ describe('createOne() ->', () => {
       });
       expect(result).have.deep.property('record.id', result.recordId);
     });
+
+    it('should return mongoose document', async () => {
+      const result = await createOne(UserModel, UserTypeComposer).resolve({
+        args: { record: { name: 'NewUser' } },
+      });
+      expect(result).property('record').instanceof(UserModel);
+    });
   });
 
   describe('Resolver.getOutputType()', () => {

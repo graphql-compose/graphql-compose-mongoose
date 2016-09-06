@@ -96,5 +96,12 @@ describe('findByIds() ->', () => {
       expect(result).to.be.instanceOf(Array);
       expect(result).to.have.lengthOf(1);
     });
+
+    it('should return mongoose documents', async () => {
+      const result = await findByIds(UserModel, UserTypeComposer)
+        .resolve({ args: { _ids: [user1._id, user2._id] } });
+      expect(result).property('0').instanceof(UserModel);
+      expect(result).property('1').instanceof(UserModel);
+    });
   });
 });

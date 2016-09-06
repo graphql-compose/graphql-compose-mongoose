@@ -168,12 +168,17 @@ describe('updateOne() ->', () => {
             name: true,
             gender: true,
           },
-          skills: true,
         },
       });
       expect(result).have.deep.property('record.id', user1.id);
       expect(result).have.deep.property('record.gender');
-      expect(result).not.have.deep.property('record.skills');
+    });
+
+    it('should return mongoose document', async () => {
+      const result = await updateOne(UserModel, UserTypeComposer).resolve({
+        args: { filter: { _id: user1.id } },
+      });
+      expect(result.record).instanceof(UserModel);
     });
   });
 

@@ -103,5 +103,12 @@ describe('findMany() ->', () => {
 
       expect(`${result1[0]._id}`).not.equal(`${result2[0]._id}`);
     });
+
+    it('should return mongoose documents', async () => {
+      const result = await findMany(UserModel, UserTypeComposer)
+        .resolve({ args: { limit: 2 } });
+      expect(result).property('0').instanceof(UserModel);
+      expect(result).property('1').instanceof(UserModel);
+    });
   });
 });

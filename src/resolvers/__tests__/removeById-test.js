@@ -106,6 +106,13 @@ describe('removeById() ->', () => {
       });
       expect(result).have.deep.property('record.id', user.id);
     });
+
+    it('should return mongoose document', async () => {
+      const result = await removeById(UserModel, UserTypeComposer).resolve({
+        args: { _id: user.id },
+      });
+      expect(result.record).instanceof(UserModel);
+    });
   });
 
   describe('Resolver.getOutputType()', () => {
