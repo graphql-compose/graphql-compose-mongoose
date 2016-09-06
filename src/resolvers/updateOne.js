@@ -1,11 +1,13 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
+
+import { GraphQLObjectType } from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
 import { skipHelperArgs } from './helpers/skip';
 import { recordHelperArgs } from './helpers/record';
 import { filterHelperArgs } from './helpers/filter';
 import { sortHelperArgs } from './helpers/sort';
 import findOne from './findOne';
-import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
 
@@ -14,7 +16,6 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
 
 
 export default function updateOne(
@@ -81,8 +82,8 @@ export default function updateOne(
       ...skipHelperArgs(),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const recordData = resolveParams.args && resolveParams.args.record || null;
-      const filterData = resolveParams.args && resolveParams.args.filter || {};
+      const recordData = (resolveParams.args && resolveParams.args.record) || null;
+      const filterData = (resolveParams.args && resolveParams.args.filter) || {};
 
       if (!(typeof filterData === 'object')
         || Object.keys(filterData).length === 0
@@ -94,9 +95,7 @@ export default function updateOne(
       }
 
       resolveParams.projection =
-        resolveParams.projection && resolveParams.projection.record || {};
-
-      resolveParams.returnMongooseDoc = true;
+        (resolveParams.projection && resolveParams.projection.record) || {};
 
       return findOneResolver.resolve(resolveParams)
         // save changes to DB
@@ -111,7 +110,7 @@ export default function updateOne(
         .then(record => {
           if (record) {
             return {
-              record: record.toObject(),
+              record,
               recordId: typeComposer.getRecordIdFn()(record),
             };
           }

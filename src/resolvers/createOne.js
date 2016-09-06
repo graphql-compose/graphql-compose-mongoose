@@ -1,16 +1,16 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
-import { recordHelperArgs } from './helpers/record';
-import { GraphQLObjectType } from 'graphql';
-import GraphQLMongoID from '../types/mongoid';
 
+import { GraphQLObjectType } from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import { recordHelperArgs } from './helpers/record';
+import typeStorage from '../typeStorage';
+import GraphQLMongoID from '../types/mongoid';
 import type {
   MongooseModelT,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
-import typeStorage from '../typeStorage';
 
 
 export default function createOne(
@@ -60,7 +60,7 @@ export default function createOne(
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const recordData = resolveParams.args && resolveParams.args.record || {};
+      const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
       if (!(typeof recordData === 'object')
         || Object.keys(recordData).length === 0
@@ -75,7 +75,7 @@ export default function createOne(
         .then(record => {
           if (record) {
             return {
-              record: record.toObject(),
+              record,
               recordId: typeComposer.getRecordIdFn()(record),
             };
           }

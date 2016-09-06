@@ -1,9 +1,10 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
+import { GraphQLObjectType } from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
-import { GraphQLObjectType } from 'graphql';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
 
@@ -12,7 +13,7 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
+
 
 export default function updateById(
   model: MongooseModelT,
@@ -69,7 +70,7 @@ export default function updateById(
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const recordData = resolveParams.args && resolveParams.args.record || {};
+      const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
       if (!(typeof recordData === 'object')) {
         return Promise.reject(
@@ -88,9 +89,7 @@ export default function updateById(
       resolveParams.args._id = recordData._id;
       delete recordData._id;
       resolveParams.projection =
-        resolveParams.projection && resolveParams.projection.record || {};
-
-      resolveParams.returnMongooseDoc = true;
+        (resolveParams.projection && resolveParams.projection.record) || {};
 
       return findByIdResolver.resolve(resolveParams)
         // save changes to DB
@@ -108,7 +107,7 @@ export default function updateById(
         .then(record => {
           if (record) {
             return {
-              record: record.toObject(),
+              record,
               recordId: typeComposer.getRecordIdFn()(record),
             };
           }

@@ -2,12 +2,10 @@
 /* eslint-disable no-param-reassign */
 
 import { Resolver, TypeComposer } from 'graphql-compose';
-
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
-
 import type {
   MongooseModelT,
   ExtendedResolveParams,
@@ -53,9 +51,7 @@ export default function findOne(
       sortHelper(resolveParams);
       projectionHelper(resolveParams);
 
-      return resolveParams.query.exec().then(res =>
-        (res && !resolveParams.returnMongooseDoc ? res.toObject() : res)
-      );
+      return resolveParams.query.exec();
     },
   });
 }

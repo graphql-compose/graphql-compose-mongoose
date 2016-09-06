@@ -1,16 +1,15 @@
 /* @flow */
 
+import { GraphQLNonNull } from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import GraphQLMongoID from '../types/mongoid';
+import { projectionHelper } from './helpers/projection';
 import type {
   MongooseModelT,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
 
-import { GraphQLNonNull } from 'graphql';
-import GraphQLMongoID from '../types/mongoid';
-
-import { projectionHelper } from './helpers/projection';
 
 export default function findById(
   model: MongooseModelT,
@@ -43,9 +42,7 @@ export default function findById(
       if (args._id) {
         resolveParams.query = model.findById(args._id); // eslint-disable-line
         projectionHelper(resolveParams);
-        return resolveParams.query.exec().then(res =>
-          (res && !resolveParams.returnMongooseDoc ? res.toObject() : res)
-        );
+        return resolveParams.query.exec();
       }
       return Promise.resolve(null);
     },

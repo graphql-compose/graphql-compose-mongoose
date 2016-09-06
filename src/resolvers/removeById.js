@@ -1,20 +1,20 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { projectionHelper } from './helpers/projection';
 import {
   GraphQLObjectType,
   GraphQLNonNull,
 } from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import { projectionHelper } from './helpers/projection';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
-
 import type {
   MongooseModelT,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
+
 
 export default function removeById(
   model: MongooseModelT,
@@ -77,11 +77,11 @@ export default function removeById(
       projectionHelper(resolveParams);
 
       return resolveParams.query.exec()
-        .then(res => {
-          if (res) {
+        .then(record => {
+          if (record) {
             return {
-              record: res.toObject(),
-              recordId: typeComposer.getRecordIdFn()(res),
+              record,
+              recordId: typeComposer.getRecordIdFn()(record),
             };
           }
 

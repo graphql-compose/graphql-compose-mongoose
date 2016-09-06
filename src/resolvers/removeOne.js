@@ -2,19 +2,17 @@
 /* eslint-disable no-param-reassign */
 
 import { GraphQLObjectType } from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
-
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
-
 import type {
   MongooseModelT,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
 
 
 export default function removeOne(
@@ -78,11 +76,11 @@ export default function removeOne(
 
       return resolveParams.query
         .exec()
-        .then(res => {
-          if (res) {
+        .then(record => {
+          if (record) {
             return {
-              record: res.toObject(),
-              recordId: typeComposer.getRecordIdFn()(res),
+              record,
+              recordId: typeComposer.getRecordIdFn()(record),
             };
           }
 
