@@ -1,10 +1,10 @@
 /* @flow */
 
 import { expect, spy } from 'chai';
-import { limitHelperArgs, limitHelper } from '../limit';
 import {
   GraphQLInt,
 } from 'graphql';
+import { limitHelperArgs, limitHelper } from '../limit';
 
 describe('Resolver helper `limit` ->', () => {
   describe('limitHelperArgs()', () => {

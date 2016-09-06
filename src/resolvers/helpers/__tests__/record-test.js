@@ -1,10 +1,10 @@
 /* @flow */
 
 import { expect } from 'chai';
-import { recordHelperArgs } from '../record';
-import { UserModel } from '../../../__mocks__/userModel.js';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
 import { InputTypeComposer } from 'graphql-compose';
+import { recordHelperArgs } from '../record';
+import { UserModel } from '../../../__mocks__/userModel.js';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
 

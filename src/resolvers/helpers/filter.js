@@ -1,13 +1,13 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import {
   GraphQLNonNull,
   GraphQLInputObjectType,
   GraphQLList,
   getNamedType,
 } from 'graphql';
+import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import getIndexesFromModel from '../../utils/getIndexesFromModel';
 import { toDottedObject, upperFirst } from '../../utils';
 import typeStorage from '../../typeStorage';

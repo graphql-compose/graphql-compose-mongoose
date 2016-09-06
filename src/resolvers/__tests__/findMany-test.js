@@ -1,9 +1,9 @@
 /* @flow */
 
 import { expect } from 'chai';
+import { Resolver } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findMany from '../findMany';
-import { Resolver } from 'graphql-compose';
 import { composeWithMongoose } from '../../composeWithMongoose';
 
 const UserTypeComposer = composeWithMongoose(UserModel);

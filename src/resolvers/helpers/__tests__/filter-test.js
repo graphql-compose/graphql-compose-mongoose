@@ -1,6 +1,8 @@
 /* @flow */
 
 import { expect, spy } from 'chai';
+import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
+import { InputTypeComposer } from 'graphql-compose';
 import {
   filterHelperArgs,
   filterHelper,
@@ -9,8 +11,6 @@ import {
   OPERATORS_FIELDNAME,
 } from '../filter';
 import { UserModel } from '../../../__mocks__/userModel.js';
-import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
-import { InputTypeComposer } from 'graphql-compose';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
 

@@ -1,7 +1,7 @@
 /* @flow */
 
-import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql';
+import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import typeStorage from '../../typeStorage';
 
 import type {

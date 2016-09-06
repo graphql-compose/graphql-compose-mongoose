@@ -1,10 +1,10 @@
 /* @flow */
 
 import { expect } from 'chai';
+import { GraphQLNonNull } from 'graphql';
+import { Resolver } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findOne from '../findOne';
-import { Resolver } from 'graphql-compose';
-import { GraphQLNonNull } from 'graphql';
 import { composeWithMongoose } from '../../composeWithMongoose';
 
 const UserTypeComposer = composeWithMongoose(UserModel);

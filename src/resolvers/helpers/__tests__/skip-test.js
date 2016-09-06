@@ -1,10 +1,10 @@
 /* @flow */
 
 import { expect, spy } from 'chai';
-import { skipHelperArgs, skipHelper } from '../skip';
 import {
   GraphQLInt,
 } from 'graphql';
+import { skipHelperArgs, skipHelper } from '../skip';
 
 describe('Resolver helper `skip` ->', () => {
   describe('limitHelperArgs()', () => {

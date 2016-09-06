@@ -1,10 +1,10 @@
 /* @flow */
 
 import { expect } from 'chai';
+import { GraphQLNonNull, GraphQLList } from 'graphql';
+import { Resolver } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel.js';
 import findByIds from '../findByIds';
-import { Resolver } from 'graphql-compose';
-import { GraphQLNonNull, GraphQLList } from 'graphql';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 
