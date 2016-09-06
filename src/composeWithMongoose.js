@@ -32,6 +32,7 @@ export function composeWithMongoose(
     prepareFields(typeComposer, opts.fields);
   }
 
+  // $FlowFixMe
   typeComposer.setRecordIdFn(source => (source ? `${source._id}` : ''));
 
   createInputType(typeComposer, opts.inputType);

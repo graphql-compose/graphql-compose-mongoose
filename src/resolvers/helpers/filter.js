@@ -216,4 +216,6 @@ export function addFieldsWithOperator(
       description: 'List of fields that can be filtered via operators',
     });
   }
+
+  return operatorsComposer;
 }

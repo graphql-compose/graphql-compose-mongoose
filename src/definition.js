@@ -2,6 +2,7 @@
 /* eslint-disable */
 
 import type { TypeComposer } from 'graphql-compose';
+import type { ProjectionType } from 'graphql-compose/lib/definition';
 import type { connectionSortMapOpts as _connectionSortMapOpts} from 'graphql-compose-connection/lib/definition';
 export type connectionSortMapOpts = _connectionSortMapOpts;
 
@@ -100,6 +101,7 @@ export type GraphQLResolveInfo = _GraphQLResolveInfo;
 export type ResolverMWResolveFn = _ResolverMWResolveFn;
 export type ExtendedResolveParams = ResolveParams & {
   query: MongooseQuery,
+  projection: ProjectionType,
 };
 
 
@@ -191,6 +193,7 @@ export type filterHelperArgsOpts = {
   onlyIndexed?: boolean,
   requiredFields?: string | string[],
   operators?: filterOperatorsOpts | false,
+  removeFields?: string | string[],
 };
 
 export type filterOperatorNames =  'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
