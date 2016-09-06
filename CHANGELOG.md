@@ -1,5 +1,11 @@
 ## master
 
+## 1.0.12 (September 6, 2016)
+- fix: Resolvers now return mongoose documents. It's useful for your resolver wrappers. Now you have access to virtual fields, model methods via `source` or `source.record`. 
+- Update dependencies
+- Update order of imported modules, due eslint warnings
+- Flow 0.32
+
 ## 1.0.11 (September 5, 2016)
 - Add support for `mongoose.Schema.Types.Mixed` type. Many thanks to @taion for his [graphql-type-json](https://github.com/taion/graphql-type-json) package.
 
