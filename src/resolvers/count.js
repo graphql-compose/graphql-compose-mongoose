@@ -1,15 +1,14 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
+import { GraphQLInt } from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import { filterHelperArgs, filterHelper } from './helpers/filter';
 import type {
   MongooseModelT,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
-import { GraphQLInt } from 'graphql';
-
-import { filterHelperArgs, filterHelper } from './helpers/filter';
 
 
 export default function count(

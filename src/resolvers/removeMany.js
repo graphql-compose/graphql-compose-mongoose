@@ -1,7 +1,9 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
-import { filterHelperArgs, filterHelper } from './helpers/filter';
+
 import { GraphQLObjectType, GraphQLInt } from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import { filterHelperArgs, filterHelper } from './helpers/filter';
 import typeStorage from '../typeStorage';
 
 import type {
@@ -9,7 +11,6 @@ import type {
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
 
 
 export default function removeMany(
@@ -59,7 +60,7 @@ export default function removeMany(
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const filterData = resolveParams.args && resolveParams.args.filter || {};
+      const filterData = (resolveParams.args && resolveParams.args.filter) || {};
 
       if (!(typeof filterData === 'object')
         || Object.keys(filterData).length === 0

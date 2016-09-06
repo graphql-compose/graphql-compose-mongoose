@@ -1,10 +1,10 @@
 /* @flow */
 /* eslint-disable no-use-before-define, no-param-reassign */
 
-import { convertModelToGraphQL } from './fieldsConverter';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
-import * as resolvers from './resolvers';
 import composeWithConnection from 'graphql-compose-connection';
+import { convertModelToGraphQL } from './fieldsConverter';
+import * as resolvers from './resolvers';
 import { OPERATORS_FIELDNAME } from './resolvers/helpers/filter';
 
 import type {

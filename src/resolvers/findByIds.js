@@ -1,19 +1,18 @@
 /* @flow */
 
+import { GraphQLNonNull, GraphQLList } from 'graphql';
+import mongoose from 'mongoose';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import GraphQLMongoID from '../types/mongoid';
+import { limitHelperArgs, limitHelper } from './helpers/limit';
+import { sortHelperArgs, sortHelper } from './helpers/sort';
+import { projectionHelper } from './helpers/projection';
 import type {
   MongooseModelT,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
-import mongoose from 'mongoose';
 
-import { GraphQLNonNull, GraphQLList } from 'graphql';
-import GraphQLMongoID from '../types/mongoid';
-
-import { limitHelperArgs, limitHelper } from './helpers/limit';
-import { sortHelperArgs, sortHelper } from './helpers/sort';
-import { projectionHelper } from './helpers/projection';
 
 export default function findByIds(
   model: MongooseModelT,

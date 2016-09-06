@@ -1,20 +1,20 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
+
+import { GraphQLObjectType, GraphQLInt } from 'graphql';
+import { Resolver, TypeComposer } from 'graphql-compose';
 import { recordHelperArgs } from './helpers/record';
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
-import { GraphQLObjectType, GraphQLInt } from 'graphql';
 import toDottedObject from '../utils/toDottedObject';
 import typeStorage from '../typeStorage';
-
 import type {
   MongooseModelT,
   ExtendedResolveParams,
   genResolverOpts,
 } from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
 
 
 export default function updateMany(
@@ -76,7 +76,7 @@ export default function updateMany(
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const recordData = resolveParams.args && resolveParams.args.record || {};
+      const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
       if (!(typeof recordData === 'object')
         || Object.keys(recordData).length === 0

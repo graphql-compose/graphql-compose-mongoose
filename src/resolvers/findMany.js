@@ -1,19 +1,18 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-import { Resolver, TypeComposer } from 'graphql-compose';
 import { GraphQLList } from 'graphql';
-
+import { Resolver, TypeComposer } from 'graphql-compose';
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
+import type {
+  MongooseModelT,
+  ExtendedResolveParams,
+  genResolverOpts,
+} from '../definition';
 
 
 export default function findMany(
