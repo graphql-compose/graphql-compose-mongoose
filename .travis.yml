@@ -2,6 +2,12 @@ sudo: false
 language: node_js
 services:
   - mongodb
+addons:
+  apt:
+    sources:
+    - mongodb-3.0-precise
+    packages:
+    - mongodb-org-server
 cache:
   directories:
     - node_modules
