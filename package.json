@@ -1,6 +1,5 @@
 {
   "name": "graphql-compose-mongoose",
-  "version": "1.0.12",
   "description": "Plugin for `graphql-compose` which derive a graphql type from a mongoose model.",
   "files": [
     "es",
@@ -10,7 +9,7 @@
   "jsnext:main": "es/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nodkz/graphql-compose-mongoose.git"
+    "url": "https://github.com/nodkz/graphql-compose-mongoose.git"
   },
   "keywords": [
     "graphql",
@@ -36,6 +35,7 @@
   },
   "devDependencies": {
     "babel-cli": "6.14.0",
+    "babel-core": "6.14.0",
     "babel-eslint": "6.1.2",
     "babel-plugin-syntax-async-functions": "6.13.0",
     "babel-plugin-transform-class-properties": "6.11.5",
@@ -47,6 +47,7 @@
     "chai": "3.5.0",
     "chai-as-promised": "5.3.0",
     "chai-spies": "0.7.1",
+    "cz-conventional-changelog": "1.2.0",
     "eslint": "3.4.0",
     "eslint-config-airbnb": "10.0.1",
     "eslint-plugin-flowtype": "2.15.0",
@@ -55,18 +56,38 @@
     "eslint-plugin-react": "6.2.0",
     "flow-bin": "0.32.0",
     "mocha": "3.0.2",
+    "nyc": "8.1.0",
     "rimraf": "2.5.4",
-    "sane": "1.4.1"
+    "sane": "1.4.1",
+    "semantic-release": "^4.3.5"
   },
   "scripts": {
     "build": "npm run build-cjs && npm run build-flow && npm run build-es",
     "build-cjs": "rimraf lib && babel src --ignore __tests__,__mocks__ -d lib",
     "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es",
     "build-flow": "find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
+    "coverage": "nyc npm run test",
     "lint": "eslint src test *.js",
-    "prepublish": "npm run test && npm run build",
     "test": "babel-node ./node_modules/.bin/_mocha --compilers js:babel-core/register --reporter dot --require ./resources/mocha-bootload src/**/__tests__/**/*-test.js",
     "watch": "babel-node ./resources/watch.js",
-    "link": "npm link graphql && npm link graphql-compose && npm link graphql-compose-connection && npm link mongoose && npm link"
+    "link": "npm link graphql && npm link graphql-compose && npm link graphql-compose-connection && npm link mongoose && npm link",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "nyc": {
+    "exclude": [
+      "**/__mocks__/**",
+      "**/__tests__/**",
+      "resources",
+      "node_modules"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ]
   }
 }
