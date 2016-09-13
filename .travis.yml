@@ -14,7 +14,7 @@ node_js:
   - "0.10"
 before_install:
   - npm i -g npm@^2.0.0
-  - npm i graphql graphql-compose graphql-compose-connection
+  - npm i graphql graphql-compose graphql-compose-connection mongoose
 before_script:
   - npm prune
 script:
