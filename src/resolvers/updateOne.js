@@ -98,6 +98,12 @@ export default function updateOne(
         (resolveParams.projection && resolveParams.projection.record) || {};
 
       return findOneResolver.resolve(resolveParams)
+        .then(doc => {
+          if (resolveParams.beforeRecordMutate) {
+            return resolveParams.beforeRecordMutate(doc);
+          }
+          return doc;
+        })
         // save changes to DB
         .then(doc => {
           if (recordData) {

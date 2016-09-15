@@ -92,6 +92,12 @@ export default function updateById(
         (resolveParams.projection && resolveParams.projection.record) || {};
 
       return findByIdResolver.resolve(resolveParams)
+        .then(doc => {
+          if (resolveParams.beforeRecordMutate) {
+            return resolveParams.beforeRecordMutate(doc);
+          }
+          return doc;
+        })
         // save changes to DB
         .then(doc => {
           if (!doc) {

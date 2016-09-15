@@ -95,6 +95,18 @@ describe('createOne() ->', () => {
       });
       expect(result).property('record').instanceof(UserModel);
     });
+
+    it('should call `beforeRecordMutate` method with created `record` as arg', async () => {
+      const result = await createOne(UserModel, UserTypeComposer).resolve({
+        args: { record: { name: 'NewUser' } },
+        beforeRecordMutate: (record) => {
+          record.name = 'OverridedName';
+          return record;
+        }
+      });
+      expect(result).property('record').instanceof(UserModel);
+      expect(result).have.deep.property('record.name', 'OverridedName');
+    });
   });
 
   describe('Resolver.getOutputType()', () => {

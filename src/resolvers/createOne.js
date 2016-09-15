@@ -71,7 +71,15 @@ export default function createOne(
         );
       }
 
-      return model.create(recordData)
+      // $FlowFixMe
+      return Promise.resolve(new model(recordData))
+        .then(doc => {
+          if (resolveParams.beforeRecordMutate) {
+            return resolveParams.beforeRecordMutate(doc);
+          }
+          return doc;
+        })
+        .then(doc => doc.save())
         .then(record => {
           if (record) {
             return {

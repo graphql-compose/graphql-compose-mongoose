@@ -102,6 +102,8 @@ export type ResolverMWResolveFn = _ResolverMWResolveFn;
 export type ExtendedResolveParams = ResolveParams & {
   query: MongooseQuery,
   projection: ProjectionType,
+  beforeQuery(query: mixed): Promise<*>,
+  beforeRecordMutate(record: mixed): Promise<*>,
 };
 
 

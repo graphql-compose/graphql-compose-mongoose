@@ -156,6 +156,19 @@ describe('updateById() ->', () => {
       });
       expect(result.record).instanceof(UserModel);
     });
+
+    it('should call `beforeRecordMutate` method with founded `record` as arg', async () => {
+      let beforeMutationId;
+      const result = await updateById(UserModel, UserTypeComposer).resolve({
+        args: { record: { _id: user1.id } },
+        beforeRecordMutate: (record) => {
+          beforeMutationId = record.id;
+          return record;
+        }
+      });
+      expect(result.record).instanceof(UserModel);
+      expect(beforeMutationId).to.equal(user1.id);
+    });
   });
 
   describe('Resolver.getOutputType()', () => {
