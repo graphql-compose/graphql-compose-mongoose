@@ -96,8 +96,11 @@ export default function updateMany(
       resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
       resolveParams.query.update({ $set: toDottedObject(recordData) });
 
-      return resolveParams.query
-        .exec()
+      return (
+        resolveParams.beforeQuery
+          ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query))
+          : resolveParams.query.exec()
+        )
         .then(res => {
           if (res.ok) {
             return {

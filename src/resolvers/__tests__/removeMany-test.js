@@ -2,6 +2,7 @@
 
 import { expect } from 'chai';
 import { GraphQLInt, GraphQLNonNull } from 'graphql';
+import { Query } from 'mongoose';
 import Resolver from 'graphql-compose/lib/resolver/resolver';
 import TypeComposer from 'graphql-compose/lib/typeComposer';
 import { UserModel } from '../../__mocks__/userModel.js';
@@ -115,6 +116,22 @@ describe('removeMany() ->', () => {
           filter: { gender: 'female' },
         },
       });
+      expect(result).have.property('numAffected', 2);
+    });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      let beforeQueryCalled = false;
+      const result = await removeMany(UserModel, UserTypeComposer).resolve({
+        args: {
+          filter: { gender: 'female' },
+        },
+        beforeQuery: (query) => {
+          expect(query).instanceof(Query);
+          beforeQueryCalled = true;
+          return query;
+        }
+      });
+      expect(beforeQueryCalled).to.be.true;
       expect(result).have.property('numAffected', 2);
     });
   });

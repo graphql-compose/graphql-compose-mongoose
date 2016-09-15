@@ -2,6 +2,7 @@
 
 import { expect } from 'chai';
 import { GraphQLNonNull } from 'graphql';
+import { Query } from 'mongoose';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel.js';
 import removeById from '../removeById';
@@ -111,6 +112,20 @@ describe('removeById() ->', () => {
       const result = await removeById(UserModel, UserTypeComposer).resolve({
         args: { _id: user.id },
       });
+      expect(result.record).instanceof(UserModel);
+    });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      let beforeQueryCalled = false;
+      const result = await removeById(UserModel, UserTypeComposer).resolve({
+        args: { _id: user.id },
+        beforeQuery: (query) => {
+          expect(query).instanceof(Query);
+          beforeQueryCalled = true;
+          return query;
+        }
+      });
+      expect(beforeQueryCalled).to.be.true;
       expect(result.record).instanceof(UserModel);
     });
   });

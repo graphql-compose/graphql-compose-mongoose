@@ -2,6 +2,7 @@
 
 import { expect } from 'chai';
 import { GraphQLInt, GraphQLNonNull } from 'graphql';
+import { Query } from 'mongoose';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel.js';
 import updateMany from '../updateMany';
@@ -114,6 +115,23 @@ describe('updateMany() ->', () => {
         },
       });
       expect(result).have.deep.property('numAffected', 2);
+    });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      let beforeQueryCalled = false;
+      const result = await updateMany(UserModel, UserTypeComposer).resolve({
+        args: {
+          record: { gender: 'female' },
+        },
+        beforeQuery: (query) => {
+          expect(query).instanceof(Query);
+          beforeQueryCalled = true;
+          // modify query before execution
+          return query.where({ _id: user1.id })
+        }
+      });
+      expect(beforeQueryCalled).to.be.true;
+      expect(result).have.deep.property('numAffected', 1);
     });
   });
 

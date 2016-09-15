@@ -75,8 +75,11 @@ export default function removeMany(
       filterHelper(resolveParams);
       resolveParams.query = resolveParams.query.remove();
 
-      return resolveParams.query
-        .exec()
+      return (
+        resolveParams.beforeQuery
+          ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query))
+          : resolveParams.query.exec()
+        )
         .then(res => {
           if (res.result && res.result.ok) {
             return {

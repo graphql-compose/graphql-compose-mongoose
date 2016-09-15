@@ -76,7 +76,11 @@ export default function removeById(
       resolveParams.query = model.findByIdAndRemove(args._id);
       projectionHelper(resolveParams);
 
-      return resolveParams.query.exec()
+      return (
+        resolveParams.beforeQuery
+          ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query))
+          : resolveParams.query.exec()
+        )
         .then(record => {
           if (record) {
             return {
