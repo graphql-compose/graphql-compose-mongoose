@@ -97,18 +97,22 @@ export const filterHelperArgs = (
 };
 
 export function filterHelper(resolveParams: ExtendedResolveParams): void {
+  // $FlowFixMe
   const filter = resolveParams.args && resolveParams.args.filter;
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
-    if (!filter[OPERATORS_FIELDNAME]) {
-      resolveParams.query = resolveParams.query.where(toDottedObject(filter)); // eslint-disable-line
-    } else {
-      const operatorFields = Object.assign({}, filter[OPERATORS_FIELDNAME]);
-      const simpleFields = Object.assign({}, filter);
-      delete simpleFields[OPERATORS_FIELDNAME];
-
-      if (Object.keys(simpleFields).length > 0) {
-        resolveParams.query = resolveParams.query.where(toDottedObject(simpleFields)); // eslint-disable-line
+    const modelFields = resolveParams.query.schema.paths;
+    const clearedFilter = {};
+    Object.keys(filter).forEach((key) => {
+      if (modelFields[key]) {
+        clearedFilter[key] = filter[key];
       }
+    })
+    if (Object.keys(clearedFilter).length > 0) {
+      resolveParams.query = resolveParams.query.where(toDottedObject(clearedFilter)); // eslint-disable-line
+    }
+
+    if (filter[OPERATORS_FIELDNAME]) {
+      const operatorFields = filter[OPERATORS_FIELDNAME];
       Object.keys(operatorFields).forEach(fieldName => {
         const fieldOperators = Object.assign({}, operatorFields[fieldName]);
         const criteria = {};

@@ -74,6 +74,7 @@ export type MongooseQuery = {
   update(data: ObjectMap): MongooseQuery,
   remove(conditions: ?Object, options?: Object): MongooseQuery,
   count(conditions: ?Object): MongooseQuery,
+  schema: MongooseModelSchemaT,
 };
 
 export type MongoseDocument = {

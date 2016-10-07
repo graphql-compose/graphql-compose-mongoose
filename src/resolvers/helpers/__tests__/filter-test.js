@@ -174,12 +174,16 @@ describe('Resolver helper `filter` ->', () => {
     beforeEach(() => {
       spyWhereFn = spy((queryObj) => {
         spyWhere2Fn = spy();
-        return { where: spyWhere2Fn };
+        return {
+          ...UserModel.find(),
+          where: spyWhere2Fn,
+        };
       });
 
       spyFindFn = spy();
       resolveParams = {
         query: {
+          ...UserModel.find(),
           where: spyWhereFn,
           find: spyFindFn,
         },

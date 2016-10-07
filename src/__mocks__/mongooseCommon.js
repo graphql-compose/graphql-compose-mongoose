@@ -23,6 +23,10 @@ function dropDBs(done) {
   });
 }
 
+process.on('exit', () => { dropDBs(); });
+process.on('uncaughtException', () => { dropDBs(); });
+process.on('SIGINT', () => { dropDBs(); });
+
 export {
   mongoose,
   Schema,
