@@ -167,11 +167,16 @@ describe('Resolver helper `filter` ->', () => {
 
   describe('filterHelper()', () => {
     let spyWhereFn;
+    let spyWhere2Fn;
     let spyFindFn;
     let resolveParams;
 
     beforeEach(() => {
-      spyWhereFn = spy();
+      spyWhereFn = spy((queryObj) => {
+        spyWhere2Fn = spy();
+        return { where: spyWhere2Fn };
+      });
+
       spyFindFn = spy();
       resolveParams = {
         query: {
@@ -217,8 +222,28 @@ describe('Resolver helper `filter` ->', () => {
         },
       };
       filterHelper(resolveParams);
-      expect(spyFindFn).to.have.been.called.with(
+      expect(spyWhereFn).to.have.been.called.with(
         { age: { $gt: 10, $lt: 20 } }
+      );
+    });
+
+    it('should add rawQuery to query', () => {
+      resolveParams.args = {
+        filter: {
+          [OPERATORS_FIELDNAME]: { age: { gt: 10, lt: 20 } },
+        },
+      };
+      resolveParams.rawQuery = {
+        age: { max: 30 },
+        active: true,
+      };
+
+      filterHelper(resolveParams);
+      expect(spyWhereFn).to.have.been.called.with(
+        { age: { $gt: 10, $lt: 20 } }
+      );
+      expect(spyWhere2Fn).to.have.been.called.with(
+        { age: { max: 30 }, active: true }
       );
     });
   });

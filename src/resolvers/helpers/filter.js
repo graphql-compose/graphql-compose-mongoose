@@ -9,6 +9,7 @@ import {
 } from 'graphql';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import getIndexesFromModel from '../../utils/getIndexesFromModel';
+import { isObject } from '../../utils/is';
 import { toDottedObject, upperFirst } from '../../utils';
 import typeStorage from '../../typeStorage';
 import type {
@@ -115,13 +116,19 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
           criteria[`$${operatorName}`] = fieldOperators[operatorName];
         });
         if (Object.keys(criteria).length > 0) {
-          // $FlowFixMe
-          resolveParams.query = resolveParams.query.find({ // eslint-disable-line
+          resolveParams.query = resolveParams.query.where({ // eslint-disable-line
             [fieldName]: criteria,
           });
         }
       });
     }
+  }
+
+  if (isObject(resolveParams.rawQuery)) {
+    resolveParams.query = resolveParams.query.where( // eslint-disable-line
+      // $FlowFixMe
+      resolveParams.rawQuery
+    );
   }
 }
 
