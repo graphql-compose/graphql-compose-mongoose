@@ -129,7 +129,7 @@ describe('composeWithMongoose ->', () => {
     describe('createResolvers()', () => {
       it('should not be called if opts.resolvers === false', () => {
         const tc = composeWithMongoose(UserModel, { resolvers: false });
-        expect(tc.getResolvers().keys()).is.empty;
+        expect(Array.from(tc.getResolvers().keys())).is.empty;
       });
 
       it('should be called if opts.resolvers not exists or has value', () => {
