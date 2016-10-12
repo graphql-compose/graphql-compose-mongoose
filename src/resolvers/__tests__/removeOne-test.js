@@ -1,9 +1,10 @@
 /* @flow */
 
 import { expect } from 'chai';
+import { GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { Query } from 'mongoose';
-import { UserModel } from '../../__mocks__/userModel.js';
+import { UserModel } from '../../__mocks__/userModel';
 import removeOne from '../removeOne';
 import GraphQLMongoID from '../../types/mongoid';
 import { mongoose } from '../../__mocks__/mongooseCommon';
@@ -181,9 +182,13 @@ describe('removeOne() ->', () => {
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `RemoveOne${UserTypeComposer.getTypeName()}Payload`;
-      typeStorage.set(outputTypeName, 'EXISTED_TYPE');
+      const existedType = new GraphQLObjectType({
+        name: outputTypeName,
+        fields: () => ({}),
+      });
+      typeStorage.set(outputTypeName, existedType);
       const outputType = removeOne(UserModel, UserTypeComposer).getOutputType();
-      expect(outputType).to.equal('EXISTED_TYPE');
+      expect(outputType).to.equal(existedType);
     });
   });
 });

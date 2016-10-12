@@ -3,7 +3,7 @@
 import { expect } from 'chai';
 import { GraphQLInt } from 'graphql';
 import { Resolver } from 'graphql-compose';
-import { UserModel } from '../../__mocks__/userModel.js';
+import { UserModel } from '../../__mocks__/userModel';
 import count from '../count';
 import { composeWithMongoose } from '../../composeWithMongoose';
 

@@ -129,14 +129,14 @@ describe('composeWithMongoose ->', () => {
     describe('createResolvers()', () => {
       it('should not be called if opts.resolvers === false', () => {
         const tc = composeWithMongoose(UserModel, { resolvers: false });
-        expect(tc.getResolvers().getKeys()).is.empty;
+        expect(tc.getResolvers().keys()).is.empty;
       });
 
       it('should be called if opts.resolvers not exists or has value', () => {
         const tc = composeWithMongoose(UserModel);
-        expect(tc.getResolvers().getKeys()).is.not.empty;
+        expect(Array.from(tc.getResolvers().keys())).is.not.empty;
         const tc2 = composeWithMongoose(UserModel, { resolvers: {} });
-        expect(tc2.getResolvers().getKeys()).is.not.empty;
+        expect(Array.from(tc2.getResolvers().keys())).is.not.empty;
       });
 
       it('should not provide resolver if opts.resolvers.[resolverName] === false', () => {
@@ -149,7 +149,7 @@ describe('composeWithMongoose ->', () => {
             },
           },
         });
-        const resolverKeys = tc2.getResolvers().getKeys();
+        const resolverKeys = Array.from(tc2.getResolvers().keys());
         expect(resolverKeys).to.not.include('removeById');
         expect(resolverKeys).include.members(['findMany', 'updateOne', 'updateMany']);
       });

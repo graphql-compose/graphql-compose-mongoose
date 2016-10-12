@@ -29,7 +29,7 @@ export default function findByIds(
     throw new Error('Second arg for Resolver findByIds() should be instance of TypeComposer.');
   }
 
-  return new Resolver(typeComposer, {
+  return new Resolver({
     outputType: new GraphQLList(typeComposer.getType()),
     name: 'findByIds',
     kind: 'query',

@@ -10,7 +10,7 @@ import {
   addFieldsWithOperator,
   OPERATORS_FIELDNAME,
 } from '../filter';
-import { UserModel } from '../../../__mocks__/userModel.js';
+import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
 

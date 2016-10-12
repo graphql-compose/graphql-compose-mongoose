@@ -46,7 +46,7 @@ export default function createOne(
     })
   );
 
-  const resolver = new Resolver(typeComposer, {
+  const resolver = new Resolver({
     name: 'createOne',
     kind: 'mutation',
     description: 'Create one document with mongoose defaults, setters, hooks and validation',

@@ -1,11 +1,10 @@
 /* @flow */
 
 import { expect } from 'chai';
-import { GraphQLInt, GraphQLNonNull } from 'graphql';
+import { GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { Query } from 'mongoose';
-import Resolver from 'graphql-compose/lib/resolver/resolver';
-import TypeComposer from 'graphql-compose/lib/typeComposer';
-import { UserModel } from '../../__mocks__/userModel.js';
+import { Resolver, TypeComposer } from 'graphql-compose/';
+import { UserModel } from '../../__mocks__/userModel';
 import removeMany from '../removeMany';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
@@ -151,9 +150,13 @@ describe('removeMany() ->', () => {
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `RemoveMany${UserTypeComposer.getTypeName()}Payload`;
-      typeStorage.set(outputTypeName, 'EXISTED_TYPE');
+      const existedType = new GraphQLObjectType({
+        name: outputTypeName,
+        fields: () => ({}),
+      });
+      typeStorage.set(outputTypeName, existedType);
       const outputType = removeMany(UserModel, UserTypeComposer).getOutputType();
-      expect(outputType).to.equal('EXISTED_TYPE');
+      expect(outputType).to.equal(existedType);
     });
   });
 });

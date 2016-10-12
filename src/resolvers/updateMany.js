@@ -47,7 +47,7 @@ export default function updateMany(
     })
   );
 
-  const resolver = new Resolver(typeComposer, {
+  const resolver = new Resolver({
     name: 'updateMany',
     kind: 'mutation',
     description: 'Update many documents without returning them: '

@@ -26,7 +26,7 @@ export default function findById(
     throw new Error('Second arg for Resolver findById() should be instance of TypeComposer.');
   }
 
-  return new Resolver(typeComposer, {
+  return new Resolver({
     outputType: typeComposer.getType(),
     name: 'findById',
     kind: 'query',

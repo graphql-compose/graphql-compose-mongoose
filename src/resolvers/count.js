@@ -26,7 +26,7 @@ export default function count(
     throw new Error('Second arg for Resolver count() should be instance of TypeComposer.');
   }
 
-  return new Resolver(typeComposer, {
+  return new Resolver({
     outputType: GraphQLInt,
     name: 'count',
     kind: 'query',

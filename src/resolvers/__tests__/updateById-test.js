@@ -5,9 +5,10 @@ import {
   GraphQLNonNull,
   GraphQLInputObjectType,
   getNullableType,
+  GraphQLObjectType,
 } from 'graphql';
 import { Resolver, TypeComposer, InputTypeComposer } from 'graphql-compose';
-import { UserModel } from '../../__mocks__/userModel.js';
+import { UserModel } from '../../__mocks__/userModel';
 import updateById from '../updateById';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
@@ -194,9 +195,13 @@ describe('updateById() ->', () => {
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `UpdateById${UserTypeComposer.getTypeName()}Payload`;
-      typeStorage.set(outputTypeName, 'EXISTED_TYPE');
+      const existedType = new GraphQLObjectType({
+        name: outputTypeName,
+        fields: () => ({}),
+      });
+      typeStorage.set(outputTypeName, existedType);
       const outputType = updateById(UserModel, UserTypeComposer).getOutputType();
-      expect(outputType).to.equal('EXISTED_TYPE');
+      expect(outputType).to.equal(existedType);
     });
   });
 });

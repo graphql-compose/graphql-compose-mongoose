@@ -1,9 +1,9 @@
 /* @flow */
 
 import { expect } from 'chai';
-import { GraphQLNonNull } from 'graphql';
+import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
-import { UserModel } from '../../__mocks__/userModel.js';
+import { UserModel } from '../../__mocks__/userModel';
 import createOne from '../createOne';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import GraphQLMongoID from '../../types/mongoid';
@@ -130,9 +130,13 @@ describe('createOne() ->', () => {
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `CreateOne${UserTypeComposer.getTypeName()}Payload`;
-      typeStorage.set(outputTypeName, 'EXISTED_TYPE');
+      const existedType = new GraphQLObjectType({
+        name: outputTypeName,
+        fields: () => ({}),
+      });
+      typeStorage.set(outputTypeName, existedType);
       const outputType = createOne(UserModel, UserTypeComposer).getOutputType();
-      expect(outputType).to.equal('EXISTED_TYPE');
+      expect(outputType).to.equal(existedType);
     });
   });
 });

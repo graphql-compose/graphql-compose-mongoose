@@ -30,7 +30,7 @@ export default function findMany(
     throw new Error('Second arg for Resolver findMany() should be instance of TypeComposer.');
   }
 
-  return new Resolver(typeComposer, {
+  return new Resolver({
     outputType: new GraphQLList(typeComposer.getType()),
     name: 'findMany',
     kind: 'query',

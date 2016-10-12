@@ -51,7 +51,7 @@ export default function removeById(
     })
   );
 
-  const resolver = new Resolver(typeComposer, {
+  const resolver = new Resolver({
     name: 'removeById',
     kind: 'mutation',
     description: 'Remove one document: '

@@ -11,13 +11,13 @@ import {
   GraphQLObjectType,
   graphql,
 } from 'graphql';
-import GraphQLJSON from 'graphql-type-json';
 import {
   GraphQLDate,
   GraphQLBuffer,
   GraphQLGeneric,
+  GraphQLJSON,
 } from 'graphql-compose';
-import { UserModel } from '../__mocks__/userModel.js';
+import { UserModel } from '../__mocks__/userModel';
 import {
   deriveComplexType,
   getFieldsFromModel,
@@ -32,14 +32,6 @@ import {
 } from '../fieldsConverter';
 import { composeWithMongoose } from '../composeWithMongoose';
 import GraphQLMongoID from '../types/mongoid';
-
-/*
-Object.prototype.getClassName = function getClassName() {
-  const funcNameRegex = /function (.{1,})\(/;
-  const results = (funcNameRegex).exec((this).constructor.toString());
-  return (results && results.length > 1) ? results[1] : '';
-};
-*/
 
 describe('fieldConverter', () => {
   const fields = getFieldsFromModel(UserModel);

@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
 import { InputTypeComposer } from 'graphql-compose';
 import { recordHelperArgs } from '../record';
-import { UserModel } from '../../../__mocks__/userModel.js';
+import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
 

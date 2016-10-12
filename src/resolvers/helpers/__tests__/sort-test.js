@@ -7,7 +7,7 @@ import {
   sortHelper,
   getSortTypeFromModel,
 } from '../sort';
-import { UserModel } from '../../../__mocks__/userModel.js';
+import { UserModel } from '../../../__mocks__/userModel';
 import getIndexesFromModel from '../../../utils/getIndexesFromModel';
 import typeStorage from '../../../typeStorage';
 

@@ -7,5 +7,6 @@ export default composeWithMongoose;
 
 export * from './fieldsConverter';
 export {
+  composeWithMongoose,
   typeStorage as mongooseTypeStorage,
 };

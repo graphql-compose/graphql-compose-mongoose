@@ -14,6 +14,9 @@ mongoose.connection.on('error', (err) => {
   throw new Error(err);
 });
 
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose default connection open to ' + uri);
+});
 
 function dropDBs(done) {
   mongoose.connection.db.dropDatabase(() => {

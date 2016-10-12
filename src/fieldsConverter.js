@@ -8,6 +8,7 @@ import {
   GraphQLDate,
   GraphQLBuffer,
   GraphQLGeneric,
+  GraphQLJSON,
   GQLReference,
 } from 'graphql-compose';
 
@@ -19,7 +20,6 @@ import {
   GraphQLEnumType,
   GraphQLObjectType,
 } from 'graphql';
-import GraphQLJSON from 'graphql-type-json';
 import GraphQLMongoID from './types/mongoid';
 import typeStorage from './typeStorage';
 

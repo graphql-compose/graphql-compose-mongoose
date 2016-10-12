@@ -2,7 +2,7 @@
 
 import { expect } from 'chai';
 import { Resolver } from 'graphql-compose';
-import { UserModel } from '../../__mocks__/userModel.js';
+import { UserModel } from '../../__mocks__/userModel';
 import findMany from '../findMany';
 import { composeWithMongoose } from '../../composeWithMongoose';
 

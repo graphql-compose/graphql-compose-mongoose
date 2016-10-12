@@ -52,7 +52,7 @@ export default function updateById(
     })
   );
 
-  const resolver = new Resolver(typeComposer, {
+  const resolver = new Resolver({
     name: 'updateById',
     kind: 'mutation',
     description: 'Update one document: '

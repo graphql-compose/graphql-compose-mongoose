@@ -37,7 +37,7 @@ export function composeWithMongoose(
 
   createInputType(typeComposer, opts.inputType);
 
-  if (!opts.hasOwnProperty('resolvers') || opts.resolvers !== false) {
+  if (!{}.hasOwnProperty.call(opts, 'resolvers') || opts.resolvers !== false) {
     createResolvers(model, typeComposer, opts.resolvers || {});
   }
 
@@ -111,8 +111,8 @@ export function createResolvers(
   opts: typeConverterResolversOpts
 ): void {
   const names = resolvers.getAvailableNames();
-  names.forEach(resolverName => {
-    if (!opts.hasOwnProperty(resolverName) || opts[resolverName] !== false) {
+  names.forEach((resolverName) => {
+    if (!{}.hasOwnProperty.call(opts, resolverName) || opts[resolverName] !== false) {
       const createResolverFn = resolvers[resolverName];
       if (createResolverFn) {
         const resolver = createResolverFn(
@@ -120,12 +120,12 @@ export function createResolvers(
           typeComposer,
           opts[resolverName] || {}
         );
-        typeComposer.setResolver(resolver);
+        typeComposer.setResolver(resolverName, resolver);
       }
     }
   });
 
-  if (!opts.hasOwnProperty('connection') || opts.connection !== false) {
+  if (!{}.hasOwnProperty.call(opts, 'connection') || opts.connection !== false) {
     prepareConnectionResolver(typeComposer, opts.connection ? opts.connection : {});
   }
 }

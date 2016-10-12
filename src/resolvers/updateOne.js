@@ -54,7 +54,7 @@ export default function updateOne(
     })
   );
 
-  const resolver = new Resolver(typeComposer, {
+  const resolver = new Resolver({
     name: 'updateOne',
     kind: 'mutation',
     description: 'Update one document: '
