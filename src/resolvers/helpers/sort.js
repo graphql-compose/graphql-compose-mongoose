@@ -54,7 +54,7 @@ export function getSortTypeFromModel(
   const sortEnumValues = {};
   indexes.forEach((indexData) => {
     const keys = Object.keys(indexData);
-    let name = keys.join('__').toUpperCase().replace('.', '__');
+    let name = keys.join('__').toUpperCase().replace(/[^_a-zA-Z0-9]/i, '__');
     if (indexData[keys[0]] === 1) {
       name = `${name}_ASC`;
     } else if (indexData[keys[0]] === -1) {

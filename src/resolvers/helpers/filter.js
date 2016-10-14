@@ -142,7 +142,8 @@ export function getIndexedFieldNames(model: MongooseModelT): string[] {
   const fieldNames = [];
   indexes.forEach((indexData) => {
     const keys = Object.keys(indexData);
-    fieldNames.push(keys[0]);
+    const clearedName = keys[0].replace(/[^_a-zA-Z0-9]/i, '__');
+    fieldNames.push(clearedName);
   });
 
   return fieldNames;

@@ -7,6 +7,18 @@ import type {
 
 export type getIndexesFromModelOpts = {
   extractCompound?: boolean, // true by default
+  skipSpecificIndeces?: boolean, // eg text, 2d, 2dsphere (true by default)
+}
+
+function isSpecificIndex(idx) {
+  let hasSpecialIndex = false;
+  Object.keys(idx).forEach((k) => {
+    if (typeof idx[k] !== 'number'
+      && typeof idx[k] !== 'boolean') {
+      hasSpecialIndex = true;
+    }
+  });
+  return hasSpecialIndex;
 }
 
 /**
@@ -17,7 +29,12 @@ export default function getIndexesFromModel(
   mongooseModel: MongooseModelT,
   opts: getIndexesFromModelOpts = {}
 ): ObjectMap[] {
-  const extractCompound = opts.extractCompound || true;
+  const extractCompound = opts.extractCompound === undefined
+    ? true
+    : Boolean(opts.extractCompound);
+  const skipSpecificIndexes = opts.skipSpecificIndexes === undefined
+    ? true
+    : Boolean(opts.skipSpecificIndexes);
 
   const indexedFields = [];
 
@@ -33,20 +50,23 @@ export default function getIndexesFromModel(
     }
   });
 
-  // scan compound indexes [MONGOOSE SCHEMA LEVEL INDEXES]
+  // scan compound and special indexes [MONGOOSE SCHEMA LEVEL INDEXES]
   if (Array.isArray(mongooseModel.schema._indexes)) {
     mongooseModel.schema._indexes.forEach((idxData) => {
       const partialIndexes = {};
       const idxFields = idxData[0];
-      if (!extractCompound) {
-        indexedFields.push(idxFields);
-      } else {
-        // extract partial indexes from compound index
-        // { name: 1, age: 1, salary: 1} -> [{name:1}, {name:1, age:1}, {name:1, age:1, salary:1}]
-        Object.keys(idxFields).forEach((fieldName) => {
-          partialIndexes[fieldName] = idxFields[fieldName];
-          indexedFields.push(Object.assign({}, partialIndexes));
-        });
+
+      if (!skipSpecificIndexes || !isSpecificIndex(idxFields)) {
+        if (!extractCompound) {
+          indexedFields.push(idxFields);
+        } else {
+          // extract partial indexes from compound index
+          // { name: 1, age: 1, salary: 1} -> [{name:1}, {name:1, age:1}, {name:1, age:1, salary:1}]
+          Object.keys(idxFields).forEach((fieldName) => {
+            partialIndexes[fieldName] = idxFields[fieldName];
+            indexedFields.push(Object.assign({}, partialIndexes));
+          });
+        }
       }
     });
   }
