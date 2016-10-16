@@ -5,7 +5,6 @@ import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import composeWithConnection from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
-import { OPERATORS_FIELDNAME } from './resolvers/helpers/filter';
 
 import type {
   MongooseModelT,
@@ -139,37 +138,35 @@ export function prepareConnectionResolver(
     countResolverName: 'count',
     sort: {
       _ID_DESC: {
-        uniqueFields: ['_id'],
-        sortValue: { _id: -1 },
-        directionFilter: (filter, cursorData, isBefore) => {
+        value: { _id: -1 },
+        cursorFields: ['_id'],
+        beforeCursorQuery: (rawQuery, cursorData) => {
           // $FlowFixMe
-          filter[OPERATORS_FIELDNAME] = filter[OPERATORS_FIELDNAME] || {};
+          if (!rawQuery._id) rawQuery._id = {};
           // $FlowFixMe
-          filter[OPERATORS_FIELDNAME]._id = filter[OPERATORS_FIELDNAME]._id || {};
-          if (isBefore) {
-            filter[OPERATORS_FIELDNAME]._id.gt = cursorData._id;
-          } else {
-            filter[OPERATORS_FIELDNAME]._id.lt = cursorData._id;
-          }
+          rawQuery._id.$gt = cursorData._id;
+        },
+        afterCursorQuery: (rawQuery, cursorData) => {
           // $FlowFixMe
-          return filter;
+          if (!rawQuery._id) rawQuery._id = {};
+          // $FlowFixMe
+          rawQuery._id.$lt = cursorData._id;
         },
       },
       _ID_ASC: {
-        uniqueFields: ['_id'],
-        sortValue: { _id: 1 },
-        directionFilter: (filter, cursorData, isBefore) => {
+        value: { _id: 1 },
+        cursorFields: ['_id'],
+        beforeCursorQuery: (rawQuery, cursorData) => {
           // $FlowFixMe
-          filter[OPERATORS_FIELDNAME] = filter[OPERATORS_FIELDNAME] || {};
+          if (!rawQuery._id) rawQuery._id = {};
           // $FlowFixMe
-          filter[OPERATORS_FIELDNAME]._id = filter[OPERATORS_FIELDNAME]._id || {};
-          if (isBefore) {
-            filter[OPERATORS_FIELDNAME]._id.lt = cursorData._id;
-          } else {
-            filter[OPERATORS_FIELDNAME]._id.gt = cursorData._id;
-          }
+          rawQuery._id.$gt = cursorData._id;
+        },
+        afterCursorQuery: (rawQuery, cursorData) => {
           // $FlowFixMe
-          return filter;
+          if (!rawQuery._id) rawQuery._id = {};
+          // $FlowFixMe
+          rawQuery._id.$lt = cursorData._id;
         },
       },
       ...opts,

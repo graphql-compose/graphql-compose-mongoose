@@ -30,7 +30,7 @@
   "peerDependencies": {
     "graphql": ">=0.7.1 || >=0.8.0",
     "graphql-compose": ">=1.0.0",
-    "graphql-compose-connection": ">=1.0.0",
+    "graphql-compose-connection": ">=2.0.0",
     "mongoose": ">=4.0.0"
   },
   "devDependencies": {
