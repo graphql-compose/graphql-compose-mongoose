@@ -8,7 +8,7 @@ import {
   getSortTypeFromModel,
 } from '../sort';
 import { UserModel } from '../../../__mocks__/userModel';
-import getIndexesFromModel from '../../../utils/getIndexesFromModel';
+import { getIndexesFromModel } from '../../../utils/getIndexesFromModel';
 import typeStorage from '../../../typeStorage';
 
 describe('Resolver helper `sort` ->', () => {

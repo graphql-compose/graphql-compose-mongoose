@@ -2,7 +2,7 @@
 /* eslint-disable no-use-before-define */
 
 import { GraphQLEnumType } from 'graphql';
-import getIndexesFromModel from '../../utils/getIndexesFromModel';
+import { getIndexesFromModel, extendByReversedIndexes } from '../../utils/getIndexesFromModel';
 import typeStorage from '../../typeStorage';
 import type {
   ExtendedResolveParams,
@@ -49,7 +49,7 @@ export function getSortTypeFromModel(
   typeName: string,
   model: MongooseModelT
 ): GraphQLEnumType {
-  const indexes = getIndexesFromModelWithReverse(model);
+  const indexes = extendByReversedIndexes(getIndexesFromModel(model));
 
   const sortEnumValues = {};
   indexes.forEach((indexData) => {
@@ -73,28 +73,4 @@ export function getSortTypeFromModel(
       values: sortEnumValues,
     })
   );
-}
-
-
-export function getIndexesFromModelWithReverse(model: MongooseModelT) {
-  const indexes = getIndexesFromModel(model);
-  const result: ObjectMap[] = [];
-
-  indexes.forEach((indexObj) => {
-    let hasSpecificIndex = false;
-    // https://docs.mongodb.org/manual/tutorial/sort-results-with-indexes/#sort-on-multiple-fields
-    const reversedIndexObj = Object.assign({}, indexObj);
-    Object.keys(reversedIndexObj).forEach((f) => {
-      if (reversedIndexObj[f] === 1) reversedIndexObj[f] = -1;
-      else if (reversedIndexObj[f] === -1) reversedIndexObj[f] = 1;
-      else hasSpecificIndex = true;
-    });
-
-    result.push(indexObj);
-    if (!hasSpecificIndex) {
-      result.push(reversedIndexObj);
-    }
-  });
-
-  return result;
 }

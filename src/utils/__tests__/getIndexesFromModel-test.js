@@ -1,6 +1,10 @@
 import { expect } from 'chai';
 import mongoose from 'mongoose';
-import getIndexesFromModel from '../getIndexesFromModel';
+import {
+  getIndexesFromModel,
+  getUniqueIndexes,
+  extendByReversedIndexes,
+} from '../getIndexesFromModel';
 
 const AgentSchema = new mongoose.Schema(
   {
@@ -15,6 +19,11 @@ const AgentSchema = new mongoose.Schema(
     name: {
       type: String,
       description: 'Person name',
+    },
+
+    someUniqField: {
+      type: String,
+      unique: true,
     },
 
     age: {
@@ -43,11 +52,12 @@ const AgentSchema = new mongoose.Schema(
 AgentSchema.set('autoIndex', false);
 AgentSchema.index({ name: 1, age: -1 });
 AgentSchema.index({ 'subDoc.field2': 1 });
-AgentSchema.index({ name: 'text', skills: 'text' });
+AgentSchema.index({ name: 'text', skills: 'text' }, { unique: true });
+AgentSchema.index({ name: 1, someOtherField: -1 }, { unique: true });
 
 const AgentModel = mongoose.model('Agent', AgentSchema);
 
-describe('getIndexesFromModel', () => {
+describe('getIndexesFromModel()', () => {
   it('should get regular indexes and extract compound idx by default', () => {
     const idx = getIndexesFromModel(AgentModel);
     expect(idx).to.deep.have.all.members([
@@ -55,6 +65,8 @@ describe('getIndexesFromModel', () => {
       { name: 1 },
       { name: 1, age: -1 },
       { 'subDoc.field2': 1 },
+      { someUniqField: 1 },
+      { name: 1, someOtherField: -1 },
     ]);
   });
 
@@ -64,11 +76,13 @@ describe('getIndexesFromModel', () => {
       { _id: 1 },
       { name: 1, age: -1 },
       { 'subDoc.field2': 1 },
+      { someUniqField: 1 },
+      { name: 1, someOtherField: -1 },
     ]);
   });
 
   it('it should return specialIndexes indexes', () => {
-    const idx = getIndexesFromModel(AgentModel, { skipSpecificIndexes : false });
+    const idx = getIndexesFromModel(AgentModel, { skipSpecificIndexes: false });
     expect(idx).to.deep.have.all.members([
       { _id: 1 },
       { name: 1 },
@@ -76,6 +90,56 @@ describe('getIndexesFromModel', () => {
       { 'subDoc.field2': 1 },
       { name: 'text' },
       { name: 'text', skills: 'text' },
+      { someUniqField: 1 },
+      { name: 1, someOtherField: -1 },
+    ]);
+  });
+});
+
+
+describe('getUniqueIndexes()', () => {
+  it('should return unique indexes', () => {
+    const idx = getUniqueIndexes(AgentModel);
+    expect(idx).to.deep.have.all.members([
+      { _id: 1 },
+      { someUniqField: 1 },
+      { name: 1, someOtherField: -1 },
+    ]);
+  });
+});
+
+describe('extendByReversedIndexes()', () => {
+  it('should return extended indexes list', () => {
+    const idxSource = [
+      { _id: 1 },
+      { someUniqField: 1 },
+      { name: 1, someOtherField: -1 },
+    ];
+    const idx = extendByReversedIndexes(idxSource);
+    expect(idx).deep.equal([
+      { _id: 1 },
+      { _id: -1 },
+      { someUniqField: 1 },
+      { someUniqField: -1 },
+      { name: 1, someOtherField: -1 },
+      { name: -1, someOtherField: 1 },
+    ]);
+  });
+
+  it('should return extended indexes list with reversed first', () => {
+    const idxSource = [
+      { _id: 1 },
+      { someUniqField: 1 },
+      { name: 1, someOtherField: -1 },
+    ];
+    const idx = extendByReversedIndexes(idxSource, { reversedFirst: true });
+    expect(idx).deep.equal([
+      { _id: -1 },
+      { _id: 1 },
+      { someUniqField: -1 },
+      { someUniqField: 1 },
+      { name: -1, someOtherField: 1 },
+      { name: 1, someOtherField: -1 },
     ]);
   });
 });

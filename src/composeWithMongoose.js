@@ -5,6 +5,10 @@ import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import composeWithConnection from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
+import {
+  getUniqueIndexes,
+  extendByReversedIndexes,
+} from './utils/getIndexesFromModel';
 
 import type {
   MongooseModelT,
@@ -125,50 +129,56 @@ export function createResolvers(
   });
 
   if (!{}.hasOwnProperty.call(opts, 'connection') || opts.connection !== false) {
-    prepareConnectionResolver(typeComposer, opts.connection ? opts.connection : {});
+    prepareConnectionResolver(model, typeComposer, opts.connection ? opts.connection : {});
   }
 }
 
 export function prepareConnectionResolver(
+  model: MongooseModelT,
   typeComposer: TypeComposer,
   opts: connectionSortMapOpts
 ) {
+  const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), { reversedFirst: true });
+  const sortConfigs = {};
+  uniqueIndexes.forEach((indexData) => {
+    const keys = Object.keys(indexData);
+    let name = keys.join('__').toUpperCase().replace(/[^_a-zA-Z0-9]/i, '__');
+    if (indexData[keys[0]] === 1) {
+      name = `${name}_ASC`;
+    } else if (indexData[keys[0]] === -1) {
+      name = `${name}_DESC`;
+    }
+    sortConfigs[name] = {
+      value: indexData,
+      cursorFields: keys,
+      beforeCursorQuery: (rawQuery, cursorData) => {
+        keys.forEach((k) => {
+          if (!rawQuery[k]) rawQuery[k] = {};
+          if (indexData[k] === 1) {
+            rawQuery[k].$lt = cursorData[k];
+          } else {
+            rawQuery[k].$gt = cursorData[k];
+          }
+        });
+      },
+      afterCursorQuery: (rawQuery, cursorData) => {
+        keys.forEach((k) => {
+          if (!rawQuery[k]) rawQuery[k] = {};
+          if (indexData[k] === 1) {
+            rawQuery[k].$gt = cursorData[k];
+          } else {
+            rawQuery[k].$lt = cursorData[k];
+          }
+        });
+      },
+    };
+  });
+
   composeWithConnection(typeComposer, {
     findResolverName: 'findMany',
     countResolverName: 'count',
     sort: {
-      _ID_DESC: {
-        value: { _id: -1 },
-        cursorFields: ['_id'],
-        beforeCursorQuery: (rawQuery, cursorData) => {
-          // $FlowFixMe
-          if (!rawQuery._id) rawQuery._id = {};
-          // $FlowFixMe
-          rawQuery._id.$gt = cursorData._id;
-        },
-        afterCursorQuery: (rawQuery, cursorData) => {
-          // $FlowFixMe
-          if (!rawQuery._id) rawQuery._id = {};
-          // $FlowFixMe
-          rawQuery._id.$lt = cursorData._id;
-        },
-      },
-      _ID_ASC: {
-        value: { _id: 1 },
-        cursorFields: ['_id'],
-        beforeCursorQuery: (rawQuery, cursorData) => {
-          // $FlowFixMe
-          if (!rawQuery._id) rawQuery._id = {};
-          // $FlowFixMe
-          rawQuery._id.$gt = cursorData._id;
-        },
-        afterCursorQuery: (rawQuery, cursorData) => {
-          // $FlowFixMe
-          if (!rawQuery._id) rawQuery._id = {};
-          // $FlowFixMe
-          rawQuery._id.$lt = cursorData._id;
-        },
-      },
+      ...sortConfigs,
       ...opts,
     },
   });

@@ -8,7 +8,7 @@ import {
   getNamedType,
 } from 'graphql';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
-import getIndexesFromModel from '../../utils/getIndexesFromModel';
+import { getIndexesFromModel } from '../../utils/getIndexesFromModel';
 import { isObject } from '../../utils/is';
 import { toDottedObject, upperFirst } from '../../utils';
 import typeStorage from '../../typeStorage';
