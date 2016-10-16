@@ -26,7 +26,7 @@ Source code: https://github.com/nodkz/graphql-compose-mongoose-example
 ```js
 import mongoose from 'mongoose';
 import composeWithMongoose from 'graphql-compose-mongoose';
-import { GraphQLSchema, GraphQLObjectType } from 'graphql';
+import { GQC } from 'graphql-compose';
 
 // STEP 1: DEFINE MONGOOSE SCHEMA AND MODEL
 const LanguagesSchema = new mongoose.Schema({
@@ -66,43 +66,30 @@ const UserModel = mongoose.model('UserModel', UserSchema);
 
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity, described below
-const typeComposer = composeWithMongoose(UserModel, customizationOptions);
-// get list of 12 Resolvers (findById, updateMany and others)
-const resolvers = typeComposer.getResolvers();
-
-// typeComposer from (graphql-compose) provide bunch if useful methods
-// for modifying GraphQL Types (eg. add/remove fields, relate with other types,
-// restrict access due context).
-
+const UserTC = composeWithMongoose(UserModel, customizationOptions);
 
 // STEP 3: CREATE CRAZY GraphQL SCHEMA WITH ALL CRUD USER OPERATIONS
 // via graphql-compose it will be much much easier, with less typing
-const graphqlSchema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: 'RootQuery',
-    fields: {
-      userById: resolvers.get('findById').getFieldConfig(),
-      userByIds: resolvers.get('findByIds').getFieldConfig(),
-      userOne: resolvers.get('findOne').getFieldConfig(),
-      userMany: resolvers.get('findMany').getFieldConfig(),
-      userTotal: resolvers.get('count').getFieldConfig(),
-      userConnection: resolvers.get('connection').getFieldConfig(),
-    },
-  }),
-  mutation: new GraphQLObjectType({
-    name: 'RootMutation',
-    fields: {
-      userCreate: resolvers.get('createOne').getFieldConfig(),
-      userUpdateById: resolvers.get('updateById').getFieldConfig(),
-      userUpdateOne: resolvers.get('updateOne').getFieldConfig(),
-      userUpdateMany: resolvers.get('updateMany').getFieldConfig(),
-      userRemoveById: resolvers.get('removeById').getFieldConfig(),
-      userRemoveOne: resolvers.get('removeOne').getFieldConfig(),
-      userRemoveMany: resolvers.get('removeMany').getFieldConfig(),
-    },
-  }),
+GQC.rootQuery().addFields({
+  userById: UserTC.getResolver('findById'),
+  userByIds: UserTC.getResolver('findByIds'),
+  userOne: UserTC.getResolver('findOne'),
+  userMany: UserTC.getResolver('findMany'),
+  userTotal: UserTC.getResolver('count'),
+  userConnection: UserTC.getResolver('connection'),
 });
 
+GQC.rootMutation().addFields({
+  userCreate: UserTC.getResolver('createOne'),
+  userUpdateById: UserTC.getResolver('updateById'),
+  userUpdateOne: UserTC.getResolver('updateOne'),
+  userUpdateMany: UserTC.getResolver('updateMany'),
+  userRemoveById: UserTC.getResolver('removeById'),
+  userRemoveOne: UserTC.getResolver('removeOne'),
+  userRemoveMany: UserTC.getResolver('removeMany'),
+});
+
+const graphqlSchema = GQC.buildSchema();
 export default graphqlSchema;
 ```
 That's all!
@@ -112,7 +99,7 @@ I don't think so, because by default internally was created about 55 graphql typ
 
 Customization options
 =====================
-When we convert model `const typeComposer = composeWithMongoose(UserModel, customizationOptions);` you may tune every piece of future derived types and resolvers.
+When we convert model `const UserTC = composeWithMongoose(UserModel, customizationOptions);` you may tune every piece of future derived types and resolvers.
 
 ### Here is flow typed definition of this options:
 
