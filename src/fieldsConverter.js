@@ -9,7 +9,6 @@ import {
   GraphQLBuffer,
   GraphQLGeneric,
   GraphQLJSON,
-  GQLReference,
 } from 'graphql-compose';
 
 import {
@@ -148,7 +147,7 @@ export function convertModelToGraphQL(
   const mongooseFields = getFieldsFromModel(model, typeName);
   const graphqlFields = {};
 
-  Object.keys(mongooseFields).forEach(fieldName => {
+  Object.keys(mongooseFields).forEach((fieldName) => {
     const mongooseField:MongooseFieldT = mongooseFields[fieldName];
     graphqlFields[fieldName] = {
       type: convertFieldToGraphQL(mongooseField, typeName),
@@ -232,7 +231,7 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
 function removePseudoIdField(typeComposer: TypeComposer): void {
   // remove pseudo object id mongoose field
   const gqFields = typeComposer.getFields();
-  Object.keys(gqFields).forEach(name => {
+  Object.keys(gqFields).forEach((name) => {
     if (gqFields[name].type === GraphQLMongoID) {
       typeComposer.removeField(name);
     }
@@ -345,14 +344,14 @@ export function referenceToGraphQL(
     + 'Correct field should has mongoose-type `ObjectID`');
   }
 
-  const refModelName = objectPath.get(field, 'options.ref');
-  if (refModelName) {
-    return GQLReference;
-    // throw new Error('Mongoose REFERENCE to graphQL TYPE not implemented yet. '
-    //                + `Field ${_getFieldName(field)}`);
-    // Storage.UnresolvedRefs.setSubKey(parentTypeName, fieldName, { refModelName });
-    // return GraphQLReference;
-  }
+  // const refModelName = objectPath.get(field, 'options.ref');
+  // if (refModelName) {
+  //   return GQLReference;
+  //   // throw new Error('Mongoose REFERENCE to graphQL TYPE not implemented yet. '
+  //   //                + `Field ${_getFieldName(field)}`);
+  //   // Storage.UnresolvedRefs.setSubKey(parentTypeName, fieldName, { refModelName });
+  //   // return GraphQLReference;
+  // }
 
   // this is mongo id field
   return scalarToGraphQL(field, prefix);

@@ -29,6 +29,7 @@ import {
   enumToGraphQL,
   documentArrayToGraphQL,
   mixedToGraphQL,
+  referenceToGraphQL,
 } from '../fieldsConverter';
 import { composeWithMongoose } from '../composeWithMongoose';
 import GraphQLMongoID from '../types/mongoid';
@@ -241,8 +242,8 @@ describe('fieldConverter', () => {
   });
 
   describe('referenceToGraphQL()', () => {
-    xit('', () => {
-
+    it('should return type of field', () => {
+      expect(referenceToGraphQL(fields.user)).equal(GraphQLMongoID);
     });
   });
 });
