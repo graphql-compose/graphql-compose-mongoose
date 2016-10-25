@@ -34,7 +34,7 @@ export const recordHelperArgs = (
   }
 
   if (opts && opts.requiredFields) {
-    recordComposer.makeFieldsRequired(opts.requiredFields);
+    recordComposer.makeRequired(opts.requiredFields);
   }
 
   return {

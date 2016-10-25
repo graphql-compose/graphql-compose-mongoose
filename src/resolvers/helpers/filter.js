@@ -66,10 +66,10 @@ export const filterHelperArgs = (
   inputComposer.removeField(removeFields);
 
   if (opts.requiredFields) {
-    inputComposer.makeFieldsRequired(opts.requiredFields);
+    inputComposer.makeRequired(opts.requiredFields);
   }
 
-  if (!opts.hasOwnProperty('operators') || opts.operators !== false) {
+  if (!{}.hasOwnProperty.call(opts, 'operators') || opts.operators !== false) {
     addFieldsWithOperator(
       // $FlowFixMe
       `Operators${opts.filterTypeName}`,
@@ -208,7 +208,7 @@ export function addFieldsWithOperator(
       });
       if (Object.keys(fields).length > 0) {
         const operatorTypeName = `${upperFirst(fieldName)}${typeName}`;
-        operatorsComposer.addField(fieldName, {
+        operatorsComposer.setField(fieldName, {
           type: typeStorage.getOrSet(
             operatorTypeName,
             new GraphQLInputObjectType({
@@ -223,7 +223,7 @@ export function addFieldsWithOperator(
   });
 
   if (Object.keys(operatorsComposer.getFields()).length > 0) {
-    inputComposer.addField(OPERATORS_FIELDNAME, {
+    inputComposer.setField(OPERATORS_FIELDNAME, {
       type: operatorsComposer.getType(),
       description: 'List of fields that can be filtered via operators',
     });

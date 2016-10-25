@@ -120,9 +120,9 @@ describe('composeWithMongoose ->', () => {
           },
         }).getInputTypeComposer();
 
-        expect(inputTypeComposer.isFieldRequired('name')).to.be.true;
-        expect(inputTypeComposer.isFieldRequired('gender')).to.be.true;
-        expect(inputTypeComposer.isFieldRequired('age')).to.be.false;
+        expect(inputTypeComposer.isRequired('name')).to.be.true;
+        expect(inputTypeComposer.isRequired('gender')).to.be.true;
+        expect(inputTypeComposer.isRequired('age')).to.be.false;
       });
     });
 
@@ -167,7 +167,7 @@ describe('composeWithMongoose ->', () => {
       });
       const filterArgInFindOne = typeComposer.getResolver('findOne').getArg('filter');
       const inputConposer = new InputTypeComposer(filterArgInFindOne.type);
-      expect(inputConposer.isFieldRequired('age')).to.be.true;
+      expect(inputConposer.isRequired('age')).to.be.true;
     });
   });
 });

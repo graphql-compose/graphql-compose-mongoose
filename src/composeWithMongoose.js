@@ -84,7 +84,7 @@ export function prepareInputFields(
     inputTypeComposer.removeField(inputFieldsOpts.remove);
   }
   if (inputFieldsOpts.required) {
-    inputTypeComposer.makeFieldsRequired(inputFieldsOpts.required);
+    inputTypeComposer.makeRequired(inputFieldsOpts.required);
   }
 }
 
