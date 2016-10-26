@@ -167,7 +167,12 @@ describe('fieldConverter', () => {
     });
 
     it('should have embedded fields', () => {
-      expect(embeddedFields.email).to.be.defined;
+      expect(embeddedFields.email).to.be.ok;
+    });
+
+    it('should have embedded fields with MongoID type, except pseudoID', () => {
+      expect(embeddedFields.locationId).to.be.ok;
+      expect(embeddedFields._id).to.be.undefined;
     });
 
     it('should skip pseudo mongoose _id field', () => {

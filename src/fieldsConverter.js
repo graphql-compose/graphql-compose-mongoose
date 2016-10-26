@@ -231,8 +231,9 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
 function removePseudoIdField(typeComposer: TypeComposer): void {
   // remove pseudo object id mongoose field
   const gqFields = typeComposer.getFields();
-  Object.keys(gqFields).forEach((name) => {
-    if (gqFields[name].type === GraphQLMongoID) {
+  const pseudoFieldNames = ['_id'];
+  pseudoFieldNames.forEach((name) => {
+    if (gqFields[name] && gqFields[name].type === GraphQLMongoID) {
       typeComposer.removeField(name);
     }
   });

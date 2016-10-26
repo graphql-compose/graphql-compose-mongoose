@@ -5,6 +5,7 @@ const ContactsSchema = new Schema(
     phones: [String],
     email: String,
     skype: String,
+    locationId: Schema.Types.ObjectId,
   }
 );
 
