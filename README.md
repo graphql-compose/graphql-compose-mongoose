@@ -97,6 +97,64 @@ You think that is to much code?
 I don't think so, because by default internally was created about 55 graphql types (for input, sorting, filtering). So you will need much much more lines of code to implement all these CRUD operations by hands.
 
 
+FAQ
+===
+### Can I get generated vanilla GraphQL types?
+```js
+const UserTC = composeWithMongoose(UserModel);
+UserTC.getType(); // returns GraphQLObjectType
+UserTC.getInputType(); // return GraphQLInputObjectType, eg. for args
+UserTC.get('languages').getType(); // get GraphQLObjectType for nested field
+UserTC.get('fieldWithNesting.subNesting').getType(); // get GraphQL type of deep nested field
+```
+
+### How to add custom fields?
+```js
+UserTC.addFields({
+  lonLat: TypeComposer.create('type LonLat { lon: Float, lat: Float }'),
+  notice: 'String', // shortand definition
+  noticeList: { // extended
+    type: '[String]', // String, Int, Float, Boolean, ID, Json
+    description: 'Array of notices',
+    resolve: (source, args, context, info) => 'some value',
+  },
+  bio: {
+    type: GraphQLString,
+    description: 'Providing vanilla GraphQL type'
+  }
+})
+```
+
+### How to build nesting/relations?
+Suppose you Model has `friendsIds` field with array of user ids. So let build some relations:
+```js
+UserTC.addRelation(
+  'friends',
+  () => ({
+    resolver: UserTC.getResolver('findByIds'),
+    args: { // resolver `findByIds` has `_ids` arg, let provide value to it
+      _ids: (source) => source.friendsIds,
+    },
+    projection: { friendsIds: 1 }, // point fields in source object, which should be fetched from DB
+  })
+);
+UserTC.addRelation(
+  'adultFriendsWithSameGender',
+  () => ({
+    resolver: UserTC.get('$findMany'), // shortand for `UserTC.getResolver('findMany')`
+    args: { // resolver `findMany` has `filter` arg, we may provide mongoose query to it
+      filter: (source) => ({
+        _id: { $in: source.friendsIds },
+        age: { $gt: 21 },
+        gender: source.gender,
+      }),
+    },
+    projection: { friendsIds: 1, gender: 1 }, // required fields from source object
+  })
+);
+```
+
+
 Customization options
 =====================
 When we convert model `const UserTC = composeWithMongoose(UserModel, customizationOptions);` you may tune every piece of future derived types and resolvers.
