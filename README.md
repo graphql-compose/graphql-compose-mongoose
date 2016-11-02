@@ -103,7 +103,7 @@ FAQ
 ```js
 const UserTC = composeWithMongoose(UserModel);
 UserTC.getType(); // returns GraphQLObjectType
-UserTC.getInputType(); // return GraphQLInputObjectType, eg. for args
+UserTC.getInputType(); // returns GraphQLInputObjectType, eg. for args
 UserTC.get('languages').getType(); // get GraphQLObjectType for nested field
 UserTC.get('fieldWithNesting.subNesting').getType(); // get GraphQL type of deep nested field
 ```
@@ -148,6 +148,7 @@ UserTC.addRelation(
         age: { $gt: 21 },
         gender: source.gender,
       }),
+      limit: 10,
     },
     projection: { friendsIds: 1, gender: 1 }, // required fields from source object
   })
@@ -290,11 +291,6 @@ Besides standard connection arguments `first`, `last`, `before` and `after`, als
 
 This plugin completely follows to [Relay Cursor Connections Specification](https://facebook.github.io/relay/graphql/connections.htm).
 
-TODO
-====
-- [ ] for `filter._operators` arg add support for $regexp
-
-[CHANGELOG](https://github.com/nodkz/graphql-compose-mongoose/blob/master/CHANGELOG.md)
 
 License
 =======
