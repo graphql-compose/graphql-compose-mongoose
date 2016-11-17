@@ -144,8 +144,11 @@ UserTC.addRelation(
     resolver: UserTC.get('$findMany'), // shortand for `UserTC.getResolver('findMany')`
     args: { // resolver `findMany` has `filter` arg, we may provide mongoose query to it
       filter: (source) => ({
-        _id: { $in: source.friendsIds },
-        age: { $gt: 21 },
+        _operators : { // Applying criteria on fields which have
+                       // operators enabled for them (by default, indexed fields only)
+          _id : { in: source.friendsIds },
+          age: { gt: 21 }
+        },
         gender: source.gender,
       }),
       limit: 10,
@@ -258,6 +261,7 @@ export type filterHelperArgsOpts = {
   onlyIndexed?: boolean, // leave only that fields, which is indexed in mongodb
   requiredFields?: string | string[], // provide fieldNames, that should be required
   operators?: filterOperatorsOpts | false, // provide filtering fields by operators, eg. $lt, $gt
+                                           // if left empty - provides all oeprators on indexed fields
 };
 
 // supported operators names in filter `arg`
