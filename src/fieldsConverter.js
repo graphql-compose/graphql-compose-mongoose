@@ -153,6 +153,20 @@ export function convertModelToGraphQL(
       type: convertFieldToGraphQL(mongooseField, typeName),
       description: _getFieldDescription(mongooseField),
     };
+
+    if (deriveComplexType(mongooseField) === ComplexTypes.EMBEDDED) {
+      // https://github.com/nodkz/graphql-compose-mongoose/issues/7
+      graphqlFields[fieldName].resolve = (source) => {
+        if (source) {
+          if (source.toObject) {
+            const obj = source.toObject();
+            return obj[fieldName];
+          }
+          return source[fieldName];
+        }
+        return null;
+      };
+    }
   });
 
   typeComposer.addFields(graphqlFields);

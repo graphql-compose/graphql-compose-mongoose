@@ -178,6 +178,81 @@ describe('fieldConverter', () => {
     it('should skip pseudo mongoose _id field', () => {
       expect(embeddedFields._id).to.be.undefined;
     });
+
+    it('should return null if subdocument is empty', async () => {
+      const UserTC = composeWithMongoose(UserModel);
+      const schema = new GraphQLSchema({
+        query: new GraphQLObjectType({
+          name: 'Query',
+          fields: {
+            user: UserTC.getResolver('findById').getFieldConfig(),
+          },
+        }),
+      });
+
+
+      const user = new UserModel({
+        name: 'Test empty subDoc',
+      });
+      await user.save();
+      const result = await graphql(schema, `{
+        user(_id: "${user._id}") {
+          name
+          subDoc {
+            field1
+            field2 {
+              field21
+            }
+          }
+        }
+      }`);
+      expect(result).deep.property('data.user').to.deep.equal({
+        name: 'Test empty subDoc',
+        subDoc: null,
+      });
+    });
+
+    it('should return subdocument if it is non-empty', async () => {
+      const UserTC = composeWithMongoose(UserModel);
+      // UserTC.get('$findById.subDoc').extendField('field2', {
+      //   resolve: (source) => {
+      //     console.log('$findById.subDoc.field2 source:', source)
+      //     return source.field2;
+      //   }
+      // })
+      const schema = new GraphQLSchema({
+        query: new GraphQLObjectType({
+          name: 'Query',
+          fields: {
+            user: UserTC.getResolver('findById').getFieldConfig(),
+          },
+        }),
+      });
+
+      const user2 = new UserModel({
+        name: 'Test non empty subDoc',
+        subDoc: { field2: { field21: 'ok' } },
+      });
+      await user2.save();
+      const result2 = await graphql(schema, `{
+        user(_id: "${user2._id}") {
+          name
+          subDoc {
+            field1
+            field2 {
+              field21
+            }
+          }
+        }
+      }`);
+      expect(result2).deep.property('data.user').to.deep.equal({
+        name: 'Test non empty subDoc',
+        subDoc: {
+          field1: null,
+          field2: { field21: 'ok' },
+        },
+      });
+    });
   });
 
   describe('documentArrayToGraphQL()', () => {
