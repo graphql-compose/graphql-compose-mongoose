@@ -127,6 +127,11 @@ export function convertModelToGraphQL(
   model: MongooseModelT | MongoosePseudoModelT,
   typeName: string
 ): TypeComposer {
+  // if model already has generated TypeComposer early, then return it
+  if (model.schema && model.schema._gqcTypeComposer instanceof TypeComposer) {
+    return model.schema._gqcTypeComposer;
+  }
+
   if (!typeName) {
     throw new Error('You provide empty name for type. '
     + '`name` argument should be non-empty string.');

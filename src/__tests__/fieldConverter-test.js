@@ -1,4 +1,4 @@
-/* eslint-disable no-unused-expressions */
+/* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
 import { expect } from 'chai';
 import {
@@ -130,52 +130,46 @@ describe('fieldConverter', () => {
   });
 
   describe('arrayToGraphQL()', () => {
-    const skillsType = arrayToGraphQL(fields.skills);
-
     it('should produce GraphQLList', () => {
+      const skillsType = arrayToGraphQL(fields.skills);
       expect(skillsType).to.be.instanceof(GraphQLList);
     });
 
     it('should has string in ofType', () => {
+      const skillsType = arrayToGraphQL(fields.skills);
       expect(skillsType.ofType.name).to.equal('String');
     });
   });
 
   describe('enumToGraphQL()', () => {
-    const genderEnum = enumToGraphQL(fields.gender);
-
     it('should be instance of GraphQLEnumType', () => {
+      const genderEnum = enumToGraphQL(fields.gender);
       expect(genderEnum).be.instanceof(GraphQLEnumType);
     });
 
     it('should have type name `Enum${FieldName}`', () => {
+      const genderEnum = enumToGraphQL(fields.gender);
       expect(genderEnum.name).to.equal('EnumGender');
     });
 
     it('should pass all enum values to GQ type', () => {
+      const genderEnum = enumToGraphQL(fields.gender);
       expect(genderEnum._values.length).to.equal(fields.gender.enumValues.length);
       expect(genderEnum._values[0].value).to.equal(fields.gender.enumValues[0]);
     });
   });
 
   describe('embeddedToGraphQL()', () => {
-    const embeddedType = embeddedToGraphQL(fields.contacts);
-    const embeddedFields = embeddedType._typeConfig.fields();
-
     it('should set name to graphql type', () => {
-      expect(embeddedType.name).to.equal('Contacts');
+      const embeddedType = embeddedToGraphQL(fields.contacts);
+      expect(embeddedType.name).to.equal('UserContacts');
     });
 
     it('should have embedded fields', () => {
+      const embeddedType = embeddedToGraphQL(fields.contacts);
+      const embeddedFields = embeddedType._typeConfig.fields();
       expect(embeddedFields.email).to.be.ok;
-    });
-
-    it('should have embedded fields with MongoID type, except pseudoID', () => {
       expect(embeddedFields.locationId).to.be.ok;
-      expect(embeddedFields._id).to.be.undefined;
-    });
-
-    it('should skip pseudo mongoose _id field', () => {
       expect(embeddedFields._id).to.be.undefined;
     });
 
@@ -263,8 +257,9 @@ describe('fieldConverter', () => {
       expect(languagesType).to.be.instanceof(GraphQLList);
     });
 
-    it('should has Languages type in ofType', () => {
-      expect(languagesType.ofType.name).to.equal('Languages');
+    it('should has Language type in ofType', () => {
+      // see src/__mocks__/languageSchema.js where type name `Language` is defined
+      expect(languagesType.ofType.name).to.equal('Language');
     });
 
     it('should skip pseudo mongoose _id field in document', () => {

@@ -1,7 +1,7 @@
 import { mongoose, Schema } from './mongooseCommon';
 import ContactsSchema from './contactsSchema';
 import enumEmployment from './enumEmployment';
-import LanguagesSchema from './languagesSchema';
+import LanguageSchema from './languageSchema';
 
 const UserSchema = new Schema(
   {
@@ -65,7 +65,7 @@ const UserSchema = new Schema(
     },
 
     languages: {
-      type: [LanguagesSchema],
+      type: [LanguageSchema],
       default: [],
       description: 'Knowledge of languages',
     },

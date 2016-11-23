@@ -1,4 +1,5 @@
 import { Schema } from './mongooseCommon';
+import { convertSchemaToGraphQL } from '../fieldsConverter';
 
 // name: 'EnumLanguageName',
 // description: 'Language names (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)',
@@ -14,7 +15,7 @@ const enumLanguageSkill = {
   native: { description: 'since birth' },
 };
 
-const LanguagesSchema = new Schema(
+const LanguageSchema = new Schema(
   {
     ln: {
       type: String,
@@ -29,4 +30,8 @@ const LanguagesSchema = new Schema(
   }
 );
 
-export default LanguagesSchema;
+export default LanguageSchema;
+
+// Such way we can set Type name for Schema which is used in another schema.
+// Otherwise by default it will have name `${ParentSchemaName}${ParentSchemaFieldName}`
+convertSchemaToGraphQL(LanguageSchema, 'Language');
