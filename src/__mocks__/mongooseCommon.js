@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign, no-console */
 import mongoose, { Schema } from 'mongoose';
 
 function getRandomInt(min, max) {
@@ -15,19 +16,20 @@ mongoose.connection.on('error', (err) => {
 });
 
 mongoose.connection.on('connected', () => {
-  console.log('Mongoose default connection open to ' + uri);
+  console.log(`Mongoose default connection open to ${uri}`);
 });
 
 function dropDBs(done) {
-  mongoose.connection.db.dropDatabase(() => {
-    if (done) {
-      done();
-    }
-  });
+  try {
+    mongoose.connection.db.dropDatabase(() => {
+      if (done) done();
+    });
+  } catch (e) { // Pitty, but not deathly
+    if (done) done();
+  }
 }
 
 process.on('exit', () => { dropDBs(); });
-process.on('uncaughtException', () => { dropDBs(); });
 process.on('SIGINT', () => { dropDBs(); });
 
 export {
