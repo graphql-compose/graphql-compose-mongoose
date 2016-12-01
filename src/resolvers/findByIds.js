@@ -53,9 +53,8 @@ export default function findByIds(
         return Promise.resolve([]);
       }
 
-      const selector = {};
-      selector._id = {
-        $in: args._ids
+      const selector = {
+        _id: { $in: args._ids },
       };
 
       resolveParams.query = model.find(selector); // eslint-disable-line
