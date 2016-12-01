@@ -53,11 +53,8 @@ export default function findByIds(
         return Promise.resolve([]);
       }
 
-      const selector = {};
-      selector._id = {
-        $in: args._ids
-          .filter(id => mongoose.Types.ObjectId.isValid(id))
-          .map(id => mongoose.Types.ObjectId(id)), // eslint-disable-line
+      const selector = {
+        _id: { $in: args._ids },
       };
 
       resolveParams.query = model.find(selector); // eslint-disable-line
