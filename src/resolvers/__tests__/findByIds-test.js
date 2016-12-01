@@ -94,13 +94,6 @@ describe('findByIds() ->', () => {
       expect(result).to.be.empty;
     });
 
-    it('should return empty array if args._ids is not valid objectIds', async () => {
-      const result = await findByIds(UserModel, UserTypeComposer)
-        .resolve({ args: { _ids: ['d', 'e'] } });
-      expect(result).to.be.instanceOf(Array);
-      expect(result).to.be.empty;
-    });
-
     it('should return array of documents', async () => {
       const result = await findByIds(UserModel, UserTypeComposer)
         .resolve({ args: { _ids: [user1._id, user2._id, user3._id] } });
