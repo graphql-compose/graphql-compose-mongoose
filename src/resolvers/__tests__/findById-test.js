@@ -4,14 +4,17 @@ import { expect } from 'chai';
 import { GraphQLNonNull } from 'graphql';
 import { Resolver } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
+import { PostModel } from '../../__mocks__/postModel';
 import findById from '../findById';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 
 const UserTypeComposer = composeWithMongoose(UserModel);
+const PostTypeComposer = composeWithMongoose(PostModel);
 
 describe('findById() ->', () => {
   let user;
+  let post;
 
   before('clear UserModel collection', (done) => {
     UserModel.collection.drop(() => {
@@ -22,6 +25,17 @@ describe('findById() ->', () => {
   before('add test user document to mongoDB', (done) => {
     user = new UserModel({ name: 'nodkz' });
     user.save(done);
+  });
+
+  before('clear PostModel collection', (done) => {
+    PostModel.collection.drop(() => {
+      done();
+    });
+  });
+
+  before('add test post document with integer _id to mongoDB', (done) => {
+    post = new PostModel({ _id: 1, title: 'Post 1' });
+    post.save(done);
   });
 
   it('should return Resolver object', () => {
@@ -66,6 +80,13 @@ describe('findById() ->', () => {
         args: { _id: user._id },
       });
       expect(result).instanceof(UserModel);
+    });
+
+    it('should return mongoose Post document', async () => {
+      const result = await findById(PostModel, PostTypeComposer).resolve({
+        args: { _id: 1 },
+      });
+      expect(result).instanceof(PostModel);
     });
   });
 });

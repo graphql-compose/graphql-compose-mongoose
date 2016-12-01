@@ -56,8 +56,8 @@ export default function findByIds(
       const selector = {};
       selector._id = {
         $in: args._ids
-          .filter(id => mongoose.Types.ObjectId.isValid(id))
-          .map(id => mongoose.Types.ObjectId(id)), // eslint-disable-line
+        .filter(id => Number.isInteger(id) || mongoose.Types.ObjectId.isValid(id))
+        .map(id => Number.isInteger(id) ? id : mongoose.Types.ObjectId(id)), // eslint-disable-line
       };
 
       resolveParams.query = model.find(selector); // eslint-disable-line
