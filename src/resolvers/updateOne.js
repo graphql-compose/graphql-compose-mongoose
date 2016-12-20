@@ -94,18 +94,20 @@ export default function updateOne(
         );
       }
 
-      resolveParams.projection =
-        (resolveParams.projection && resolveParams.projection.record) || {};
+      // We should get all data for document, cause Mongoose model may have hooks/middlewares
+      // which required some fields which not in graphql projection
+      // So empty projection returns all fields.
+      resolveParams.projection = {};
 
       return findOneResolver.resolve(resolveParams)
-        .then(doc => {
+        .then((doc) => {
           if (resolveParams.beforeRecordMutate) {
             return resolveParams.beforeRecordMutate(doc);
           }
           return doc;
         })
         // save changes to DB
-        .then(doc => {
+        .then((doc) => {
           if (recordData) {
             doc.set(recordData);
             return doc.save();
@@ -113,7 +115,7 @@ export default function updateOne(
           return doc;
         })
         // prepare output payload
-        .then(record => {
+        .then((record) => {
           if (record) {
             return {
               record,

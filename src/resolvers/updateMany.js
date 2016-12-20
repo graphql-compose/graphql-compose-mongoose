@@ -101,7 +101,7 @@ export default function updateMany(
           ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query))
           : resolveParams.query.exec()
         )
-        .then(res => {
+        .then((res) => {
           if (res.ok) {
             return {
               numAffected: res.nModified,

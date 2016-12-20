@@ -15,13 +15,7 @@ describe('updateOne() ->', () => {
   let user1;
   let user2;
 
-  before('clear UserModel collection', (done) => {
-    UserModel.collection.drop(() => {
-      done();
-    });
-  });
-
-  before('add test user document to mongoDB', () => {
+  beforeEach('init UserModel collection', (done) => {
     user1 = new UserModel({
       name: 'userName1',
       skills: ['js', 'ruby', 'php', 'python'],
@@ -36,10 +30,12 @@ describe('updateOne() ->', () => {
       relocation: true,
     });
 
-    return Promise.all([
-      user1.save(),
-      user2.save(),
-    ]);
+    UserModel.collection.drop(() => {
+      Promise.all([
+        user1.save(),
+        user2.save(),
+      ]).then(() => done());
+    });
   });
 
   beforeEach(() => {
@@ -158,7 +154,7 @@ describe('updateOne() ->', () => {
       expect(result1.record.id).to.not.equal(result2.record.id);
     });
 
-    it('should extract projection from record for findOne', async () => {
+    it('should pass empty projection to findOne and got full document data', async () => {
       const result = await updateOne(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { _id: user1.id },
@@ -166,12 +162,12 @@ describe('updateOne() ->', () => {
         projection: {
           record: {
             name: true,
-            gender: true,
           },
         },
       });
       expect(result).have.deep.property('record.id', user1.id);
-      expect(result).have.deep.property('record.gender');
+      expect(result).have.deep.property('record.name', user1.name);
+      expect(result).have.deep.property('record.gender', user1.gender);
     });
 
     it('should return mongoose document', async () => {
@@ -188,7 +184,7 @@ describe('updateOne() ->', () => {
         beforeRecordMutate: (record) => {
           beforeMutationId = record.id;
           return record;
-        }
+        },
       });
       expect(result.record).instanceof(UserModel);
       expect(beforeMutationId).to.equal(user1.id);

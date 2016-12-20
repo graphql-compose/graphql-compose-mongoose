@@ -4,7 +4,7 @@ import type {
   ExtendedResolveParams,
 } from '../../definition';
 
-export function projectionHelper(resolveParams: ExtendedResolveParams): void {
+export function projectionHelper(resolveParams: ExtendedResolveParams): void { // eslint-disable-line
   const projection = resolveParams.projection;
   if (projection) {
     const flatProjection = {};
@@ -17,6 +17,9 @@ export function projectionHelper(resolveParams: ExtendedResolveParams): void {
         flatProjection[key] = !!projection[key];
       }
     });
-    resolveParams.query = resolveParams.query.select(flatProjection); // eslint-disable-line
+
+    if (Object.keys(flatProjection).length > 0) {
+      resolveParams.query = resolveParams.query.select(flatProjection); // eslint-disable-line
+    }
   }
 }

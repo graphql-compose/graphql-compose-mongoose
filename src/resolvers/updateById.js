@@ -88,18 +88,21 @@ export default function updateById(
 
       resolveParams.args._id = recordData._id;
       delete recordData._id;
-      resolveParams.projection =
-        (resolveParams.projection && resolveParams.projection.record) || {};
+
+      // We should get all data for document, cause Mongoose model may have hooks/middlewares
+      // which required some fields which not in graphql projection
+      // So empty projection returns all fields.
+      resolveParams.projection = {};
 
       return findByIdResolver.resolve(resolveParams)
-        .then(doc => {
+        .then((doc) => {
           if (resolveParams.beforeRecordMutate) {
             return resolveParams.beforeRecordMutate(doc);
           }
           return doc;
         })
         // save changes to DB
-        .then(doc => {
+        .then((doc) => {
           if (!doc) {
             return Promise.reject('Document not found');
           }
@@ -110,7 +113,7 @@ export default function updateById(
           return doc;
         })
         // prepare output payload
-        .then(record => {
+        .then((record) => {
           if (record) {
             return {
               record,
