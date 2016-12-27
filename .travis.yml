@@ -20,7 +20,7 @@ node_js:
   - "5"
   - "4"
 script:
-  - yarn add -g graphql graphql-compose graphql-compose-connection mongoose
+  - yarn global add graphql graphql-compose graphql-compose-connection mongoose
   - yarn run coverage
   - yarn run build
 after_success:
