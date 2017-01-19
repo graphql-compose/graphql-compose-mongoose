@@ -20,13 +20,13 @@ describe('findByIds() ->', () => {
   let post2;
   let post3;
 
-  before('clear UserModel collection', (done) => {
+  beforeEach('clear UserModel collection', (done) => {
     UserModel.collection.drop(() => {
       done();
     });
   });
 
-  before('add test users documents to mongoDB', (done) => {
+  beforeEach('add test users documents to mongoDB', (done) => {
     user1 = new UserModel({ name: 'nodkz1' });
     user2 = new UserModel({ name: 'nodkz2' });
     user3 = new UserModel({ name: 'nodkz3' });
@@ -38,13 +38,13 @@ describe('findByIds() ->', () => {
     ]).then(() => done());
   });
 
-  before('clear PostModel collection', (done) => {
+  beforeEach('clear PostModel collection', (done) => {
     PostModel.collection.drop(() => {
       done();
     });
   });
 
-  before('add test post documents with integer _id to mongoDB', (done) => {
+  beforeEach('add test post documents with integer _id to mongoDB', (done) => {
     post1 = new PostModel({ _id: 1, title: 'Post 1' });
     post2 = new PostModel({ _id: 2, title: 'Post 2' });
     post3 = new PostModel({ _id: 3, title: 'Post 3' });

@@ -16,13 +16,13 @@ describe('updateMany() ->', () => {
   let user1;
   let user2;
 
-  before('clear UserModel collection', (done) => {
+  beforeEach('clear UserModel collection', (done) => {
     UserModel.collection.drop(() => {
       done();
     });
   });
 
-  before('add test user document to mongoDB', () => {
+  beforeEach('add test user document to mongoDB', () => {
     user1 = new UserModel({
       name: 'userName1',
       skills: ['js', 'ruby', 'php', 'python'],

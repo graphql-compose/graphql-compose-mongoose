@@ -18,7 +18,7 @@ describe('removeOne() ->', () => {
   let user2;
   let user3;
 
-  before('clear UserModel collection', (done) => {
+  beforeEach('clear UserModel collection', (done) => {
     UserModel.collection.drop(() => {
       done();
     });

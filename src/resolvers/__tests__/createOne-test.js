@@ -13,7 +13,7 @@ import typeStorage from '../../typeStorage';
 const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('createOne() ->', () => {
-  before('clear UserModel collection', (done) => {
+  beforeEach('clear UserModel collection', (done) => {
     UserModel.collection.drop(() => {
       done();
     });

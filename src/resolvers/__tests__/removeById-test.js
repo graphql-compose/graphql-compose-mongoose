@@ -15,7 +15,7 @@ const UserTypeComposer = composeWithMongoose(UserModel);
 describe('removeById() ->', () => {
   let user;
 
-  before('clear UserModel collection', (done) => {
+  beforeEach('clear UserModel collection', (done) => {
     UserModel.collection.drop(() => {
       done();
     });

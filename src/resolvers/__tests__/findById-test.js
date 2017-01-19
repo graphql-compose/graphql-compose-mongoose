@@ -16,24 +16,24 @@ describe('findById() ->', () => {
   let user;
   let post;
 
-  before('clear UserModel collection', (done) => {
+  beforeEach('clear UserModel collection', (done) => {
     UserModel.collection.drop(() => {
       done();
     });
   });
 
-  before('add test user document to mongoDB', (done) => {
+  beforeEach('add test user document to mongoDB', (done) => {
     user = new UserModel({ name: 'nodkz' });
     user.save(done);
   });
 
-  before('clear PostModel collection', (done) => {
+  beforeEach('clear PostModel collection', (done) => {
     PostModel.collection.drop(() => {
       done();
     });
   });
 
-  before('add test post document with integer _id to mongoDB', (done) => {
+  beforeEach('add test post document with integer _id to mongoDB', (done) => {
     post = new PostModel({ _id: 1, title: 'Post 1' });
     post.save(done);
   });
