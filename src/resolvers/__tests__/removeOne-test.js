@@ -1,9 +1,9 @@
 /* @flow */
+/* eslint-disable no-param-reassign */
 
 import { expect } from 'chai';
 import { GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
-import { Query } from 'mongoose';
 import { UserModel } from '../../__mocks__/userModel';
 import removeOne from '../removeOne';
 import GraphQLMongoID from '../../types/mongoid';
@@ -139,25 +139,67 @@ describe('removeOne() ->', () => {
       expect(result2).have.deep.property('record.age', user3.age);
     });
 
+    it('should pass empty projection to findOne and got full document data', async () => {
+      const result = await removeOne(UserModel, UserTypeComposer).resolve({
+        args: {
+          filter: { _id: user1.id },
+        },
+        projection: {
+          record: {
+            name: true,
+          },
+        },
+      });
+      expect(result).have.deep.property('record.id', user1.id);
+      expect(result).have.deep.property('record.name', user1.name);
+      expect(result).have.deep.property('record.gender', user1.gender);
+    });
+
     it('should return mongoose document', async () => {
       const result = await removeOne(UserModel, UserTypeComposer).resolve({
-        args: { },
+        args: { filter: { _id: user1.id } },
       });
       expect(result.record).instanceof(UserModel);
     });
 
-    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
-      let beforeQueryCalled = false;
+    it('should rejected with Error if args.filter is empty', async () => {
+      const result = removeOne(UserModel, UserTypeComposer).resolve({ args: {} });
+      await expect(result).be.rejectedWith(Error, 'at least one value in args.filter');
+    });
+
+    it('should call `beforeRecordMutate` method with founded `record` and `resolveParams` as args', async () => {
+      let beforeMutationId;
       const result = await removeOne(UserModel, UserTypeComposer).resolve({
-        args: { },
-        beforeQuery: (query) => {
-          expect(query).instanceof(Query);
-          beforeQueryCalled = true;
-          return query;
-        }
+        args: { filter: { _id: user1.id } },
+        context: { ip: '1.1.1.1' },
+        beforeRecordMutate: (record, rp) => {
+          beforeMutationId = record.id;
+          record.someDynamic = rp.context.ip;
+          return record;
+        },
       });
-      expect(beforeQueryCalled).to.be.true;
       expect(result.record).instanceof(UserModel);
+      expect(result).have.deep.property('record.someDynamic', '1.1.1.1');
+      expect(beforeMutationId).to.equal(user1.id);
+
+      const empty = await UserModel.collection.findOne({ _id: user1._id });
+      expect(empty).to.equal(null);
+    });
+
+    it('`beforeRecordMutate` may reject operation', async () => {
+      const result = removeOne(UserModel, UserTypeComposer).resolve({
+        args: { filter: { _id: user1.id } },
+        context: { readOnly: true },
+        beforeRecordMutate: (record, rp) => {
+          if (rp.context.readOnly) {
+            return Promise.reject(new Error('Denied due context ReadOnly'));
+          }
+          return record;
+        },
+      });
+      await expect(result).be.rejectedWith(Error, 'Denied due context ReadOnly');
+      const exist = await UserModel.collection.findOne({ _id: user1._id });
+      expect(exist.name).to.equal(user1.name);
     });
   });
 

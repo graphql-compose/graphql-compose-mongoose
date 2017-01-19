@@ -6,6 +6,7 @@ import {
   GraphQLNonNull,
 } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
+import findById from './findById';
 import { projectionHelper } from './helpers/projection';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
@@ -32,6 +33,8 @@ export default function removeById(
       'Second arg for Resolver removeById() should be instance of TypeComposer.'
     );
   }
+
+  const findByIdResolver = findById(model, typeComposer);
 
   const outputTypeName = `RemoveById${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
@@ -64,6 +67,7 @@ export default function removeById(
         type: new GraphQLNonNull(GraphQLMongoID),
       },
     },
+    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
@@ -73,15 +77,29 @@ export default function removeById(
         );
       }
 
-      resolveParams.query = model.findByIdAndRemove(args._id);
-      projectionHelper(resolveParams);
+      // We should get all data for document, cause Mongoose model may have hooks/middlewares
+      // which required some fields which not in graphql projection
+      // So empty projection returns all fields.
+      resolveParams.projection = {};
 
-      return (
-        resolveParams.beforeQuery
-          ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query))
-          : resolveParams.query.exec()
-        )
-        .then(record => {
+      // FlowFixMe
+      return findByIdResolver.resolve(resolveParams)
+        .then((doc) => {
+          // $FlowFixMe
+          if (resolveParams.beforeRecordMutate) {
+            return resolveParams.beforeRecordMutate(doc, resolveParams);
+          }
+          return doc;
+        })
+        // remove record from DB
+        .then((doc) => {
+          if (!doc) {
+            return Promise.reject(new Error('Document not found'));
+          }
+          return doc.remove();
+        })
+        // prepare output payload
+        .then((record) => {
           if (record) {
             return {
               record,

@@ -1,8 +1,8 @@
 /* @flow */
+/* eslint-disable no-param-reassign */
 
 import { expect } from 'chai';
 import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
-import { Query } from 'mongoose';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import removeById from '../removeById';
@@ -74,14 +74,14 @@ describe('removeById() ->', () => {
       expect(result).have.property('recordId', user.id);
     });
 
-    it('should return payload.recordId even document not exists', async () => {
+    it('should return error if document does not exist', () => {
       const unexistedId = '500000000000000000000000';
-      const result = await removeById(UserModel, UserTypeComposer).resolve({
+      const promise = removeById(UserModel, UserTypeComposer).resolve({
         args: {
           _id: unexistedId,
         },
       });
-      expect(result).have.property('recordId', unexistedId);
+      return expect(promise).to.eventually.be.rejectedWith('Document not found');
     });
 
 
@@ -108,6 +108,22 @@ describe('removeById() ->', () => {
       expect(result).have.deep.property('record.id', user.id);
     });
 
+    it('should pass empty projection to findById and got full document data', async () => {
+      const result = await removeById(UserModel, UserTypeComposer).resolve({
+        args: {
+          _id: user.id,
+        },
+        projection: {
+          record: {
+            name: true,
+          },
+        },
+      });
+      expect(result).have.deep.property('record.id', user.id);
+      expect(result).have.deep.property('record.name', user.name);
+      expect(result).have.deep.property('record.gender', user.gender);
+    });
+
     it('should return mongoose document', async () => {
       const result = await removeById(UserModel, UserTypeComposer).resolve({
         args: { _id: user.id },
@@ -115,18 +131,39 @@ describe('removeById() ->', () => {
       expect(result.record).instanceof(UserModel);
     });
 
-    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
-      let beforeQueryCalled = false;
+    it('should call `beforeRecordMutate` method with founded `record` and `resolveParams` as args', async () => {
+      let beforeMutationId;
       const result = await removeById(UserModel, UserTypeComposer).resolve({
         args: { _id: user.id },
-        beforeQuery: (query) => {
-          expect(query).instanceof(Query);
-          beforeQueryCalled = true;
-          return query;
-        }
+        context: { ip: '1.1.1.1' },
+        beforeRecordMutate: (record, rp) => {
+          beforeMutationId = record.id;
+          record.someDynamic = rp.context.ip;
+          return record;
+        },
       });
-      expect(beforeQueryCalled).to.be.true;
       expect(result.record).instanceof(UserModel);
+      expect(result).have.deep.property('record.someDynamic', '1.1.1.1');
+      expect(beforeMutationId).to.equal(user.id);
+
+      const empty = await UserModel.collection.findOne({ _id: user._id });
+      expect(empty).to.equal(null);
+    });
+
+    it('`beforeRecordMutate` may reject operation', async () => {
+      const result = removeById(UserModel, UserTypeComposer).resolve({
+        args: { _id: user.id },
+        context: { readOnly: true },
+        beforeRecordMutate: (record, rp) => {
+          if (rp.context.readOnly) {
+            return Promise.reject(new Error('Denied due context ReadOnly'));
+          }
+          return record;
+        },
+      });
+      await expect(result).be.rejectedWith(Error, 'Denied due context ReadOnly');
+      const exist = await UserModel.collection.findOne({ _id: user._id });
+      expect(exist.name).to.equal(user.name);
     });
   });
 

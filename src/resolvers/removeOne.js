@@ -5,9 +5,9 @@ import { GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
-import { filterHelperArgs, filterHelper } from './helpers/filter';
-import { sortHelperArgs, sortHelper } from './helpers/sort';
-import { projectionHelper } from './helpers/projection';
+import { filterHelperArgs } from './helpers/filter';
+import { sortHelperArgs } from './helpers/sort';
+import findOne from './findOne';
 import type {
   MongooseModelT,
   ExtendedResolveParams,
@@ -31,6 +31,8 @@ export default function removeOne(
       'Second arg for Resolver removeOne() should be instance of TypeComposer.'
     );
   }
+
+  const findOneResolver = findOne(model, typeComposer, opts);
 
   const outputTypeName = `RemoveOne${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
@@ -68,18 +70,42 @@ export default function removeOne(
         ...(opts && opts.sort),
       }),
     },
+    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
-      resolveParams.query = model.findOneAndRemove({});
-      filterHelper(resolveParams);
-      sortHelper(resolveParams);
-      projectionHelper(resolveParams);
+      const filterData = (resolveParams.args && resolveParams.args.filter) || {};
 
-      return (
-        resolveParams.beforeQuery
-          ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query))
-          : resolveParams.query.exec()
-        )
-        .then(record => {
+      if (!(typeof filterData === 'object')
+        || Object.keys(filterData).length === 0
+      ) {
+        return Promise.reject(
+          new Error(`${typeComposer.getTypeName()}.removeOne resolver requires `
+                  + 'at least one value in args.filter')
+        );
+      }
+
+      // We should get all data for document, cause Mongoose model may have hooks/middlewares
+      // which required some fields which not in graphql projection
+      // So empty projection returns all fields.
+      resolveParams.projection = {};
+
+      // $FlowFixMe
+      return findOneResolver.resolve(resolveParams)
+        .then((doc) => {
+          // $FlowFixMe
+          if (resolveParams.beforeRecordMutate) {
+            return resolveParams.beforeRecordMutate(doc, resolveParams);
+          }
+          return doc;
+        })
+        // remove record from DB
+        .then((doc) => {
+          if (!doc) {
+            return Promise.reject(new Error('Document not found'));
+          }
+          return doc.remove();
+        })
+        // prepare output payload
+        .then((record) => {
           if (record) {
             return {
               record,
