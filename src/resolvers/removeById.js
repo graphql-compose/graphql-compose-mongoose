@@ -7,7 +7,6 @@ import {
 } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import findById from './findById';
-import { projectionHelper } from './helpers/projection';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
 import type {
@@ -82,7 +81,7 @@ export default function removeById(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      // FlowFixMe
+      // $FlowFixMe
       return findByIdResolver.resolve(resolveParams)
         .then((doc) => {
           // $FlowFixMe

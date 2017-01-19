@@ -59,6 +59,7 @@ export default function removeMany(
         ...(opts && opts.filter),
       }),
     },
+    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const filterData = (resolveParams.args && resolveParams.args.filter) || {};
 
@@ -72,15 +73,20 @@ export default function removeMany(
       }
 
       resolveParams.query = model.find();
+      // $FlowFixMe
       filterHelper(resolveParams);
       resolveParams.query = resolveParams.query.remove();
 
       return (
+        // `beforeQuery` is experemental feature, if you want to use it
+        // please open an issue with your use case, cause I suppose that
+        // this option is excessive
+        // $FlowFixMe
         resolveParams.beforeQuery
-          ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query))
+          ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query, resolveParams))
           : resolveParams.query.exec()
         )
-        .then(res => {
+        .then((res) => {
           if (res.result && res.result.ok) {
             return {
               numAffected: res.result.n,
