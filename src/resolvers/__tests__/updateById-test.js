@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable no-param-reassign */
 
 import { expect } from 'chai';
 import {
@@ -152,16 +153,19 @@ describe('updateById() ->', () => {
       expect(result.record).instanceof(UserModel);
     });
 
-    it('should call `beforeRecordMutate` method with founded `record` as arg', async () => {
+    it('should call `beforeRecordMutate` method with founded `record` and `resolveParams` as args', async () => {
       let beforeMutationId;
       const result = await updateById(UserModel, UserTypeComposer).resolve({
         args: { record: { _id: user1.id } },
-        beforeRecordMutate: (record) => {
+        context: { ip: '1.1.1.1' },
+        beforeRecordMutate: (record, rp) => {
           beforeMutationId = record.id;
+          record.someDynamic = rp.context.ip;
           return record;
-        }
+        },
       });
       expect(result.record).instanceof(UserModel);
+      expect(result).have.deep.property('record.someDynamic', '1.1.1.1');
       expect(beforeMutationId).to.equal(user1.id);
     });
   });

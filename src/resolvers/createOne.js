@@ -1,5 +1,5 @@
 /* @flow */
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign, new-cap */
 
 import { GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
@@ -59,6 +59,7 @@ export default function createOne(
         ...(opts && opts.record),
       }),
     },
+    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
@@ -73,14 +74,15 @@ export default function createOne(
 
       // $FlowFixMe
       return Promise.resolve(new model(recordData))
-        .then(doc => {
+        .then((doc) => {
+          // $FlowFixMe
           if (resolveParams.beforeRecordMutate) {
-            return resolveParams.beforeRecordMutate(doc);
+            return resolveParams.beforeRecordMutate(doc, resolveParams);
           }
           return doc;
         })
         .then(doc => doc.save())
-        .then(record => {
+        .then((record) => {
           if (record) {
             return {
               record,

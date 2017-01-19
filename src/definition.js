@@ -2,7 +2,6 @@
 /* eslint-disable */
 
 import type { TypeComposer } from 'graphql-compose';
-import type { ProjectionType } from 'graphql-compose/lib/definition';
 import type { connectionSortMapOpts as _connectionSortMapOpts} from 'graphql-compose-connection/lib/definition';
 export type connectionSortMapOpts = _connectionSortMapOpts;
 
@@ -86,7 +85,6 @@ export type MongoseDocument = {
 import type {
   GraphQLObjectType as _GraphQLObjectType,
   GraphQLOutputType as _GraphQLOutputType,
-  InputObjectConfigFieldMap as _InputObjectConfigFieldMap,
   ResolveParams as _ResolveParams,
   GraphQLFieldConfigArgumentMap as _GraphQLFieldConfigArgumentMap,
   ResolverMWResolveFn as _ResolverMWResolveFn,
@@ -95,16 +93,14 @@ import type {
 
 export type GraphQLObjectType = _GraphQLObjectType;
 export type GraphQLOutputType = _GraphQLOutputType;
-export type InputObjectConfigFieldMap = _InputObjectConfigFieldMap;
 export type GraphQLFieldConfigArgumentMap = _GraphQLFieldConfigArgumentMap;
 export type ResolveParams = _ResolveParams;
 export type GraphQLResolveInfo = _GraphQLResolveInfo;
 export type ResolverMWResolveFn = _ResolverMWResolveFn;
 export type ExtendedResolveParams = ResolveParams & {
   query: MongooseQuery,
-  projection: ProjectionType,
-  beforeQuery(query: mixed): Promise<*>,
-  beforeRecordMutate(record: mixed): Promise<*>,
+  beforeQuery?: (query: mixed, rp: ExtendedResolveParams) => Promise<*>,
+  beforeRecordMutate?: (record: mixed, rp: ExtendedResolveParams) => Promise<*>,
 };
 
 

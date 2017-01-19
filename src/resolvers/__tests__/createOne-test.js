@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable no-param-reassign */
 
 import { expect } from 'chai';
 import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
@@ -96,16 +97,19 @@ describe('createOne() ->', () => {
       expect(result).property('record').instanceof(UserModel);
     });
 
-    it('should call `beforeRecordMutate` method with created `record` as arg', async () => {
+    it('should call `beforeRecordMutate` method with created `record` and `resolveParams` as args', async () => {
       const result = await createOne(UserModel, UserTypeComposer).resolve({
         args: { record: { name: 'NewUser' } },
-        beforeRecordMutate: (record) => {
+        context: { ip: '1.1.1.1' },
+        beforeRecordMutate: (record, rp) => {
           record.name = 'OverridedName';
+          record.someDynamic = rp.context.ip;
           return record;
-        }
+        },
       });
       expect(result).property('record').instanceof(UserModel);
       expect(result).have.deep.property('record.name', 'OverridedName');
+      expect(result).have.deep.property('record.someDynamic', '1.1.1.1');
     });
   });
 

@@ -54,7 +54,7 @@ export const filterHelperArgs = (
 
   if (opts.onlyIndexed) {
     const indexedFieldNames = getIndexedFieldNames(model);
-    Object.keys(typeComposer.getFields()).forEach(fieldName => {
+    Object.keys(typeComposer.getFields()).forEach((fieldName) => {
       if (indexedFieldNames.indexOf(fieldName) === -1) {
         removeFields.push(fieldName);
       }
@@ -106,17 +106,17 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
       if (modelFields[key]) {
         clearedFilter[key] = filter[key];
       }
-    })
+    });
     if (Object.keys(clearedFilter).length > 0) {
       resolveParams.query = resolveParams.query.where(toDottedObject(clearedFilter)); // eslint-disable-line
     }
 
     if (filter[OPERATORS_FIELDNAME]) {
       const operatorFields = filter[OPERATORS_FIELDNAME];
-      Object.keys(operatorFields).forEach(fieldName => {
+      Object.keys(operatorFields).forEach((fieldName) => {
         const fieldOperators = Object.assign({}, operatorFields[fieldName]);
         const criteria = {};
-        Object.keys(fieldOperators).forEach(operatorName => {
+        Object.keys(fieldOperators).forEach((operatorName) => {
           criteria[`$${operatorName}`] = fieldOperators[operatorName];
         });
         if (Object.keys(criteria).length > 0) {
@@ -172,13 +172,13 @@ export function addFieldsWithOperator(
   // then fill it up with indexed fields
   const indexedFields = getIndexedFieldNames(model);
   if (operatorsOpts !== false && Object.keys(operatorsOpts).length === 0) {
-    indexedFields.forEach(fieldName => {
+    indexedFields.forEach((fieldName) => {
       operatorsOpts[fieldName] = availableOperators; // eslint-disable-line
     });
   }
 
   const existedFields = inputComposer.getFields();
-  Object.keys(existedFields).forEach(fieldName => {
+  Object.keys(existedFields).forEach((fieldName) => {
     if (operatorsOpts[fieldName] && operatorsOpts[fieldName] !== false) {
       const fields = {};
       let operators;
@@ -187,7 +187,7 @@ export function addFieldsWithOperator(
       } else {
         operators = availableOperators;
       }
-      operators.forEach(operatorName => {
+      operators.forEach((operatorName) => {
         // unwrap from GraphQLNonNull and GraphQLList, if present
         const namedType = getNamedType(existedFields[fieldName].type);
         if (namedType) {

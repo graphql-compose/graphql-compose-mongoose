@@ -81,6 +81,7 @@ export default function updateOne(
       }),
       ...skipHelperArgs(),
     },
+    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const recordData = (resolveParams.args && resolveParams.args.record) || null;
       const filterData = (resolveParams.args && resolveParams.args.filter) || {};
@@ -99,10 +100,12 @@ export default function updateOne(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
+      // $FlowFixMe
       return findOneResolver.resolve(resolveParams)
         .then((doc) => {
+          // $FlowFixMe
           if (resolveParams.beforeRecordMutate) {
-            return resolveParams.beforeRecordMutate(doc);
+            return resolveParams.beforeRecordMutate(doc, resolveParams);
           }
           return doc;
         })

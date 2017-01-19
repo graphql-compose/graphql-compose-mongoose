@@ -69,6 +69,7 @@ export default function updateById(
         ...(opts && opts.record),
       }),
     },
+    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
@@ -94,10 +95,12 @@ export default function updateById(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
+      // $FlowFixMe
       return findByIdResolver.resolve(resolveParams)
         .then((doc) => {
+          // $FlowFixMe
           if (resolveParams.beforeRecordMutate) {
-            return resolveParams.beforeRecordMutate(doc);
+            return resolveParams.beforeRecordMutate(doc, resolveParams);
           }
           return doc;
         })
