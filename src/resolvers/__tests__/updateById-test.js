@@ -168,6 +168,22 @@ describe('updateById() ->', () => {
       expect(result).have.deep.property('record.someDynamic', '1.1.1.1');
       expect(beforeMutationId).to.equal(user1.id);
     });
+
+    it('`beforeRecordMutate` may reject operation', async () => {
+      const result = updateById(UserModel, UserTypeComposer).resolve({
+        args: { record: { _id: user1.id, name: 'new name' } },
+        context: { readOnly: true },
+        beforeRecordMutate: (record, rp) => {
+          if (rp.context.readOnly) {
+            return Promise.reject(new Error('Denied due context ReadOnly'));
+          }
+          return record;
+        },
+      });
+      await expect(result).be.rejectedWith(Error, 'Denied due context ReadOnly');
+      const exist = await UserModel.collection.findOne({ _id: user1._id });
+      expect(exist.name).to.equal(user1.name);
+    });
   });
 
   describe('Resolver.getOutputType()', () => {

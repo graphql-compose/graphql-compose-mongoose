@@ -107,7 +107,7 @@ export default function updateById(
         // save changes to DB
         .then((doc) => {
           if (!doc) {
-            return Promise.reject('Document not found');
+            return Promise.reject(new Error('Document not found'));
           }
           if (recordData) {
             doc.set(recordData);
