@@ -1,8 +1,8 @@
 ## master
 
 ## 0.0.0-semantically-released (September 12, 2016)
-Setup fully automated package publishing via [semantic-release](https://github.com/semantic-release/semantic-release).
-[Changelog](https://github.com/nodkz/graphql-compose-mongoose/releases) is generated automatically and can be found here: https://github.com/nodkz/graphql-compose-mongoose/releases
+This package publishing automated by [semantic-release](https://github.com/semantic-release/semantic-release).
+[Changelog](https://github.com/nodkz/graphql-compose/releases) is generated automatically and can be found here: https://github.com/nodkz/graphql-compose/releases
 
 ## 1.0.12 (September 6, 2016)
 - fix: Resolvers now return mongoose documents. It's useful for your resolver wrappers. Now you have access to virtual fields, model methods via `source` or `source.record`.
