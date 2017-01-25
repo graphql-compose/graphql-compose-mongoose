@@ -27,7 +27,7 @@ export default function count(
   }
 
   return new Resolver({
-    outputType: GraphQLInt,
+    type: GraphQLInt,
     name: 'count',
     kind: 'query',
     args: {

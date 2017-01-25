@@ -27,7 +27,7 @@ export default function findById(
   }
 
   return new Resolver({
-    outputType: typeComposer.getType(),
+    type: typeComposer.getType(),
     name: 'findById',
     kind: 'query',
     args: {

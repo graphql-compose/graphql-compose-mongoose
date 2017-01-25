@@ -72,9 +72,9 @@ describe('count() ->', () => {
     });
   });
 
-  describe('Resolver.getOutputType()', () => {
+  describe('Resolver.getType()', () => {
     it('should return GraphQLInt type', () => {
-      const outputType = count(UserModel, UserTypeComposer).getOutputType();
+      const outputType = count(UserModel, UserTypeComposer).getType();
       expect(outputType).to.equal(GraphQLInt);
     });
   });

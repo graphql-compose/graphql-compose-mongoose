@@ -113,21 +113,21 @@ describe('createOne() ->', () => {
     });
   });
 
-  describe('Resolver.getOutputType()', () => {
+  describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType = createOne(UserModel, UserTypeComposer).getOutputType();
+      const outputType = createOne(UserModel, UserTypeComposer).getType();
       expect(outputType).property('name')
         .to.equal(`CreateOne${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
-      const outputType = createOne(UserModel, UserTypeComposer).getOutputType();
+      const outputType = createOne(UserModel, UserTypeComposer).getType();
       const recordIdField = new TypeComposer(outputType).getField('recordId');
       expect(recordIdField).property('type').to.equal(GraphQLMongoID);
     });
 
     it('should have record field', () => {
-      const outputType = createOne(UserModel, UserTypeComposer).getOutputType();
+      const outputType = createOne(UserModel, UserTypeComposer).getType();
       const recordField = new TypeComposer(outputType).getField('record');
       expect(recordField).property('type').to.equal(UserTypeComposer.getType());
     });
@@ -139,7 +139,7 @@ describe('createOne() ->', () => {
         fields: () => ({}),
       });
       typeStorage.set(outputTypeName, existedType);
-      const outputType = createOne(UserModel, UserTypeComposer).getOutputType();
+      const outputType = createOne(UserModel, UserTypeComposer).getType();
       expect(outputType).to.equal(existedType);
     });
   });

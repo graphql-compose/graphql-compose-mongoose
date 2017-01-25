@@ -53,7 +53,7 @@ export default function updateMany(
     description: 'Update many documents without returning them: '
                + 'Use Query.update mongoose method. '
                + 'Do not apply mongoose defaults, setters, hooks and validation. ',
-    outputType,
+    type: outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
         recordTypeName: `UpdateMany${typeComposer.getTypeName()}Input`,

@@ -50,7 +50,7 @@ export default function createOne(
     name: 'createOne',
     kind: 'mutation',
     description: 'Create one document with mongoose defaults, setters, hooks and validation',
-    outputType,
+    type: outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
         recordTypeName: `CreateOne${typeComposer.getTypeName()}Input`,

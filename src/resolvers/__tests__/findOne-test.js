@@ -117,9 +117,9 @@ describe('findOne() ->', () => {
     });
   });
 
-  describe('Resolver.getOutputType()', () => {
+  describe('Resolver.getType()', () => {
     it('should return model type', () => {
-      const outputType = findOne(UserModel, UserTypeComposer).getOutputType();
+      const outputType = findOne(UserModel, UserTypeComposer).getType();
       expect(outputType).to.equal(UserTypeComposer.getType());
     });
   });

@@ -29,7 +29,7 @@ export default function findOne(
   }
 
   return new Resolver({
-    outputType: typeComposer.getType(),
+    type: typeComposer.getType(),
     name: 'findOne',
     kind: 'query',
     args: {

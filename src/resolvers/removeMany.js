@@ -50,7 +50,7 @@ export default function removeMany(
     description: 'Remove many documents without returning them: '
                + 'Use Query.remove mongoose method. '
                + 'Do not apply mongoose defaults, setters, hooks and validation. ',
-    outputType,
+    type: outputType,
     args: {
       ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterRemoveMany${typeComposer.getTypeName()}Input`,

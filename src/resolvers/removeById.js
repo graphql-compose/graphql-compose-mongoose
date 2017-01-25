@@ -59,7 +59,7 @@ export default function removeById(
     description: 'Remove one document: '
                + '1) Retrieve one document and remove with hooks via findByIdAndRemove. '
                + '2) Return removed document.',
-    outputType,
+    type: outputType,
     args: {
       _id: {
         name: '_id',

@@ -135,15 +135,15 @@ describe('updateMany() ->', () => {
     });
   });
 
-  describe('Resolver.getOutputType()', () => {
+  describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType = updateMany(UserModel, UserTypeComposer).getOutputType();
+      const outputType = updateMany(UserModel, UserTypeComposer).getType();
       expect(outputType).property('name')
         .to.equal(`UpdateMany${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have numAffected field', () => {
-      const outputType = updateMany(UserModel, UserTypeComposer).getOutputType();
+      const outputType = updateMany(UserModel, UserTypeComposer).getType();
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
       expect(numAffectedField).property('type').to.equal(GraphQLInt);
     });
@@ -155,7 +155,7 @@ describe('updateMany() ->', () => {
         fields: () => ({}),
       });
       typeStorage.set(outputTypeName, existedType);
-      const outputType = updateMany(UserModel, UserTypeComposer).getOutputType();
+      const outputType = updateMany(UserModel, UserTypeComposer).getType();
       expect(outputType).to.equal(existedType);
     });
   });

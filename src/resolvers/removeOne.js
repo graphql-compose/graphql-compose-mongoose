@@ -58,7 +58,7 @@ export default function removeOne(
     description: 'Remove one document: '
                + '1) Remove with hooks via findOneAndRemove. '
                + '2) Return removed document.',
-    outputType,
+    type: outputType,
     args: {
       ...filterHelperArgs(typeComposer, model, {
         filterTypeName: `FilterRemoveOne${typeComposer.getTypeName()}Input`,

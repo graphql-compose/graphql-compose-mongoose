@@ -30,7 +30,7 @@ export default function findByIds(
   }
 
   return new Resolver({
-    outputType: new GraphQLList(typeComposer.getType()),
+    type: new GraphQLList(typeComposer.getType()),
     name: 'findByIds',
     kind: 'query',
     args: {

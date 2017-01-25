@@ -186,22 +186,22 @@ describe('updateById() ->', () => {
     });
   });
 
-  describe('Resolver.getOutputType()', () => {
+  describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType = updateById(UserModel, UserTypeComposer).getOutputType();
+      const outputType = updateById(UserModel, UserTypeComposer).getType();
       expect(outputType.name)
         .to.equal(`UpdateById${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
-      const outputType = updateById(UserModel, UserTypeComposer).getOutputType();
+      const outputType = updateById(UserModel, UserTypeComposer).getType();
       const typeComposer = new TypeComposer(outputType);
       expect(typeComposer.hasField('recordId')).to.be.true;
       expect(typeComposer.getField('recordId').type).to.equal(GraphQLMongoID);
     });
 
     it('should have record field', () => {
-      const outputType = updateById(UserModel, UserTypeComposer).getOutputType();
+      const outputType = updateById(UserModel, UserTypeComposer).getType();
       const typeComposer = new TypeComposer(outputType);
       expect(typeComposer.hasField('record')).to.be.true;
       expect(typeComposer.getField('record').type).to.equal(UserTypeComposer.getType());
@@ -214,7 +214,7 @@ describe('updateById() ->', () => {
         fields: () => ({}),
       });
       typeStorage.set(outputTypeName, existedType);
-      const outputType = updateById(UserModel, UserTypeComposer).getOutputType();
+      const outputType = updateById(UserModel, UserTypeComposer).getType();
       expect(outputType).to.equal(existedType);
     });
   });

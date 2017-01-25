@@ -60,7 +60,7 @@ export default function updateById(
                + '2) Apply updates to mongoose document. '
                + '3) Mongoose applies defaults, setters, hooks and validation. '
                + '4) And save it.',
-    outputType,
+    type: outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
         recordTypeName: `UpdateById${typeComposer.getTypeName()}Input`,

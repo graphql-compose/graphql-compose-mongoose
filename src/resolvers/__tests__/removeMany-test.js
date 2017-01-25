@@ -135,15 +135,15 @@ describe('removeMany() ->', () => {
     });
   });
 
-  describe('Resolver.getOutputType()', () => {
+  describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType = removeMany(UserModel, UserTypeComposer).getOutputType();
+      const outputType = removeMany(UserModel, UserTypeComposer).getType();
       expect(outputType).property('name')
         .to.equal(`RemoveMany${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have numAffected field', () => {
-      const outputType = removeMany(UserModel, UserTypeComposer).getOutputType();
+      const outputType = removeMany(UserModel, UserTypeComposer).getType();
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
       expect(numAffectedField).property('type').to.equal(GraphQLInt);
     });
@@ -155,7 +155,7 @@ describe('removeMany() ->', () => {
         fields: () => ({}),
       });
       typeStorage.set(outputTypeName, existedType);
-      const outputType = removeMany(UserModel, UserTypeComposer).getOutputType();
+      const outputType = removeMany(UserModel, UserTypeComposer).getType();
       expect(outputType).to.equal(existedType);
     });
   });
