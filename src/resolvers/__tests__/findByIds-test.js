@@ -8,11 +8,22 @@ import { PostModel } from '../../__mocks__/postModel';
 import findByIds from '../findByIds';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
+import typeStorage from '../../typeStorage';
 
-const UserTypeComposer = composeWithMongoose(UserModel);
-const PostTypeComposer = composeWithMongoose(PostModel);
 
 describe('findByIds() ->', () => {
+  let UserTypeComposer;
+  let PostTypeComposer;
+
+  beforeEach(() => {
+    typeStorage.clear();
+    UserModel.schema._gqcTypeComposer = undefined;
+    UserTypeComposer = composeWithMongoose(UserModel);
+
+    PostModel.schema._gqcTypeComposer = undefined;
+    PostTypeComposer = composeWithMongoose(PostModel);
+  });
+
   let user1;
   let user2;
   let user3;

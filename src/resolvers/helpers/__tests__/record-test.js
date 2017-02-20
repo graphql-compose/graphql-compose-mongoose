@@ -8,11 +8,13 @@ import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
 
-const UserTypeComposer = composeWithMongoose(UserModel);
-
 describe('Resolver helper `record` ->', () => {
+  let UserTypeComposer;
+
   beforeEach(() => {
     typeStorage.clear();
+    UserModel.schema._gqcTypeComposer = undefined;
+    UserTypeComposer = composeWithMongoose(UserModel);
   });
 
   describe('recordHelperArgs()', () => {

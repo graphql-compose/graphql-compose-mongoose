@@ -6,10 +6,18 @@ import { Resolver } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import findOne from '../findOne';
 import { composeWithMongoose } from '../../composeWithMongoose';
+import typeStorage from '../../typeStorage';
 
-const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('findOne() ->', () => {
+  let UserTypeComposer;
+
+  beforeEach(() => {
+    typeStorage.clear();
+    UserModel.schema._gqcTypeComposer = undefined;
+    UserTypeComposer = composeWithMongoose(UserModel);
+  });
+
   let user1;
   let user2;
 

@@ -14,9 +14,15 @@ import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
 
-const UserTypeComposer = composeWithMongoose(UserModel);
-
 describe('Resolver helper `filter` ->', () => {
+  let UserTypeComposer;
+
+  beforeEach(() => {
+    typeStorage.clear();
+    UserModel.schema._gqcTypeComposer = undefined;
+    UserTypeComposer = composeWithMongoose(UserModel);
+  });
+
   describe('getIndexedFieldNames()', () => {
     it('should return array of indexed fieldNames', () => {
       const indexedFields = getIndexedFieldNames(UserModel);

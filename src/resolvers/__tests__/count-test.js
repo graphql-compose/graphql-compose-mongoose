@@ -6,11 +6,17 @@ import { Resolver } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import count from '../count';
 import { composeWithMongoose } from '../../composeWithMongoose';
-
-
-const UserTypeComposer = composeWithMongoose(UserModel);
+import typeStorage from '../../typeStorage';
 
 describe('count() ->', () => {
+  let UserTypeComposer;
+
+  beforeEach(() => {
+    typeStorage.clear();
+    UserModel.schema._gqcTypeComposer = undefined;
+    UserTypeComposer = composeWithMongoose(UserModel);
+  });
+
   let user1;
   let user2;
 

@@ -10,9 +10,16 @@ import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-const UserTypeComposer = composeWithMongoose(UserModel);
 
 describe('removeById() ->', () => {
+  let UserTypeComposer;
+
+  beforeEach(() => {
+    typeStorage.clear();
+    UserModel.schema._gqcTypeComposer = undefined;
+    UserTypeComposer = composeWithMongoose(UserModel);
+  });
+
   let user;
 
   beforeEach('clear UserModel collection', (done) => {
