@@ -148,6 +148,7 @@ export function convertModelToGraphQL(
       })
     )
   );
+  model.schema._gqcTypeComposer = typeComposer; // eslint-disable-line
 
   const mongooseFields = getFieldsFromModel(model, typeName);
   const graphqlFields = {};

@@ -1,14 +1,16 @@
 /* eslint-disable no-unused-expressions */
 
 import { expect } from 'chai';
-import { UserModel } from '../__mocks__/userModel.js';
-import { composeWithMongoose } from '../composeWithMongoose';
+import mongoose from 'mongoose';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import { UserModel } from '../__mocks__/userModel';
+import { composeWithMongoose } from '../composeWithMongoose';
 import typeStorage from '../typeStorage';
 
 describe('composeWithMongoose ->', () => {
   beforeEach(() => {
     typeStorage.clear();
+    UserModel.schema._gqcTypeComposer = undefined;
   });
 
   describe('mongooseModelToTypeComposer()', () => {
@@ -21,6 +23,8 @@ describe('composeWithMongoose ->', () => {
       it('should set type name from model or opts.name', () => {
         expect(composeWithMongoose(UserModel).getTypeName())
           .equal(UserModel.modelName);
+
+        UserModel.schema._gqcTypeComposer = undefined;
         expect(composeWithMongoose(UserModel, { name: 'Ok' }).getTypeName())
           .equal('Ok');
       });
@@ -168,6 +172,19 @@ describe('composeWithMongoose ->', () => {
       const filterArgInFindOne = typeComposer.getResolver('findOne').getArg('filter');
       const inputConposer = new InputTypeComposer(filterArgInFindOne.type);
       expect(inputConposer.isRequired('age')).to.be.true;
+    });
+
+    it('should use cached type to avoid maximum call stack size exceeded', () => {
+      const PersonSchema = new mongoose.Schema({
+        name: String,
+      });
+      PersonSchema.add({
+        spouse: PersonSchema,
+        friends: [PersonSchema],
+      });
+      const PersonModel = mongoose.model('Person', PersonSchema);
+      const tc = composeWithMongoose(PersonModel);
+      expect(tc.getFields()).to.contain.keys(['_id', 'name', 'spouse', 'friends']);
     });
   });
 });
