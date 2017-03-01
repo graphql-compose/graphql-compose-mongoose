@@ -1,9 +1,9 @@
 /* @flow */
-import toDottedObject from './toDottedObject';
+import toMongoDottedObject from './toMongoDottedObject';
 import { isObject } from './is';
 
 export {
-  toDottedObject,
+  toMongoDottedObject,
   isObject,
 };
 

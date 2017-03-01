@@ -10,7 +10,7 @@ import {
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import { getIndexesFromModel } from '../../utils/getIndexesFromModel';
 import { isObject } from '../../utils/is';
-import { toDottedObject, upperFirst } from '../../utils';
+import { toMongoDottedObject, upperFirst } from '../../utils';
 import typeStorage from '../../typeStorage';
 import type {
   GraphQLFieldConfigArgumentMap,
@@ -23,24 +23,27 @@ import type {
 
 export const OPERATORS_FIELDNAME = '_operators';
 
-
 export const filterHelperArgs = (
   typeComposer: TypeComposer,
   model: MongooseModelT,
-  opts: filterHelperArgsOpts
+  opts: filterHelperArgsOpts,
 ): GraphQLFieldConfigArgumentMap => {
   if (!(typeComposer instanceof TypeComposer)) {
-    throw new Error('First arg for filterHelperArgs() should be instance of TypeComposer.');
+    throw new Error(
+      'First arg for filterHelperArgs() should be instance of TypeComposer.',
+    );
   }
 
   if (!model || !model.modelName || !model.schema) {
     throw new Error(
-      'Second arg for filterHelperArgs() should be instance of MongooseModel.'
+      'Second arg for filterHelperArgs() should be instance of MongooseModel.',
     );
   }
 
   if (!opts || !opts.filterTypeName) {
-    throw new Error('You should provide non-empty `filterTypeName` in options.');
+    throw new Error(
+      'You should provide non-empty `filterTypeName` in options.',
+    );
   }
 
   const removeFields = [];
@@ -54,7 +57,7 @@ export const filterHelperArgs = (
 
   if (opts.onlyIndexed) {
     const indexedFieldNames = getIndexedFieldNames(model);
-    Object.keys(typeComposer.getFields()).forEach((fieldName) => {
+    Object.keys(typeComposer.getFields()).forEach(fieldName => {
       if (indexedFieldNames.indexOf(fieldName) === -1) {
         removeFields.push(fieldName);
       }
@@ -62,20 +65,24 @@ export const filterHelperArgs = (
   }
 
   const filterTypeName: string = opts.filterTypeName;
-  const inputComposer = typeComposer.getInputTypeComposer().clone(filterTypeName);
+  const inputComposer = typeComposer
+    .getInputTypeComposer()
+    .clone(filterTypeName);
   inputComposer.removeField(removeFields);
 
   if (opts.requiredFields) {
     inputComposer.makeRequired(opts.requiredFields);
   }
 
-  if (!{}.hasOwnProperty.call(opts, 'operators') || opts.operators !== false) {
+  if (
+    !({}).hasOwnProperty.call(opts, 'operators') || opts.operators !== false
+  ) {
     addFieldsWithOperator(
       // $FlowFixMe
       `Operators${opts.filterTypeName}`,
       inputComposer,
       model,
-      opts.operators || {}
+      opts.operators || {},
     );
   }
 
@@ -102,25 +109,28 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
     const modelFields = resolveParams.query.schema.paths;
     const clearedFilter = {};
-    Object.keys(filter).forEach((key) => {
+    Object.keys(filter).forEach(key => {
       if (modelFields[key]) {
         clearedFilter[key] = filter[key];
       }
     });
     if (Object.keys(clearedFilter).length > 0) {
-      resolveParams.query = resolveParams.query.where(toDottedObject(clearedFilter)); // eslint-disable-line
+      resolveParams.query = resolveParams.query.where(
+        toMongoDottedObject(clearedFilter),
+      ); // eslint-disable-line
     }
 
     if (filter[OPERATORS_FIELDNAME]) {
       const operatorFields = filter[OPERATORS_FIELDNAME];
-      Object.keys(operatorFields).forEach((fieldName) => {
+      Object.keys(operatorFields).forEach(fieldName => {
         const fieldOperators = Object.assign({}, operatorFields[fieldName]);
         const criteria = {};
-        Object.keys(fieldOperators).forEach((operatorName) => {
+        Object.keys(fieldOperators).forEach(operatorName => {
           criteria[`$${operatorName}`] = fieldOperators[operatorName];
         });
         if (Object.keys(criteria).length > 0) {
-          resolveParams.query = resolveParams.query.where({ // eslint-disable-line
+          resolveParams.query = resolveParams.query.where({
+            // eslint-disable-line
             [fieldName]: criteria,
           });
         }
@@ -129,10 +139,11 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
   }
 
   if (isObject(resolveParams.rawQuery)) {
-    resolveParams.query = resolveParams.query.where( // eslint-disable-line
-      // $FlowFixMe
-      resolveParams.rawQuery
-    );
+    resolveParams.query = resolveParams.query
+      .where( // eslint-disable-line
+        // $FlowFixMe
+        resolveParams.rawQuery,
+      );
   }
 }
 
@@ -140,7 +151,7 @@ export function getIndexedFieldNames(model: MongooseModelT): string[] {
   const indexes = getIndexesFromModel(model);
 
   const fieldNames = [];
-  indexes.forEach((indexData) => {
+  indexes.forEach(indexData => {
     const keys = Object.keys(indexData);
     const clearedName = keys[0].replace(/[^_a-zA-Z0-9]/i, '__');
     fieldNames.push(clearedName);
@@ -153,7 +164,7 @@ export function addFieldsWithOperator(
   typeName: string,
   inputComposer: InputTypeComposer,
   model: MongooseModelT,
-  operatorsOpts: filterOperatorsOpts
+  operatorsOpts: filterOperatorsOpts,
 ): InputTypeComposer {
   const operatorsComposer = new InputTypeComposer(
     typeStorage.getOrSet(
@@ -161,24 +172,31 @@ export function addFieldsWithOperator(
       new GraphQLInputObjectType({
         name: typeName,
         fields: {},
-      })
-    )
+      }),
+    ),
   );
 
-  const availableOperators: filterOperatorNames[]
-    = ['gt', 'gte', 'lt', 'lte', 'ne', 'in[]', 'nin[]'];
+  const availableOperators: filterOperatorNames[] = [
+    'gt',
+    'gte',
+    'lt',
+    'lte',
+    'ne',
+    'in[]',
+    'nin[]',
+  ];
 
   // if `opts.resolvers.[resolverName].filter.operators` is empty and not disabled via `false`
   // then fill it up with indexed fields
   const indexedFields = getIndexedFieldNames(model);
   if (operatorsOpts !== false && Object.keys(operatorsOpts).length === 0) {
-    indexedFields.forEach((fieldName) => {
+    indexedFields.forEach(fieldName => {
       operatorsOpts[fieldName] = availableOperators; // eslint-disable-line
     });
   }
 
   const existedFields = inputComposer.getFields();
-  Object.keys(existedFields).forEach((fieldName) => {
+  Object.keys(existedFields).forEach(fieldName => {
     if (operatorsOpts[fieldName] && operatorsOpts[fieldName] !== false) {
       const fields = {};
       let operators;
@@ -187,7 +205,7 @@ export function addFieldsWithOperator(
       } else {
         operators = availableOperators;
       }
-      operators.forEach((operatorName) => {
+      operators.forEach(operatorName => {
         // unwrap from GraphQLNonNull and GraphQLList, if present
         const namedType = getNamedType(existedFields[fieldName].type);
         if (namedType) {
@@ -214,7 +232,7 @@ export function addFieldsWithOperator(
             new GraphQLInputObjectType({
               name: operatorTypeName,
               fields,
-            })
+            }),
           ),
           description: 'Filter value by operator(s)',
         });

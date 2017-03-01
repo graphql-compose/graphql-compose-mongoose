@@ -8,7 +8,7 @@ import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
-import toDottedObject from '../utils/toDottedObject';
+import toMongoDottedObject from '../utils/toMongoDottedObject';
 import typeStorage from '../typeStorage';
 import type {
   MongooseModelT,
@@ -16,20 +16,19 @@ import type {
   genResolverOpts,
 } from '../definition';
 
-
 export default function updateMany(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts
+  opts?: genResolverOpts,
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(
-      'First arg for Resolver updateMany() should be instance of Mongoose Model.'
+      'First arg for Resolver updateMany() should be instance of Mongoose Model.',
     );
   }
   if (!(typeComposer instanceof TypeComposer)) {
     throw new Error(
-      'Second arg for Resolver updateMany() should be instance of TypeComposer.'
+      'Second arg for Resolver updateMany() should be instance of TypeComposer.',
     );
   }
 
@@ -44,15 +43,15 @@ export default function updateMany(
           description: 'Affected documents number',
         },
       },
-    })
+    }),
   );
 
   const resolver = new Resolver({
     name: 'updateMany',
     kind: 'mutation',
-    description: 'Update many documents without returning them: '
-               + 'Use Query.update mongoose method. '
-               + 'Do not apply mongoose defaults, setters, hooks and validation. ',
+    description: 'Update many documents without returning them: ' +
+      'Use Query.update mongoose method. ' +
+      'Do not apply mongoose defaults, setters, hooks and validation. ',
     type: outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
@@ -77,14 +76,18 @@ export default function updateMany(
     },
     // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || {};
+      const recordData = (resolveParams.args && resolveParams.args.record) || {
+      };
 
-      if (!(typeof recordData === 'object')
-        || Object.keys(recordData).length === 0
+      if (
+        !(typeof recordData === 'object') ||
+        Object.keys(recordData).length === 0
       ) {
         return Promise.reject(
-          new Error(`${typeComposer.getTypeName()}.updateMany resolver requires `
-                  + 'at least one value in args.record')
+          new Error(
+            `${typeComposer.getTypeName()}.updateMany resolver requires ` +
+              'at least one value in args.record',
+          ),
         );
       }
 
@@ -99,18 +102,17 @@ export default function updateMany(
       limitHelper(resolveParams);
 
       resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
-      resolveParams.query.update({ $set: toDottedObject(recordData) });
+      resolveParams.query.update({ $set: toMongoDottedObject(recordData) });
 
-      return (
-        // `beforeQuery` is experemental feature, if you want to use it
-        // please open an issue with your use case, cause I suppose that
-        // this option is excessive
-        // $FlowFixMe
-        resolveParams.beforeQuery
-          ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query, resolveParams))
-          : resolveParams.query.exec()
-        )
-        .then((res) => {
+      // `beforeQuery` is experemental feature, if you want to use it
+      // please open an issue with your use case, cause I suppose that
+      // this option is excessive
+      // $FlowFixMe
+      return (resolveParams.beforeQuery
+        ? Promise.resolve(
+            resolveParams.beforeQuery(resolveParams.query, resolveParams),
+          )
+        : resolveParams.query.exec()).then(res => {
           if (res.ok) {
             return {
               numAffected: res.nModified,

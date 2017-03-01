@@ -5,6 +5,7 @@
     "no-underscore-dangle": 0,
     "no-unused-expressions": 0,
     "arrow-body-style": 0,
+    "arrow-parens": 0,
     "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
     "comma-dangle": ["error", {
       "arrays": "always-multiline",
