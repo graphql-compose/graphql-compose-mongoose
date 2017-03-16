@@ -170,6 +170,7 @@ describe('fieldConverter', () => {
       const embeddedFields = embeddedType._typeConfig.fields();
       expect(embeddedFields.email).to.be.ok;
       expect(embeddedFields.locationId).to.be.ok;
+      expect(embeddedFields._id).to.be.ok;
     });
 
     it('should return null if subdocument is empty', async () => {
@@ -250,6 +251,7 @@ describe('fieldConverter', () => {
 
   describe('documentArrayToGraphQL()', () => {
     const languagesType = documentArrayToGraphQL(fields.languages);
+    const languagesFields = languagesType.ofType._typeConfig.fields();
 
     it('should produce GraphQLList', () => {
       expect(languagesType).to.be.instanceof(GraphQLList);
@@ -258,6 +260,10 @@ describe('fieldConverter', () => {
     it('should has Language type in ofType', () => {
       // see src/__mocks__/languageSchema.js where type name `Language` is defined
       expect(languagesType.ofType.name).to.equal('Language');
+    });
+
+    it('should include pseudo mongoose _id field in document', () => {
+      expect(languagesFields._id).to.be.ok;
     });
   });
 
