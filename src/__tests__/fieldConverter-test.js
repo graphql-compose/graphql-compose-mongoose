@@ -170,7 +170,7 @@ describe('fieldConverter', () => {
       const embeddedFields = embeddedType._typeConfig.fields();
       expect(embeddedFields.email).to.be.ok;
       expect(embeddedFields.locationId).to.be.ok;
-      expect(embeddedFields._id).to.be.undefined;
+      expect(embeddedFields._id).to.be.ok;
     });
 
     it('should return null if subdocument is empty', async () => {
@@ -262,8 +262,8 @@ describe('fieldConverter', () => {
       expect(languagesType.ofType.name).to.equal('Language');
     });
 
-    it('should skip pseudo mongoose _id field in document', () => {
-      expect(languagesFields._id).to.be.undefined;
+    it('should include pseudo mongoose _id field in document', () => {
+      expect(languagesFields._id).to.be.ok;
     });
   });
 

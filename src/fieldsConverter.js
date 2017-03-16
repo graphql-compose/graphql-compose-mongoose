@@ -248,17 +248,6 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
   return ComplexTypes.SCALAR;
 }
 
-function removePseudoIdField(typeComposer: TypeComposer): void {
-  // remove pseudo object id mongoose field
-  const gqFields = typeComposer.getFields();
-  const pseudoFieldNames = ['_id'];
-  pseudoFieldNames.forEach((name) => {
-    if (gqFields[name] && gqFields[name].type === GraphQLMongoID) {
-      typeComposer.removeField(name);
-    }
-  });
-}
-
 export function scalarToGraphQL(field: MongooseFieldT): GraphQLOutputType {
   const typeName = _getFieldType(field);
 
@@ -304,11 +293,9 @@ export function embeddedToGraphQL(
 
   const typeName = `${prefix}${capitalize(fieldName)}`;
   const typeComposer = convertSchemaToGraphQL(field.schema, typeName);
-  removePseudoIdField(typeComposer);
 
   return typeComposer.getType();
 }
-
 
 export function enumToGraphQL(
   field: MongooseFieldT,
@@ -349,7 +336,6 @@ export function documentArrayToGraphQL(
   const typeName = `${prefix}${capitalize(_getFieldName(field))}`;
 
   const typeComposer = convertModelToGraphQL(field, typeName);
-  removePseudoIdField(typeComposer);
 
   return new GraphQLList(typeComposer.getType());
 }
