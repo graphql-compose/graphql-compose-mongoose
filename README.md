@@ -157,7 +157,72 @@ UserTC.addRelation(
   })
 );
 ```
+### Reusing the same mongoose Schame in embedded object fields
+Suppose you have a common structure you use as embedded object in multiple Schemas.
+Also suppose you want the strcutre to have the same GraphQL type across all parent types.
+(For instance, to allow reuse of fragments for this type)
+Here are Schemas to demonstrate:
+```js
+import { Schema } from 'mongoose';
 
+const ImageDataStructure = Schema({
+  url: String,
+  dimensions : {
+    width: Number,
+    height: Number
+  }
+}, { _id: false });
+
+const UserProfile = Schema({
+  fullName: String,
+  personalImage: ImageDataStructure
+});
+
+const Article = Schema({
+  title: String,
+  heroImage: ImageDataStructure
+});
+```
+If you want the `ImageDataStructure` to use the same GraphQL type in both `Article` and `UserProfile` you will need to explicitly tell `graphql-compose-mongoose` that.
+Do the following:
+```js
+import { convertSchemaToGraphQL } from 'graphql-compose-mongoose';
+convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage'); // Force this type on this mongoose schema
+```
+Before continuing to convert your models to TypeComposers:
+```js
+import mongoose from 'mongoose';
+import { composeWithMongoose } from 'graphql-compose-mongoose';
+
+const UserProfileModel = mongoose.model('UserProfile', UserProfile);
+const ArticleModel = mongoose.model('Article', Article);
+
+const UserProfileTC = composeWithMongoose(UserProfileModel);
+const ArticleTC = composeWithMongoose(ArticleModel);
+```
+Then, you can use queries like this:
+```graphql
+query {
+  topUser {
+    fullName
+    personalImage {
+      ...fullImageData
+    }
+  }
+  topArticle {
+    title
+    heroImage {
+      ...fullImageData
+    }
+  }
+}
+fragment fullImageData on EmbeddedImage {
+  url
+  dimensions {
+    width height
+  }
+}
+```
 
 Customization options
 =====================
