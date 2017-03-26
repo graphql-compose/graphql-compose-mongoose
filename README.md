@@ -183,7 +183,8 @@ const Article = Schema({
   heroImage: ImageDataStructure
 });
 ```
-If you want the `ImageDataStructure` to use the same GraphQL type in both `Article` and `UserProfile` you will need to explicitly tell `graphql-compose-mongoose` that.
+If you want the `ImageDataStructure` to use the same GraphQL type in both `Article` and `UserProfile` you will need create it as a mongoose schema (not a standard javascript object) and to explicitly tell `graphql-compose-mongoose` the name you want it to have. Otherwise, without the name, it would generate the name according to the first parent this type was embedded in.
+
 Do the following:
 ```js
 import { convertSchemaToGraphQL } from 'graphql-compose-mongoose';
