@@ -112,7 +112,7 @@ UserTC.get('fieldWithNesting.subNesting').getType(); // get GraphQL type of deep
 ```js
 UserTC.addFields({
   lonLat: TypeComposer.create('type LonLat { lon: Float, lat: Float }'),
-  notice: 'String', // shortand definition
+  notice: 'String', // shorthand definition
   noticeList: { // extended
     type: '[String]', // String, Int, Float, Boolean, ID, Json
     description: 'Array of notices',
@@ -141,7 +141,7 @@ UserTC.addRelation(
 UserTC.addRelation(
   'adultFriendsWithSameGender',
   () => ({
-    resolver: UserTC.get('$findMany'), // shortand for `UserTC.getResolver('findMany')`
+    resolver: UserTC.get('$findMany'), // shorthand for `UserTC.getResolver('findMany')`
     args: { // resolver `findMany` has `filter` arg, we may provide mongoose query to it
       filter: (source) => ({
         _operators : { // Applying criteria on fields which have
@@ -157,9 +157,9 @@ UserTC.addRelation(
   })
 );
 ```
-### Reusing the same mongoose Schame in embedded object fields
+### Reusing the same mongoose Schema in embedded object fields
 Suppose you have a common structure you use as embedded object in multiple Schemas.
-Also suppose you want the strcutre to have the same GraphQL type across all parent types.
+Also suppose you want the structure to have the same GraphQL type across all parent types.
 (For instance, to allow reuse of fragments for this type)
 Here are Schemas to demonstrate:
 ```js
@@ -327,7 +327,7 @@ export type filterHelperArgsOpts = {
   onlyIndexed?: boolean, // leave only that fields, which is indexed in mongodb
   requiredFields?: string | string[], // provide fieldNames, that should be required
   operators?: filterOperatorsOpts | false, // provide filtering fields by operators, eg. $lt, $gt
-                                           // if left empty - provides all oeprators on indexed fields
+                                           // if left empty - provides all operators on indexed fields
 };
 
 // supported operators names in filter `arg`
