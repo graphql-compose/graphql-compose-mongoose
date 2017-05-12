@@ -3,7 +3,7 @@
 [![travis build](https://img.shields.io/travis/nodkz/graphql-compose-mongoose.svg)](https://travis-ci.org/nodkz/graphql-compose-mongoose)
 [![codecov coverage](https://img.shields.io/codecov/c/github/nodkz/graphql-compose-mongoose.svg)](https://codecov.io/github/nodkz/graphql-compose-mongoose)
 [![](https://img.shields.io/npm/v/graphql-compose-mongoose.svg)](https://www.npmjs.com/package/graphql-compose-mongoose)
-[![npm](https://img.shields.io/npm/dt/graphql-compose-mongoose.svg)](https://www.npmjs.com/package/graphql-compose-mongoose)
+[![npm](https://img.shields.io/npm/dt/graphql-compose-mongoose.svg)](http://www.npmtrends.com/graphql-compose-mongoose)
 [![Join the chat at https://gitter.im/graphql-compose/Lobby](https://badges.gitter.im/nodkz/graphql-compose.svg)](https://gitter.im/graphql-compose/Lobby)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
