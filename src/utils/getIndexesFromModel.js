@@ -71,7 +71,16 @@ export function getIndexesFromModel(
     });
   }
 
-  return indexedFields;
+  // filter duplicates
+  const tmp = [];
+  const result = indexedFields.filter((val) => {
+    const asString = JSON.stringify(val);
+    if (tmp.includes(asString)) return false;
+    tmp.push(asString);
+    return true;
+  });
+
+  return result;
 }
 
 

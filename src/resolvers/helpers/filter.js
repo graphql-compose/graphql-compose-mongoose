@@ -157,7 +157,15 @@ export function getIndexedFieldNames(model: MongooseModelT): string[] {
     fieldNames.push(clearedName);
   });
 
-  return fieldNames;
+  // filter duplicates
+  const uniqueNames = [];
+  const result = fieldNames.filter((val) => {
+    if (uniqueNames.includes(val)) return false;
+    uniqueNames.push(val);
+    return true;
+  });
+
+  return result;
 }
 
 export function addFieldsWithOperator(
