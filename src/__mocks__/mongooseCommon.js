@@ -11,7 +11,7 @@ mongoServer.getConnectionString().then((mongoUri) => {
 
   mongoose.connection.on('error', (e) => {
     if (e.message.code === 'ETIMEDOUT') {
-      console.log(e);
+      console.error(e);
       mongoose.connect(mongoUri);
     } else {
       throw e;
@@ -19,7 +19,7 @@ mongoServer.getConnectionString().then((mongoUri) => {
   });
 
   mongoose.connection.once('open', () => {
-    console.log(`MongoDB successfully connected to ${mongoUri}`);
+    // console.log(`MongoDB successfully connected to ${mongoUri}`);
   });
 });
 

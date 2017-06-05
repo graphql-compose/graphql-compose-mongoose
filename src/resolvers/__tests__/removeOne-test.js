@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { expect } from 'chai';
 import { GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
@@ -25,17 +24,9 @@ describe('removeOne() ->', () => {
   let user2;
   let user3;
 
-  beforeEach('clear UserModel collection', (done) => {
-    UserModel.collection.drop(() => {
-      done();
-    });
-  });
+  beforeEach(async () => {
+    await UserModel.remove({});
 
-  beforeEach(() => {
-    typeStorage.clear();
-  });
-
-  beforeEach('add test user document to mongoDB', () => {
     user1 = new UserModel({
       name: 'userName1',
       gender: 'male',
@@ -57,7 +48,7 @@ describe('removeOne() ->', () => {
       age: 30,
     });
 
-    return Promise.all([
+    await Promise.all([
       user1.save(),
       user2.save(),
       user3.save(),
@@ -66,24 +57,24 @@ describe('removeOne() ->', () => {
 
   it('should return Resolver object', () => {
     const resolver = removeOne(UserModel, UserTypeComposer);
-    expect(resolver).to.be.instanceof(Resolver);
+    expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have `filter` arg', () => {
       const resolver = removeOne(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('filter')).to.be.true;
+      expect(resolver.hasArg('filter')).toBe(true);
     });
 
     it('should not have `skip` arg due mongoose error: '
      + 'skip cannot be used with findOneAndRemove', () => {
       const resolver = removeOne(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('skip')).to.be.false;
+      expect(resolver.hasArg('skip')).toBe(false);
     });
 
     it('should have `sort` arg', () => {
       const resolver = removeOne(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('sort')).to.be.true;
+      expect(resolver.hasArg('sort')).toBe(true);
     });
   });
 
@@ -94,7 +85,7 @@ describe('removeOne() ->', () => {
       // otherwise it returns Promise object, but it not instanse of global Promise
       mongoose.Promise = Promise; // eslint-disable-line
       const result = removeOne(UserModel, UserTypeComposer).resolve({});
-      expect(result).instanceof(Promise);
+      expect(result).toBeInstanceOf(Promise);
       result.catch(() => 'catch error if appears, hide it from mocha');
     });
 
@@ -102,30 +93,26 @@ describe('removeOne() ->', () => {
       const result = await removeOne(UserModel, UserTypeComposer).resolve({
         args: { filter: { _id: user1.id } },
       });
-      expect(result).have.property('recordId', user1.id);
+      expect(result).toHaveProperty('recordId', user1.id);
     });
 
-    it('should remove document in database', (done) => {
+    it('should remove document in database', async () => {
       const checkedName = 'nameForMongoDB';
-      removeOne(UserModel, UserTypeComposer).resolve({
+      await removeOne(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { _id: user1.id },
           input: { name: checkedName },
         },
-      }).then(() => {
-        UserModel.collection.findOne({ _id: user1._id }, (err, doc) => {
-          expect(err).to.be.null;
-          expect(doc).to.be.null;
-          done();
-        });
       });
+
+      await expect(UserModel.findOne({ _id: user1._id })).resolves.toBeNull();
     });
 
     it('should return payload.record', async () => {
       const result = await removeOne(UserModel, UserTypeComposer).resolve({
         args: { filter: { _id: user1.id } },
       });
-      expect(result).have.deep.property('record.id', user1.id);
+      expect(result.record.id).toBe(user1.id);
     });
 
     it('should sort records', async () => {
@@ -135,7 +122,7 @@ describe('removeOne() ->', () => {
           sort: { age: 1 },
         },
       });
-      expect(result1).have.deep.property('record.age', user1.age);
+      expect(result1.record.age).toBe(user1.age);
 
       const result2 = await removeOne(UserModel, UserTypeComposer).resolve({
         args: {
@@ -143,7 +130,7 @@ describe('removeOne() ->', () => {
           sort: { age: -1 },
         },
       });
-      expect(result2).have.deep.property('record.age', user3.age);
+      expect(result2.record.age).toBe(user3.age);
     });
 
     it('should pass empty projection to findOne and got full document data', async () => {
@@ -157,21 +144,21 @@ describe('removeOne() ->', () => {
           },
         },
       });
-      expect(result).have.deep.property('record.id', user1.id);
-      expect(result).have.deep.property('record.name', user1.name);
-      expect(result).have.deep.property('record.gender', user1.gender);
+      expect(result.record.id).toBe(user1.id);
+      expect(result.record.name).toBe(user1.name);
+      expect(result.record.gender).toBe(user1.gender);
     });
 
     it('should return mongoose document', async () => {
       const result = await removeOne(UserModel, UserTypeComposer).resolve({
         args: { filter: { _id: user1.id } },
       });
-      expect(result.record).instanceof(UserModel);
+      expect(result.record).toBeInstanceOf(UserModel);
     });
 
     it('should rejected with Error if args.filter is empty', async () => {
       const result = removeOne(UserModel, UserTypeComposer).resolve({ args: {} });
-      await expect(result).be.rejectedWith(Error, 'at least one value in args.filter');
+      await expect(result).rejects.toMatchSnapshot();
     });
 
     it('should call `beforeRecordMutate` method with founded `record` and `resolveParams` as args', async () => {
@@ -185,12 +172,12 @@ describe('removeOne() ->', () => {
           return record;
         },
       });
-      expect(result.record).instanceof(UserModel);
-      expect(result).have.deep.property('record.someDynamic', '1.1.1.1');
-      expect(beforeMutationId).to.equal(user1.id);
+      expect(result.record).toBeInstanceOf(UserModel);
+      expect(result.record.someDynamic).toBe('1.1.1.1');
+      expect(beforeMutationId).toBe(user1.id);
 
       const empty = await UserModel.collection.findOne({ _id: user1._id });
-      expect(empty).to.equal(null);
+      expect(empty).toBe(null);
     });
 
     it('`beforeRecordMutate` may reject operation', async () => {
@@ -204,29 +191,28 @@ describe('removeOne() ->', () => {
           return record;
         },
       });
-      await expect(result).be.rejectedWith(Error, 'Denied due context ReadOnly');
+      await expect(result).rejects.toMatchSnapshot();
       const exist = await UserModel.collection.findOne({ _id: user1._id });
-      expect(exist.name).to.equal(user1.name);
+      expect(exist.name).toBe(user1.name);
     });
   });
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
       const outputType = removeOne(UserModel, UserTypeComposer).getType();
-      expect(outputType).property('name')
-        .to.equal(`RemoveOne${UserTypeComposer.getTypeName()}Payload`);
+      expect(outputType.name).toBe(`RemoveOne${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
       const outputType = removeOne(UserModel, UserTypeComposer).getType();
       const recordIdField = new TypeComposer(outputType).getField('recordId');
-      expect(recordIdField).property('type').to.equal(GraphQLMongoID);
+      expect(recordIdField.type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType = removeOne(UserModel, UserTypeComposer).getType();
       const recordField = new TypeComposer(outputType).getField('record');
-      expect(recordField).property('type').to.equal(UserTypeComposer.getType());
+      expect(recordField.type).toBe(UserTypeComposer.getType());
     });
 
     it('should reuse existed outputType', () => {
@@ -237,7 +223,7 @@ describe('removeOne() ->', () => {
       });
       typeStorage.set(outputTypeName, existedType);
       const outputType = removeOne(UserModel, UserTypeComposer).getType();
-      expect(outputType).to.equal(existedType);
+      expect(outputType).toBe(existedType);
     });
   });
 });

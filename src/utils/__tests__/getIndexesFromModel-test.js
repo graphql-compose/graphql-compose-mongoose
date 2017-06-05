@@ -1,4 +1,3 @@
-import { expect } from 'chai';
 import mongoose from 'mongoose';
 import {
   getIndexesFromModel,
@@ -60,30 +59,30 @@ const AgentModel = mongoose.model('Agent', AgentSchema);
 describe('getIndexesFromModel()', () => {
   it('should get regular indexes and extract compound idx by default', () => {
     const idx = getIndexesFromModel(AgentModel);
-    expect(idx).to.deep.have.all.members([
+    expect(idx).toEqual(expect.arrayContaining([
       { _id: 1 },
       { name: 1 },
       { name: 1, age: -1 },
       { 'subDoc.field2': 1 },
       { someUniqField: 1 },
       { name: 1, someOtherField: -1 },
-    ]);
+    ]));
   });
 
   it('should not extract compound indexes', () => {
     const idx = getIndexesFromModel(AgentModel, { extractCompound: false });
-    expect(idx).to.deep.have.all.members([
+    expect(idx).toEqual(expect.arrayContaining([
       { _id: 1 },
       { name: 1, age: -1 },
       { 'subDoc.field2': 1 },
       { someUniqField: 1 },
       { name: 1, someOtherField: -1 },
-    ]);
+    ]));
   });
 
   it('it should return specialIndexes indexes', () => {
     const idx = getIndexesFromModel(AgentModel, { skipSpecificIndexes: false });
-    expect(idx).to.deep.have.all.members([
+    expect(idx).toEqual(expect.arrayContaining([
       { _id: 1 },
       { name: 1 },
       { name: 1, age: -1 },
@@ -92,7 +91,7 @@ describe('getIndexesFromModel()', () => {
       { name: 'text', skills: 'text' },
       { someUniqField: 1 },
       { name: 1, someOtherField: -1 },
-    ]);
+    ]));
   });
 });
 
@@ -100,11 +99,11 @@ describe('getIndexesFromModel()', () => {
 describe('getUniqueIndexes()', () => {
   it('should return unique indexes', () => {
     const idx = getUniqueIndexes(AgentModel);
-    expect(idx).to.deep.have.all.members([
+    expect(idx).toEqual(expect.arrayContaining([
       { _id: 1 },
       { someUniqField: 1 },
       { name: 1, someOtherField: -1 },
-    ]);
+    ]));
   });
 });
 
@@ -116,7 +115,7 @@ describe('extendByReversedIndexes()', () => {
       { name: 1, someOtherField: -1 },
     ];
     const idx = extendByReversedIndexes(idxSource);
-    expect(idx).deep.equal([
+    expect(idx).toEqual([
       { _id: 1 },
       { _id: -1 },
       { someUniqField: 1 },
@@ -133,7 +132,7 @@ describe('extendByReversedIndexes()', () => {
       { name: 1, someOtherField: -1 },
     ];
     const idx = extendByReversedIndexes(idxSource, { reversedFirst: true });
-    expect(idx).deep.equal([
+    expect(idx).toEqual([
       { _id: -1 },
       { _id: 1 },
       { someUniqField: -1 },

@@ -1,6 +1,5 @@
 /* @flow */
 
-import { expect } from 'chai';
 import { GraphQLNonNull } from 'graphql';
 import { Resolver } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
@@ -21,13 +20,9 @@ describe('findOne() ->', () => {
   let user1;
   let user2;
 
-  beforeEach('clear UserModel collection', (done) => {
-    UserModel.collection.drop(() => {
-      done();
-    });
-  });
+  beforeEach(async () => {
+    await UserModel.remove({});
 
-  beforeEach('add test user document to mongoDB', () => {
     user1 = new UserModel({
       name: 'userName1',
       skills: ['js', 'ruby', 'php', 'python'],
@@ -42,7 +37,7 @@ describe('findOne() ->', () => {
       relocation: false,
     });
 
-    return Promise.all([
+    await Promise.all([
       user1.save(),
       user2.save(),
     ]);
@@ -50,13 +45,13 @@ describe('findOne() ->', () => {
 
   it('should return Resolver object', () => {
     const resolver = findOne(UserModel, UserTypeComposer);
-    expect(resolver).to.be.instanceof(Resolver);
+    expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have `filter` arg', () => {
       const resolver = findOne(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('filter')).to.be.true;
+      expect(resolver.hasArg('filter')).toBe(true);
     });
 
     it('should have `filter` arg only with indexed fields', async () => {
@@ -64,47 +59,47 @@ describe('findOne() ->', () => {
         { filter: { onlyIndexed: true, operators: false } }
       );
       const filterFields = result.args.filter.type._typeConfig.fields();
-      expect(filterFields).all.keys(['_id', 'name', 'employment']);
+      expect(Object.keys(filterFields)).toEqual(expect.arrayContaining(['_id', 'name', 'employment']));
     });
 
     it('should have `filter` arg with required `name` field', async () => {
       const result = findOne(UserModel, UserTypeComposer, { filter: { requiredFields: 'name' } });
       const filterFields = result.args.filter.type._typeConfig.fields();
-      expect(filterFields).deep.property('name.type').instanceof(GraphQLNonNull);
+      expect(filterFields.name.type).toBeInstanceOf(GraphQLNonNull);
     });
 
     it('should have `skip` arg', () => {
       const resolver = findOne(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('skip')).to.be.true;
+      expect(resolver.hasArg('skip')).toBe(true);
     });
 
     it('should have `sort` arg', () => {
       const resolver = findOne(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('sort')).to.be.true;
+      expect(resolver.hasArg('sort')).toBe(true);
     });
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled promise', async () => {
       const result = findOne(UserModel, UserTypeComposer).resolve({});
-      await expect(result).be.fulfilled;
+      await expect(result).resolves.toBeDefined();
     });
 
     it('should return one document if args is empty', async () => {
       const result = await findOne(UserModel, UserTypeComposer).resolve({ args: {} });
-      expect(result).is.a('object');
-      expect(result).have.property('name').that.oneOf([user1.name, user2.name]);
+      expect(typeof result).toBe('object');
+      expect([user1.name, user2.name]).toContain(result.name);
     });
 
     it('should return document if provided existed id', async () => {
       const result = await findOne(UserModel, UserTypeComposer)
         .resolve({ args: { id: user1._id } });
-      expect(result).have.property('name').that.equal(user1.name);
+      expect(result.name).toBe(user1.name);
     });
 
     it('should skip records', async () => {
       const result = await findOne(UserModel, UserTypeComposer).resolve({ args: { skip: 2000 } });
-      expect(result).to.be.null;
+      expect(result).toBeNull();
     });
 
     it('should sort records', async () => {
@@ -114,21 +109,21 @@ describe('findOne() ->', () => {
       const result2 = await findOne(UserModel, UserTypeComposer)
         .resolve({ args: { sort: { _id: -1 } } });
 
-      expect(`${result1._id}`).not.equal(`${result2._id}`);
+      expect(`${result1._id}`).not.toBe(`${result2._id}`);
     });
 
     it('should return mongoose document', async () => {
       const result = await findOne(UserModel, UserTypeComposer).resolve({
         args: { _id: user1._id },
       });
-      expect(result).instanceof(UserModel);
+      expect(result).toBeInstanceOf(UserModel);
     });
   });
 
   describe('Resolver.getType()', () => {
     it('should return model type', () => {
       const outputType = findOne(UserModel, UserTypeComposer).getType();
-      expect(outputType).to.equal(UserTypeComposer.getType());
+      expect(outputType).toBe(UserTypeComposer.getType());
     });
   });
 });

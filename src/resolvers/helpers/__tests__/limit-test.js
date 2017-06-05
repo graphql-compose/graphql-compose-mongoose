@@ -1,25 +1,21 @@
 /* @flow */
 
-import { expect, spy } from 'chai';
-import {
-  GraphQLInt,
-} from 'graphql';
+import { GraphQLInt } from 'graphql';
 import { limitHelperArgs, limitHelper } from '../limit';
 
 describe('Resolver helper `limit` ->', () => {
   describe('limitHelperArgs()', () => {
     it('should return limit field', () => {
       const args = limitHelperArgs();
-      expect(args).has.property('limit');
-      expect(args).has.deep.property('limit.name', 'limit');
-      expect(args).has.deep.property('limit.type', GraphQLInt);
+      expect(args).toHaveProperty('limit');
+      expect(args).toHaveProperty('limit.name', 'limit');
+      expect(args).toHaveProperty('limit.type', GraphQLInt);
     });
     it('should process `opts.defaultValue` arg', () => {
-      expect(limitHelperArgs())
-        .has.deep.property('limit.defaultValue', 1000);
+      expect(limitHelperArgs()).toHaveProperty('limit.defaultValue', 1000);
       expect(limitHelperArgs({
         defaultValue: 333,
-      })).has.deep.property('limit.defaultValue', 333);
+      })).toHaveProperty('limit.defaultValue', 333);
     });
   });
 
@@ -28,7 +24,7 @@ describe('Resolver helper `limit` ->', () => {
     let resolveParams;
 
     beforeEach(() => {
-      spyFn = spy();
+      spyFn = jest.fn();
       resolveParams = {
         query: {
           limit: spyFn,
@@ -38,17 +34,17 @@ describe('Resolver helper `limit` ->', () => {
 
     it('should not call query.limit if args.limit is empty', () => {
       limitHelper(resolveParams);
-      expect(spyFn).to.have.not.been.called();
+      expect(spyFn).not.toBeCalled();
     });
     it('should call query.limit if args.limit is provided', () => {
       resolveParams.args = { limit: 333 };
       limitHelper(resolveParams);
-      expect(spyFn).to.have.been.called.with(333);
+      expect(spyFn).toBeCalledWith(333);
     });
     it('should convert string to int in args.limit', () => {
       resolveParams.args = { limit: '444' };
       limitHelper(resolveParams);
-      expect(spyFn).to.have.been.called.with(444);
+      expect(spyFn).toBeCalledWith(444);
     });
   });
 });

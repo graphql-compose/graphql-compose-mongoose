@@ -1,6 +1,5 @@
 /* @flow */
 
-import { expect } from 'chai';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
 import { InputTypeComposer } from 'graphql-compose';
 import { recordHelperArgs } from '../record';
@@ -19,17 +18,16 @@ describe('Resolver helper `record` ->', () => {
 
   describe('recordHelperArgs()', () => {
     it('should throw error if `recordTypeName` not provided in opts', () => {
-      expect(() => recordHelperArgs(UserTypeComposer))
-        .to.throw('provide non-empty `recordTypeName`');
+      expect(() => recordHelperArgs(UserTypeComposer)).toThrowError('provide non-empty `recordTypeName`');
     });
 
     it('should return input field', () => {
       const args = recordHelperArgs(UserTypeComposer, {
         recordTypeName: 'RecordUserType',
       });
-      expect(args).has.property('record');
-      expect(args).has.deep.property('record.name', 'record');
-      expect(args).has.deep.property('record.type').instanceof(GraphQLInputObjectType);
+      expect(args).toHaveProperty('record');
+      expect(args).toHaveProperty('record.name', 'record');
+      expect(args.record.type).toBeInstanceOf(GraphQLInputObjectType);
     });
 
     it('should reuse existed inputType', () => {
@@ -41,7 +39,7 @@ describe('Resolver helper `record` ->', () => {
       const args = recordHelperArgs(UserTypeComposer, {
         recordTypeName: 'RecordUserType',
       });
-      expect(args).has.deep.property('record.type').equal(existedType);
+      expect(args.record.type).toBe(existedType);
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
@@ -49,9 +47,9 @@ describe('Resolver helper `record` ->', () => {
         recordTypeName: 'RecordUserType',
         isRequired: true,
       });
-      expect(args).has.property('record');
-      expect(args).has.deep.property('record.name', 'record');
-      expect(args).has.deep.property('record.type').instanceof(GraphQLNonNull);
+      expect(args).toHaveProperty('record');
+      expect(args).toHaveProperty('record.name', 'record');
+      expect(args.record.type).toBeInstanceOf(GraphQLNonNull);
     });
 
     it('should remove fields via opts.removeFields', () => {
@@ -60,9 +58,9 @@ describe('Resolver helper `record` ->', () => {
         removeFields: ['name', 'age'],
       });
       const inputTypeComposer = new InputTypeComposer(args.record.type);
-      expect(inputTypeComposer.hasField('name')).to.be.false;
-      expect(inputTypeComposer.hasField('age')).to.be.false;
-      expect(inputTypeComposer.hasField('gender')).to.be.true;
+      expect(inputTypeComposer.hasField('name')).toBe(false);
+      expect(inputTypeComposer.hasField('age')).toBe(false);
+      expect(inputTypeComposer.hasField('gender')).toBe(true);
     });
 
     it('should set required fields via opts.requiredFields', () => {
@@ -71,9 +69,9 @@ describe('Resolver helper `record` ->', () => {
         requiredFields: ['name', 'age'],
       });
       const inputTypeComposer = new InputTypeComposer(args.record.type);
-      expect(inputTypeComposer.getFieldType('name')).instanceof(GraphQLNonNull);
-      expect(inputTypeComposer.getFieldType('age')).instanceof(GraphQLNonNull);
-      expect(inputTypeComposer.getFieldType('gender')).not.instanceof(GraphQLNonNull);
+      expect(inputTypeComposer.getFieldType('name')).toBeInstanceOf(GraphQLNonNull);
+      expect(inputTypeComposer.getFieldType('age')).toBeInstanceOf(GraphQLNonNull);
+      expect(inputTypeComposer.getFieldType('gender')).not.toBeInstanceOf(GraphQLNonNull);
     });
   });
 });

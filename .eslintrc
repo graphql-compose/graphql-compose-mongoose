@@ -16,7 +16,8 @@
     }]
   },
   "env": {
-    "mocha": true
+    "jasmine": true,
+    "jest": true,
   },
   "plugins": [
     "flowtype"

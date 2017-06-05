@@ -1,18 +1,15 @@
 /* @flow */
 
-import { expect, spy } from 'chai';
-import {
-  GraphQLInt,
-} from 'graphql';
+import { GraphQLInt } from 'graphql';
 import { skipHelperArgs, skipHelper } from '../skip';
 
 describe('Resolver helper `skip` ->', () => {
   describe('limitHelperArgs()', () => {
     it('should return skip field', () => {
       const args = skipHelperArgs();
-      expect(args).has.property('skip');
-      expect(args).has.deep.property('skip.name', 'skip');
-      expect(args).has.deep.property('skip.type', GraphQLInt);
+      expect(args).toHaveProperty('skip');
+      expect(args).toHaveProperty('skip.name', 'skip');
+      expect(args).toHaveProperty('skip.type', GraphQLInt);
     });
   });
 
@@ -21,7 +18,7 @@ describe('Resolver helper `skip` ->', () => {
     let resolveParams;
 
     beforeEach(() => {
-      spyFn = spy();
+      spyFn = jest.fn();
       resolveParams = {
         query: {
           skip: spyFn,
@@ -31,17 +28,17 @@ describe('Resolver helper `skip` ->', () => {
 
     it('should not call query.skip if args.skip is empty', () => {
       skipHelper(resolveParams);
-      expect(spyFn).to.have.not.been.called();
+      expect(spyFn).not.toBeCalled();
     });
     it('should call query.skip if args.skip is provided', () => {
       resolveParams.args = { skip: 333 };
       skipHelper(resolveParams);
-      expect(spyFn).to.have.been.called.with(333);
+      expect(spyFn).toBeCalledWith(333);
     });
     it('should convert skip to int in args.skip', () => {
       resolveParams.args = { skip: '444' };
       skipHelper(resolveParams);
-      expect(spyFn).to.have.been.called.with(444);
+      expect(spyFn).toBeCalledWith(444);
     });
   });
 });

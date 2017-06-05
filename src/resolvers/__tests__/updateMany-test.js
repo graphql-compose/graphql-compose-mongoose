@@ -1,6 +1,5 @@
 /* @flow */
 
-import { expect } from 'chai';
 import { GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { Query } from 'mongoose';
 import { Resolver, TypeComposer } from 'graphql-compose';
@@ -22,13 +21,9 @@ describe('updateMany() ->', () => {
   let user1;
   let user2;
 
-  beforeEach('clear UserModel collection', (done) => {
-    UserModel.collection.drop(() => {
-      done();
-    });
-  });
+  beforeEach(async () => {
+    await UserModel.remove({});
 
-  beforeEach('add test user document to mongoDB', () => {
     user1 = new UserModel({
       name: 'userName1',
       skills: ['js', 'ruby', 'php', 'python'],
@@ -43,75 +38,70 @@ describe('updateMany() ->', () => {
       relocation: true,
     });
 
-    return Promise.all([
+    await Promise.all([
       user1.save(),
       user2.save(),
     ]);
   });
 
-  beforeEach(() => {
-    typeStorage.clear();
-  });
-
   it('should return Resolver object', () => {
     const resolver = updateMany(UserModel, UserTypeComposer);
-    expect(resolver).to.be.instanceof(Resolver);
+    expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have `filter` arg', () => {
       const resolver = updateMany(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('filter')).to.be.true;
+      expect(resolver.hasArg('filter')).toBe(true);
     });
 
     it('should have `limit` arg', () => {
       const resolver = updateMany(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('limit')).to.be.true;
+      expect(resolver.hasArg('limit')).toBe(true);
     });
 
     it('should have `skip` arg', () => {
       const resolver = updateMany(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('skip')).to.be.true;
+      expect(resolver.hasArg('skip')).toBe(true);
     });
 
     it('should have `sort` arg', () => {
       const resolver = updateMany(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('sort')).to.be.true;
+      expect(resolver.hasArg('sort')).toBe(true);
     });
 
     it('should have `record` arg', () => {
       const resolver = updateMany(UserModel, UserTypeComposer);
       const argConfig = resolver.getArg('record');
-      expect(argConfig).property('type').instanceof(GraphQLNonNull);
-      expect(argConfig).deep.property('type.ofType.name', 'UpdateManyUserInput');
+      expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
+      expect(argConfig.type.ofType.name).toBe('UpdateManyUserInput');
     });
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be promise', () => {
       const result = updateMany(UserModel, UserTypeComposer).resolve({});
-      expect(result).instanceof(Promise);
+      expect(result).toBeInstanceOf(Promise);
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
     it('should rejected with Error if args.record is empty', async () => {
       const result = updateMany(UserModel, UserTypeComposer).resolve({ args: {} });
-      await expect(result).be.rejectedWith(Error, 'at least one value in args.record');
+      await expect(result).rejects.toMatchSnapshot();
     });
 
-    it('should change data via args.record in database', (done) => {
+    it('should change data via args.record in database', async () => {
       const checkedName = 'nameForMongoDB';
-      updateMany(UserModel, UserTypeComposer).resolve({
+      await updateMany(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { _id: user1.id },
           record: { name: checkedName },
         },
-      }).then(() => {
-        UserModel.collection.findOne({ _id: user1._id }, (err, doc) => {
-          expect(doc).property('name').to.be.equal(checkedName);
-          done();
-        });
       });
+
+      await expect(UserModel.findOne({ _id: user1._id })).resolves.toEqual(
+        expect.objectContaining({ name: checkedName })
+      );
     });
 
     it('should return payload.numAffected', async () => {
@@ -120,7 +110,7 @@ describe('updateMany() ->', () => {
           record: { gender: 'female' },
         },
       });
-      expect(result).have.deep.property('numAffected', 2);
+      expect(result.numAffected).toBe(2);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
@@ -130,28 +120,27 @@ describe('updateMany() ->', () => {
           record: { gender: 'female' },
         },
         beforeQuery: (query) => {
-          expect(query).instanceof(Query);
+          expect(query).toBeInstanceOf(Query);
           beforeQueryCalled = true;
           // modify query before execution
-          return query.where({ _id: user1.id })
-        }
+          return query.where({ _id: user1.id });
+        },
       });
-      expect(beforeQueryCalled).to.be.true;
-      expect(result).have.deep.property('numAffected', 1);
+      expect(beforeQueryCalled).toBe(true);
+      expect(result.numAffected).toBe(1);
     });
   });
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
       const outputType = updateMany(UserModel, UserTypeComposer).getType();
-      expect(outputType).property('name')
-        .to.equal(`UpdateMany${UserTypeComposer.getTypeName()}Payload`);
+      expect(outputType.name).toBe(`UpdateMany${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have numAffected field', () => {
       const outputType = updateMany(UserModel, UserTypeComposer).getType();
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
-      expect(numAffectedField).property('type').to.equal(GraphQLInt);
+      expect(numAffectedField.type).toBe(GraphQLInt);
     });
 
     it('should reuse existed outputType', () => {
@@ -162,7 +151,7 @@ describe('updateMany() ->', () => {
       });
       typeStorage.set(outputTypeName, existedType);
       const outputType = updateMany(UserModel, UserTypeComposer).getType();
-      expect(outputType).to.equal(existedType);
+      expect(outputType).toBe(existedType);
     });
   });
 });

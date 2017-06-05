@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { expect } from 'chai';
 import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
@@ -20,40 +19,34 @@ describe('createOne() ->', () => {
     UserTypeComposer = composeWithMongoose(UserModel);
   });
 
-  beforeEach('clear UserModel collection', (done) => {
-    UserModel.collection.drop(() => {
-      done();
-    });
-  });
-
-  beforeEach(() => {
-    typeStorage.clear();
+  beforeEach(async () => {
+    await UserModel.remove({});
   });
 
   it('should return Resolver object', () => {
     const resolver = createOne(UserModel, UserTypeComposer);
-    expect(resolver).to.be.instanceof(Resolver);
+    expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have required `record` arg', () => {
       const resolver = createOne(UserModel, UserTypeComposer);
       const argConfig = resolver.getArg('record');
-      expect(argConfig).property('type').instanceof(GraphQLNonNull);
-      expect(argConfig).deep.property('type.ofType.name', 'CreateOneUserInput');
+      expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
+      expect(argConfig.type.ofType.name).toBe('CreateOneUserInput');
     });
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be promise', () => {
       const result = createOne(UserModel, UserTypeComposer).resolve({});
-      expect(result).instanceof(Promise);
+      expect(result).toBeInstanceOf(Promise);
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
     it('should rejected with Error if args.record is empty', async () => {
       const result = createOne(UserModel, UserTypeComposer).resolve({ args: {} });
-      await expect(result).be.rejectedWith(Error, 'at least one value in args.record');
+      await expect(result).rejects.toMatchSnapshot();
     });
 
     it('should return payload.recordId', async () => {
@@ -62,7 +55,7 @@ describe('createOne() ->', () => {
           record: { name: 'newName' },
         },
       });
-      expect(result).property('recordId').to.be.ok;
+      expect(result.recordId).toBeTruthy();
     });
 
     it('should create document with args.record', async () => {
@@ -71,7 +64,7 @@ describe('createOne() ->', () => {
           record: { name: 'newName' },
         },
       });
-      expect(result).have.deep.property('record.name', 'newName');
+      expect(result.record.name).toBe('newName');
     });
 
     it('should save document to database', (done) => {
@@ -82,7 +75,7 @@ describe('createOne() ->', () => {
         },
       }).then((res) => {
         UserModel.collection.findOne({ _id: res.record._id }, (err, doc) => {
-          expect(doc.name).to.be.equal(checkedName);
+          expect(doc.name).toBe(checkedName);
           done();
         });
       });
@@ -94,14 +87,14 @@ describe('createOne() ->', () => {
           record: { name: 'NewUser' },
         },
       });
-      expect(result).have.deep.property('record.id', result.recordId);
+      expect(result.record.id).toBe(result.recordId);
     });
 
     it('should return mongoose document', async () => {
       const result = await createOne(UserModel, UserTypeComposer).resolve({
         args: { record: { name: 'NewUser' } },
       });
-      expect(result).property('record').instanceof(UserModel);
+      expect(result.record).toBeInstanceOf(UserModel);
     });
 
     it('should call `beforeRecordMutate` method with created `record` and `resolveParams` as args', async () => {
@@ -114,29 +107,28 @@ describe('createOne() ->', () => {
           return record;
         },
       });
-      expect(result).property('record').instanceof(UserModel);
-      expect(result).have.deep.property('record.name', 'OverridedName');
-      expect(result).have.deep.property('record.someDynamic', '1.1.1.1');
+      expect(result.record).toBeInstanceOf(UserModel);
+      expect(result.record.name).toBe('OverridedName');
+      expect(result.record.someDynamic).toBe('1.1.1.1');
     });
   });
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
       const outputType = createOne(UserModel, UserTypeComposer).getType();
-      expect(outputType).property('name')
-        .to.equal(`CreateOne${UserTypeComposer.getTypeName()}Payload`);
+      expect(outputType.name).toBe(`CreateOne${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
       const outputType = createOne(UserModel, UserTypeComposer).getType();
       const recordIdField = new TypeComposer(outputType).getField('recordId');
-      expect(recordIdField).property('type').to.equal(GraphQLMongoID);
+      expect(recordIdField.type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType = createOne(UserModel, UserTypeComposer).getType();
       const recordField = new TypeComposer(outputType).getField('record');
-      expect(recordField).property('type').to.equal(UserTypeComposer.getType());
+      expect(recordField.type).toBe(UserTypeComposer.getType());
     });
 
     it('should reuse existed outputType', () => {
@@ -147,7 +139,7 @@ describe('createOne() ->', () => {
       });
       typeStorage.set(outputTypeName, existedType);
       const outputType = createOne(UserModel, UserTypeComposer).getType();
-      expect(outputType).to.equal(existedType);
+      expect(outputType).toBe(existedType);
     });
   });
 });

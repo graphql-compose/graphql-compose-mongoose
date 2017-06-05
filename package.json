@@ -45,9 +45,6 @@
     "babel-plugin-transform-regenerator": "^6.24.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",
-    "chai": "3.5.0",
-    "chai-as-promised": "6.0.0",
-    "chai-spies": "0.7.1",
     "cz-conventional-changelog": "^2.0.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb-base": "^11.2.0",
@@ -57,12 +54,11 @@
     "graphql": "^0.10.1",
     "graphql-compose": "^1.19.3",
     "graphql-compose-connection": "^2.1.4",
-    "mocha": "^3.4.2",
+    "jest": "^20.0.4",
+    "jest-babel": "^1.0.1",
     "mongodb-memory-server": "^1.1.1",
     "mongoose": "^4.10.4",
-    "nyc": "^11.0.2",
     "rimraf": "^2.6.1",
-    "sane": "^1.7.0",
     "semantic-release": "^6.3.6"
   },
   "config": {
@@ -82,15 +78,20 @@
       "text"
     ]
   },
+  "jest": {
+    "roots": [
+      "<rootDir>/src"
+    ]
+  },
   "scripts": {
     "build": "npm run build-cjs && npm run build-flow && npm run build-es",
     "build-cjs": "rimraf lib && babel src --ignore __tests__,__mocks__ -d lib",
     "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es",
     "build-flow": "find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
-    "coverage": "nyc npm run test",
+    "coverage": "jest --coverage",
     "lint": "eslint src test *.js",
-    "test": "babel-node ./node_modules/.bin/_mocha --compilers js:babel-core/register --reporter dot --timeout 20000 --require ./resources/mocha-bootload src/**/__tests__/**/*-test.js",
-    "watch": "babel-node ./resources/watch.js",
+    "test": "jest",
+    "watch": "jest --watch",
     "link": "yarn build && yarn link graphql && yarn link graphql-compose && yarn link graphql-compose-connection && yarn link mongoose && yarn link",
     "unlink": "yarn unlink graphql && yarn unlink graphql-compose && yarn unlink graphql-compose-connection && yarn unlink mongoose && yarn add graphql graphql-compose graphql-compose-connection mongoose",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
