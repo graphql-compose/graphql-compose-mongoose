@@ -9,7 +9,6 @@ import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-
 describe('findByIds() ->', () => {
   let UserTypeComposer;
   let PostTypeComposer;
@@ -37,11 +36,7 @@ describe('findByIds() ->', () => {
     user2 = new UserModel({ name: 'nodkz2' });
     user3 = new UserModel({ name: 'nodkz3' });
 
-    await Promise.all([
-      user1.save(),
-      user2.save(),
-      user3.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save(), user3.save()]);
 
     await PostModel.remove({});
 
@@ -49,11 +44,7 @@ describe('findByIds() ->', () => {
     post2 = new PostModel({ _id: 2, title: 'Post 2' });
     post3 = new PostModel({ _id: 3, title: 'Post 3' });
 
-    await Promise.all([
-      post1.save(),
-      post2.save(),
-      post3.save(),
-    ]);
+    await Promise.all([post1.save(), post2.save(), post3.save()]);
   });
 
   it('should return Resolver object', () => {
@@ -95,33 +86,39 @@ describe('findByIds() ->', () => {
     });
 
     it('should return array of documents', async () => {
-      const result = await findByIds(UserModel, UserTypeComposer)
-        .resolve({ args: { _ids: [user1._id, user2._id, user3._id] } });
+      const result = await findByIds(UserModel, UserTypeComposer).resolve({
+        args: { _ids: [user1._id, user2._id, user3._id] },
+      });
 
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(3);
-      expect(result.map(d => d.name)).toEqual(expect.arrayContaining([user1.name, user2.name, user3.name]));
+      expect(result.map(d => d.name)).toEqual(
+        expect.arrayContaining([user1.name, user2.name, user3.name])
+      );
     });
 
     it('should return array of documents if object id is string', async () => {
       const stringId = `${user1._id}`;
-      const result = await findByIds(UserModel, UserTypeComposer)
-        .resolve({ args: { _ids: [stringId] } });
+      const result = await findByIds(UserModel, UserTypeComposer).resolve({
+        args: { _ids: [stringId] },
+      });
 
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(1);
     });
 
     it('should return array of documents if args._ids are integers', async () => {
-      const result = await findByIds(PostModel, PostTypeComposer)
-        .resolve({ args: { _ids: [1, 2, 3] } });
+      const result = await findByIds(PostModel, PostTypeComposer).resolve({
+        args: { _ids: [1, 2, 3] },
+      });
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(3);
     });
 
     it('should return mongoose documents', async () => {
-      const result = await findByIds(UserModel, UserTypeComposer)
-        .resolve({ args: { _ids: [user1._id, user2._id] } });
+      const result = await findByIds(UserModel, UserTypeComposer).resolve({
+        args: { _ids: [user1._id, user2._id] },
+      });
       expect(result[0]).toBeInstanceOf(UserModel);
       expect(result[1]).toBeInstanceOf(UserModel);
     });

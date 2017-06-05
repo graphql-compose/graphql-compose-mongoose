@@ -4,10 +4,7 @@ import { GraphQLNonNull } from 'graphql';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import typeStorage from '../../typeStorage';
 
-import type {
-  GraphQLFieldConfigArgumentMap,
-  recordHelperArgsOpts,
-} from '../../definition';
+import type { GraphQLFieldConfigArgumentMap, recordHelperArgsOpts } from '../../definition';
 
 export const recordHelperArgs = (
   typeComposer: TypeComposer,

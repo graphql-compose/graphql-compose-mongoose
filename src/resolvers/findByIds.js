@@ -1,18 +1,12 @@
 /* @flow */
 
 import { GraphQLNonNull, GraphQLList } from 'graphql';
-import mongoose from 'mongoose';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import GraphQLMongoID from '../types/mongoid';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-
+import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
 
 export default function findByIds(
   model: MongooseModelT,
@@ -20,9 +14,7 @@ export default function findByIds(
   opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver findByIds() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver findByIds() should be instance of Mongoose Model.');
   }
 
   if (!(typeComposer instanceof TypeComposer)) {
@@ -46,7 +38,7 @@ export default function findByIds(
         ...(opts && opts.sort),
       }),
     },
-    resolve: (resolveParams : ExtendedResolveParams) => {
+    resolve: (resolveParams: ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
       if (!Array.isArray(args._ids)) {

@@ -8,7 +8,6 @@ import removeMany from '../removeMany';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-
 describe('removeMany() ->', () => {
   let UserTypeComposer;
 
@@ -46,11 +45,7 @@ describe('removeMany() ->', () => {
       age: 30,
     });
 
-    await Promise.all([
-      user1.save(),
-      user2.save(),
-      user3.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save(), user3.save()]);
   });
 
   it('should return Resolver object', () => {
@@ -113,7 +108,7 @@ describe('removeMany() ->', () => {
         args: {
           filter: { gender: 'female' },
         },
-        beforeQuery: (query) => {
+        beforeQuery: query => {
           expect(query).toBeInstanceOf(Query);
           beforeQueryCalled = true;
           return query;

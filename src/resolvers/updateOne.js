@@ -11,12 +11,7 @@ import findOne from './findOne';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
 
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-
+import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
 
 export default function updateOne(
   model: MongooseModelT,
@@ -24,14 +19,10 @@ export default function updateOne(
   opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver updateOne() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver updateOne() should be instance of Mongoose Model.');
   }
   if (!(typeComposer instanceof TypeComposer)) {
-    throw new Error(
-      'Second arg for Resolver updateOne() should be instance of TypeComposer.'
-    );
+    throw new Error('Second arg for Resolver updateOne() should be instance of TypeComposer.');
   }
 
   const findOneResolver = findOne(model, typeComposer, opts);
@@ -57,11 +48,12 @@ export default function updateOne(
   const resolver = new Resolver({
     name: 'updateOne',
     kind: 'mutation',
-    description: 'Update one document: '
-               + '1) Retrieve one document via findOne. '
-               + '2) Apply updates to mongoose document. '
-               + '3) Mongoose applies defaults, setters, hooks and validation. '
-               + '4) And save it.',
+    description:
+      'Update one document: ' +
+        '1) Retrieve one document via findOne. ' +
+        '2) Apply updates to mongoose document. ' +
+        '3) Mongoose applies defaults, setters, hooks and validation. ' +
+        '4) And save it.',
     type: outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
@@ -86,12 +78,12 @@ export default function updateOne(
       const recordData = (resolveParams.args && resolveParams.args.record) || null;
       const filterData = (resolveParams.args && resolveParams.args.filter) || {};
 
-      if (!(typeof filterData === 'object')
-        || Object.keys(filterData).length === 0
-      ) {
+      if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
         return Promise.reject(
-          new Error(`${typeComposer.getTypeName()}.updateOne resolver requires `
-                  + 'at least one value in args.filter')
+          new Error(
+            `${typeComposer.getTypeName()}.updateOne resolver requires ` +
+              'at least one value in args.filter'
+          )
         );
       }
 
@@ -101,33 +93,36 @@ export default function updateOne(
       resolveParams.projection = {};
 
       // $FlowFixMe
-      return findOneResolver.resolve(resolveParams)
-        .then((doc) => {
-          // $FlowFixMe
-          if (resolveParams.beforeRecordMutate) {
-            return resolveParams.beforeRecordMutate(doc, resolveParams);
-          }
-          return doc;
-        })
-        // save changes to DB
-        .then((doc) => {
-          if (recordData) {
-            doc.set(recordData);
-            return doc.save();
-          }
-          return doc;
-        })
-        // prepare output payload
-        .then((record) => {
-          if (record) {
-            return {
-              record,
-              recordId: typeComposer.getRecordIdFn()(record),
-            };
-          }
+      return (
+        findOneResolver
+          .resolve(resolveParams)
+          .then(doc => {
+            // $FlowFixMe
+            if (resolveParams.beforeRecordMutate) {
+              return resolveParams.beforeRecordMutate(doc, resolveParams);
+            }
+            return doc;
+          })
+          // save changes to DB
+          .then(doc => {
+            if (recordData) {
+              doc.set(recordData);
+              return doc.save();
+            }
+            return doc;
+          })
+          // prepare output payload
+          .then(record => {
+            if (record) {
+              return {
+                record,
+                recordId: typeComposer.getRecordIdFn()(record),
+              };
+            }
 
-          return null;
-        });
+            return null;
+          })
+      );
     },
   });
 

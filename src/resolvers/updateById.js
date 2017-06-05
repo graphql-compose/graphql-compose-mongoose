@@ -8,12 +8,7 @@ import findById from './findById';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
 
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-
+import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
 
 export default function updateById(
   model: MongooseModelT,
@@ -21,15 +16,11 @@ export default function updateById(
   opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver updateById() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver updateById() should be instance of Mongoose Model.');
   }
 
   if (!(typeComposer instanceof TypeComposer)) {
-    throw new Error(
-      'Second arg for Resolver updateById() should be instance of TypeComposer.'
-    );
+    throw new Error('Second arg for Resolver updateById() should be instance of TypeComposer.');
   }
 
   const findByIdResolver = findById(model, typeComposer);
@@ -55,11 +46,12 @@ export default function updateById(
   const resolver = new Resolver({
     name: 'updateById',
     kind: 'mutation',
-    description: 'Update one document: '
-               + '1) Retrieve one document by findById. '
-               + '2) Apply updates to mongoose document. '
-               + '3) Mongoose applies defaults, setters, hooks and validation. '
-               + '4) And save it.',
+    description:
+      'Update one document: ' +
+        '1) Retrieve one document by findById. ' +
+        '2) Apply updates to mongoose document. ' +
+        '3) Mongoose applies defaults, setters, hooks and validation. ' +
+        '4) And save it.',
     type: outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
@@ -96,36 +88,39 @@ export default function updateById(
       resolveParams.projection = {};
 
       // $FlowFixMe
-      return findByIdResolver.resolve(resolveParams)
-        .then((doc) => {
-          // $FlowFixMe
-          if (resolveParams.beforeRecordMutate) {
-            return resolveParams.beforeRecordMutate(doc, resolveParams);
-          }
-          return doc;
-        })
-        // save changes to DB
-        .then((doc) => {
-          if (!doc) {
-            return Promise.reject(new Error('Document not found'));
-          }
-          if (recordData) {
-            doc.set(recordData);
-            return doc.save();
-          }
-          return doc;
-        })
-        // prepare output payload
-        .then((record) => {
-          if (record) {
-            return {
-              record,
-              recordId: typeComposer.getRecordIdFn()(record),
-            };
-          }
+      return (
+        findByIdResolver
+          .resolve(resolveParams)
+          .then(doc => {
+            // $FlowFixMe
+            if (resolveParams.beforeRecordMutate) {
+              return resolveParams.beforeRecordMutate(doc, resolveParams);
+            }
+            return doc;
+          })
+          // save changes to DB
+          .then(doc => {
+            if (!doc) {
+              return Promise.reject(new Error('Document not found'));
+            }
+            if (recordData) {
+              doc.set(recordData);
+              return doc.save();
+            }
+            return doc;
+          })
+          // prepare output payload
+          .then(record => {
+            if (record) {
+              return {
+                record,
+                recordId: typeComposer.getRecordIdFn()(record),
+              };
+            }
 
-          return null;
-        });
+            return null;
+          })
+      );
     },
   });
 

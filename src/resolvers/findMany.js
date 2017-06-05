@@ -8,12 +8,7 @@ import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-
+import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
 
 export default function findMany(
   model: MongooseModelT,
@@ -21,9 +16,7 @@ export default function findMany(
   opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver findMany() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver findMany() should be instance of Mongoose Model.');
   }
 
   if (!(typeComposer instanceof TypeComposer)) {
@@ -49,7 +42,7 @@ export default function findMany(
         ...(opts && opts.sort),
       }),
     },
-    resolve: (resolveParams : ExtendedResolveParams) => {
+    resolve: (resolveParams: ExtendedResolveParams) => {
       resolveParams.query = model.find();
       filterHelper(resolveParams);
       skipHelper(resolveParams);

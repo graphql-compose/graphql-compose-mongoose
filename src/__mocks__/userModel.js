@@ -45,10 +45,12 @@ const UserSchema = new Schema(
     },
 
     employment: {
-      type: [{
-        type: String,
-        enum: Object.keys(enumEmployment),
-      }],
+      type: [
+        {
+          type: String,
+          enum: Object.keys(enumEmployment),
+        },
+      ],
       description: 'List of desired employment types',
       index: true,
     },
@@ -76,7 +78,7 @@ const UserSchema = new Schema(
 
     someDynamic: {
       type: Schema.Types.Mixed,
-      description: 'Some mixed value, that served with @taion\'s `graphql-type-json`',
+      description: "Some mixed value, that served with @taion's `graphql-type-json`",
     },
 
     // createdAt, created via option `timastamp: true` (see bottom)
@@ -96,10 +98,6 @@ UserSchema.virtual('nameVirtual').get(function () { // eslint-disable-line
   return `VirtualFieldValue${this._id}`;
 });
 
-
 const UserModel = mongoose.model('User', UserSchema);
 
-export {
-  UserSchema,
-  UserModel,
-};
+export { UserSchema, UserModel };

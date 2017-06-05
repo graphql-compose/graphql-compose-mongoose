@@ -9,7 +9,6 @@ import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-
 describe('updateOne() ->', () => {
   let UserTypeComposer;
 
@@ -39,10 +38,7 @@ describe('updateOne() ->', () => {
       relocation: true,
     });
 
-    await Promise.all([
-      user1.save(),
-      user2.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save()]);
   });
 
   it('should return Resolver object', () => {
@@ -113,9 +109,9 @@ describe('updateOne() ->', () => {
       });
 
       await expect(UserModel.findOne({ _id: user1._id })).resolves.toEqual(
-          expect.objectContaining({
-            name: checkedName,
-          })
+        expect.objectContaining({
+          name: checkedName,
+        })
       );
     });
 

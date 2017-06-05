@@ -9,7 +9,6 @@ import { composeWithMongoose } from '../../composeWithMongoose';
 import GraphQLMongoID from '../../types/mongoid';
 import typeStorage from '../../typeStorage';
 
-
 describe('createOne() ->', () => {
   let UserTypeComposer;
 
@@ -67,18 +66,20 @@ describe('createOne() ->', () => {
       expect(result.record.name).toBe('newName');
     });
 
-    it('should save document to database', (done) => {
+    it('should save document to database', done => {
       const checkedName = 'nameForMongoDB';
-      createOne(UserModel, UserTypeComposer).resolve({
-        args: {
-          record: { name: checkedName },
-        },
-      }).then((res) => {
-        UserModel.collection.findOne({ _id: res.record._id }, (err, doc) => {
-          expect(doc.name).toBe(checkedName);
-          done();
+      createOne(UserModel, UserTypeComposer)
+        .resolve({
+          args: {
+            record: { name: checkedName },
+          },
+        })
+        .then(res => {
+          UserModel.collection.findOne({ _id: res.record._id }, (err, doc) => {
+            expect(doc.name).toBe(checkedName);
+            done();
+          });
         });
-      });
     });
 
     it('should return payload.record', async () => {

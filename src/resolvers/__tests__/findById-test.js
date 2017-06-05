@@ -9,7 +9,6 @@ import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-
 describe('findById() ->', () => {
   let UserTypeComposer;
   let PostTypeComposer;
@@ -70,8 +69,9 @@ describe('findById() ->', () => {
     });
 
     it('should return document if provided existed id', async () => {
-      const result = await findById(UserModel, UserTypeComposer)
-        .resolve({ args: { _id: user._id } });
+      const result = await findById(UserModel, UserTypeComposer).resolve({
+        args: { _id: user._id },
+      });
       expect(result.name).toBe(user.name);
     });
 

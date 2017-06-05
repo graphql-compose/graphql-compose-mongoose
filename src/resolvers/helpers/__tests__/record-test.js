@@ -18,7 +18,9 @@ describe('Resolver helper `record` ->', () => {
 
   describe('recordHelperArgs()', () => {
     it('should throw error if `recordTypeName` not provided in opts', () => {
-      expect(() => recordHelperArgs(UserTypeComposer)).toThrowError('provide non-empty `recordTypeName`');
+      expect(() => recordHelperArgs(UserTypeComposer)).toThrowError(
+        'provide non-empty `recordTypeName`'
+      );
     });
 
     it('should return input field', () => {

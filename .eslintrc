@@ -1,25 +1,44 @@
 {
-  "extends": "airbnb-base",
+  "extends": [
+    "airbnb-base",
+    "prettier"
+  ],
   "parser": "babel-eslint",
   "rules": {
     "no-underscore-dangle": 0,
-    "no-unused-expressions": 0,
     "arrow-body-style": 0,
-    "arrow-parens": 0,
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+    "no-unused-expressions": 0,
+    "no-plusplus": 0,
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": ["**/*-test.js", "**/__mocks__/**"]}],
+    "no-prototype-builtins": 0,
+    "no-restricted-syntax": 0,
+    "no-mixed-operators": 0,
     "comma-dangle": ["error", {
       "arrays": "always-multiline",
       "objects": "always-multiline",
       "imports": "always-multiline",
       "exports": "always-multiline",
       "functions": "ignore",
-    }]
+    }],
+    "prettier/prettier": ["error", {
+      "printWidth": 100,
+      "singleQuote": true,
+      "trailingComma": "es5",
+    }],
+    "import/prefer-default-export": 0,
+    "arrow-parens": 0
   },
   "env": {
     "jasmine": true,
-    "jest": true,
+    "jest": true
   },
   "plugins": [
-    "flowtype"
-  ]
+    "flowtype",
+    "prettier"
+  ],
+  "globals": {
+    "Class": true,
+    "Iterator": true,
+    "$Shape": true,
+  }
 }

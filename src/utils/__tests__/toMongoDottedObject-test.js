@@ -15,9 +15,7 @@ describe('toMongoDottedObject()', () => {
   });
 
   it('should mix query operators started with $', () => {
-    expect(
-      toMongoDottedObject({ a: { $in: [1, 2, 3], $exists: true } }),
-    ).toEqual({
+    expect(toMongoDottedObject({ a: { $in: [1, 2, 3], $exists: true } })).toEqual({
       a: { $in: [1, 2, 3], $exists: true },
     });
   });

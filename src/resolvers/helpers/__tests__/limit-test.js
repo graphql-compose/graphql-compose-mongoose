@@ -13,9 +13,11 @@ describe('Resolver helper `limit` ->', () => {
     });
     it('should process `opts.defaultValue` arg', () => {
       expect(limitHelperArgs()).toHaveProperty('limit.defaultValue', 1000);
-      expect(limitHelperArgs({
-        defaultValue: 333,
-      })).toHaveProperty('limit.defaultValue', 333);
+      expect(
+        limitHelperArgs({
+          defaultValue: 333,
+        })
+      ).toHaveProperty('limit.defaultValue', 333);
     });
   });
 

@@ -9,18 +9,14 @@ import type {
   GraphQLFieldConfigArgumentMap,
   MongooseModelT,
   sortHelperArgsOpts,
-  ObjectMap,
 } from '../../definition';
-
 
 export const sortHelperArgs = (
   model: MongooseModelT,
   opts: sortHelperArgsOpts
 ): GraphQLFieldConfigArgumentMap => {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for sortHelperArgs() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for sortHelperArgs() should be instance of Mongoose Model.');
   }
 
   if (!opts || !opts.sortTypeName) {
@@ -44,15 +40,11 @@ export function sortHelper(resolveParams: ExtendedResolveParams): void {
   }
 }
 
-
-export function getSortTypeFromModel(
-  typeName: string,
-  model: MongooseModelT
-): GraphQLEnumType {
+export function getSortTypeFromModel(typeName: string, model: MongooseModelT): GraphQLEnumType {
   const indexes = extendByReversedIndexes(getIndexesFromModel(model));
 
   const sortEnumValues = {};
-  indexes.forEach((indexData) => {
+  indexes.forEach(indexData => {
     const keys = Object.keys(indexData);
     let name = keys.join('__').toUpperCase().replace(/[^_a-zA-Z0-9]/i, '__');
     if (indexData[keys[0]] === 1) {

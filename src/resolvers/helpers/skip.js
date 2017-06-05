@@ -1,13 +1,9 @@
 /* @flow */
 
 import { GraphQLInt } from 'graphql';
-import type {
-  GraphQLFieldConfigArgumentMap,
-  ExtendedResolveParams,
-} from '../../definition';
+import type { GraphQLFieldConfigArgumentMap, ExtendedResolveParams } from '../../definition';
 
-
-export const skipHelperArgs = ():GraphQLFieldConfigArgumentMap => {
+export const skipHelperArgs = (): GraphQLFieldConfigArgumentMap => {
   return {
     skip: {
       name: 'skip',

@@ -9,7 +9,6 @@ import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-
 describe('removeById() ->', () => {
   let UserTypeComposer;
 
@@ -57,7 +56,7 @@ describe('removeById() ->', () => {
     });
 
     it('should rejected with Error if args._id is empty', async () => {
-      const result = removeById(UserModel, UserTypeComposer).resolve({ args: { } });
+      const result = removeById(UserModel, UserTypeComposer).resolve({ args: {} });
       await expect(result).rejects.toMatchSnapshot();
     });
 
@@ -79,7 +78,6 @@ describe('removeById() ->', () => {
       });
       return expect(promise).rejects.toMatchSnapshot();
     });
-
 
     it('should remove document in database', async () => {
       await removeById(UserModel, UserTypeComposer).resolve({

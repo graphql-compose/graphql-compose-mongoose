@@ -8,7 +8,6 @@ import updateMany from '../updateMany';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-
 describe('updateMany() ->', () => {
   let UserTypeComposer;
 
@@ -38,10 +37,7 @@ describe('updateMany() ->', () => {
       relocation: true,
     });
 
-    await Promise.all([
-      user1.save(),
-      user2.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save()]);
   });
 
   it('should return Resolver object', () => {
@@ -119,7 +115,7 @@ describe('updateMany() ->', () => {
         args: {
           record: { gender: 'female' },
         },
-        beforeQuery: (query) => {
+        beforeQuery: query => {
           expect(query).toBeInstanceOf(Query);
           beforeQueryCalled = true;
           // modify query before execution

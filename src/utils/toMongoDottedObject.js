@@ -14,12 +14,12 @@
  * @param {Object} target target object
  * @param {Array} path path array (internal)
  */
- export default function toMongoDottedObject(
-   obj: Object,
-   target?: Object = {},
-   path?: string[] = [],
- ): { [dottedPath: string]: mixed } {
-   /* eslint-disable */
+export default function toMongoDottedObject(
+  obj: Object,
+  target?: Object = {},
+  path?: string[] = []
+): { [dottedPath: string]: mixed } {
+  /* eslint-disable */
    Object.keys(obj).forEach(key => {
      if (key.startsWith('$')) {
        target[path.join('.')] = Object.assign({}, target[path.join('.')], {
@@ -33,4 +33,4 @@
    });
    return target;
    /* eslint-enable */
- }
+}

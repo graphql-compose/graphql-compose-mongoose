@@ -6,7 +6,6 @@ import findMany from '../findMany';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-
 describe('findMany() ->', () => {
   let UserTypeComposer;
 
@@ -36,10 +35,7 @@ describe('findMany() ->', () => {
       relocation: false,
     });
 
-    await Promise.all([
-      user1.save(),
-      user2.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save()]);
   });
 
   it('should return Resolver object', () => {
@@ -82,34 +78,33 @@ describe('findMany() ->', () => {
     });
 
     it('should limit records', async () => {
-      const result = await findMany(UserModel, UserTypeComposer)
-        .resolve({ args: { limit: 1 } });
+      const result = await findMany(UserModel, UserTypeComposer).resolve({ args: { limit: 1 } });
 
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(1);
     });
 
     it('should skip records', async () => {
-      const result = await findMany(UserModel, UserTypeComposer)
-        .resolve({ args: { skip: 1000 } });
+      const result = await findMany(UserModel, UserTypeComposer).resolve({ args: { skip: 1000 } });
 
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(0);
     });
 
     it('should sort records', async () => {
-      const result1 = await findMany(UserModel, UserTypeComposer)
-        .resolve({ args: { sort: { _id: 1 } } });
+      const result1 = await findMany(UserModel, UserTypeComposer).resolve({
+        args: { sort: { _id: 1 } },
+      });
 
-      const result2 = await findMany(UserModel, UserTypeComposer)
-        .resolve({ args: { sort: { _id: -1 } } });
+      const result2 = await findMany(UserModel, UserTypeComposer).resolve({
+        args: { sort: { _id: -1 } },
+      });
 
       expect(`${result1[0]._id}`).not.toBe(`${result2[0]._id}`);
     });
 
     it('should return mongoose documents', async () => {
-      const result = await findMany(UserModel, UserTypeComposer)
-        .resolve({ args: { limit: 2 } });
+      const result = await findMany(UserModel, UserTypeComposer).resolve({ args: { limit: 2 } });
       expect(result[0]).toBeInstanceOf(UserModel);
       expect(result[1]).toBeInstanceOf(UserModel);
     });

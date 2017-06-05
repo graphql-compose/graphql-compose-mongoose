@@ -36,10 +36,7 @@ describe('count() ->', () => {
       relocation: false,
     });
 
-    await Promise.all([
-      user1.save(),
-      user2.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save()]);
   });
 
   it('should return Resolver object', () => {
@@ -66,9 +63,9 @@ describe('count() ->', () => {
     });
 
     it('should return number of document by filter data', async () => {
-      const result = await count(UserModel, UserTypeComposer).resolve(
-        { args: { filter: { gender: 'male' } } }
-      );
+      const result = await count(UserModel, UserTypeComposer).resolve({
+        args: { filter: { gender: 'male' } },
+      });
       expect(result).toBe(1);
     });
   });

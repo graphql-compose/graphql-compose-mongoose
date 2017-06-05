@@ -10,7 +10,6 @@ import { mongoose } from '../../__mocks__/mongooseCommon';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-
 describe('removeOne() ->', () => {
   let UserTypeComposer;
 
@@ -48,11 +47,7 @@ describe('removeOne() ->', () => {
       age: 30,
     });
 
-    await Promise.all([
-      user1.save(),
-      user2.save(),
-      user3.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save(), user3.save()]);
   });
 
   it('should return Resolver object', () => {
@@ -66,11 +61,14 @@ describe('removeOne() ->', () => {
       expect(resolver.hasArg('filter')).toBe(true);
     });
 
-    it('should not have `skip` arg due mongoose error: '
-     + 'skip cannot be used with findOneAndRemove', () => {
-      const resolver = removeOne(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('skip')).toBe(false);
-    });
+    it(
+      'should not have `skip` arg due mongoose error: ' +
+        'skip cannot be used with findOneAndRemove',
+      () => {
+        const resolver = removeOne(UserModel, UserTypeComposer);
+        expect(resolver.hasArg('skip')).toBe(false);
+      }
+    );
 
     it('should have `sort` arg', () => {
       const resolver = removeOne(UserModel, UserTypeComposer);

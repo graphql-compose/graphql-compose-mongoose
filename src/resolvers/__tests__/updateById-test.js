@@ -1,14 +1,18 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLNonNull, GraphQLInputObjectType, getNullableType, GraphQLObjectType } from 'graphql';
+import {
+  GraphQLNonNull,
+  GraphQLInputObjectType,
+  getNullableType,
+  GraphQLObjectType,
+} from 'graphql';
 import { Resolver, TypeComposer, InputTypeComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import updateById from '../updateById';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
-
 
 describe('updateById() ->', () => {
   let UserTypeComposer;
@@ -39,10 +43,7 @@ describe('updateById() ->', () => {
       relocation: true,
     });
 
-    await Promise.all([
-      user1.save(),
-      user2.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save()]);
   });
 
   it('should return Resolver object', () => {

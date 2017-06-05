@@ -7,7 +7,6 @@ import findOne from '../findOne';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
-
 describe('findOne() ->', () => {
   let UserTypeComposer;
 
@@ -37,10 +36,7 @@ describe('findOne() ->', () => {
       relocation: false,
     });
 
-    await Promise.all([
-      user1.save(),
-      user2.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save()]);
   });
 
   it('should return Resolver object', () => {
@@ -55,11 +51,13 @@ describe('findOne() ->', () => {
     });
 
     it('should have `filter` arg only with indexed fields', async () => {
-      const result = findOne(UserModel, UserTypeComposer,
-        { filter: { onlyIndexed: true, operators: false } }
-      );
+      const result = findOne(UserModel, UserTypeComposer, {
+        filter: { onlyIndexed: true, operators: false },
+      });
       const filterFields = result.args.filter.type._typeConfig.fields();
-      expect(Object.keys(filterFields)).toEqual(expect.arrayContaining(['_id', 'name', 'employment']));
+      expect(Object.keys(filterFields)).toEqual(
+        expect.arrayContaining(['_id', 'name', 'employment'])
+      );
     });
 
     it('should have `filter` arg with required `name` field', async () => {
@@ -92,8 +90,9 @@ describe('findOne() ->', () => {
     });
 
     it('should return document if provided existed id', async () => {
-      const result = await findOne(UserModel, UserTypeComposer)
-        .resolve({ args: { id: user1._id } });
+      const result = await findOne(UserModel, UserTypeComposer).resolve({
+        args: { id: user1._id },
+      });
       expect(result.name).toBe(user1.name);
     });
 
@@ -103,11 +102,13 @@ describe('findOne() ->', () => {
     });
 
     it('should sort records', async () => {
-      const result1 = await findOne(UserModel, UserTypeComposer)
-        .resolve({ args: { sort: { _id: 1 } } });
+      const result1 = await findOne(UserModel, UserTypeComposer).resolve({
+        args: { sort: { _id: 1 } },
+      });
 
-      const result2 = await findOne(UserModel, UserTypeComposer)
-        .resolve({ args: { sort: { _id: -1 } } });
+      const result2 = await findOne(UserModel, UserTypeComposer).resolve({
+        args: { sort: { _id: -1 } },
+      });
 
       expect(`${result1._id}`).not.toBe(`${result2._id}`);
     });

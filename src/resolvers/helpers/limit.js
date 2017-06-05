@@ -7,9 +7,7 @@ import type {
   limitHelperArgsOpts,
 } from '../../definition';
 
-export const limitHelperArgs = (
-  opts: limitHelperArgsOpts
-):GraphQLFieldConfigArgumentMap => {
+export const limitHelperArgs = (opts: limitHelperArgsOpts): GraphQLFieldConfigArgumentMap => {
   return {
     limit: {
       name: 'limit',

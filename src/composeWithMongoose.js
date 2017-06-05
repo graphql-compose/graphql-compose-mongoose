@@ -5,10 +5,7 @@ import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import composeWithConnection from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
-import {
-  getUniqueIndexes,
-  extendByReversedIndexes,
-} from './utils/getIndexesFromModel';
+import { getUniqueIndexes, extendByReversedIndexes } from './utils/getIndexesFromModel';
 
 import type {
   MongooseModelT,
@@ -17,7 +14,6 @@ import type {
   typeConverterInputTypeOpts,
   connectionSortMapOpts,
 } from './definition';
-
 
 export function composeWithMongoose(
   model: MongooseModelT,
@@ -47,7 +43,6 @@ export function composeWithMongoose(
   return typeComposer;
 }
 
-
 export function prepareFields(
   typeComposer: TypeComposer,
   opts: {
@@ -57,8 +52,9 @@ export function prepareFields(
 ) {
   if (Array.isArray(opts.only)) {
     const onlyFieldNames: string[] = opts.only;
-    const removeFields =
-      Object.keys(typeComposer.getFields()).filter(fName => !onlyFieldNames.includes(fName));
+    const removeFields = Object.keys(typeComposer.getFields()).filter(
+      fName => !onlyFieldNames.includes(fName)
+    );
     typeComposer.removeField(removeFields);
   }
   if (opts.remove) {
@@ -76,8 +72,9 @@ export function prepareInputFields(
 ) {
   if (Array.isArray(inputFieldsOpts.only)) {
     const onlyFieldNames: string[] = inputFieldsOpts.only;
-    const removeFields =
-      Object.keys(inputTypeComposer.getFields()).filter(fName => !onlyFieldNames.includes(fName));
+    const removeFields = Object.keys(inputTypeComposer.getFields()).filter(
+      fName => !onlyFieldNames.includes(fName)
+    );
     inputTypeComposer.removeField(removeFields);
   }
   if (inputFieldsOpts.remove) {
@@ -107,22 +104,17 @@ export function createInputType(
   }
 }
 
-
 export function createResolvers(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts: typeConverterResolversOpts
 ): void {
   const names = resolvers.getAvailableNames();
-  names.forEach((resolverName) => {
+  names.forEach(resolverName => {
     if (!{}.hasOwnProperty.call(opts, resolverName) || opts[resolverName] !== false) {
       const createResolverFn = resolvers[resolverName];
       if (createResolverFn) {
-        const resolver = createResolverFn(
-          model,
-          typeComposer,
-          opts[resolverName] || {}
-        );
+        const resolver = createResolverFn(model, typeComposer, opts[resolverName] || {});
         typeComposer.setResolver(resolverName, resolver);
       }
     }
@@ -140,7 +132,7 @@ export function prepareConnectionResolver(
 ) {
   const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), { reversedFirst: true });
   const sortConfigs = {};
-  uniqueIndexes.forEach((indexData) => {
+  uniqueIndexes.forEach(indexData => {
     const keys = Object.keys(indexData);
     let name = keys.join('__').toUpperCase().replace(/[^_a-zA-Z0-9]/i, '__');
     if (indexData[keys[0]] === 1) {
@@ -152,7 +144,7 @@ export function prepareConnectionResolver(
       value: indexData,
       cursorFields: keys,
       beforeCursorQuery: (rawQuery, cursorData) => {
-        keys.forEach((k) => {
+        keys.forEach(k => {
           if (!rawQuery[k]) rawQuery[k] = {};
           if (indexData[k] === 1) {
             rawQuery[k].$lt = cursorData[k];
@@ -162,7 +154,7 @@ export function prepareConnectionResolver(
         });
       },
       afterCursorQuery: (rawQuery, cursorData) => {
-        keys.forEach((k) => {
+        keys.forEach(k => {
           if (!rawQuery[k]) rawQuery[k] = {};
           if (indexData[k] === 1) {
             rawQuery[k].$gt = cursorData[k];

@@ -4,12 +4,7 @@
 import { GraphQLInt } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-
+import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
 
 export default function count(
   model: MongooseModelT,
@@ -17,9 +12,7 @@ export default function count(
   opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver count() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver count() should be instance of Mongoose Model.');
   }
 
   if (!(typeComposer instanceof TypeComposer)) {
@@ -37,7 +30,7 @@ export default function count(
         ...(opts && opts.filter),
       }),
     },
-    resolve: (resolveParams : ExtendedResolveParams) => {
+    resolve: (resolveParams: ExtendedResolveParams) => {
       resolveParams.query = model.find();
       filterHelper(resolveParams);
       return resolveParams.query.count().exec();

@@ -51,7 +51,9 @@ describe('Resolver helper `filter` ->', () => {
       addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, {});
       const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
       const opComposer = new InputTypeComposer(operatorsType);
-      expect(opComposer.getFieldNames()).toEqual(expect.arrayContaining(['name', '_id', 'employment']));
+      expect(opComposer.getFieldNames()).toEqual(
+        expect.arrayContaining(['name', '_id', 'employment'])
+      );
     });
 
     it('should have only provided fields via options', () => {
@@ -87,11 +89,15 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should throw error if second arg is not MongooseModel', () => {
-      expect(() => filterHelperArgs(UserTypeComposer, {})).toThrowError('should be instance of MongooseModel');
+      expect(() => filterHelperArgs(UserTypeComposer, {})).toThrowError(
+        'should be instance of MongooseModel'
+      );
     });
 
     it('should throw error if `filterTypeName` not provided in opts', () => {
-      expect(() => filterHelperArgs(UserTypeComposer, UserModel)).toThrowError('provide non-empty `filterTypeName`');
+      expect(() => filterHelperArgs(UserTypeComposer, UserModel)).toThrowError(
+        'provide non-empty `filterTypeName`'
+      );
     });
 
     it('should return filter field', () => {
@@ -224,9 +230,7 @@ describe('Resolver helper `filter` ->', () => {
         },
       };
       filterHelper(resolveParams);
-      expect(spyWhereFn).toBeCalledWith(
-        { age: { $gt: 10, $lt: 20 } }
-      );
+      expect(spyWhereFn).toBeCalledWith({ age: { $gt: 10, $lt: 20 } });
     });
 
     it('should add rawQuery to query', () => {
@@ -241,12 +245,8 @@ describe('Resolver helper `filter` ->', () => {
       };
 
       filterHelper(resolveParams);
-      expect(spyWhereFn).toBeCalledWith(
-        { age: { $gt: 10, $lt: 20 } }
-      );
-      expect(spyWhere2Fn).toBeCalledWith(
-        { age: { max: 30 }, active: true }
-      );
+      expect(spyWhereFn).toBeCalledWith({ age: { $gt: 10, $lt: 20 } });
+      expect(spyWhere2Fn).toBeCalledWith({ age: { max: 30 }, active: true });
     });
   });
 });

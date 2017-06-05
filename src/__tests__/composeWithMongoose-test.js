@@ -33,7 +33,9 @@ describe('composeWithMongoose ->', () => {
 
       it('should get fields from mongoose model', () => {
         const tc = composeWithMongoose(UserModel);
-        expect(tc.getFieldNames()).toEqual(expect.arrayContaining(['_id', 'name', 'gender', 'age']));
+        expect(tc.getFieldNames()).toEqual(
+          expect.arrayContaining(['_id', 'name', 'gender', 'age'])
+        );
       });
     });
 
@@ -150,7 +152,9 @@ describe('composeWithMongoose ->', () => {
         });
         const resolverKeys = Array.from(tc2.getResolvers().keys());
         expect(resolverKeys).not.toContain('removeById');
-        expect(resolverKeys).toEqual(expect.arrayContaining(['findMany', 'updateOne', 'updateMany']));
+        expect(resolverKeys).toEqual(
+          expect.arrayContaining(['findMany', 'updateOne', 'updateMany'])
+        );
       });
     });
   });
@@ -179,7 +183,9 @@ describe('composeWithMongoose ->', () => {
       });
       const PersonModel = mongoose.model('Person', PersonSchema);
       const tc = composeWithMongoose(PersonModel);
-      expect(tc.getFieldNames()).toEqual(expect.arrayContaining(['_id', 'name', 'spouse', 'friends']));
+      expect(tc.getFieldNames()).toEqual(
+        expect.arrayContaining(['_id', 'name', 'spouse', 'friends'])
+      );
     });
   });
 });

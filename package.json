@@ -42,8 +42,10 @@
     "cz-conventional-changelog": "^2.0.0",
     "eslint": "^3.19.0",
     "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-config-prettier": "^2.1.1",
     "eslint-plugin-flowtype": "^2.34.0",
     "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-prettier": "^2.1.1",
     "flow-bin": "^0.47.0",
     "graphql": "^0.10.1",
     "graphql-compose": "^1.19.3",
@@ -52,6 +54,7 @@
     "jest-babel": "^1.0.1",
     "mongodb-memory-server": "^1.1.1",
     "mongoose": "^4.10.4",
+    "prettier": "^1.4.2",
     "rimraf": "^2.6.1",
     "semantic-release": "^6.3.6"
   },

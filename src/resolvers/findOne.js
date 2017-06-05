@@ -6,12 +6,7 @@ import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-
+import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
 
 export default function findOne(
   model: MongooseModelT,
@@ -19,9 +14,7 @@ export default function findOne(
   opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver findOne() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver findOne() should be instance of Mongoose Model.');
   }
 
   if (!(typeComposer instanceof TypeComposer)) {
@@ -44,7 +37,7 @@ export default function findOne(
         ...(opts && opts.sort),
       }),
     },
-    resolve: (resolveParams : ExtendedResolveParams) => {
+    resolve: (resolveParams: ExtendedResolveParams) => {
       resolveParams.query = model.findOne({}); // eslint-disable-line
       filterHelper(resolveParams);
       skipHelper(resolveParams);

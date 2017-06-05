@@ -10,26 +10,18 @@ import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import toMongoDottedObject from '../utils/toMongoDottedObject';
 import typeStorage from '../typeStorage';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
+import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
 
 export default function updateMany(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts,
+  opts?: genResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver updateMany() should be instance of Mongoose Model.',
-    );
+    throw new Error('First arg for Resolver updateMany() should be instance of Mongoose Model.');
   }
   if (!(typeComposer instanceof TypeComposer)) {
-    throw new Error(
-      'Second arg for Resolver updateMany() should be instance of TypeComposer.',
-    );
+    throw new Error('Second arg for Resolver updateMany() should be instance of TypeComposer.');
   }
 
   const outputTypeName = `UpdateMany${typeComposer.getTypeName()}Payload`;
@@ -43,15 +35,16 @@ export default function updateMany(
           description: 'Affected documents number',
         },
       },
-    }),
+    })
   );
 
   const resolver = new Resolver({
     name: 'updateMany',
     kind: 'mutation',
-    description: 'Update many documents without returning them: ' +
-      'Use Query.update mongoose method. ' +
-      'Do not apply mongoose defaults, setters, hooks and validation. ',
+    description:
+      'Update many documents without returning them: ' +
+        'Use Query.update mongoose method. ' +
+        'Do not apply mongoose defaults, setters, hooks and validation. ',
     type: outputType,
     args: {
       ...recordHelperArgs(typeComposer, {
@@ -76,18 +69,14 @@ export default function updateMany(
     },
     // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || {
-      };
+      const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
-      if (
-        !(typeof recordData === 'object') ||
-        Object.keys(recordData).length === 0
-      ) {
+      if (!(typeof recordData === 'object') || Object.keys(recordData).length === 0) {
         return Promise.reject(
           new Error(
             `${typeComposer.getTypeName()}.updateMany resolver requires ` +
-              'at least one value in args.record',
-          ),
+              'at least one value in args.record'
+          )
         );
       }
 
@@ -109,18 +98,16 @@ export default function updateMany(
       // this option is excessive
       // $FlowFixMe
       return (resolveParams.beforeQuery
-        ? Promise.resolve(
-            resolveParams.beforeQuery(resolveParams.query, resolveParams),
-          )
+        ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query, resolveParams))
         : resolveParams.query.exec()).then(res => {
-          if (res.ok) {
-            return {
-              numAffected: res.nModified,
-            };
-          }
+        if (res.ok) {
+          return {
+            numAffected: res.nModified,
+          };
+        }
 
-          return Promise.reject(res);
-        });
+        return Promise.reject(res);
+      });
     },
   });
 

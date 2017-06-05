@@ -1,12 +1,16 @@
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
-import { GraphQLString, GraphQLFloat, GraphQLBoolean, GraphQLList, GraphQLEnumType, GraphQLSchema, GraphQLObjectType, graphql } from 'graphql';
 import {
-  GraphQLDate,
-  GraphQLBuffer,
-  GraphQLGeneric,
-  GraphQLJSON,
-} from 'graphql-compose';
+  GraphQLString,
+  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLList,
+  GraphQLEnumType,
+  GraphQLSchema,
+  GraphQLObjectType,
+  graphql,
+} from 'graphql';
+import { GraphQLDate, GraphQLBuffer, GraphQLGeneric, GraphQLJSON } from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel';
 import {
   deriveComplexType,
@@ -39,19 +43,33 @@ describe('fieldConverter', () => {
     });
 
     it('should throw Exception, if model does `schema.path` property', () => {
-      expect(() => { getFieldsFromModel({ a: 1 }); }).toThrowError(/incorrect mongoose model/);
-      expect(() => { getFieldsFromModel({ schema: {} }); }).toThrowError(/incorrect mongoose model/);
+      expect(() => {
+        getFieldsFromModel({ a: 1 });
+      }).toThrowError(/incorrect mongoose model/);
+      expect(() => {
+        getFieldsFromModel({ schema: {} });
+      }).toThrowError(/incorrect mongoose model/);
     });
   });
 
   describe('deriveComplexType()', () => {
     it('should throw error on incorrect mongoose field', () => {
       const err = /incorrect mongoose field/;
-      expect(() => { deriveComplexType(); }).toThrowError(err);
-      expect(() => { deriveComplexType(123); }).toThrowError(err);
-      expect(() => { deriveComplexType({ a: 1 }); }).toThrowError(err);
-      expect(() => { deriveComplexType({ path: 'name' }); }).toThrowError(err);
-      expect(() => { deriveComplexType({ path: 'name', instance: 'Abc' }); }).not.toThrowError(err);
+      expect(() => {
+        deriveComplexType();
+      }).toThrowError(err);
+      expect(() => {
+        deriveComplexType(123);
+      }).toThrowError(err);
+      expect(() => {
+        deriveComplexType({ a: 1 });
+      }).toThrowError(err);
+      expect(() => {
+        deriveComplexType({ path: 'name' });
+      }).toThrowError(err);
+      expect(() => {
+        deriveComplexType({ path: 'name', instance: 'Abc' });
+      }).not.toThrowError(err);
     });
 
     it('should derive DOCUMENT_ARRAY', () => {
@@ -174,12 +192,13 @@ describe('fieldConverter', () => {
         }),
       });
 
-
       const user = new UserModel({
         name: 'Test empty subDoc',
       });
       await user.save();
-      const result = await graphql(schema, `{
+      const result = await graphql(
+        schema,
+        `{
         user(_id: "${user._id}") {
           name
           subDoc {
@@ -189,7 +208,8 @@ describe('fieldConverter', () => {
             }
           }
         }
-      }`);
+      }`
+      );
       expect(result.data.user).toEqual({
         name: 'Test empty subDoc',
         subDoc: null,
@@ -218,7 +238,9 @@ describe('fieldConverter', () => {
         subDoc: { field2: { field21: 'ok' } },
       });
       await user2.save();
-      const result2 = await graphql(schema, `{
+      const result2 = await graphql(
+        schema,
+        `{
         user(_id: "${user2._id}") {
           name
           subDoc {
@@ -228,7 +250,8 @@ describe('fieldConverter', () => {
             }
           }
         }
-      }`);
+      }`
+      );
       expect(result2.data.user).toEqual({
         name: 'Test non empty subDoc',
         subDoc: {
