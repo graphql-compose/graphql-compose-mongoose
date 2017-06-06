@@ -670,6 +670,12 @@ babel-plugin-transform-regenerator@^6.22.0:
   dependencies:
     regenerator-transform "0.9.11"
 
+babel-plugin-transform-runtime@^6.23.0:
+  version "6.23.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-runtime/-/babel-plugin-transform-runtime-6.23.0.tgz#88490d446502ea9b8e7efb0fe09ec4d99479b1ee"
+  dependencies:
+    babel-runtime "^6.22.0"
+
 babel-plugin-transform-strict-mode@^6.24.1:
   version "6.24.1"
   resolved "https://registry.yarnpkg.com/babel-plugin-transform-strict-mode/-/babel-plugin-transform-strict-mode-6.24.1.tgz#d5faf7aa578a65bbe591cf5edae04a0c67020758"
@@ -1916,15 +1922,15 @@ graceful-fs@^4.1.10, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.4
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphql-compose-connection@^2.1.4:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-2.1.4.tgz#394f2dd08c4751e11d41038145d4f3db0a9cb210"
+graphql-compose-connection@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-2.2.0.tgz#118acf81254dca2eae04705ff2a76ee33b432c6a"
   dependencies:
     babel-runtime "^6.23.0"
 
-graphql-compose@^1.19.3:
-  version "1.19.3"
-  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-1.19.3.tgz#cea43697378b4da864d34836bbd36376de71649a"
+graphql-compose@^1.20.1:
+  version "1.20.1"
+  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-1.20.1.tgz#41a1f35f2c2aded2934bb6568ac762c9e6b9b5ce"
   dependencies:
     babel-runtime "^6.23.0"
     object-path "^0.11.4"
@@ -2312,10 +2318,6 @@ istanbul-reports@^1.1.1:
 iterall@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/iterall/-/iterall-1.1.1.tgz#f7f0af11e9a04ec6426260f5019d9fcca4d50214"
-
-jest-babel@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/jest-babel/-/jest-babel-1.0.1.tgz#ef659df0e9397b083c0f6aebd4cb8cfaa77df8bf"
 
 jest-changed-files@^20.0.3:
   version "20.0.3"
@@ -2906,9 +2908,9 @@ mongodb-download@^2.2.1:
     request-promise "^4.1.1"
     yargs "^3.26.0"
 
-mongodb-memory-server@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.1.1.tgz#9cecafe01b3e0f7e12b2a240f706c183b2f4d3c6"
+mongodb-memory-server@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.1.2.tgz#7d0a7760d44b692d8b29444b278f4137a7370c8b"
   dependencies:
     get-port "^3.1.0"
     mongodb-prebuilt "^6.2.0"

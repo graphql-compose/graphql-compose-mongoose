@@ -3,11 +3,9 @@
   "version": "0.0.0-semantically-released",
   "description": "Plugin for `graphql-compose` which derive a graphql types from a mongoose model.",
   "files": [
-    "es",
     "lib"
   ],
   "main": "lib/index.js",
-  "jsnext:main": "es/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/nodkz/graphql-compose-mongoose.git"
@@ -25,6 +23,7 @@
   },
   "homepage": "https://github.com/nodkz/graphql-compose-mongoose",
   "dependencies": {
+    "babel-runtime": "^6.23.0",
     "object-path": "^0.11.4"
   },
   "peerDependencies": {
@@ -39,6 +38,7 @@
     "babel-jest": "^20.0.3",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.5.1",
     "cz-conventional-changelog": "^2.0.0",
     "eslint": "^3.19.0",
@@ -69,9 +69,8 @@
     ]
   },
   "scripts": {
-    "build": "npm run build-cjs && npm run build-flow && npm run build-es",
+    "build": "npm run build-cjs && npm run build-flow",
     "build-cjs": "rimraf lib && babel src --ignore __tests__,__mocks__ -d lib",
-    "build-es": "rimraf es && BABEL_ENV=es babel src --ignore __tests__,__mocks__ -d es",
     "build-flow": "find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
     "coverage": "jest --coverage",
     "lint": "eslint src test *.js",

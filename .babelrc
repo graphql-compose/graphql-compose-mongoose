@@ -1,7 +1,8 @@
 {
   "plugins": [
     "transform-object-rest-spread",
-    "transform-flow-strip-types"
+    "transform-flow-strip-types",
+    ["transform-runtime", { "polyfill": false }]
   ],
   "presets": [
     ["env", {
