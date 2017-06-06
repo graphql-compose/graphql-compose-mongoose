@@ -1,13 +1,14 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import createOne from '../createOne';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import GraphQLMongoID from '../../types/mongoid';
 import typeStorage from '../../typeStorage';
+
+const { GraphQLNonNull, GraphQLObjectType } = graphql;
 
 describe('createOne() ->', () => {
   let UserTypeComposer;

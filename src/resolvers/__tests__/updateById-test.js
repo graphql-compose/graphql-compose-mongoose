@@ -1,18 +1,14 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import {
-  GraphQLNonNull,
-  GraphQLInputObjectType,
-  getNullableType,
-  GraphQLObjectType,
-} from 'graphql';
-import { Resolver, TypeComposer, InputTypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, InputTypeComposer, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import updateById from '../updateById';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
+
+const { GraphQLNonNull, GraphQLInputObjectType, getNullableType, GraphQLObjectType } = graphql;
 
 describe('updateById() ->', () => {
   let UserTypeComposer;
@@ -79,7 +75,9 @@ describe('updateById() ->', () => {
     });
 
     it('should rejected with Error if args.record._id is empty', async () => {
-      const result = updateById(UserModel, UserTypeComposer).resolve({ args: { record: {} } });
+      const result = updateById(UserModel, UserTypeComposer).resolve({
+        args: { record: {} },
+      });
       await expect(result).rejects.toMatchSnapshot();
     });
 

@@ -1,10 +1,12 @@
 /* @flow */
 
-import { GraphQLEnumType } from 'graphql';
+import { graphql } from 'graphql-compose';
 import { sortHelperArgs, sortHelper, getSortTypeFromModel } from '../sort';
 import { UserModel } from '../../../__mocks__/userModel';
 import { getIndexesFromModel } from '../../../utils/getIndexesFromModel';
 import typeStorage from '../../../typeStorage';
+
+const { GraphQLEnumType } = graphql;
 
 describe('Resolver helper `sort` ->', () => {
   beforeEach(() => {
@@ -16,7 +18,7 @@ describe('Resolver helper `sort` ->', () => {
       const typeName = 'SortType';
       const type = getSortTypeFromModel(typeName, UserModel);
       expect(type).toBeInstanceOf(GraphQLEnumType);
-      expect(type).toHaveProperty('name', typeName);
+      expect(type.name).toBe(typeName);
     });
 
     it('should reuse existed EnumType', () => {
@@ -56,8 +58,7 @@ describe('Resolver helper `sort` ->', () => {
       const args = sortHelperArgs(UserModel, {
         sortTypeName: 'SortInput',
       });
-      expect(args).toHaveProperty('sort');
-      expect(args).toHaveProperty('sort.name', 'sort');
+      expect(args.sort.name).toBe('sort');
       expect(args.sort.type).toBeInstanceOf(GraphQLEnumType);
     });
   });

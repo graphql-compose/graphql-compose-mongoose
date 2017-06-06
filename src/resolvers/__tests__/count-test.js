@@ -1,11 +1,12 @@
 /* @flow */
 
-import { GraphQLInt } from 'graphql';
-import { Resolver } from 'graphql-compose';
+import { Resolver, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import count from '../count';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
+
+const { GraphQLInt } = graphql;
 
 describe('count() ->', () => {
   let UserTypeComposer;

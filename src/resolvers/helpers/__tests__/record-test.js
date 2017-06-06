@@ -1,11 +1,12 @@
 /* @flow */
 
-import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
-import { InputTypeComposer } from 'graphql-compose';
+import { InputTypeComposer, graphql } from 'graphql-compose';
 import { recordHelperArgs } from '../record';
 import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
+
+const { GraphQLInputObjectType, GraphQLNonNull } = graphql;
 
 describe('Resolver helper `record` ->', () => {
   let UserTypeComposer;
@@ -27,8 +28,7 @@ describe('Resolver helper `record` ->', () => {
       const args = recordHelperArgs(UserTypeComposer, {
         recordTypeName: 'RecordUserType',
       });
-      expect(args).toHaveProperty('record');
-      expect(args).toHaveProperty('record.name', 'record');
+      expect(args.record.name).toBe('record');
       expect(args.record.type).toBeInstanceOf(GraphQLInputObjectType);
     });
 
@@ -49,8 +49,7 @@ describe('Resolver helper `record` ->', () => {
         recordTypeName: 'RecordUserType',
         isRequired: true,
       });
-      expect(args).toHaveProperty('record');
-      expect(args).toHaveProperty('record.name', 'record');
+      expect(args.record.name).toBe('record');
       expect(args.record.type).toBeInstanceOf(GraphQLNonNull);
     });
 

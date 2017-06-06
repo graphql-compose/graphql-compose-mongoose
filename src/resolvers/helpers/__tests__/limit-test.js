@@ -1,23 +1,21 @@
 /* @flow */
 
-import { GraphQLInt } from 'graphql';
 import { limitHelperArgs, limitHelper } from '../limit';
 
 describe('Resolver helper `limit` ->', () => {
   describe('limitHelperArgs()', () => {
     it('should return limit field', () => {
       const args = limitHelperArgs();
-      expect(args).toHaveProperty('limit');
-      expect(args).toHaveProperty('limit.name', 'limit');
-      expect(args).toHaveProperty('limit.type', GraphQLInt);
+      expect(args.limit.name).toBe('limit');
+      expect(args.limit.type).toBe('Int');
     });
     it('should process `opts.defaultValue` arg', () => {
-      expect(limitHelperArgs()).toHaveProperty('limit.defaultValue', 1000);
+      expect(limitHelperArgs().limit.defaultValue).toBe(1000);
       expect(
         limitHelperArgs({
           defaultValue: 333,
-        })
-      ).toHaveProperty('limit.defaultValue', 333);
+        }).limit.defaultValue
+      ).toBe(333);
     });
   });
 

@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLList } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
@@ -24,7 +23,7 @@ export default function findMany(
   }
 
   return new Resolver({
-    type: new GraphQLList(typeComposer.getType()),
+    type: [typeComposer],
     name: 'findMany',
     kind: 'query',
     args: {

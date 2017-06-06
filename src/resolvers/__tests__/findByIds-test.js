@@ -1,13 +1,14 @@
 /* @flow */
 
-import { GraphQLNonNull, GraphQLList } from 'graphql';
-import { Resolver } from 'graphql-compose';
+import { Resolver, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import { PostModel } from '../../__mocks__/postModel';
 import findByIds from '../findByIds';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
+
+const { GraphQLNonNull, GraphQLList } = graphql;
 
 describe('findByIds() ->', () => {
   let UserTypeComposer;

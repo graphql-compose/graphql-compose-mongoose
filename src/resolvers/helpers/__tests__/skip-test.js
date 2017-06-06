@@ -1,15 +1,13 @@
 /* @flow */
 
-import { GraphQLInt } from 'graphql';
 import { skipHelperArgs, skipHelper } from '../skip';
 
 describe('Resolver helper `skip` ->', () => {
   describe('limitHelperArgs()', () => {
     it('should return skip field', () => {
       const args = skipHelperArgs();
-      expect(args).toHaveProperty('skip');
-      expect(args).toHaveProperty('skip.name', 'skip');
-      expect(args).toHaveProperty('skip.type', GraphQLInt);
+      expect(args.skip.name).toBe('skip');
+      expect(args.skip.type).toBe('Int');
     });
   });
 

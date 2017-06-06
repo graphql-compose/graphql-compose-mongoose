@@ -1,12 +1,13 @@
 /* @flow */
 
-import { GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { Query } from 'mongoose';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import updateMany from '../updateMany';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
+
+const { GraphQLInt, GraphQLNonNull, GraphQLObjectType } = graphql;
 
 describe('updateMany() ->', () => {
   let UserTypeComposer;

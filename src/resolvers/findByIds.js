@@ -1,12 +1,13 @@
 /* @flow */
 
-import { GraphQLNonNull, GraphQLList } from 'graphql';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import GraphQLMongoID from '../types/mongoid';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
 import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
+
+const { GraphQLNonNull, GraphQLList } = graphql;
 
 export default function findByIds(
   model: MongooseModelT,
@@ -22,7 +23,7 @@ export default function findByIds(
   }
 
   return new Resolver({
-    type: new GraphQLList(typeComposer.getType()),
+    type: [typeComposer],
     name: 'findByIds',
     kind: 'query',
     args: {

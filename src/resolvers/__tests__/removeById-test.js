@@ -1,13 +1,14 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import removeById from '../removeById';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
+
+const { GraphQLNonNull, GraphQLObjectType } = graphql;
 
 describe('removeById() ->', () => {
   let UserTypeComposer;
@@ -66,7 +67,7 @@ describe('removeById() ->', () => {
           _id: user.id,
         },
       });
-      expect(result).toHaveProperty('recordId', user.id);
+      expect(result.recordId).toBe(user.id);
     });
 
     it('should return error if document does not exist', () => {

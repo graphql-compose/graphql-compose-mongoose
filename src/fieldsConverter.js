@@ -9,16 +9,9 @@ import {
   GraphQLBuffer,
   GraphQLGeneric,
   GraphQLJSON,
+  graphql,
 } from 'graphql-compose';
 
-import {
-  GraphQLString,
-  GraphQLFloat,
-  GraphQLBoolean,
-  GraphQLList,
-  GraphQLEnumType,
-  GraphQLObjectType,
-} from 'graphql';
 import GraphQLMongoID from './types/mongoid';
 import typeStorage from './typeStorage';
 
@@ -31,6 +24,15 @@ import type {
   ComplexTypesT,
   GraphQLOutputType,
 } from './definition';
+
+const {
+  GraphQLString,
+  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLList,
+  GraphQLEnumType,
+  GraphQLObjectType,
+} = graphql;
 
 export const ComplexTypes = {
   ARRAY: 'ARRAY',

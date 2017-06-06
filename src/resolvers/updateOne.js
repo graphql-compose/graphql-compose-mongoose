@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { skipHelperArgs } from './helpers/skip';
 import { recordHelperArgs } from './helpers/record';
@@ -30,7 +29,7 @@ export default function updateOne(
   const outputTypeName = `UpdateOne${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
     outputTypeName,
-    new GraphQLObjectType({
+    TypeComposer.create({
       name: outputTypeName,
       fields: {
         recordId: {

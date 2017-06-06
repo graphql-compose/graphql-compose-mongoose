@@ -1,20 +1,22 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import { GraphQLEnumType } from 'graphql';
+import { graphql } from 'graphql-compose';
 import { getIndexesFromModel, extendByReversedIndexes } from '../../utils/getIndexesFromModel';
 import typeStorage from '../../typeStorage';
 import type {
   ExtendedResolveParams,
-  GraphQLFieldConfigArgumentMap,
+  ComposeFieldConfigArgumentMap,
   MongooseModelT,
   sortHelperArgsOpts,
 } from '../../definition';
 
+const { GraphQLEnumType } = graphql;
+
 export const sortHelperArgs = (
   model: MongooseModelT,
   opts: sortHelperArgsOpts
-): GraphQLFieldConfigArgumentMap => {
+): ComposeFieldConfigArgumentMap => {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for sortHelperArgs() should be instance of Mongoose Model.');
   }

@@ -1,10 +1,11 @@
 /* @flow */
 
-import { GraphQLNonNull } from 'graphql';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import GraphQLMongoID from '../types/mongoid';
 import { projectionHelper } from './helpers/projection';
 import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
+
+const { GraphQLNonNull } = graphql;
 
 export default function findById(
   model: MongooseModelT,

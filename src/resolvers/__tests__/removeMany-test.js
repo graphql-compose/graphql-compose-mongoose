@@ -1,12 +1,13 @@
 /* @flow */
 
-import { GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { Query } from 'mongoose';
-import { Resolver, TypeComposer } from 'graphql-compose/';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import removeMany from '../removeMany';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
+
+const { GraphQLInt, GraphQLNonNull, GraphQLObjectType } = graphql;
 
 describe('removeMany() ->', () => {
   let UserTypeComposer;
@@ -99,7 +100,7 @@ describe('removeMany() ->', () => {
           filter: { gender: 'female' },
         },
       });
-      expect(result).toHaveProperty('numAffected', 2);
+      expect(result.numAffected).toBe(2);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
@@ -115,7 +116,7 @@ describe('removeMany() ->', () => {
         },
       });
       expect(beforeQueryCalled).toBe(true);
-      expect(result).toHaveProperty('numAffected', 2);
+      expect(result.numAffected).toBe(2);
     });
   });
 

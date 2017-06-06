@@ -86,14 +86,14 @@ import type {
   GraphQLObjectType as _GraphQLObjectType,
   GraphQLOutputType as _GraphQLOutputType,
   ResolveParams as _ResolveParams,
-  GraphQLFieldConfigArgumentMap as _GraphQLFieldConfigArgumentMap,
+  ComposeFieldConfigArgumentMap as _ComposeFieldConfigArgumentMap,
   ResolverMWResolveFn as _ResolverMWResolveFn,
   GraphQLResolveInfo as _GraphQLResolveInfo,
 } from 'graphql-compose/lib/definition.js';
 
 export type GraphQLObjectType = _GraphQLObjectType;
 export type GraphQLOutputType = _GraphQLOutputType;
-export type GraphQLFieldConfigArgumentMap = _GraphQLFieldConfigArgumentMap;
+export type ComposeFieldConfigArgumentMap = _ComposeFieldConfigArgumentMap;
 export type ResolveParams<TSource, TContext> = _ResolveParams<TSource, TContext>;
 export type GraphQLResolveInfo = _GraphQLResolveInfo;
 export type ResolverMWResolveFn<TSource, TContext> = _ResolverMWResolveFn<TSource, TContext>;

@@ -1,11 +1,12 @@
 /* @flow */
 
-import { GraphQLNonNull } from 'graphql';
-import { Resolver } from 'graphql-compose';
+import { Resolver, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import findOne from '../findOne';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
+
+const { GraphQLNonNull } = graphql;
 
 describe('findOne() ->', () => {
   let UserTypeComposer;

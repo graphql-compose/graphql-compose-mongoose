@@ -1,13 +1,12 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import { GraphQLNonNull, GraphQLInputObjectType, GraphQLList, getNamedType } from 'graphql';
-import { TypeComposer, InputTypeComposer, isObject } from 'graphql-compose';
+import { TypeComposer, InputTypeComposer, isObject, graphql } from 'graphql-compose';
 import { getIndexesFromModel } from '../../utils/getIndexesFromModel';
 import { toMongoDottedObject, upperFirst } from '../../utils';
 import typeStorage from '../../typeStorage';
 import type {
-  GraphQLFieldConfigArgumentMap,
+  ComposeFieldConfigArgumentMap,
   ExtendedResolveParams,
   MongooseModelT,
   filterHelperArgsOpts,
@@ -15,13 +14,15 @@ import type {
   filterOperatorNames,
 } from '../../definition';
 
+const { GraphQLNonNull, GraphQLInputObjectType, GraphQLList, getNamedType } = graphql;
+
 export const OPERATORS_FIELDNAME = '_operators';
 
 export const filterHelperArgs = (
   typeComposer: TypeComposer,
   model: MongooseModelT,
   opts: filterHelperArgsOpts
-): GraphQLFieldConfigArgumentMap => {
+): ComposeFieldConfigArgumentMap => {
   if (!(typeComposer instanceof TypeComposer)) {
     throw new Error('First arg for filterHelperArgs() should be instance of TypeComposer.');
   }

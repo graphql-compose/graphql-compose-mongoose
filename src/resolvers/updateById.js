@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
@@ -28,7 +27,7 @@ export default function updateById(
   const outputTypeName = `UpdateById${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
     outputTypeName,
-    new GraphQLObjectType({
+    TypeComposer.create({
       name: outputTypeName,
       fields: {
         recordId: {

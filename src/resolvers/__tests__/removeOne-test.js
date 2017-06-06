@@ -1,14 +1,15 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType } from 'graphql';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import removeOne from '../removeOne';
 import GraphQLMongoID from '../../types/mongoid';
 import { mongoose } from '../../__mocks__/mongooseCommon';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
+
+const { GraphQLObjectType } = graphql;
 
 describe('removeOne() ->', () => {
   let UserTypeComposer;
@@ -91,7 +92,7 @@ describe('removeOne() ->', () => {
       const result = await removeOne(UserModel, UserTypeComposer).resolve({
         args: { filter: { _id: user1.id } },
       });
-      expect(result).toHaveProperty('recordId', user1.id);
+      expect(result.recordId).toBe(user1.id);
     });
 
     it('should remove document in database', async () => {

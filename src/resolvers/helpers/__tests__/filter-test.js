@@ -1,7 +1,6 @@
 /* @flow */
 
-import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
-import { InputTypeComposer } from 'graphql-compose';
+import { InputTypeComposer, graphql } from 'graphql-compose';
 import {
   filterHelperArgs,
   filterHelper,
@@ -12,6 +11,8 @@ import {
 import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
+
+const { GraphQLInputObjectType, GraphQLNonNull } = graphql;
 
 describe('Resolver helper `filter` ->', () => {
   let UserTypeComposer;
@@ -104,8 +105,7 @@ describe('Resolver helper `filter` ->', () => {
       const args = filterHelperArgs(UserTypeComposer, UserModel, {
         filterTypeName: 'FilterUserType',
       });
-      expect(args).toHaveProperty('filter');
-      expect(args).toHaveProperty('filter.name', 'filter');
+      expect(args.filter.name).toBe('filter');
       expect(args.filter.type).toBeInstanceOf(GraphQLInputObjectType);
     });
 
@@ -114,8 +114,7 @@ describe('Resolver helper `filter` ->', () => {
         filterTypeName: 'FilterUserType',
         isRequired: true,
       });
-      expect(args).toHaveProperty('filter');
-      expect(args).toHaveProperty('filter.name', 'filter');
+      expect(args.filter.name).toBe('filter');
       expect(args.filter.type).toBeInstanceOf(GraphQLNonNull);
     });
 

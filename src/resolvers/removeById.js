@@ -1,12 +1,13 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType, GraphQLNonNull } from 'graphql';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import findById from './findById';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
 import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
+
+const { GraphQLNonNull } = graphql;
 
 export default function removeById(
   model: MongooseModelT,
@@ -26,7 +27,7 @@ export default function removeById(
   const outputTypeName = `RemoveById${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
     outputTypeName,
-    new GraphQLObjectType({
+    TypeComposer.create({
       name: outputTypeName,
       fields: {
         recordId: {

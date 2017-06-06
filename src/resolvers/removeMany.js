@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType, GraphQLInt } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import typeStorage from '../typeStorage';
@@ -24,11 +23,11 @@ export default function removeMany(
   const outputTypeName = `RemoveMany${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
     outputTypeName,
-    new GraphQLObjectType({
+    TypeComposer.create({
       name: outputTypeName,
       fields: {
         numAffected: {
-          type: GraphQLInt,
+          type: 'Int',
           description: 'Affected documents number',
         },
       },

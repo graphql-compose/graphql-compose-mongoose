@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType, GraphQLInt } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { recordHelperArgs } from './helpers/record';
 import { skipHelperArgs, skipHelper } from './helpers/skip';
@@ -27,11 +26,11 @@ export default function updateMany(
   const outputTypeName = `UpdateMany${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
     outputTypeName,
-    new GraphQLObjectType({
+    TypeComposer.create({
       name: outputTypeName,
       fields: {
         numAffected: {
-          type: GraphQLInt,
+          type: 'Int',
           description: 'Affected documents number',
         },
       },
