@@ -1928,9 +1928,9 @@ graphql-compose-connection@^2.2.1:
   dependencies:
     babel-runtime "^6.23.0"
 
-graphql-compose@^1.20.3:
-  version "1.20.3"
-  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-1.20.3.tgz#04d8cb24e78f14135ee5b5e0d24d8f6956610e7a"
+graphql-compose@^1.20.4:
+  version "1.20.4"
+  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-1.20.4.tgz#de70282439b29e2014fae0ee6effca6fbd348b9e"
   dependencies:
     babel-runtime "^6.23.0"
     object-path "^0.11.4"
@@ -2895,9 +2895,9 @@ mongodb-core@2.1.11:
     bson "~1.0.4"
     require_optional "~1.0.0"
 
-mongodb-download@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/mongodb-download/-/mongodb-download-2.2.1.tgz#061df0835be6b33596480da0ce83fdabbfb9cbb4"
+mongodb-download@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/mongodb-download/-/mongodb-download-2.2.2.tgz#fd36079087628e9bdef0e8ac7d2df2e8123360a3"
   dependencies:
     debug "^2.2.0"
     decompress "^4.0.0"
@@ -2908,22 +2908,22 @@ mongodb-download@^2.2.1:
     request-promise "^4.1.1"
     yargs "^3.26.0"
 
-mongodb-memory-server@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.1.2.tgz#7d0a7760d44b692d8b29444b278f4137a7370c8b"
+mongodb-memory-server@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.1.4.tgz#8221f24dcf2a87c3c27a86e32bc291ee5a29212b"
   dependencies:
     get-port "^3.1.0"
-    mongodb-prebuilt "^6.2.0"
+    mongodb-prebuilt "^6.3.2"
     tmp "^0.0.31"
     uuid "^3.0.1"
 
-mongodb-prebuilt@^6.2.0:
-  version "6.3.1"
-  resolved "https://registry.yarnpkg.com/mongodb-prebuilt/-/mongodb-prebuilt-6.3.1.tgz#3533b69c55b71e945248cb540e74e3218a56d346"
+mongodb-prebuilt@^6.3.2:
+  version "6.3.2"
+  resolved "https://registry.yarnpkg.com/mongodb-prebuilt/-/mongodb-prebuilt-6.3.2.tgz#028bfda570e0c7d7271b5099e418c2c788cd846d"
   dependencies:
     debug "^2.2.0"
     glob "^7.1.1"
-    mongodb-download "^2.2.1"
+    mongodb-download "^2.2.2"
     spawn-sync "1.0.15"
     yargs "^3.26.0"
 
