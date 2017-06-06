@@ -12,7 +12,7 @@ export default function createOne(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts?: genResolverOpts
-): Resolver {
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createOne() should be instance of Mongoose Model.');
   }
@@ -52,7 +52,6 @@ export default function createOne(
         ...(opts && opts.record),
       }),
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
@@ -68,7 +67,6 @@ export default function createOne(
       // $FlowFixMe
       return Promise.resolve(new model(recordData))
         .then(doc => {
-          // $FlowFixMe
           if (resolveParams.beforeRecordMutate) {
             return resolveParams.beforeRecordMutate(doc, resolveParams);
           }

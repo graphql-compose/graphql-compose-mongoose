@@ -14,7 +14,7 @@ export default function findMany(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts?: genResolverOpts
-): Resolver {
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findMany() should be instance of Mongoose Model.');
   }

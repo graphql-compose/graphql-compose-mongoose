@@ -12,7 +12,7 @@ export default function removeMany(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts?: genResolverOpts
-): Resolver {
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeMany() should be instance of Mongoose Model.');
   }
@@ -51,7 +51,6 @@ export default function removeMany(
         ...(opts && opts.filter),
       }),
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const filterData = (resolveParams.args && resolveParams.args.filter) || {};
 
@@ -65,7 +64,6 @@ export default function removeMany(
       }
 
       resolveParams.query = model.find();
-      // $FlowFixMe
       filterHelper(resolveParams);
       resolveParams.query = resolveParams.query.remove();
 
@@ -73,7 +71,6 @@ export default function removeMany(
         // `beforeQuery` is experemental feature, if you want to use it
         // please open an issue with your use case, cause I suppose that
         // this option is excessive
-        // $FlowFixMe
         (resolveParams.beforeQuery
           ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query, resolveParams))
           : resolveParams.query.exec()).then(res => {

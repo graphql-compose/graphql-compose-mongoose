@@ -17,7 +17,7 @@ export default function updateOne(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts?: genResolverOpts
-): Resolver {
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateOne() should be instance of Mongoose Model.');
   }
@@ -73,7 +73,6 @@ export default function updateOne(
       }),
       ...skipHelperArgs(),
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const recordData = (resolveParams.args && resolveParams.args.record) || null;
       const filterData = (resolveParams.args && resolveParams.args.filter) || {};
@@ -92,12 +91,10 @@ export default function updateOne(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      // $FlowFixMe
       return (
         findOneResolver
           .resolve(resolveParams)
           .then(doc => {
-            // $FlowFixMe
             if (resolveParams.beforeRecordMutate) {
               return resolveParams.beforeRecordMutate(doc, resolveParams);
             }

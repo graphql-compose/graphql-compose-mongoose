@@ -150,7 +150,7 @@ export function convertModelToGraphQL(
   );
   model.schema._gqcTypeComposer = typeComposer; // eslint-disable-line
 
-  const mongooseFields = getFieldsFromModel(model, typeName);
+  const mongooseFields = getFieldsFromModel(model);
   const graphqlFields = {};
 
   Object.keys(mongooseFields).forEach(fieldName => {
@@ -211,7 +211,7 @@ export function convertFieldToGraphQL(
     case ComplexTypes.ENUM:
       return enumToGraphQL(field, prefix);
     case ComplexTypes.REFERENCE:
-      return referenceToGraphQL(field, prefix);
+      return referenceToGraphQL(field);
     case ComplexTypes.DOCUMENT_ARRAY:
       return documentArrayToGraphQL(field, prefix);
     case ComplexTypes.MIXED:
@@ -350,7 +350,7 @@ export function documentArrayToGraphQL(
   return new GraphQLList(typeComposer.getType());
 }
 
-export function referenceToGraphQL(field: MongooseFieldT, prefix: string = ''): GraphQLOutputType {
+export function referenceToGraphQL(field: MongooseFieldT): GraphQLOutputType {
   const fieldType = _getFieldType(field);
   if (fieldType !== 'ObjectID') {
     throw new Error(
@@ -369,7 +369,7 @@ export function referenceToGraphQL(field: MongooseFieldT, prefix: string = ''): 
   // }
 
   // this is mongo id field
-  return scalarToGraphQL(field, prefix);
+  return scalarToGraphQL(field);
 }
 
 export function mixedToGraphQL(field: MongooseFieldT): GraphQLOutputType {

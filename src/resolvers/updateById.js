@@ -14,7 +14,7 @@ export default function updateById(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts?: genResolverOpts
-): Resolver {
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateById() should be instance of Mongoose Model.');
   }
@@ -61,7 +61,6 @@ export default function updateById(
         ...(opts && opts.record),
       }),
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
@@ -87,12 +86,10 @@ export default function updateById(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      // $FlowFixMe
       return (
         findByIdResolver
           .resolve(resolveParams)
           .then(doc => {
-            // $FlowFixMe
             if (resolveParams.beforeRecordMutate) {
               return resolveParams.beforeRecordMutate(doc, resolveParams);
             }

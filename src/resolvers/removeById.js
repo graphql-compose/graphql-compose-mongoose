@@ -12,7 +12,7 @@ export default function removeById(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts?: genResolverOpts // eslint-disable-line no-unused-vars
-): Resolver {
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');
   }
@@ -55,7 +55,6 @@ export default function removeById(
         type: new GraphQLNonNull(GraphQLMongoID),
       },
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
@@ -70,12 +69,10 @@ export default function removeById(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      // $FlowFixMe
       return (
         findByIdResolver
           .resolve(resolveParams)
           .then(doc => {
-            // $FlowFixMe
             if (resolveParams.beforeRecordMutate) {
               return resolveParams.beforeRecordMutate(doc, resolveParams);
             }

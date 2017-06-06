@@ -14,7 +14,7 @@ export default function removeOne(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts?: genResolverOpts
-): Resolver {
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeOne() should be instance of Mongoose Model.');
   }
@@ -62,7 +62,6 @@ export default function removeOne(
         ...(opts && opts.sort),
       }),
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const filterData = (resolveParams.args && resolveParams.args.filter) || {};
 
@@ -80,12 +79,10 @@ export default function removeOne(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      // $FlowFixMe
       return (
         findOneResolver
           .resolve(resolveParams)
           .then(doc => {
-            // $FlowFixMe
             if (resolveParams.beforeRecordMutate) {
               return resolveParams.beforeRecordMutate(doc, resolveParams);
             }

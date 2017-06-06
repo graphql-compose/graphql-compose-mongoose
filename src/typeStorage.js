@@ -13,7 +13,7 @@ class TypeStorage extends Map {
     return inst;
   }
 
-  getOrSet<T>(typeName: string, typeOrThunk: T | (() => T)): ?T {
+  getOrSet<T>(typeName: string, typeOrThunk: T | (() => T)): T {
     if (this.has(typeName)) {
       // $FlowFixMe
       return this.get(typeName);

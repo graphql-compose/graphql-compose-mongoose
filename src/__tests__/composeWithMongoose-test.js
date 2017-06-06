@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-disable no-unused-expressions */
 
 import mongoose from 'mongoose';

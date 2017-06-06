@@ -1,3 +1,5 @@
+/* @flow */
+
 import typeStorage from '../typeStorage';
 
 describe('typeStorage', () => {

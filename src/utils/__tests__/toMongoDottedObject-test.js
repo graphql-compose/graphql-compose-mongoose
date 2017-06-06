@@ -1,3 +1,5 @@
+/* @flow */
+
 import toMongoDottedObject from '../toMongoDottedObject';
 
 describe('toMongoDottedObject()', () => {

@@ -16,7 +16,7 @@ export default function updateMany(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts?: genResolverOpts
-): Resolver {
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateMany() should be instance of Mongoose Model.');
   }
@@ -67,7 +67,6 @@ export default function updateMany(
         ...(opts && opts.limit),
       }),
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
@@ -81,13 +80,9 @@ export default function updateMany(
       }
 
       resolveParams.query = model.find();
-      // $FlowFixMe
       filterHelper(resolveParams);
-      // $FlowFixMe
       skipHelper(resolveParams);
-      // $FlowFixMe
       sortHelper(resolveParams);
-      // $FlowFixMe
       limitHelper(resolveParams);
 
       resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
@@ -96,7 +91,6 @@ export default function updateMany(
       // `beforeQuery` is experemental feature, if you want to use it
       // please open an issue with your use case, cause I suppose that
       // this option is excessive
-      // $FlowFixMe
       return (resolveParams.beforeQuery
         ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query, resolveParams))
         : resolveParams.query.exec()).then(res => {

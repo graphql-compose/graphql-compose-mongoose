@@ -1,3 +1,5 @@
+/* @flow */
+
 import { Schema } from './mongooseCommon';
 import { convertSchemaToGraphQL } from '../fieldsConverter';
 

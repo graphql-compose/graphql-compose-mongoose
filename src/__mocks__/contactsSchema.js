@@ -1,3 +1,5 @@
+/* @flow */
+
 import { Schema } from './mongooseCommon';
 
 const ContactsSchema = new Schema({

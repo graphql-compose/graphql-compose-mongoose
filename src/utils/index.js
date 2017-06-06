@@ -1,6 +1,7 @@
 /* @flow */
+
+import { isObject } from 'graphql-compose';
 import toMongoDottedObject from './toMongoDottedObject';
-import { isObject } from './is';
 
 export { toMongoDottedObject, isObject };
 

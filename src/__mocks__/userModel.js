@@ -1,3 +1,5 @@
+/* @flow */
+
 import { mongoose, Schema } from './mongooseCommon';
 import ContactsSchema from './contactsSchema';
 import enumEmployment from './enumEmployment';

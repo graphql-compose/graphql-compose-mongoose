@@ -10,7 +10,7 @@ export default function findById(
   model: MongooseModelT,
   typeComposer: TypeComposer,
   opts?: genResolverOpts // eslint-disable-line no-unused-vars
-): Resolver {
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findById() should be instance of Mongoose Model.');
   }

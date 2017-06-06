@@ -1,3 +1,5 @@
+/* @flow */
+
 import mongoose from 'mongoose';
 import {
   getIndexesFromModel,

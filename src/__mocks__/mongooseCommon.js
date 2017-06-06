@@ -1,6 +1,8 @@
+/* @flow */
 /* eslint-disable no-param-reassign, no-console */
+
 import mongoose, { Schema } from 'mongoose';
-import MongodbMemoryServer from 'mongodb-memory-server'; // eslint-disable
+import MongodbMemoryServer from 'mongodb-memory-server';
 
 mongoose.Promise = Promise;
 

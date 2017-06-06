@@ -63,7 +63,7 @@ export type ResolverNames = 'findById' | 'findByIds' | 'findOne' | 'findMany' |
 
 export type MongooseQuery = {
   exec(): Promise<any>,
-  where(criteriaOrFieldName: ObjectMap | string): MongooseQuery,
+  where(criteria: ObjectMap): MongooseQuery,
   // where(fieldName: string, equalTo: string): MongooseQuery,
   skip(num: number): MongooseQuery,
   limit(num: number): MongooseQuery,
@@ -94,11 +94,12 @@ import type {
 export type GraphQLObjectType = _GraphQLObjectType;
 export type GraphQLOutputType = _GraphQLOutputType;
 export type GraphQLFieldConfigArgumentMap = _GraphQLFieldConfigArgumentMap;
-export type ResolveParams = _ResolveParams;
+export type ResolveParams<TSource, TContext> = _ResolveParams<TSource, TContext>;
 export type GraphQLResolveInfo = _GraphQLResolveInfo;
-export type ResolverMWResolveFn = _ResolverMWResolveFn;
-export type ExtendedResolveParams = ResolveParams & {
+export type ResolverMWResolveFn<TSource, TContext> = _ResolverMWResolveFn<TSource, TContext>;
+export type ExtendedResolveParams = $Shape<ResolveParams<*, *>> & {
   query: MongooseQuery,
+  rawQuery: ObjectMap,
   beforeQuery?: (query: mixed, rp: ExtendedResolveParams) => Promise<*>,
   beforeRecordMutate?: (record: mixed, rp: ExtendedResolveParams) => Promise<*>,
 };

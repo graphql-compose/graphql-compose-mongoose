@@ -1,3 +1,4 @@
+/* @flow */
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
 import {

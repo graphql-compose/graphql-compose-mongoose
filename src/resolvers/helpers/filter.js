@@ -2,9 +2,8 @@
 /* eslint-disable no-use-before-define */
 
 import { GraphQLNonNull, GraphQLInputObjectType, GraphQLList, getNamedType } from 'graphql';
-import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import { TypeComposer, InputTypeComposer, isObject } from 'graphql-compose';
 import { getIndexesFromModel } from '../../utils/getIndexesFromModel';
-import { isObject } from '../../utils/is';
 import { toMongoDottedObject, upperFirst } from '../../utils';
 import typeStorage from '../../typeStorage';
 import type {
@@ -85,7 +84,6 @@ export const filterHelperArgs = (
 };
 
 export function filterHelper(resolveParams: ExtendedResolveParams): void {
-  // $FlowFixMe
   const filter = resolveParams.args && resolveParams.args.filter;
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
     const modelFields = resolveParams.query.schema.paths;

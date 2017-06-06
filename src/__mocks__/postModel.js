@@ -1,3 +1,5 @@
+/* @flow */
+
 import { mongoose, Schema } from './mongooseCommon';
 
 const PostSchema = new Schema({
