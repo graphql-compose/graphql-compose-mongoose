@@ -170,6 +170,7 @@ describe('composeWithMongoose ->', () => {
         },
       });
       const filterArgInFindOne = typeComposer.getResolver('findOne').getArg('filter');
+      // $FlowFixMe
       const inputConposer = new InputTypeComposer(filterArgInFindOne.type);
       expect(inputConposer.isRequired('age')).toBe(true);
     });

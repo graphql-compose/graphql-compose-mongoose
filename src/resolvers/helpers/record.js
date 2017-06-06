@@ -3,13 +3,13 @@
 import { TypeComposer, InputTypeComposer, graphql } from 'graphql-compose';
 import typeStorage from '../../typeStorage';
 
-import type { ComposeFieldConfigArgumentMap, recordHelperArgsOpts } from '../../definition';
+import type { ComposeFieldConfigArgumentMap, RecordHelperArgsOpts } from '../../definition';
 
 const { GraphQLNonNull } = graphql;
 
 export const recordHelperArgs = (
   typeComposer: TypeComposer,
-  opts: recordHelperArgsOpts
+  opts?: RecordHelperArgsOpts
 ): ComposeFieldConfigArgumentMap => {
   if (!(typeComposer instanceof TypeComposer)) {
     throw new Error('First arg for recordHelperArgs() should be instance of TypeComposer.');

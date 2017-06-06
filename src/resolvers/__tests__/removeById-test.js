@@ -44,7 +44,9 @@ describe('removeById() ->', () => {
       const resolver = removeById(UserModel, UserTypeComposer);
       expect(resolver.hasArg('_id')).toBe(true);
       const argConfig = resolver.getArg('_id');
+      // $FlowFixMe
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
+      // $FlowFixMe
       expect(argConfig.type.ofType).toBe(GraphQLMongoID);
     });
   });
@@ -161,11 +163,13 @@ describe('removeById() ->', () => {
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
       const outputType = removeById(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       expect(outputType.name).toBe(`RemoveById${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
       const outputType = removeById(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       const typeComposer = new TypeComposer(outputType);
       expect(typeComposer.hasField('recordId')).toBe(true);
       expect(typeComposer.getField('recordId').type).toBe(GraphQLMongoID);
@@ -173,6 +177,7 @@ describe('removeById() ->', () => {
 
     it('should have record field', () => {
       const outputType = removeById(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       const typeComposer = new TypeComposer(outputType);
       expect(typeComposer.hasField('record')).toBe(true);
       expect(typeComposer.getField('record').type).toBe(UserTypeComposer.getType());

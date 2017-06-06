@@ -22,9 +22,10 @@ export default function toMongoDottedObject(
   /* eslint-disable */
    Object.keys(obj).forEach(key => {
      if (key.startsWith('$')) {
-       target[path.join('.')] = Object.assign({}, target[path.join('.')], {
+       target[path.join('.')] = { 
+         ...target[path.join('.')],
          [key]: obj[key],
-       });
+       };
      } else if (Object(obj[key]) === obj[key]) {
        toMongoDottedObject(obj[key], target, path.concat(key));
      } else {

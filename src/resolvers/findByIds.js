@@ -5,14 +5,14 @@ import GraphQLMongoID from '../types/mongoid';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
-import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
+import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
 
 const { GraphQLNonNull, GraphQLList } = graphql;
 
 export default function findByIds(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts
+  opts?: GenResolverOpts
 ): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIds() should be instance of Mongoose Model.');

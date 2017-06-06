@@ -9,9 +9,9 @@ import type {
   ComposeFieldConfigArgumentMap,
   ExtendedResolveParams,
   MongooseModelT,
-  filterHelperArgsOpts,
-  filterOperatorsOpts,
-  filterOperatorNames,
+  FilterHelperArgsOpts,
+  FilterOperatorsOpts,
+  FilterOperatorNames,
 } from '../../definition';
 
 const { GraphQLNonNull, GraphQLInputObjectType, GraphQLList, getNamedType } = graphql;
@@ -21,7 +21,7 @@ export const OPERATORS_FIELDNAME = '_operators';
 export const filterHelperArgs = (
   typeComposer: TypeComposer,
   model: MongooseModelT,
-  opts: filterHelperArgsOpts
+  opts?: FilterHelperArgsOpts
 ): ComposeFieldConfigArgumentMap => {
   if (!(typeComposer instanceof TypeComposer)) {
     throw new Error('First arg for filterHelperArgs() should be instance of TypeComposer.');
@@ -101,7 +101,7 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
     if (filter[OPERATORS_FIELDNAME]) {
       const operatorFields = filter[OPERATORS_FIELDNAME];
       Object.keys(operatorFields).forEach(fieldName => {
-        const fieldOperators = Object.assign({}, operatorFields[fieldName]);
+        const fieldOperators = { ...operatorFields[fieldName] };
         const criteria = {};
         Object.keys(fieldOperators).forEach(operatorName => {
           criteria[`$${operatorName}`] = fieldOperators[operatorName];
@@ -149,7 +149,7 @@ export function addFieldsWithOperator(
   typeName: string,
   inputComposer: InputTypeComposer,
   model: MongooseModelT,
-  operatorsOpts: filterOperatorsOpts
+  operatorsOpts: FilterOperatorsOpts
 ): InputTypeComposer {
   const operatorsComposer = new InputTypeComposer(
     typeStorage.getOrSet(
@@ -161,7 +161,7 @@ export function addFieldsWithOperator(
     )
   );
 
-  const availableOperators: filterOperatorNames[] = [
+  const availableOperators: FilterOperatorNames[] = [
     'gt',
     'gte',
     'lt',

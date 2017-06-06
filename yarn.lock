@@ -1922,15 +1922,15 @@ graceful-fs@^4.1.10, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.4
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphql-compose-connection@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-2.2.0.tgz#118acf81254dca2eae04705ff2a76ee33b432c6a"
+graphql-compose-connection@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-2.2.1.tgz#5a460fea48b7804293d6613e5db65008fc5598c2"
   dependencies:
     babel-runtime "^6.23.0"
 
-graphql-compose@^1.20.1:
-  version "1.20.1"
-  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-1.20.1.tgz#41a1f35f2c2aded2934bb6568ac762c9e6b9b5ce"
+graphql-compose@^1.20.3:
+  version "1.20.3"
+  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-1.20.3.tgz#04d8cb24e78f14135ee5b5e0d24d8f6956610e7a"
   dependencies:
     babel-runtime "^6.23.0"
     object-path "^0.11.4"

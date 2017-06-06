@@ -58,8 +58,11 @@ describe('findByIds() ->', () => {
       const resolver = findByIds(UserModel, UserTypeComposer);
       expect(resolver.hasArg('_ids')).toBe(true);
       const argConfig = resolver.getArg('_ids');
+      // $FlowFixMe
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
+      // $FlowFixMe
       expect(argConfig.type.ofType).toBeInstanceOf(GraphQLList);
+      // $FlowFixMe
       expect(argConfig.type.ofType.ofType).toBe(GraphQLMongoID);
     });
 

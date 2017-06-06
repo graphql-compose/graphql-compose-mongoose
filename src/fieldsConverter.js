@@ -45,7 +45,7 @@ export const ComplexTypes = {
 };
 
 function _getFieldName(field: MongooseFieldT): string {
-  return field.path;
+  return field.path || '__unknownField__';
 }
 
 function _getFieldType(field: MongooseFieldT): string {
@@ -97,7 +97,12 @@ export function dotPathsToEmbedded(fields: MongooseFieldMapT): MongooseFieldMapT
         result[name] = embeddedField;
       }
       const subName = fieldName.substr(dotIdx + 1);
-      result[name].schema.paths[subName] = Object.assign({}, fields[fieldName], { path: subName });
+
+      const fieldSchema = result[name].schema;
+      if (!fieldSchema) {
+        throw new Error(`Field ${name} does not have schema property`);
+      }
+      fieldSchema.paths[subName] = { ...fields[fieldName], path: subName };
     }
   });
 
@@ -181,7 +186,10 @@ export function convertModelToGraphQL(
   return typeComposer;
 }
 
-export function convertSchemaToGraphQL(schema: MongooseModelSchemaT, typeName: string) {
+export function convertSchemaToGraphQL(
+  schema: MongooseModelSchemaT,
+  typeName: string
+): TypeComposer {
   if (!typeName) {
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
   }
@@ -200,7 +208,7 @@ export function convertSchemaToGraphQL(schema: MongooseModelSchemaT, typeName: s
 
 export function convertFieldToGraphQL(
   field: MongooseFieldT,
-  prefix: string = ''
+  prefix?: string = ''
 ): GraphQLOutputType {
   const complexType = deriveComplexType(field);
   switch (complexType) {
@@ -277,7 +285,7 @@ export function scalarToGraphQL(field: MongooseFieldT): GraphQLOutputType {
   }
 }
 
-export function arrayToGraphQL(field: MongooseFieldT, prefix: string = ''): GraphQLOutputType {
+export function arrayToGraphQL(field: MongooseFieldT, prefix?: string = ''): GraphQLOutputType {
   if (!field || !field.caster) {
     throw new Error(
       'You provide incorrect mongoose field to `arrayToGraphQL()`. ' +
@@ -285,31 +293,36 @@ export function arrayToGraphQL(field: MongooseFieldT, prefix: string = ''): Grap
     );
   }
 
-  const unwrappedField = Object.assign({}, field.caster);
+  const unwrappedField = { ...field.caster };
   objectPath.set(unwrappedField, 'options.ref', objectPath.get(field, 'options.ref', undefined));
 
   const outputType = convertFieldToGraphQL(unwrappedField, prefix);
   return new GraphQLList(outputType);
 }
 
-export function embeddedToGraphQL(field: MongooseFieldT, prefix: string = ''): GraphQLOutputType {
+export function embeddedToGraphQL(field: MongooseFieldT, prefix?: string = ''): GraphQLObjectType {
   const fieldName = _getFieldName(field);
   const fieldType = _getFieldType(field);
 
   if (fieldType !== 'Embedded') {
     throw new Error(
-      'You provide incorrect field to `embeddedToGraphQL()`. ' +
+      `You provide incorrect field '${prefix}.${fieldName}' to 'embeddedToGraphQL()'. ` +
         'This field should has `Embedded` type. '
     );
   }
 
+  const fieldSchema = field.schema;
+  if (!fieldSchema) {
+    throw new Error(`Mongoose field '${prefix}.${fieldName}' should have 'schema' property`);
+  }
+
   const typeName = `${prefix}${capitalize(fieldName)}`;
-  const typeComposer = convertSchemaToGraphQL(field.schema, typeName);
+  const typeComposer = convertSchemaToGraphQL(fieldSchema, typeName);
 
   return typeComposer.getType();
 }
 
-export function enumToGraphQL(field: MongooseFieldT, prefix: string = ''): GraphQLOutputType {
+export function enumToGraphQL(field: MongooseFieldT, prefix?: string = ''): GraphQLEnumType {
   const valueList = _getFieldEnums(field);
   if (!valueList) {
     throw new Error(
@@ -336,8 +349,8 @@ export function enumToGraphQL(field: MongooseFieldT, prefix: string = ''): Graph
 
 export function documentArrayToGraphQL(
   field: MongooseFieldT,
-  prefix: string = ''
-): GraphQLOutputType {
+  prefix?: string = ''
+): GraphQLList<GraphQLOutputType> {
   if (!(field instanceof mongoose.Schema.Types.DocumentArray)) {
     throw new Error(
       'You provide incorrect mongoose field to `documentArrayToGraphQL()`. ' +

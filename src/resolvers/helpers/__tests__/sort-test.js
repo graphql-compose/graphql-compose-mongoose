@@ -42,10 +42,12 @@ describe('Resolver helper `sort` ->', () => {
 
       // should have ASC criteria for mongoose
       const complexASC = type._values.find(enumConfig => enumConfig.name === 'NAME__AGE_ASC');
+      // $FlowFixMe
       expect(complexASC.value).toEqual({ name: 1, age: -1 });
 
       // should have DESC criteria for mongoose
       const complexDESC = type._values.find(enumConfig => enumConfig.name === 'NAME__AGE_DESC');
+      // $FlowFixMe
       expect(complexDESC.value).toEqual({ name: -1, age: 1 });
     });
   });
@@ -65,7 +67,7 @@ describe('Resolver helper `sort` ->', () => {
 
   describe('sortHelper()', () => {
     let spyFn;
-    let resolveParams;
+    let resolveParams: any;
 
     beforeEach(() => {
       spyFn = jest.fn();

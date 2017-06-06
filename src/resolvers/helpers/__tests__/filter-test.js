@@ -86,10 +86,12 @@ describe('Resolver helper `filter` ->', () => {
 
   describe('filterHelperArgs()', () => {
     it('should throw error if first arg is not TypeComposer', () => {
+      // $FlowFixMe
       expect(() => filterHelperArgs({})).toThrowError('should be instance of TypeComposer');
     });
 
     it('should throw error if second arg is not MongooseModel', () => {
+      // $FlowFixMe
       expect(() => filterHelperArgs(UserTypeComposer, {})).toThrowError(
         'should be instance of MongooseModel'
       );
@@ -172,7 +174,7 @@ describe('Resolver helper `filter` ->', () => {
     let spyWhereFn;
     let spyWhere2Fn;
     let spyFindFn;
-    let resolveParams;
+    let resolveParams: any;
 
     beforeEach(() => {
       spyWhereFn = jest.fn(() => {

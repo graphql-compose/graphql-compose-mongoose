@@ -9,15 +9,15 @@ import { getUniqueIndexes, extendByReversedIndexes } from './utils/getIndexesFro
 
 import type {
   MongooseModelT,
-  typeConverterOpts,
-  typeConverterResolversOpts,
-  typeConverterInputTypeOpts,
-  connectionSortMapOpts,
+  TypeConverterOpts,
+  TypeConverterResolversOpts,
+  TypeConverterInputTypeOpts,
+  ConnectionSortMapOpts,
 } from './definition';
 
 export function composeWithMongoose(
   model: MongooseModelT,
-  opts: typeConverterOpts = {}
+  opts: TypeConverterOpts = {}
 ): TypeComposer {
   const name: string = (opts && opts.name) || model.modelName;
 
@@ -86,7 +86,7 @@ export function prepareInputFields(
 
 export function createInputType(
   typeComposer: TypeComposer,
-  inputTypeOpts?: typeConverterInputTypeOpts = {}
+  inputTypeOpts?: TypeConverterInputTypeOpts = {}
 ): void {
   const inputTypeComposer = typeComposer.getInputTypeComposer();
 
@@ -106,7 +106,7 @@ export function createInputType(
 export function createResolvers(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts: typeConverterResolversOpts
+  opts: TypeConverterResolversOpts
 ): void {
   const names = resolvers.getAvailableNames();
   names.forEach(resolverName => {
@@ -127,7 +127,7 @@ export function createResolvers(
 export function prepareConnectionResolver(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts: connectionSortMapOpts
+  opts: ConnectionSortMapOpts
 ) {
   const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), { reversedFirst: true });
   const sortConfigs = {};

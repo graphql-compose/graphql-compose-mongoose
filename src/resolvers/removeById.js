@@ -5,14 +5,14 @@ import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import findById from './findById';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
-import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
+import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
 
 const { GraphQLNonNull } = graphql;
 
 export default function removeById(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts // eslint-disable-line no-unused-vars
+  opts?: GenResolverOpts // eslint-disable-line no-unused-vars
 ): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');

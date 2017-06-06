@@ -21,7 +21,7 @@ describe('Resolver helper `limit` ->', () => {
 
   describe('limitHelper()', () => {
     let spyFn;
-    let resolveParams;
+    let resolveParams: any;
 
     beforeEach(() => {
       spyFn = jest.fn();

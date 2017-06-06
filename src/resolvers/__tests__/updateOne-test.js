@@ -66,7 +66,9 @@ describe('updateOne() ->', () => {
     it('should have required `record` arg', () => {
       const resolver = updateOne(UserModel, UserTypeComposer);
       const argConfig = resolver.getArg('record');
+      // $FlowFixMe
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
+      // $FlowFixMe
       expect(argConfig.type.ofType.name).toBe('UpdateOneUserInput');
     });
   });
@@ -214,17 +216,20 @@ describe('updateOne() ->', () => {
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
       const outputType = updateOne(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       expect(outputType.name).toBe(`UpdateOne${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
       const outputType = updateOne(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       const recordIdField = new TypeComposer(outputType).getField('recordId');
       expect(recordIdField.type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType = updateOne(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       const recordField = new TypeComposer(outputType).getField('record');
       expect(recordField.type).toBe(UserTypeComposer.getType());
     });

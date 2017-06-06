@@ -3,10 +3,10 @@
 import type {
   ComposeFieldConfigArgumentMap,
   ExtendedResolveParams,
-  limitHelperArgsOpts,
+  LimitHelperArgsOpts,
 } from '../../definition';
 
-export const limitHelperArgs = (opts: limitHelperArgsOpts): ComposeFieldConfigArgumentMap => {
+export const limitHelperArgs = (opts?: LimitHelperArgsOpts): ComposeFieldConfigArgumentMap => {
   return {
     limit: {
       name: 'limit',

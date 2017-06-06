@@ -59,6 +59,7 @@ describe('removeMany() ->', () => {
       const resolver = removeMany(UserModel, UserTypeComposer);
       const filterField = resolver.getArg('filter');
       expect(filterField).toBeTruthy();
+      // $FlowFixMe
       expect(filterField.type).toBeInstanceOf(GraphQLNonNull);
     });
   });
@@ -123,11 +124,13 @@ describe('removeMany() ->', () => {
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
       const outputType = removeMany(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       expect(outputType.name).toBe(`RemoveMany${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have numAffected field', () => {
       const outputType = removeMany(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
       expect(numAffectedField.type).toBe(GraphQLInt);
     });

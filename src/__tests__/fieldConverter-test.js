@@ -45,9 +45,11 @@ describe('fieldConverter', () => {
 
     it('should throw Exception, if model does `schema.path` property', () => {
       expect(() => {
+        // $FlowFixMe
         getFieldsFromModel({ a: 1 });
       }).toThrowError(/incorrect mongoose model/);
       expect(() => {
+        // $FlowFixMe
         getFieldsFromModel({ schema: {} });
       }).toThrowError(/incorrect mongoose model/);
     });
@@ -57,15 +59,19 @@ describe('fieldConverter', () => {
     it('should throw error on incorrect mongoose field', () => {
       const err = /incorrect mongoose field/;
       expect(() => {
+        // $FlowFixMe
         deriveComplexType();
       }).toThrowError(err);
       expect(() => {
+        // $FlowFixMe
         deriveComplexType(123);
       }).toThrowError(err);
       expect(() => {
+        // $FlowFixMe
         deriveComplexType({ a: 1 });
       }).toThrowError(err);
       expect(() => {
+        // $FlowFixMe
         deriveComplexType({ path: 'name' });
       }).toThrowError(err);
       expect(() => {
@@ -90,7 +96,9 @@ describe('fieldConverter', () => {
 
     it('schould derive ENUM', () => {
       expect(deriveComplexType(fields.gender)).toBe(ComplexTypes.ENUM);
+      // $FlowFixMe
       expect(deriveComplexType(fields.languages.schema.paths.ln)).toBe(ComplexTypes.ENUM);
+      // $FlowFixMe
       expect(deriveComplexType(fields.languages.schema.paths.sk)).toBe(ComplexTypes.ENUM);
     });
 
@@ -146,6 +154,7 @@ describe('fieldConverter', () => {
 
     it('should has string in ofType', () => {
       const skillsType = arrayToGraphQL(fields.skills);
+      // $FlowFixMe
       expect(skillsType.ofType.name).toBe('String');
     });
   });
@@ -163,7 +172,9 @@ describe('fieldConverter', () => {
 
     it('should pass all enum values to GQ type', () => {
       const genderEnum = enumToGraphQL(fields.gender);
+      // $FlowFixMe
       expect(genderEnum._values.length).toBe(fields.gender.enumValues.length);
+      // $FlowFixMe
       expect(genderEnum._values[0].value).toBe(fields.gender.enumValues[0]);
     });
   });
@@ -176,6 +187,7 @@ describe('fieldConverter', () => {
 
     it('should have embedded fields', () => {
       const embeddedType = embeddedToGraphQL(fields.contacts);
+      // $FlowFixMe
       const embeddedFields = embeddedType._typeConfig.fields();
       expect(embeddedFields.email).toBeTruthy();
       expect(embeddedFields.locationId).toBeTruthy();
@@ -211,6 +223,7 @@ describe('fieldConverter', () => {
         }
       }`
       );
+      // $FlowFixMe
       expect(result.data.user).toEqual({
         name: 'Test empty subDoc',
         subDoc: null,
@@ -253,6 +266,7 @@ describe('fieldConverter', () => {
         }
       }`
       );
+      // $FlowFixMe
       expect(result2.data.user).toEqual({
         name: 'Test non empty subDoc',
         subDoc: {
@@ -265,6 +279,7 @@ describe('fieldConverter', () => {
 
   describe('documentArrayToGraphQL()', () => {
     const languagesType = documentArrayToGraphQL(fields.languages);
+    // $FlowFixMe
     const languagesFields = languagesType.ofType._typeConfig.fields();
 
     it('should produce GraphQLList', () => {
@@ -273,6 +288,7 @@ describe('fieldConverter', () => {
 
     it('should has Language type in ofType', () => {
       // see src/__mocks__/languageSchema.js where type name `Language` is defined
+      // $FlowFixMe
       expect(languagesType.ofType.name).toBe('Language');
     });
 
@@ -323,7 +339,9 @@ describe('fieldConverter', () => {
         }
       }`;
       const result = await graphql.graphql(schema, query);
+      // $FlowFixMe
       expect(result.data.user.name).toBe(user.name);
+      // $FlowFixMe
       expect(result.data.user.someDynamic).toEqual(user.someDynamic);
     });
   });

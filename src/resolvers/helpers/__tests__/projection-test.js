@@ -5,7 +5,7 @@ import { projectionHelper } from '../projection';
 describe('Resolver helper `projection` ->', () => {
   describe('projectionHelper()', () => {
     let spyFn;
-    let resolveParams;
+    let resolveParams: any;
 
     beforeEach(() => {
       spyFn = jest.fn();

@@ -21,20 +21,20 @@ describe('typeStorage', () => {
   describe('getOrSet() method', () => {
     it('should return existed value', () => {
       typeStorage.clear();
-      typeStorage.set(123, 456);
-      expect(typeStorage.getOrSet(123, 'any')).toBe(456);
+      typeStorage.set('Type1', 456);
+      expect(typeStorage.getOrSet('Type1', 'any')).toBe(456);
     });
 
     it('should set new value and return it, if key not exists', () => {
       typeStorage.clear();
-      expect(typeStorage.getOrSet(123, 456)).toBe(456);
-      expect(typeStorage.get(123)).toBe(456);
+      expect(typeStorage.getOrSet('Type2', 456)).toBe(456);
+      expect(typeStorage.get('Type2')).toBe(456);
     });
 
     it('should not set new value if it is empty', () => {
       typeStorage.clear();
-      expect(typeStorage.getOrSet(123, null)).toBe(null);
-      expect(typeStorage.has(123)).toBe(false);
+      expect(typeStorage.getOrSet('Type3', null)).toBe(null);
+      expect(typeStorage.has('Type3')).toBe(false);
     });
   });
 });

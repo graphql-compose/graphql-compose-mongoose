@@ -1,6 +1,4 @@
 [ignore]
-.*/__tests__/.*
-.*/__mocks__/.*
 .*/coverage/.*
 .*/resources/.*
 <PROJECT_ROOT>/lib/.*
@@ -44,5 +42,3 @@
 esproposal.class_instance_fields=enable
 suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
 unsafe.enable_getters_and_setters=true
-
-[version]

@@ -58,7 +58,7 @@ export function getIndexesFromModel(
           // { name: 1, age: 1, salary: 1} -> [{name:1}, {name:1, age:1}, {name:1, age:1, salary:1}]
           Object.keys(idxFields).forEach(fieldName => {
             partialIndexes[fieldName] = idxFields[fieldName];
-            indexedFields.push(Object.assign({}, partialIndexes));
+            indexedFields.push({ ...partialIndexes });
           });
         }
       }
@@ -121,7 +121,7 @@ export function extendByReversedIndexes(
   indexes.forEach(indexObj => {
     let hasSpecificIndex = false;
     // https://docs.mongodb.org/manual/tutorial/sort-results-with-indexes/#sort-on-multiple-fields
-    const reversedIndexObj = Object.assign({}, indexObj);
+    const reversedIndexObj = { ...indexObj };
     Object.keys(reversedIndexObj).forEach(f => {
       if (reversedIndexObj[f] === 1) reversedIndexObj[f] = -1;
       else if (reversedIndexObj[f] === -1) reversedIndexObj[f] = 1;

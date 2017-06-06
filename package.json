@@ -27,9 +27,8 @@
     "object-path": "^0.11.4"
   },
   "peerDependencies": {
-    "graphql": ">=0.7.1 || >=0.8.0 || >=0.9.0",
-    "graphql-compose": ">=1.20.1",
-    "graphql-compose-connection": ">=2.2.0",
+    "graphql-compose": ">=1.20.3",
+    "graphql-compose-connection": ">=2.2.1",
     "mongoose": ">=4.0.0"
   },
   "devDependencies": {
@@ -49,8 +48,8 @@
     "eslint-plugin-prettier": "^2.1.1",
     "flow-bin": "^0.47.0",
     "graphql": "^0.10.1",
-    "graphql-compose": "^1.20.1",
-    "graphql-compose-connection": "^2.2.0",
+    "graphql-compose": "^1.20.3",
+    "graphql-compose-connection": "^2.2.1",
     "jest": "^20.0.4",
     "mongodb-memory-server": "^1.1.2",
     "mongoose": "^4.10.4",
@@ -76,9 +75,10 @@
     "lint": "eslint src test *.js",
     "test": "jest",
     "watch": "jest --watch",
-    "all": "npm run test && npm run lint && ./node_modules/.bin/flow",
-    "link": "yarn build && yarn link graphql && yarn link graphql-compose && yarn link graphql-compose-connection && yarn link mongoose && yarn link",
-    "unlink": "yarn unlink graphql && yarn unlink graphql-compose && yarn unlink graphql-compose-connection && yarn unlink mongoose && yarn add graphql graphql-compose graphql-compose-connection mongoose",
+    "flow": "./node_modules/.bin/flow stop && ./node_modules/.bin/flow",
+    "all": "npm run test && npm run lint && npm run flow",
+    "link": "yarn build && yarn link graphql-compose && yarn link graphql-compose-connection && yarn link mongoose && yarn link",
+    "unlink": "yarn unlink graphql-compose && yarn unlink graphql-compose-connection && yarn unlink mongoose && yarn add graphql-compose graphql-compose-connection mongoose --dev",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   }
 }

@@ -8,14 +8,14 @@ import type {
   ExtendedResolveParams,
   ComposeFieldConfigArgumentMap,
   MongooseModelT,
-  sortHelperArgsOpts,
+  SortHelperArgsOpts,
 } from '../../definition';
 
 const { GraphQLEnumType } = graphql;
 
 export const sortHelperArgs = (
   model: MongooseModelT,
-  opts: sortHelperArgsOpts
+  opts?: SortHelperArgsOpts
 ): ComposeFieldConfigArgumentMap => {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for sortHelperArgs() should be instance of Mongoose Model.');

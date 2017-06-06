@@ -5,12 +5,12 @@ import { Resolver, TypeComposer } from 'graphql-compose';
 import { recordHelperArgs } from './helpers/record';
 import typeStorage from '../typeStorage';
 import GraphQLMongoID from '../types/mongoid';
-import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
+import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
 
 export default function createOne(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts
+  opts?: GenResolverOpts
 ): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createOne() should be instance of Mongoose Model.');

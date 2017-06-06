@@ -3,14 +3,14 @@
 import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import GraphQLMongoID from '../types/mongoid';
 import { projectionHelper } from './helpers/projection';
-import type { MongooseModelT, ExtendedResolveParams, genResolverOpts } from '../definition';
+import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
 
 const { GraphQLNonNull } = graphql;
 
 export default function findById(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts // eslint-disable-line no-unused-vars
+  opts?: GenResolverOpts // eslint-disable-line no-unused-vars
 ): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findById() should be instance of Mongoose Model.');
