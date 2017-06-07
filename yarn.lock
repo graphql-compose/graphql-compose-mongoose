@@ -2932,9 +2932,9 @@ mongodb-download@^2.2.3:
     request-promise "^4.1.1"
     yargs "^3.26.0"
 
-mongodb-memory-server@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.3.0.tgz#c4fe5cac59c4365c19e37c9e0a0eb76cf8102c4d"
+mongodb-memory-server@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.3.1.tgz#5cf6facbe8e49522aca49fb1088b17f2faa4f1af"
   dependencies:
     debug "^2.6.8"
     get-port "^3.1.0"
