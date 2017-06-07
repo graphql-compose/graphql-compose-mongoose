@@ -25,4 +25,9 @@ mongoServer.getConnectionString().then(mongoUri => {
   });
 });
 
+afterAll(() => {
+  mongoose.disconnect();
+  mongoServer.stop();
+});
+
 export { mongoose, Schema };
