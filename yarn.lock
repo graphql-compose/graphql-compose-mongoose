@@ -2895,9 +2895,9 @@ mongodb-core@2.1.11:
     bson "~1.0.4"
     require_optional "~1.0.0"
 
-mongodb-download@^2.2.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/mongodb-download/-/mongodb-download-2.2.2.tgz#fd36079087628e9bdef0e8ac7d2df2e8123360a3"
+mongodb-download@^2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/mongodb-download/-/mongodb-download-2.2.3.tgz#5ab9396c6c15f7653756ed646e30722f0ad72a00"
   dependencies:
     debug "^2.2.0"
     decompress "^4.0.0"
@@ -2908,22 +2908,22 @@ mongodb-download@^2.2.2:
     request-promise "^4.1.1"
     yargs "^3.26.0"
 
-mongodb-memory-server@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.1.4.tgz#8221f24dcf2a87c3c27a86e32bc291ee5a29212b"
+mongodb-memory-server@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.1.5.tgz#859d9633da4785b1645b8cae14fdd8b2abb386f4"
   dependencies:
     get-port "^3.1.0"
-    mongodb-prebuilt "^6.3.2"
+    mongodb-prebuilt "^6.3.3"
     tmp "^0.0.31"
     uuid "^3.0.1"
 
-mongodb-prebuilt@^6.3.2:
-  version "6.3.2"
-  resolved "https://registry.yarnpkg.com/mongodb-prebuilt/-/mongodb-prebuilt-6.3.2.tgz#028bfda570e0c7d7271b5099e418c2c788cd846d"
+mongodb-prebuilt@^6.3.3:
+  version "6.3.3"
+  resolved "https://registry.yarnpkg.com/mongodb-prebuilt/-/mongodb-prebuilt-6.3.3.tgz#f1a17b34586c6739c6bc6dda196864e0464a836c"
   dependencies:
     debug "^2.2.0"
     glob "^7.1.1"
-    mongodb-download "^2.2.2"
+    mongodb-download "^2.2.3"
     spawn-sync "1.0.15"
     yargs "^3.26.0"
 
@@ -2935,16 +2935,16 @@ mongodb@2.2.27:
     mongodb-core "2.1.11"
     readable-stream "2.2.7"
 
-mongoose@^4.10.4:
-  version "4.10.4"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-4.10.4.tgz#b9a0a033725e5c29efd9eefb4687d1371956c7b6"
+mongoose@^4.10.5:
+  version "4.10.5"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-4.10.5.tgz#7cd50ee38d5057815e83962e3985f7dd9da769ad"
   dependencies:
     async "2.1.4"
     bson "~1.0.4"
     hooks-fixed "2.0.0"
     kareem "1.4.1"
     mongodb "2.2.27"
-    mpath "0.2.1"
+    mpath "0.3.0"
     mpromise "0.5.5"
     mquery "2.3.1"
     ms "2.0.0"
@@ -2952,9 +2952,9 @@ mongoose@^4.10.4:
     regexp-clone "0.0.1"
     sliced "1.0.1"
 
-mpath@0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/mpath/-/mpath-0.2.1.tgz#3a4e829359801de96309c27a6b2e102e89f9e96e"
+mpath@0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/mpath/-/mpath-0.3.0.tgz#7a58f789e9b5fd3c94520634157960f26bd5ef44"
 
 mpromise@0.5.5:
   version "0.5.5"
