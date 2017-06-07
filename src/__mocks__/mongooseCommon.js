@@ -6,7 +6,7 @@ import MongodbMemoryServer from 'mongodb-memory-server';
 
 mongoose.Promise = Promise;
 
-const mongoServer = new MongodbMemoryServer({ debug: true });
+const mongoServer = new MongodbMemoryServer();
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
@@ -25,11 +25,6 @@ mongoServer.getConnectionString().then(mongoUri => {
   mongoose.connection.once('open', () => {
     // console.log(`MongoDB successfully connected to ${mongoUri}`);
   });
-});
-
-afterAll(() => {
-  mongoose.disconnect();
-  mongoServer.stop();
 });
 
 export { mongoose, Schema };
