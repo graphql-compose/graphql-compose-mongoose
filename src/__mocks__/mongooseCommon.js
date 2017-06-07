@@ -8,6 +8,8 @@ mongoose.Promise = Promise;
 
 const mongoServer = new MongodbMemoryServer();
 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
+
 mongoServer.getConnectionString().then(mongoUri => {
   mongoose.connect(mongoUri);
 
