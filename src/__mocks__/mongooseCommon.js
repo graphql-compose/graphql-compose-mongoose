@@ -6,7 +6,7 @@ import MongodbMemoryServer from 'mongodb-memory-server';
 
 mongoose.Promise = Promise;
 
-const mongoServer = new MongodbMemoryServer();
+const mongoServer = new MongodbMemoryServer({ debug: true });
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
