@@ -137,7 +137,7 @@ export function getIndexedFieldNames(model: MongooseModelT): string[] {
   // filter duplicates
   const uniqueNames = [];
   const result = fieldNames.filter(val => {
-    if (uniqueNames.includes(val)) return false;
+    if (uniqueNames.indexOf(val) > -1) return false;
     uniqueNames.push(val);
     return true;
   });

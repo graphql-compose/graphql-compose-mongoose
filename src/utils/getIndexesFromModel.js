@@ -69,7 +69,7 @@ export function getIndexesFromModel(
   const tmp = [];
   const result = indexedFields.filter(val => {
     const asString = JSON.stringify(val);
-    if (tmp.includes(asString)) return false;
+    if (tmp.indexOf(asString) > -1) return false;
     tmp.push(asString);
     return true;
   });

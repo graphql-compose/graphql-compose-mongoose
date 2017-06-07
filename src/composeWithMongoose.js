@@ -52,7 +52,7 @@ export function prepareFields(
   if (Array.isArray(opts.only)) {
     const onlyFieldNames: string[] = opts.only;
     const removeFields = Object.keys(typeComposer.getFields()).filter(
-      fName => !onlyFieldNames.includes(fName)
+      fName => onlyFieldNames.indexOf(fName) === -1
     );
     typeComposer.removeField(removeFields);
   }
@@ -72,7 +72,7 @@ export function prepareInputFields(
   if (Array.isArray(inputFieldsOpts.only)) {
     const onlyFieldNames: string[] = inputFieldsOpts.only;
     const removeFields = Object.keys(inputTypeComposer.getFields()).filter(
-      fName => !onlyFieldNames.includes(fName)
+      fName => onlyFieldNames.indexOf(fName) === -1
     );
     inputTypeComposer.removeField(removeFields);
   }
@@ -129,7 +129,9 @@ export function prepareConnectionResolver(
   typeComposer: TypeComposer,
   opts: ConnectionSortMapOpts
 ) {
-  const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), { reversedFirst: true });
+  const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), {
+    reversedFirst: true,
+  });
   const sortConfigs = {};
   uniqueIndexes.forEach(indexData => {
     const keys = Object.keys(indexData);
