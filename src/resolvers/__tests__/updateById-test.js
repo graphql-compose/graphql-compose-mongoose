@@ -10,6 +10,9 @@ import typeStorage from '../../typeStorage';
 
 const { GraphQLNonNull, GraphQLInputObjectType, getNullableType, GraphQLObjectType } = graphql;
 
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
+
 describe('updateById() ->', () => {
   let UserTypeComposer;
 

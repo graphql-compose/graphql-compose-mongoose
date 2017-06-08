@@ -6,6 +6,9 @@ import findMany from '../findMany';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
+
 describe('findMany() ->', () => {
   let UserTypeComposer;
 

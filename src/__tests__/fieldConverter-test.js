@@ -19,6 +19,9 @@ import {
 import { composeWithMongoose } from '../composeWithMongoose';
 import GraphQLMongoID from '../types/mongoid';
 
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
+
 const {
   GraphQLString,
   GraphQLFloat,

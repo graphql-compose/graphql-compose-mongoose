@@ -5,11 +5,13 @@ import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import removeOne from '../removeOne';
 import GraphQLMongoID from '../../types/mongoid';
-import { mongoose } from '../../__mocks__/mongooseCommon';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
 const { GraphQLObjectType } = graphql;
+
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
 
 describe('removeOne() ->', () => {
   let UserTypeComposer;
@@ -79,10 +81,6 @@ describe('removeOne() ->', () => {
 
   describe('Resolver.resolve():Promise', () => {
     it('should be promise', () => {
-      // some crazy shit for method `MongooseModel.findOneAndRemove`
-      // needs to set explicitly Promise object
-      // otherwise it returns Promise object, but it not instanse of global Promise
-      mongoose.Promise = Promise; // eslint-disable-line
       const result = removeOne(UserModel, UserTypeComposer).resolve({});
       expect(result).toBeInstanceOf(Promise);
       result.catch(() => 'catch error if appears, hide it from mocha');

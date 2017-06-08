@@ -8,6 +8,9 @@ import typeStorage from '../../typeStorage';
 
 const { GraphQLInt } = graphql;
 
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
+
 describe('count() ->', () => {
   let UserTypeComposer;
 

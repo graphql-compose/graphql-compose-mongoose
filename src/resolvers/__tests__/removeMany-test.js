@@ -9,6 +9,9 @@ import typeStorage from '../../typeStorage';
 
 const { GraphQLInt, GraphQLNonNull, GraphQLObjectType } = graphql;
 
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
+
 describe('removeMany() ->', () => {
   let UserTypeComposer;
 

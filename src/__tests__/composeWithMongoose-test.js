@@ -7,6 +7,9 @@ import { UserModel } from '../__mocks__/userModel';
 import { composeWithMongoose } from '../composeWithMongoose';
 import typeStorage from '../typeStorage';
 
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
+
 describe('composeWithMongoose ->', () => {
   beforeEach(() => {
     typeStorage.clear();

@@ -8,6 +8,9 @@ import typeStorage from '../../typeStorage';
 
 const { GraphQLNonNull } = graphql;
 
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
+
 describe('findOne() ->', () => {
   let UserTypeComposer;
 

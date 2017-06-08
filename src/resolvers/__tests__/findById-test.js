@@ -10,6 +10,9 @@ import typeStorage from '../../typeStorage';
 
 const { GraphQLNonNull } = graphql;
 
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
+
 describe('findById() ->', () => {
   let UserTypeComposer;
   let PostTypeComposer;
