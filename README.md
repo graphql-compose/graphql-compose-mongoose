@@ -1,5 +1,7 @@
 # graphql-compose-mongoose
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/nodkz/graphql-compose-mongoose.svg)](https://greenkeeper.io/)
+
 [![travis build](https://img.shields.io/travis/nodkz/graphql-compose-mongoose.svg)](https://travis-ci.org/nodkz/graphql-compose-mongoose)
 [![codecov coverage](https://img.shields.io/codecov/c/github/nodkz/graphql-compose-mongoose.svg)](https://codecov.io/github/nodkz/graphql-compose-mongoose)
 [![](https://img.shields.io/npm/v/graphql-compose-mongoose.svg)](https://www.npmjs.com/package/graphql-compose-mongoose)
