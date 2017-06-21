@@ -1686,7 +1686,7 @@ flat-cache@^1.2.1:
     graceful-fs "^4.1.2"
     write "^0.2.1"
 
-flow-bin@0.48.0:
+flow-bin@^0.48.0:
   version "0.48.0"
   resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.48.0.tgz#72d075143524358db8901525e3c784dc13a7c7ee"
 
@@ -1946,9 +1946,9 @@ graphql-compose-connection@^2.2.1:
   dependencies:
     babel-runtime "^6.23.0"
 
-graphql-compose@^1.21.1:
-  version "1.21.1"
-  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-1.21.1.tgz#65a8152335285d51d1d220ba3355b7e4eb52a515"
+graphql-compose@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-2.0.0.tgz#edf7e8e1af0675721cfcfe55a3d2297663a5e284"
   dependencies:
     babel-runtime "^6.23.0"
     object-path "^0.11.4"
