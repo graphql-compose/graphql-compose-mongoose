@@ -3,6 +3,7 @@
 
 import { TypeComposer, InputTypeComposer, isObject, graphql } from 'graphql-compose';
 import { getIndexesFromModel } from '../../utils/getIndexesFromModel';
+import GraphQLMongoID from '../../types/mongoid';
 import { toMongoDottedObject, upperFirst } from '../../utils';
 import typeStorage from '../../typeStorage';
 import type {
@@ -55,6 +56,11 @@ export const filterHelperArgs = (
 
   const filterTypeName: string = opts.filterTypeName;
   const inputComposer = typeComposer.getInputTypeComposer().clone(filterTypeName);
+
+  inputComposer.addFields({
+    _ids: new GraphQLList(GraphQLMongoID),
+  });
+
   inputComposer.removeField(removeFields);
 
   if (opts.requiredFields) {
@@ -88,14 +94,22 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
   const filter = resolveParams.args && resolveParams.args.filter;
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
     const modelFields = resolveParams.query.schema.paths;
+
+    const { _ids, ...filterFields } = filter;
+    if (_ids && Array.isArray(_ids)) {
+      // eslint-disable-next-line
+      resolveParams.query = resolveParams.query.where({ _id: { $in: _ids } });
+    }
+
     const clearedFilter = {};
-    Object.keys(filter).forEach(key => {
+    Object.keys(filterFields).forEach(key => {
       if (modelFields[key]) {
-        clearedFilter[key] = filter[key];
+        clearedFilter[key] = filterFields[key];
       }
     });
     if (Object.keys(clearedFilter).length > 0) {
-      resolveParams.query = resolveParams.query.where(toMongoDottedObject(clearedFilter)); // eslint-disable-line
+      // eslint-disable-next-line
+      resolveParams.query = resolveParams.query.where(toMongoDottedObject(clearedFilter));
     }
 
     if (filter[OPERATORS_FIELDNAME]) {

@@ -8,11 +8,12 @@ import {
   addFieldsWithOperator,
   OPERATORS_FIELDNAME,
 } from '../filter';
+import GraphQLMongoID from '../../../types/mongoid';
 import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
 
-const { GraphQLInputObjectType, GraphQLNonNull } = graphql;
+const { GraphQLInputObjectType, GraphQLNonNull, GraphQLList } = graphql;
 
 describe('Resolver helper `filter` ->', () => {
   let UserTypeComposer;
@@ -111,6 +112,15 @@ describe('Resolver helper `filter` ->', () => {
       expect(args.filter.type).toBeInstanceOf(GraphQLInputObjectType);
     });
 
+    it('should return filter with field _ids', () => {
+      const args = filterHelperArgs(UserTypeComposer, UserModel, {
+        filterTypeName: 'FilterUserType',
+      });
+      const itc = new InputTypeComposer(args.filter.type);
+      expect(itc.getFieldType('_ids')).toBeInstanceOf(GraphQLList);
+      expect(itc.getFieldType('_ids').ofType).toBe(GraphQLMongoID);
+    });
+
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
       const args = filterHelperArgs(UserTypeComposer, UserModel, {
         filterTypeName: 'FilterUserType',
@@ -172,17 +182,12 @@ describe('Resolver helper `filter` ->', () => {
 
   describe('filterHelper()', () => {
     let spyWhereFn;
-    let spyWhere2Fn;
     let spyFindFn;
     let resolveParams: any;
 
     beforeEach(() => {
       spyWhereFn = jest.fn(() => {
-        spyWhere2Fn = jest.fn();
-        return {
-          ...UserModel.find(),
-          where: spyWhere2Fn,
-        };
+        return resolveParams.query;
       });
 
       spyFindFn = jest.fn();
@@ -206,6 +211,17 @@ describe('Resolver helper `filter` ->', () => {
       };
       filterHelper(resolveParams);
       expect(spyWhereFn).toBeCalledWith({ name: 'nodkz' });
+    });
+
+    it('should call query.where if args.filter provided with _ids', () => {
+      resolveParams.args = {
+        filter: {
+          age: 30,
+          _ids: [1, 2, 3],
+        },
+      };
+      filterHelper(resolveParams);
+      expect(spyWhereFn.mock.calls).toEqual([[{ _id: { $in: [1, 2, 3] } }], [{ age: 30 }]]);
     });
 
     it('should convert deep object in args.filter to dotted object', () => {
@@ -246,8 +262,10 @@ describe('Resolver helper `filter` ->', () => {
       };
 
       filterHelper(resolveParams);
-      expect(spyWhereFn).toBeCalledWith({ age: { $gt: 10, $lt: 20 } });
-      expect(spyWhere2Fn).toBeCalledWith({ age: { max: 30 }, active: true });
+      expect(spyWhereFn.mock.calls).toEqual([
+        [{ age: { $gt: 10, $lt: 20 } }],
+        [{ active: true, age: { max: 30 } }],
+      ]);
     });
   });
 });
