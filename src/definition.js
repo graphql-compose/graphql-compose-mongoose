@@ -3,6 +3,7 @@
 
 import type { TypeComposer } from 'graphql-compose';
 import type { ConnectionSortMapOpts as _ConnectionSortMapOpts} from 'graphql-compose-connection/lib/definition';
+
 export type ConnectionSortMapOpts = _ConnectionSortMapOpts;
 
 export type ObjectMap = { [optName: string]: any };
@@ -185,6 +186,7 @@ export type TypeConverterResolversOpts = {
     filter?: FilterHelperArgsOpts | false,
   },
   connection?: ConnectionSortMapOpts | false,
+  pagination?: { perPage?: number } | false,
 };
 
 export type FilterHelperArgsOpts = {

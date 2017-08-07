@@ -14,9 +14,9 @@ This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose)
 Installation
 ============
 ```
-npm install graphql graphql-compose graphql-compose-connection mongoose graphql-compose-mongoose --save
+npm install graphql graphql-compose graphql-compose-connection graphql-compose-pagination mongoose graphql-compose-mongoose --save
 ```
-Modules `graphql`, `graphql-compose`, `graphql-compose-connection`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
+Modules `graphql`, `graphql-compose`, `graphql-compose-connection`, `graphql-compose-pagination`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
 
 Example
 =======
@@ -76,8 +76,9 @@ GQC.rootQuery().addFields({
   userByIds: UserTC.getResolver('findByIds'),
   userOne: UserTC.getResolver('findOne'),
   userMany: UserTC.getResolver('findMany'),
-  userTotal: UserTC.getResolver('count'),
+  userCount: UserTC.getResolver('count'),
   userConnection: UserTC.getResolver('connection'),
+  userPagination: UserTC.getResolver('pagination'),
 });
 
 GQC.rootMutation().addFields({
@@ -314,7 +315,10 @@ export type typeConverterResolversOpts = {
     uniqueFields: string[],
     sortValue: mixed,
     directionFilter: (<T>(filterArg: T, cursorData: CursorDataType, isBefore: boolean) => T),
-  };
+  },
+  pagination?: false | {
+    perPage?: number,
+  },
 };
 ```
 
@@ -362,6 +366,8 @@ Besides standard connection arguments `first`, `last`, `before` and `after`, als
 
 This plugin completely follows to [Relay Cursor Connections Specification](https://facebook.github.io/relay/graphql/connections.htm).
 
+### [graphql-compose-pagination](https://github.com/nodkz/graphql-compose-pagination)
+This plugin adds `pagination` resolver.
 
 License
 =======

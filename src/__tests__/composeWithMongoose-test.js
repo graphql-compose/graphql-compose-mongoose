@@ -163,6 +163,30 @@ describe('composeWithMongoose ->', () => {
     });
   });
 
+  describe('3rd party resolvers', () => {
+    describe('graphql-compose-connection', () => {
+      it('should add `connection` resolver by default', () => {
+        const tc2 = composeWithMongoose(UserModel);
+        expect(tc2.getResolver('connection')).toBeDefined();
+      });
+    });
+
+    describe('graphql-compose-pagination', () => {
+      it('should add `pagination` resolver by default', () => {
+        const tc2 = composeWithMongoose(UserModel);
+        expect(tc2.getResolver('pagination')).toBeDefined();
+      });
+
+      it('should add `pagination` resolver with `perPage` option', () => {
+        const tc2 = composeWithMongoose(UserModel, { resolvers: { pagination: { perPage: 333 } } });
+        const resolver = tc2.getResolver('pagination');
+        expect(resolver).toBeDefined();
+        // $FlowFixMe
+        expect(resolver.getArg('perPage').defaultValue).toBe(333);
+      });
+    });
+  });
+
   describe('complex situations', () => {
     it('required input fields, should be passed down to resolvers', () => {
       const typeComposer = composeWithMongoose(UserModel, {

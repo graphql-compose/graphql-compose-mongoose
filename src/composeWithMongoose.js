@@ -3,6 +3,7 @@
 
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import composeWithConnection from 'graphql-compose-connection';
+import composeWithPagination from 'graphql-compose-pagination';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
 import { getUniqueIndexes, extendByReversedIndexes } from './utils/getIndexesFromModel';
@@ -121,6 +122,15 @@ export function createResolvers(
 
   if (!{}.hasOwnProperty.call(opts, 'connection') || opts.connection !== false) {
     prepareConnectionResolver(model, typeComposer, opts.connection ? opts.connection : {});
+  }
+
+  if (!{}.hasOwnProperty.call(opts, 'pagination') || opts.pagination !== false) {
+    const pOpts = opts.pagination || {};
+    composeWithPagination(typeComposer, {
+      findResolverName: 'findMany',
+      countResolverName: 'count',
+      ...pOpts,
+    });
   }
 }
 
