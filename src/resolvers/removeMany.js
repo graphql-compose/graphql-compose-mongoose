@@ -39,8 +39,8 @@ export default function removeMany(
     kind: 'mutation',
     description:
       'Remove many documents without returning them: ' +
-        'Use Query.remove mongoose method. ' +
-        'Do not apply mongoose defaults, setters, hooks and validation. ',
+      'Use Query.remove mongoose method. ' +
+      'Do not apply mongoose defaults, setters, hooks and validation. ',
     type: outputType,
     args: {
       ...filterHelperArgs(typeComposer, model, {

@@ -47,8 +47,8 @@ export default function removeOne(
     kind: 'mutation',
     description:
       'Remove one document: ' +
-        '1) Remove with hooks via findOneAndRemove. ' +
-        '2) Return removed document.',
+      '1) Remove with hooks via findOneAndRemove. ' +
+      '2) Return removed document.',
     type: outputType,
     args: {
       ...filterHelperArgs(typeComposer, model, {

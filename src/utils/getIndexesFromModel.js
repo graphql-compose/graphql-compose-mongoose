@@ -17,18 +17,17 @@ function isSpecificIndex(idx) {
   return hasSpecialIndex;
 }
 
-/**
+/*
 * Get mongoose model, and return array of fields with indexes.
 *  MongooseModel  ->  [ { _id: 1 }, { name: 1, surname: -1 } ]
-**/
+*/
 export function getIndexesFromModel(
   mongooseModel: MongooseModelT,
   opts: getIndexesFromModelOpts = {}
 ): ObjectMap[] {
   const extractCompound = opts.extractCompound === undefined ? true : Boolean(opts.extractCompound);
-  const skipSpecificIndexes = opts.skipSpecificIndexes === undefined
-    ? true
-    : Boolean(opts.skipSpecificIndexes);
+  const skipSpecificIndexes =
+    opts.skipSpecificIndexes === undefined ? true : Boolean(opts.skipSpecificIndexes);
 
   const indexedFields = [];
 

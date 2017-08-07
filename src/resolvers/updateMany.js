@@ -42,8 +42,8 @@ export default function updateMany(
     kind: 'mutation',
     description:
       'Update many documents without returning them: ' +
-        'Use Query.update mongoose method. ' +
-        'Do not apply mongoose defaults, setters, hooks and validation. ',
+      'Use Query.update mongoose method. ' +
+      'Do not apply mongoose defaults, setters, hooks and validation. ',
     type: outputType,
     args: {
       ...recordHelperArgs(typeComposer, {

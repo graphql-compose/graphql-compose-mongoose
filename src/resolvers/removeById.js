@@ -47,8 +47,8 @@ export default function removeById(
     kind: 'mutation',
     description:
       'Remove one document: ' +
-        '1) Retrieve one document and remove with hooks via findByIdAndRemove. ' +
-        '2) Return removed document.',
+      '1) Retrieve one document and remove with hooks via findByIdAndRemove. ' +
+      '2) Return removed document.',
     type: outputType,
     args: {
       _id: {
