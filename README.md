@@ -14,9 +14,14 @@ This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose)
 Installation
 ============
 ```
-npm install graphql graphql-compose graphql-compose-connection graphql-compose-pagination mongoose graphql-compose-mongoose --save
+npm install graphql graphql-compose mongoose graphql-compose-mongoose --save
 ```
-Modules `graphql`, `graphql-compose`, `graphql-compose-connection`, `graphql-compose-pagination`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
+Modules `graphql`, `graphql-compose`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
+
+If you want to add additional resolvers [`connection`](https://github.com/nodkz/graphql-compose-connection) and/or [`pagination`](https://github.com/nodkz/graphql-compose-pagination) - just install following packages and `graphql-compose-mongoose` will add them automatically.
+```
+npm install graphql-compose-connection graphql-compose-pagination --save
+```
 
 Example
 =======

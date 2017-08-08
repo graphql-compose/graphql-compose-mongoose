@@ -186,7 +186,11 @@ export type TypeConverterResolversOpts = {
     filter?: FilterHelperArgsOpts | false,
   },
   connection?: ConnectionSortMapOpts | false,
-  pagination?: { perPage?: number } | false,
+  pagination?: PaginationOpts | false,
+};
+
+export type PaginationOpts = {
+  perPage?: number
 };
 
 export type FilterHelperArgsOpts = {

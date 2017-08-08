@@ -1,9 +1,7 @@
 /* @flow */
-/* eslint-disable no-use-before-define, no-param-reassign */
+/* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
-import composeWithConnection from 'graphql-compose-connection';
-import composeWithPagination from 'graphql-compose-pagination';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
 import { getUniqueIndexes, extendByReversedIndexes } from './utils/getIndexesFromModel';
@@ -14,6 +12,7 @@ import type {
   TypeConverterResolversOpts,
   TypeConverterInputTypeOpts,
   ConnectionSortMapOpts,
+  PaginationOpts,
 } from './definition';
 
 export function composeWithMongoose(
@@ -125,13 +124,22 @@ export function createResolvers(
   }
 
   if (!{}.hasOwnProperty.call(opts, 'pagination') || opts.pagination !== false) {
-    const pOpts = opts.pagination || {};
-    composeWithPagination(typeComposer, {
-      findResolverName: 'findMany',
-      countResolverName: 'count',
-      ...pOpts,
-    });
+    preparePaginationResolver(typeComposer, opts.pagination || {});
   }
+}
+
+export function preparePaginationResolver(typeComposer: TypeComposer, opts: PaginationOpts) {
+  try {
+    require.resolve('graphql-compose-pagination');
+  } catch (e) {
+    return;
+  }
+  const composeWithPagination = require('graphql-compose-pagination').default;
+  composeWithPagination(typeComposer, {
+    findResolverName: 'findMany',
+    countResolverName: 'count',
+    ...opts,
+  });
 }
 
 export function prepareConnectionResolver(
@@ -139,6 +147,13 @@ export function prepareConnectionResolver(
   typeComposer: TypeComposer,
   opts: ConnectionSortMapOpts
 ) {
+  try {
+    require.resolve('graphql-compose-connection');
+  } catch (e) {
+    return;
+  }
+  const composeWithConnection = require('graphql-compose-connection').default;
+
   const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), {
     reversedFirst: true,
   });
