@@ -50,7 +50,7 @@
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-prettier": "^2.1.2",
     "flow-bin": "^0.52.0",
-    "graphql": "^0.10.3",
+    "graphql": "^0.11.0",
     "graphql-compose": "^2.0.0",
     "graphql-compose-connection": ">=2.2.1",
     "graphql-compose-pagination": ">=1.0.0",
