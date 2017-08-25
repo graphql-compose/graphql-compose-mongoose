@@ -1917,9 +1917,9 @@ graphql-compose@^2.0.0:
     babel-runtime "^6.23.0"
     object-path "^0.11.4"
 
-graphql@^0.10.3:
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-0.10.5.tgz#c9be17ca2bdfdbd134077ffd9bbaa48b8becd298"
+graphql@0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-0.11.0.tgz#a72561b0b9396a622128228bc34f3801c255fbdb"
   dependencies:
     iterall "^1.1.0"
 
