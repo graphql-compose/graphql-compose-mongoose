@@ -16,7 +16,7 @@ import type {
 } from './definition';
 
 export function composeWithMongoose(
-  model: MongooseModelT,
+  model: Object, // MongooseModelT, TODO use Model from mongoose_v4.x.x definition when it will be public
   opts: TypeConverterOpts = {}
 ): TypeComposer {
   const name: string = (opts && opts.name) || model.modelName;

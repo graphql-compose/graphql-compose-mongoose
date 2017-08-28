@@ -17,7 +17,7 @@ import typeStorage from './typeStorage';
 
 import type {
   MongooseModelT,
-  MongooseModelSchemaT,
+  // MongooseModelSchemaT,
   MongoosePseudoModelT,
   MongooseFieldT,
   MongooseFieldMapT,
@@ -187,7 +187,7 @@ export function convertModelToGraphQL(
 }
 
 export function convertSchemaToGraphQL(
-  schema: MongooseModelSchemaT,
+  schema: Object, // MongooseModelSchemaT, TODO use Model from mongoose_v4.x.x definition when it will be public
   typeName: string
 ): TypeComposer {
   if (!typeName) {
