@@ -62,7 +62,6 @@ describe('removeMany() ->', () => {
       const resolver = removeMany(UserModel, UserTypeComposer);
       const filterField = resolver.getArg('filter');
       expect(filterField).toBeTruthy();
-      // $FlowFixMe
       expect(filterField.type).toBeInstanceOf(GraphQLNonNull);
     });
   });

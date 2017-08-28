@@ -181,7 +181,6 @@ describe('composeWithMongoose ->', () => {
         const tc2 = composeWithMongoose(UserModel, { resolvers: { pagination: { perPage: 333 } } });
         const resolver = tc2.getResolver('pagination');
         expect(resolver).toBeDefined();
-        // $FlowFixMe
         expect(resolver.getArg('perPage').defaultValue).toBe(333);
       });
     });

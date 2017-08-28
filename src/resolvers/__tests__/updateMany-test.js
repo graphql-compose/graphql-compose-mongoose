@@ -73,7 +73,6 @@ describe('updateMany() ->', () => {
     it('should have `record` arg', () => {
       const resolver = updateMany(UserModel, UserTypeComposer);
       const argConfig = resolver.getArg('record');
-      // $FlowFixMe
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
       // $FlowFixMe
       expect(argConfig.type.ofType.name).toBe('UpdateManyUserInput');

@@ -54,7 +54,6 @@ describe('updateById() ->', () => {
     it('should have `record` arg', () => {
       const resolver = updateById(UserModel, UserTypeComposer);
       const argConfig = resolver.getArg('record');
-      // $FlowFixMe
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
       // $FlowFixMe
       expect(argConfig.type.ofType.name).toBe('UpdateByIdUserInput');
