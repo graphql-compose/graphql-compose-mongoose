@@ -164,9 +164,15 @@ UserTC.addRelation(
   })
 );
 ```
+<<<<<<< HEAD
+### Reusing the same mongoose Schame in embedded object fields
+Suppose you have a common structure you use as embedded object in multiple Schemas.
+Also suppose you want the strcutre to have the same GraphQL type across all parent types.
+=======
 ### Reusing the same mongoose Schema in embedded object fields
 Suppose you have a common structure you use as embedded object in multiple Schemas.
 Also suppose you want the structure to have the same GraphQL type across all parent types.
+>>>>>>> upstream/master
 (For instance, to allow reuse of fragments for this type)
 Here are Schemas to demonstrate:
 ```js
@@ -184,6 +190,7 @@ const UserProfile = Schema({
   fullName: String,
   personalImage: ImageDataStructure
 });
+<<<<<<< HEAD
 
 const Article = Schema({
   title: String,
@@ -205,6 +212,29 @@ import { composeWithMongoose } from 'graphql-compose-mongoose';
 const UserProfileModel = mongoose.model('UserProfile', UserProfile);
 const ArticleModel = mongoose.model('Article', Article);
 
+=======
+
+const Article = Schema({
+  title: String,
+  heroImage: ImageDataStructure
+});
+```
+If you want the `ImageDataStructure` to use the same GraphQL type in both `Article` and `UserProfile` you will need create it as a mongoose schema (not a standard javascript object) and to explicitly tell `graphql-compose-mongoose` the name you want it to have. Otherwise, without the name, it would generate the name according to the first parent this type was embedded in.
+
+Do the following:
+```js
+import { convertSchemaToGraphQL } from 'graphql-compose-mongoose';
+convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage'); // Force this type on this mongoose schema
+```
+Before continuing to convert your models to TypeComposers:
+```js
+import mongoose from 'mongoose';
+import { composeWithMongoose } from 'graphql-compose-mongoose';
+
+const UserProfileModel = mongoose.model('UserProfile', UserProfile);
+const ArticleModel = mongoose.model('Article', Article);
+
+>>>>>>> upstream/master
 const UserProfileTC = composeWithMongoose(UserProfileModel);
 const ArticleTC = composeWithMongoose(ArticleModel);
 ```

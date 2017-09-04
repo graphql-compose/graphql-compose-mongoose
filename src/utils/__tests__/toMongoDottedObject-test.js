@@ -28,4 +28,16 @@ describe('toMongoDottedObject()', () => {
       'a.b': 3,
     });
   });
+
+  it('should handle date object values as scalars', () => {
+    expect(toMongoDottedObject({ dateField: new Date(100) })).toEqual({
+      dateField: new Date(100),
+    });
+  });
+
+  it('should handle date object values when nested', () => {
+    expect(toMongoDottedObject({ a: { dateField: new Date(100) } })).toEqual({
+      'a.dateField': new Date(100),
+    });
+  });
 });
