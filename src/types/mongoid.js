@@ -1,5 +1,8 @@
-import { GraphQLScalarType } from 'graphql';
-import { Kind } from 'graphql/language';
+/* @flow */
+
+import { graphql } from 'graphql-compose';
+
+const { GraphQLScalarType, Kind } = graphql;
 
 const GraphQLMongoID = new GraphQLScalarType({
   name: 'MongoID',
@@ -11,9 +14,7 @@ const GraphQLMongoID = new GraphQLScalarType({
   serialize: String,
   parseValue: String,
   parseLiteral(ast) {
-    return ast.kind === Kind.STRING || ast.kind === Kind.INT ?
-      ast.value :
-      null;
+    return ast.kind === Kind.STRING || ast.kind === Kind.INT ? ast.value : null;
   },
 });
 

@@ -1,49 +1,39 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import {
-  GraphQLNonNull,
-  GraphQLInputObjectType,
-  GraphQLList,
-  getNamedType,
-} from 'graphql';
-import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import { TypeComposer, InputTypeComposer, isObject, graphql } from 'graphql-compose';
 import { getIndexesFromModel } from '../../utils/getIndexesFromModel';
-import { isObject } from '../../utils/is';
+import GraphQLMongoID from '../../types/mongoid';
 import { toMongoDottedObject, upperFirst } from '../../utils';
 import typeStorage from '../../typeStorage';
 import type {
-  GraphQLFieldConfigArgumentMap,
+  ComposeFieldConfigArgumentMap,
   ExtendedResolveParams,
   MongooseModelT,
-  filterHelperArgsOpts,
-  filterOperatorsOpts,
-  filterOperatorNames,
+  FilterHelperArgsOpts,
+  FilterOperatorsOpts,
+  FilterOperatorNames,
 } from '../../definition';
+
+const { GraphQLNonNull, GraphQLInputObjectType, GraphQLList, getNamedType } = graphql;
 
 export const OPERATORS_FIELDNAME = '_operators';
 
 export const filterHelperArgs = (
   typeComposer: TypeComposer,
   model: MongooseModelT,
-  opts: filterHelperArgsOpts,
-): GraphQLFieldConfigArgumentMap => {
+  opts?: FilterHelperArgsOpts
+): ComposeFieldConfigArgumentMap => {
   if (!(typeComposer instanceof TypeComposer)) {
-    throw new Error(
-      'First arg for filterHelperArgs() should be instance of TypeComposer.',
-    );
+    throw new Error('First arg for filterHelperArgs() should be instance of TypeComposer.');
   }
 
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'Second arg for filterHelperArgs() should be instance of MongooseModel.',
-    );
+    throw new Error('Second arg for filterHelperArgs() should be instance of MongooseModel.');
   }
 
   if (!opts || !opts.filterTypeName) {
-    throw new Error(
-      'You should provide non-empty `filterTypeName` in options.',
-    );
+    throw new Error('You should provide non-empty `filterTypeName` in options.');
   }
 
   const removeFields = [];
@@ -65,24 +55,25 @@ export const filterHelperArgs = (
   }
 
   const filterTypeName: string = opts.filterTypeName;
-  const inputComposer = typeComposer
-    .getInputTypeComposer()
-    .clone(filterTypeName);
+  const inputComposer = typeComposer.getInputTypeComposer().clone(filterTypeName);
+
+  inputComposer.addFields({
+    _ids: new GraphQLList(GraphQLMongoID),
+  });
+
   inputComposer.removeField(removeFields);
 
   if (opts.requiredFields) {
     inputComposer.makeRequired(opts.requiredFields);
   }
 
-  if (
-    !({}).hasOwnProperty.call(opts, 'operators') || opts.operators !== false
-  ) {
+  if (!{}.hasOwnProperty.call(opts, 'operators') || opts.operators !== false) {
     addFieldsWithOperator(
       // $FlowFixMe
       `Operators${opts.filterTypeName}`,
       inputComposer,
       model,
-      opts.operators || {},
+      opts.operators || {}
     );
   }
 
@@ -93,44 +84,45 @@ export const filterHelperArgs = (
   return {
     filter: {
       name: 'filter',
-      type: opts.isRequired
-        ? new GraphQLNonNull(inputComposer.getType())
-        : inputComposer.getType(),
-      description: opts.onlyIndexed
-        ? 'Filter only by indexed fields'
-        : 'Filter by fields',
+      type: opts.isRequired ? new GraphQLNonNull(inputComposer.getType()) : inputComposer.getType(),
+      description: opts.onlyIndexed ? 'Filter only by indexed fields' : 'Filter by fields',
     },
   };
 };
 
 export function filterHelper(resolveParams: ExtendedResolveParams): void {
-  // $FlowFixMe
   const filter = resolveParams.args && resolveParams.args.filter;
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
     const modelFields = resolveParams.query.schema.paths;
+
+    const { _ids, ...filterFields } = filter;
+    if (_ids && Array.isArray(_ids)) {
+      // eslint-disable-next-line
+      resolveParams.query = resolveParams.query.where({ _id: { $in: _ids } });
+    }
+
     const clearedFilter = {};
-    Object.keys(filter).forEach(key => {
+    Object.keys(filterFields).forEach(key => {
       if (modelFields[key]) {
-        clearedFilter[key] = filter[key];
+        clearedFilter[key] = filterFields[key];
       }
     });
     if (Object.keys(clearedFilter).length > 0) {
-      resolveParams.query = resolveParams.query.where(
-        toMongoDottedObject(clearedFilter),
-      ); // eslint-disable-line
+      // eslint-disable-next-line
+      resolveParams.query = resolveParams.query.where(toMongoDottedObject(clearedFilter));
     }
 
     if (filter[OPERATORS_FIELDNAME]) {
       const operatorFields = filter[OPERATORS_FIELDNAME];
       Object.keys(operatorFields).forEach(fieldName => {
-        const fieldOperators = Object.assign({}, operatorFields[fieldName]);
+        const fieldOperators = { ...operatorFields[fieldName] };
         const criteria = {};
         Object.keys(fieldOperators).forEach(operatorName => {
           criteria[`$${operatorName}`] = fieldOperators[operatorName];
         });
         if (Object.keys(criteria).length > 0) {
+          // eslint-disable-next-line
           resolveParams.query = resolveParams.query.where({
-            // eslint-disable-line
             [fieldName]: criteria,
           });
         }
@@ -139,11 +131,10 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
   }
 
   if (isObject(resolveParams.rawQuery)) {
-    resolveParams.query = resolveParams.query
-      .where( // eslint-disable-line
-        // $FlowFixMe
-        resolveParams.rawQuery,
-      );
+    // eslint-disable-next-line
+    resolveParams.query = resolveParams.query.where(
+      resolveParams.rawQuery
+    );
   }
 }
 
@@ -157,14 +148,22 @@ export function getIndexedFieldNames(model: MongooseModelT): string[] {
     fieldNames.push(clearedName);
   });
 
-  return fieldNames;
+  // filter duplicates
+  const uniqueNames = [];
+  const result = fieldNames.filter(val => {
+    if (uniqueNames.indexOf(val) > -1) return false;
+    uniqueNames.push(val);
+    return true;
+  });
+
+  return result;
 }
 
 export function addFieldsWithOperator(
   typeName: string,
   inputComposer: InputTypeComposer,
   model: MongooseModelT,
-  operatorsOpts: filterOperatorsOpts,
+  operatorsOpts: FilterOperatorsOpts
 ): InputTypeComposer {
   const operatorsComposer = new InputTypeComposer(
     typeStorage.getOrSet(
@@ -172,11 +171,11 @@ export function addFieldsWithOperator(
       new GraphQLInputObjectType({
         name: typeName,
         fields: {},
-      }),
-    ),
+      })
+    )
   );
 
-  const availableOperators: filterOperatorNames[] = [
+  const availableOperators: FilterOperatorNames[] = [
     'gt',
     'gte',
     'lt',
@@ -232,7 +231,7 @@ export function addFieldsWithOperator(
             new GraphQLInputObjectType({
               name: operatorTypeName,
               fields,
-            }),
+            })
           ),
           description: 'Filter value by operator(s)',
         });

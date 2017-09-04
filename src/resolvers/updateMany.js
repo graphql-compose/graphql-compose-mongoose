@@ -1,7 +1,6 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType, GraphQLInt } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { recordHelperArgs } from './helpers/record';
 import { skipHelperArgs, skipHelper } from './helpers/skip';
@@ -10,46 +9,39 @@ import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import toMongoDottedObject from '../utils/toMongoDottedObject';
 import typeStorage from '../typeStorage';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
+import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
 
 export default function updateMany(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts,
-): Resolver {
+  opts?: GenResolverOpts
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver updateMany() should be instance of Mongoose Model.',
-    );
+    throw new Error('First arg for Resolver updateMany() should be instance of Mongoose Model.');
   }
   if (!(typeComposer instanceof TypeComposer)) {
-    throw new Error(
-      'Second arg for Resolver updateMany() should be instance of TypeComposer.',
-    );
+    throw new Error('Second arg for Resolver updateMany() should be instance of TypeComposer.');
   }
 
   const outputTypeName = `UpdateMany${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
     outputTypeName,
-    new GraphQLObjectType({
+    TypeComposer.create({
       name: outputTypeName,
       fields: {
         numAffected: {
-          type: GraphQLInt,
+          type: 'Int',
           description: 'Affected documents number',
         },
       },
-    }),
+    })
   );
 
   const resolver = new Resolver({
     name: 'updateMany',
     kind: 'mutation',
-    description: 'Update many documents without returning them: ' +
+    description:
+      'Update many documents without returning them: ' +
       'Use Query.update mongoose method. ' +
       'Do not apply mongoose defaults, setters, hooks and validation. ',
     type: outputType,
@@ -74,31 +66,22 @@ export default function updateMany(
         ...(opts && opts.limit),
       }),
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || {
-      };
+      const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
-      if (
-        !(typeof recordData === 'object') ||
-        Object.keys(recordData).length === 0
-      ) {
+      if (!(typeof recordData === 'object') || Object.keys(recordData).length === 0) {
         return Promise.reject(
           new Error(
             `${typeComposer.getTypeName()}.updateMany resolver requires ` +
-              'at least one value in args.record',
-          ),
+              'at least one value in args.record'
+          )
         );
       }
 
       resolveParams.query = model.find();
-      // $FlowFixMe
       filterHelper(resolveParams);
-      // $FlowFixMe
       skipHelper(resolveParams);
-      // $FlowFixMe
       sortHelper(resolveParams);
-      // $FlowFixMe
       limitHelper(resolveParams);
 
       resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
@@ -107,20 +90,17 @@ export default function updateMany(
       // `beforeQuery` is experemental feature, if you want to use it
       // please open an issue with your use case, cause I suppose that
       // this option is excessive
-      // $FlowFixMe
       return (resolveParams.beforeQuery
-        ? Promise.resolve(
-            resolveParams.beforeQuery(resolveParams.query, resolveParams),
-          )
+        ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query, resolveParams))
         : resolveParams.query.exec()).then(res => {
-          if (res.ok) {
-            return {
-              numAffected: res.nModified,
-            };
-          }
+        if (res.ok) {
+          return {
+            numAffected: res.nModified,
+          };
+        }
 
-          return Promise.reject(res);
-        });
+        return Promise.reject(res);
+      });
     },
   });
 

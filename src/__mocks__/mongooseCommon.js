@@ -1,41 +1,37 @@
+/* @flow */
 /* eslint-disable no-param-reassign, no-console */
+
 import mongoose, { Schema } from 'mongoose';
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-const dbName = `gqc-mongoose-test${getRandomInt(1, 1000000)}`;
-const uri = `mongodb://127.0.0.1:27017/${dbName}`;
+import MongodbMemoryServer from 'mongodb-memory-server';
 
 mongoose.Promise = Promise;
-mongoose.connect(uri);
 
-mongoose.connection.on('error', (err) => {
-  throw new Error(err);
-});
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
-mongoose.connection.on('connected', () => {
-  console.log(`Mongoose default connection open to ${uri}`);
-});
+const originalConnect = mongoose.connect;
+mongoose.connect = async () => {
+  const mongoServer = new MongodbMemoryServer();
 
-function dropDBs(done) {
-  try {
-    mongoose.connection.db.dropDatabase(() => {
-      if (done) done();
-    });
-  } catch (e) { // Pitty, but not deathly
-    if (done) done();
-  }
-}
+  const mongoUri = await mongoServer.getConnectionString();
 
-process.on('exit', () => { dropDBs(); });
-process.on('SIGINT', () => { dropDBs(); });
+  originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true });
 
-export {
-  mongoose,
-  Schema,
-  dropDBs,
-  uri,
-  dbName,
+  mongoose.connection.on('error', e => {
+    if (e.message.code === 'ETIMEDOUT') {
+      console.error(e);
+    } else {
+      throw e;
+    }
+  });
+
+  mongoose.connection.once('open', () => {
+    // console.log(`MongoDB successfully connected to ${mongoUri}`);
+  });
+
+  mongoose.connection.once('disconnected', () => {
+    // console.log('MongoDB disconnected!');
+    mongoServer.stop();
+  });
 };
+
+export { mongoose, Schema };

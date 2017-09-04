@@ -1,15 +1,17 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { expect } from 'chai';
-import { GraphQLNonNull, GraphQLObjectType } from 'graphql';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import removeById from '../removeById';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
+const { GraphQLNonNull, GraphQLObjectType } = graphql;
+
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
 
 describe('removeById() ->', () => {
   let UserTypeComposer;
@@ -22,17 +24,9 @@ describe('removeById() ->', () => {
 
   let user;
 
-  beforeEach('clear UserModel collection', (done) => {
-    UserModel.collection.drop(() => {
-      done();
-    });
-  });
+  beforeEach(async () => {
+    await UserModel.remove({});
 
-  beforeEach(() => {
-    typeStorage.clear();
-  });
-
-  beforeEach('add test user document to mongoDB', () => {
     user = new UserModel({
       name: 'userName1',
       skills: ['js', 'ruby', 'php', 'python'],
@@ -40,36 +34,35 @@ describe('removeById() ->', () => {
       relocation: true,
     });
 
-    return Promise.all([
-      user.save(),
-    ]);
+    await user.save();
   });
 
   it('should return Resolver object', () => {
     const resolver = removeById(UserModel, UserTypeComposer);
-    expect(resolver).to.be.instanceof(Resolver);
+    expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have non-null `_id` arg', () => {
       const resolver = removeById(UserModel, UserTypeComposer);
-      expect(resolver.hasArg('_id')).to.be.true;
+      expect(resolver.hasArg('_id')).toBe(true);
       const argConfig = resolver.getArg('_id');
-      expect(argConfig).property('type').that.instanceof(GraphQLNonNull);
-      expect(argConfig).deep.property('type.ofType').that.equal(GraphQLMongoID);
+      expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
+      // $FlowFixMe
+      expect(argConfig.type.ofType).toBe(GraphQLMongoID);
     });
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be promise', () => {
       const result = removeById(UserModel, UserTypeComposer).resolve({});
-      expect(result).instanceof(Promise);
+      expect(result).toBeInstanceOf(Promise);
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
     it('should rejected with Error if args._id is empty', async () => {
-      const result = removeById(UserModel, UserTypeComposer).resolve({ args: { } });
-      await expect(result).be.rejectedWith(Error, 'requires args._id');
+      const result = removeById(UserModel, UserTypeComposer).resolve({ args: {} });
+      await expect(result).rejects.toMatchSnapshot();
     });
 
     it('should return payload.recordId', async () => {
@@ -78,7 +71,7 @@ describe('removeById() ->', () => {
           _id: user.id,
         },
       });
-      expect(result).have.property('recordId', user.id);
+      expect(result.recordId).toBe(user.id);
     });
 
     it('should return error if document does not exist', () => {
@@ -88,22 +81,17 @@ describe('removeById() ->', () => {
           _id: unexistedId,
         },
       });
-      return expect(promise).to.eventually.be.rejectedWith('Document not found');
+      return expect(promise).rejects.toMatchSnapshot();
     });
 
-
-    it('should remove document in database', (done) => {
-      removeById(UserModel, UserTypeComposer).resolve({
+    it('should remove document in database', async () => {
+      await removeById(UserModel, UserTypeComposer).resolve({
         args: {
           _id: user.id,
         },
-      }).then(() => {
-        UserModel.collection.findOne({ _id: user._id }, (err, doc) => {
-          expect(err).to.be.null;
-          expect(doc).to.be.null;
-          done();
-        });
       });
+
+      await expect(UserModel.findOne({ _id: user._id })).resolves.toBeNull();
     });
 
     it('should return payload.record', async () => {
@@ -112,7 +100,7 @@ describe('removeById() ->', () => {
           _id: user.id,
         },
       });
-      expect(result).have.deep.property('record.id', user.id);
+      expect(result.record.id).toBe(user.id);
     });
 
     it('should pass empty projection to findById and got full document data', async () => {
@@ -126,16 +114,16 @@ describe('removeById() ->', () => {
           },
         },
       });
-      expect(result).have.deep.property('record.id', user.id);
-      expect(result).have.deep.property('record.name', user.name);
-      expect(result).have.deep.property('record.gender', user.gender);
+      expect(result.record.id).toBe(user.id);
+      expect(result.record.name).toBe(user.name);
+      expect(result.record.gender).toBe(user.gender);
     });
 
     it('should return mongoose document', async () => {
       const result = await removeById(UserModel, UserTypeComposer).resolve({
         args: { _id: user.id },
       });
-      expect(result.record).instanceof(UserModel);
+      expect(result.record).toBeInstanceOf(UserModel);
     });
 
     it('should call `beforeRecordMutate` method with founded `record` and `resolveParams` as args', async () => {
@@ -149,12 +137,12 @@ describe('removeById() ->', () => {
           return record;
         },
       });
-      expect(result.record).instanceof(UserModel);
-      expect(result).have.deep.property('record.someDynamic', '1.1.1.1');
-      expect(beforeMutationId).to.equal(user.id);
+      expect(result.record).toBeInstanceOf(UserModel);
+      expect(result.record.someDynamic).toBe('1.1.1.1');
+      expect(beforeMutationId).toBe(user.id);
 
       const empty = await UserModel.collection.findOne({ _id: user._id });
-      expect(empty).to.equal(null);
+      expect(empty).toBe(null);
     });
 
     it('`beforeRecordMutate` may reject operation', async () => {
@@ -168,30 +156,33 @@ describe('removeById() ->', () => {
           return record;
         },
       });
-      await expect(result).be.rejectedWith(Error, 'Denied due context ReadOnly');
+      await expect(result).rejects.toMatchSnapshot();
       const exist = await UserModel.collection.findOne({ _id: user._id });
-      expect(exist.name).to.equal(user.name);
+      expect(exist.name).toBe(user.name);
     });
   });
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
       const outputType = removeById(UserModel, UserTypeComposer).getType();
-      expect(outputType.name).to.equal(`RemoveById${UserTypeComposer.getTypeName()}Payload`);
+      // $FlowFixMe
+      expect(outputType.name).toBe(`RemoveById${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
       const outputType = removeById(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       const typeComposer = new TypeComposer(outputType);
-      expect(typeComposer.hasField('recordId')).to.be.true;
-      expect(typeComposer.getField('recordId').type).to.equal(GraphQLMongoID);
+      expect(typeComposer.hasField('recordId')).toBe(true);
+      expect(typeComposer.getField('recordId').type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType = removeById(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       const typeComposer = new TypeComposer(outputType);
-      expect(typeComposer.hasField('record')).to.be.true;
-      expect(typeComposer.getField('record').type).to.equal(UserTypeComposer.getType());
+      expect(typeComposer.hasField('record')).toBe(true);
+      expect(typeComposer.getField('record').type).toBe(UserTypeComposer.getType());
     });
 
     it('should reuse existed outputType', () => {
@@ -202,7 +193,7 @@ describe('removeById() ->', () => {
       });
       typeStorage.set(outputTypeName, existedType);
       const outputType = removeById(UserModel, UserTypeComposer).getType();
-      expect(outputType).to.equal(existedType);
+      expect(outputType).toBe(existedType);
     });
   });
 });

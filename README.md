@@ -3,9 +3,10 @@
 [![travis build](https://img.shields.io/travis/nodkz/graphql-compose-mongoose.svg)](https://travis-ci.org/nodkz/graphql-compose-mongoose)
 [![codecov coverage](https://img.shields.io/codecov/c/github/nodkz/graphql-compose-mongoose.svg)](https://codecov.io/github/nodkz/graphql-compose-mongoose)
 [![](https://img.shields.io/npm/v/graphql-compose-mongoose.svg)](https://www.npmjs.com/package/graphql-compose-mongoose)
-[![npm](https://img.shields.io/npm/dt/graphql-compose-mongoose.svg)](https://www.npmjs.com/package/graphql-compose-mongoose)
+[![npm](https://img.shields.io/npm/dt/graphql-compose-mongoose.svg)](http://www.npmtrends.com/graphql-compose-mongoose)
 [![Join the chat at https://gitter.im/graphql-compose/Lobby](https://badges.gitter.im/nodkz/graphql-compose.svg)](https://gitter.im/graphql-compose/Lobby)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/nodkz/graphql-compose-mongoose.svg)](https://greenkeeper.io/)
 
 
 This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internal GraphQL Types. Provide all CRUD resolvers, including `graphql connection`, also provided basic search via operators ($lt, $gt and so on).
@@ -13,9 +14,14 @@ This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose)
 Installation
 ============
 ```
-npm install graphql graphql-compose graphql-compose-connection mongoose graphql-compose-mongoose --save
+npm install graphql graphql-compose mongoose graphql-compose-mongoose --save
 ```
-Modules `graphql`, `graphql-compose`, `graphql-compose-connection`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
+Modules `graphql`, `graphql-compose`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
+
+If you want to add additional resolvers [`connection`](https://github.com/nodkz/graphql-compose-connection) and/or [`pagination`](https://github.com/nodkz/graphql-compose-pagination) - just install following packages and `graphql-compose-mongoose` will add them automatically.
+```
+npm install graphql-compose-connection graphql-compose-pagination --save
+```
 
 Example
 =======
@@ -75,8 +81,9 @@ GQC.rootQuery().addFields({
   userByIds: UserTC.getResolver('findByIds'),
   userOne: UserTC.getResolver('findOne'),
   userMany: UserTC.getResolver('findMany'),
-  userTotal: UserTC.getResolver('count'),
+  userCount: UserTC.getResolver('count'),
   userConnection: UserTC.getResolver('connection'),
+  userPagination: UserTC.getResolver('pagination'),
 });
 
 GQC.rootMutation().addFields({
@@ -112,7 +119,7 @@ UserTC.get('fieldWithNesting.subNesting').getType(); // get GraphQL type of deep
 ```js
 UserTC.addFields({
   lonLat: TypeComposer.create('type LonLat { lon: Float, lat: Float }'),
-  notice: 'String', // shortand definition
+  notice: 'String', // shorthand definition
   noticeList: { // extended
     type: '[String]', // String, Int, Float, Boolean, ID, Json
     description: 'Array of notices',
@@ -141,7 +148,7 @@ UserTC.addRelation(
 UserTC.addRelation(
   'adultFriendsWithSameGender',
   () => ({
-    resolver: UserTC.get('$findMany'), // shortand for `UserTC.getResolver('findMany')`
+    resolver: UserTC.get('$findMany'), // shorthand for `UserTC.getResolver('findMany')`
     args: { // resolver `findMany` has `filter` arg, we may provide mongoose query to it
       filter: (source) => ({
         _operators : { // Applying criteria on fields which have
@@ -157,9 +164,15 @@ UserTC.addRelation(
   })
 );
 ```
+<<<<<<< HEAD
 ### Reusing the same mongoose Schame in embedded object fields
 Suppose you have a common structure you use as embedded object in multiple Schemas.
 Also suppose you want the strcutre to have the same GraphQL type across all parent types.
+=======
+### Reusing the same mongoose Schema in embedded object fields
+Suppose you have a common structure you use as embedded object in multiple Schemas.
+Also suppose you want the structure to have the same GraphQL type across all parent types.
+>>>>>>> upstream/master
 (For instance, to allow reuse of fragments for this type)
 Here are Schemas to demonstrate:
 ```js
@@ -177,6 +190,7 @@ const UserProfile = Schema({
   fullName: String,
   personalImage: ImageDataStructure
 });
+<<<<<<< HEAD
 
 const Article = Schema({
   title: String,
@@ -198,6 +212,29 @@ import { composeWithMongoose } from 'graphql-compose-mongoose';
 const UserProfileModel = mongoose.model('UserProfile', UserProfile);
 const ArticleModel = mongoose.model('Article', Article);
 
+=======
+
+const Article = Schema({
+  title: String,
+  heroImage: ImageDataStructure
+});
+```
+If you want the `ImageDataStructure` to use the same GraphQL type in both `Article` and `UserProfile` you will need create it as a mongoose schema (not a standard javascript object) and to explicitly tell `graphql-compose-mongoose` the name you want it to have. Otherwise, without the name, it would generate the name according to the first parent this type was embedded in.
+
+Do the following:
+```js
+import { convertSchemaToGraphQL } from 'graphql-compose-mongoose';
+convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage'); // Force this type on this mongoose schema
+```
+Before continuing to convert your models to TypeComposers:
+```js
+import mongoose from 'mongoose';
+import { composeWithMongoose } from 'graphql-compose-mongoose';
+
+const UserProfileModel = mongoose.model('UserProfile', UserProfile);
+const ArticleModel = mongoose.model('Article', Article);
+
+>>>>>>> upstream/master
 const UserProfileTC = composeWithMongoose(UserProfileModel);
 const ArticleTC = composeWithMongoose(ArticleModel);
 ```
@@ -313,7 +350,10 @@ export type typeConverterResolversOpts = {
     uniqueFields: string[],
     sortValue: mixed,
     directionFilter: (<T>(filterArg: T, cursorData: CursorDataType, isBefore: boolean) => T),
-  };
+  },
+  pagination?: false | {
+    perPage?: number,
+  },
 };
 ```
 
@@ -327,7 +367,7 @@ export type filterHelperArgsOpts = {
   onlyIndexed?: boolean, // leave only that fields, which is indexed in mongodb
   requiredFields?: string | string[], // provide fieldNames, that should be required
   operators?: filterOperatorsOpts | false, // provide filtering fields by operators, eg. $lt, $gt
-                                           // if left empty - provides all oeprators on indexed fields
+                                           // if left empty - provides all operators on indexed fields
 };
 
 // supported operators names in filter `arg`
@@ -361,6 +401,8 @@ Besides standard connection arguments `first`, `last`, `before` and `after`, als
 
 This plugin completely follows to [Relay Cursor Connections Specification](https://facebook.github.io/relay/graphql/connections.htm).
 
+### [graphql-compose-pagination](https://github.com/nodkz/graphql-compose-pagination)
+This plugin adds `pagination` resolver.
 
 License
 =======

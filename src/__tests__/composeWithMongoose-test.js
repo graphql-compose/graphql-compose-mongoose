@@ -1,11 +1,14 @@
+/* @flow */
 /* eslint-disable no-unused-expressions */
 
-import { expect } from 'chai';
 import mongoose from 'mongoose';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel';
 import { composeWithMongoose } from '../composeWithMongoose';
 import typeStorage from '../typeStorage';
+
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
 
 describe('composeWithMongoose ->', () => {
   beforeEach(() => {
@@ -16,28 +19,27 @@ describe('composeWithMongoose ->', () => {
   describe('mongooseModelToTypeComposer()', () => {
     describe('basics', () => {
       it('should return TypeComposer', () => {
-        expect(composeWithMongoose(UserModel)).instanceof(TypeComposer);
-        expect(composeWithMongoose(UserModel, { name: 'Ok' })).instanceof(TypeComposer);
+        expect(composeWithMongoose(UserModel)).toBeInstanceOf(TypeComposer);
+        expect(composeWithMongoose(UserModel, { name: 'Ok' })).toBeInstanceOf(TypeComposer);
       });
 
       it('should set type name from model or opts.name', () => {
-        expect(composeWithMongoose(UserModel).getTypeName())
-          .equal(UserModel.modelName);
+        expect(composeWithMongoose(UserModel).getTypeName()).toBe(UserModel.modelName);
 
         UserModel.schema._gqcTypeComposer = undefined;
-        expect(composeWithMongoose(UserModel, { name: 'Ok' }).getTypeName())
-          .equal('Ok');
+        expect(composeWithMongoose(UserModel, { name: 'Ok' }).getTypeName()).toBe('Ok');
       });
 
       it('should set description from opts.description', () => {
         const description = 'This is model from mongoose';
-        expect(composeWithMongoose(UserModel, { description }).getDescription())
-          .equal(description);
+        expect(composeWithMongoose(UserModel, { description }).getDescription()).toBe(description);
       });
 
       it('should get fields from mongoose model', () => {
         const tc = composeWithMongoose(UserModel);
-        expect(tc.getFields()).to.contain.keys(['_id', 'name', 'gender', 'age']);
+        expect(tc.getFieldNames()).toEqual(
+          expect.arrayContaining(['_id', 'name', 'gender', 'age'])
+        );
       });
     });
 
@@ -48,8 +50,9 @@ describe('composeWithMongoose ->', () => {
             remove: ['name', 'gender'],
           },
         });
-        expect(tc.getFields()).to.not.contain.keys(['name', 'gender']);
-        expect(tc.getFields()).to.contain.keys(['_id', 'age']);
+
+        expect(tc.getFieldNames()).not.toEqual(expect.arrayContaining(['name', 'gender']));
+        expect(tc.getFieldNames()).toEqual(expect.arrayContaining(['_id', 'age']));
       });
 
       it('should proceed opts.fields.only', () => {
@@ -58,40 +61,38 @@ describe('composeWithMongoose ->', () => {
             only: ['name', 'gender'],
           },
         });
-        expect(tc.getFields()).to.have.all.keys(['name', 'gender']);
+        expect(tc.getFieldNames()).toEqual(expect.arrayContaining(['name', 'gender']));
       });
     });
 
     describe('createInputType()', () => {
       it('should be availiable InputTypeComposer', () => {
-        const inputTypeComposer = composeWithMongoose(UserModel).getInputTypeComposer();
-        expect(inputTypeComposer).instanceof(InputTypeComposer);
+        const itc = composeWithMongoose(UserModel).getInputTypeComposer();
+        expect(itc).toBeInstanceOf(InputTypeComposer);
       });
 
       it('should set type name opts.inputType.name', () => {
-        const inputTypeComposer = composeWithMongoose(UserModel, {
+        const itc = composeWithMongoose(UserModel, {
           inputType: {
             name: 'GreatUserInput',
           },
         }).getInputTypeComposer();
 
-        expect(inputTypeComposer.getTypeName())
-          .equal('GreatUserInput');
+        expect(itc.getTypeName()).toBe('GreatUserInput');
       });
 
       it('should set description from opts.inputType.name', () => {
-        const inputTypeComposer = composeWithMongoose(UserModel, {
+        const itc = composeWithMongoose(UserModel, {
           inputType: {
             description: 'type for input data',
           },
         }).getInputTypeComposer();
 
-        expect(inputTypeComposer.getDescription())
-          .equal('type for input data');
+        expect(itc.getDescription()).toBe('type for input data');
       });
 
       it('should proceed opts.inputType.fields.remove', () => {
-        const inputTypeComposer = composeWithMongoose(UserModel, {
+        const itc = composeWithMongoose(UserModel, {
           inputType: {
             fields: {
               remove: ['name', 'gender'],
@@ -99,12 +100,12 @@ describe('composeWithMongoose ->', () => {
           },
         }).getInputTypeComposer();
 
-        expect(inputTypeComposer.getFields()).to.not.contain.keys(['name', 'gender']);
-        expect(inputTypeComposer.getFields()).to.contain.keys(['_id', 'age']);
+        expect(itc.getFieldNames()).not.toEqual(expect.arrayContaining(['name', 'gender']));
+        expect(itc.getFieldNames()).toEqual(expect.arrayContaining(['_id', 'age']));
       });
 
       it('should proceed opts.inputType.fields.only', () => {
-        const inputTypeComposer = composeWithMongoose(UserModel, {
+        const itc = composeWithMongoose(UserModel, {
           inputType: {
             fields: {
               only: ['name', 'gender'],
@@ -112,11 +113,11 @@ describe('composeWithMongoose ->', () => {
           },
         }).getInputTypeComposer();
 
-        expect(inputTypeComposer.getFields()).to.have.all.keys(['name', 'gender']);
+        expect(itc.getFieldNames()).toEqual(expect.arrayContaining(['name', 'gender']));
       });
 
       it('should proceed opts.inputType.fields.required', () => {
-        const inputTypeComposer = composeWithMongoose(UserModel, {
+        const itc = composeWithMongoose(UserModel, {
           inputType: {
             fields: {
               required: ['name', 'gender'],
@@ -124,23 +125,23 @@ describe('composeWithMongoose ->', () => {
           },
         }).getInputTypeComposer();
 
-        expect(inputTypeComposer.isRequired('name')).to.be.true;
-        expect(inputTypeComposer.isRequired('gender')).to.be.true;
-        expect(inputTypeComposer.isRequired('age')).to.be.false;
+        expect(itc.isRequired('name')).toBe(true);
+        expect(itc.isRequired('gender')).toBe(true);
+        expect(itc.isRequired('age')).toBe(false);
       });
     });
 
     describe('createResolvers()', () => {
       it('should not be called if opts.resolvers === false', () => {
         const tc = composeWithMongoose(UserModel, { resolvers: false });
-        expect(Array.from(tc.getResolvers().keys())).is.empty;
+        expect(Array.from(tc.getResolvers().keys())).toHaveLength(0);
       });
 
       it('should be called if opts.resolvers not exists or has value', () => {
         const tc = composeWithMongoose(UserModel);
-        expect(Array.from(tc.getResolvers().keys())).is.not.empty;
+        expect(Array.from(tc.getResolvers().keys())).not.toHaveLength(0);
         const tc2 = composeWithMongoose(UserModel, { resolvers: {} });
-        expect(Array.from(tc2.getResolvers().keys())).is.not.empty;
+        expect(Array.from(tc2.getResolvers().keys())).not.toHaveLength(0);
       });
 
       it('should not provide resolver if opts.resolvers.[resolverName] === false', () => {
@@ -154,8 +155,33 @@ describe('composeWithMongoose ->', () => {
           },
         });
         const resolverKeys = Array.from(tc2.getResolvers().keys());
-        expect(resolverKeys).to.not.include('removeById');
-        expect(resolverKeys).include.members(['findMany', 'updateOne', 'updateMany']);
+        expect(resolverKeys).not.toContain('removeById');
+        expect(resolverKeys).toEqual(
+          expect.arrayContaining(['findMany', 'updateOne', 'updateMany'])
+        );
+      });
+    });
+  });
+
+  describe('3rd party resolvers', () => {
+    describe('graphql-compose-connection', () => {
+      it('should add `connection` resolver by default', () => {
+        const tc2 = composeWithMongoose(UserModel);
+        expect(tc2.getResolver('connection')).toBeDefined();
+      });
+    });
+
+    describe('graphql-compose-pagination', () => {
+      it('should add `pagination` resolver by default', () => {
+        const tc2 = composeWithMongoose(UserModel);
+        expect(tc2.getResolver('pagination')).toBeDefined();
+      });
+
+      it('should add `pagination` resolver with `perPage` option', () => {
+        const tc2 = composeWithMongoose(UserModel, { resolvers: { pagination: { perPage: 333 } } });
+        const resolver = tc2.getResolver('pagination');
+        expect(resolver).toBeDefined();
+        expect(resolver.getArg('perPage').defaultValue).toBe(333);
       });
     });
   });
@@ -170,8 +196,9 @@ describe('composeWithMongoose ->', () => {
         },
       });
       const filterArgInFindOne = typeComposer.getResolver('findOne').getArg('filter');
+      // $FlowFixMe
       const inputConposer = new InputTypeComposer(filterArgInFindOne.type);
-      expect(inputConposer.isRequired('age')).to.be.true;
+      expect(inputConposer.isRequired('age')).toBe(true);
     });
 
     it('should use cached type to avoid maximum call stack size exceeded', () => {
@@ -184,7 +211,9 @@ describe('composeWithMongoose ->', () => {
       });
       const PersonModel = mongoose.model('Person', PersonSchema);
       const tc = composeWithMongoose(PersonModel);
-      expect(tc.getFields()).to.contain.keys(['_id', 'name', 'spouse', 'friends']);
+      expect(tc.getFieldNames()).toEqual(
+        expect.arrayContaining(['_id', 'name', 'spouse', 'friends'])
+      );
     });
   });
 });

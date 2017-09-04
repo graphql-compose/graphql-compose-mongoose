@@ -1,27 +1,19 @@
 /* @flow */
 /* eslint-disable no-param-reassign, new-cap */
 
-import { GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { recordHelperArgs } from './helpers/record';
 import typeStorage from '../typeStorage';
 import GraphQLMongoID from '../types/mongoid';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-
+import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
 
 export default function createOne(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts
-): Resolver {
+  opts?: GenResolverOpts
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver createOne() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver createOne() should be instance of Mongoose Model.');
   }
 
   if (!(typeComposer instanceof TypeComposer)) {
@@ -31,7 +23,7 @@ export default function createOne(
   const outputTypeName = `CreateOne${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
     outputTypeName,
-    new GraphQLObjectType({
+    TypeComposer.create({
       name: outputTypeName,
       fields: {
         recordId: {
@@ -59,30 +51,28 @@ export default function createOne(
         ...(opts && opts.record),
       }),
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const recordData = (resolveParams.args && resolveParams.args.record) || {};
 
-      if (!(typeof recordData === 'object')
-        || Object.keys(recordData).length === 0
-      ) {
+      if (!(typeof recordData === 'object') || Object.keys(recordData).length === 0) {
         return Promise.reject(
-          new Error(`${typeComposer.getTypeName()}.createOne resolver requires `
-                  + 'at least one value in args.record')
+          new Error(
+            `${typeComposer.getTypeName()}.createOne resolver requires ` +
+              'at least one value in args.record'
+          )
         );
       }
 
       // $FlowFixMe
       return Promise.resolve(new model(recordData))
-        .then((doc) => {
-          // $FlowFixMe
+        .then(doc => {
           if (resolveParams.beforeRecordMutate) {
             return resolveParams.beforeRecordMutate(doc, resolveParams);
           }
           return doc;
         })
         .then(doc => doc.save())
-        .then((record) => {
+        .then(record => {
           if (record) {
             return {
               record,

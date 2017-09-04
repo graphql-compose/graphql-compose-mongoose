@@ -1,18 +1,16 @@
 /* @flow */
 
-import { GraphQLNonNull } from 'graphql';
-import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import { TypeComposer, InputTypeComposer, graphql } from 'graphql-compose';
 import typeStorage from '../../typeStorage';
 
-import type {
-  GraphQLFieldConfigArgumentMap,
-  recordHelperArgsOpts,
-} from '../../definition';
+import type { ComposeFieldConfigArgumentMap, RecordHelperArgsOpts } from '../../definition';
+
+const { GraphQLNonNull } = graphql;
 
 export const recordHelperArgs = (
   typeComposer: TypeComposer,
-  opts: recordHelperArgsOpts
-): GraphQLFieldConfigArgumentMap => {
+  opts?: RecordHelperArgsOpts
+): ComposeFieldConfigArgumentMap => {
   if (!(typeComposer instanceof TypeComposer)) {
     throw new Error('First arg for recordHelperArgs() should be instance of TypeComposer.');
   }

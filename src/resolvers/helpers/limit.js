@@ -1,19 +1,16 @@
 /* @flow */
 
-import { GraphQLInt } from 'graphql';
 import type {
-  GraphQLFieldConfigArgumentMap,
+  ComposeFieldConfigArgumentMap,
   ExtendedResolveParams,
-  limitHelperArgsOpts,
+  LimitHelperArgsOpts,
 } from '../../definition';
 
-export const limitHelperArgs = (
-  opts: limitHelperArgsOpts
-):GraphQLFieldConfigArgumentMap => {
+export const limitHelperArgs = (opts?: LimitHelperArgsOpts): ComposeFieldConfigArgumentMap => {
   return {
     limit: {
       name: 'limit',
-      type: GraphQLInt,
+      type: 'Int',
       defaultValue: (opts && opts.defaultValue) || 1000,
     },
   };

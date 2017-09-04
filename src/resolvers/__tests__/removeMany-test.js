@@ -1,14 +1,16 @@
 /* @flow */
 
-import { expect } from 'chai';
-import { GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import { Query } from 'mongoose';
-import { Resolver, TypeComposer } from 'graphql-compose/';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import removeMany from '../removeMany';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
 
+const { GraphQLInt, GraphQLNonNull, GraphQLObjectType } = graphql;
+
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
 
 describe('removeMany() ->', () => {
   let UserTypeComposer;
@@ -23,17 +25,9 @@ describe('removeMany() ->', () => {
   let user2;
   let user3;
 
-  beforeEach(() => {
-    typeStorage.clear();
-  });
+  beforeEach(async () => {
+    await UserModel.remove({});
 
-  beforeEach('clear UserModel collection', (done) => {
-    UserModel.collection.drop(() => {
-      done();
-    });
-  });
-
-  beforeEach('add test user document to mongoDB', () => {
     user1 = new UserModel({
       name: 'userName1',
       gender: 'male',
@@ -55,65 +49,52 @@ describe('removeMany() ->', () => {
       age: 30,
     });
 
-    return Promise.all([
-      user1.save(),
-      user2.save(),
-      user3.save(),
-    ]);
+    await Promise.all([user1.save(), user2.save(), user3.save()]);
   });
 
   it('should return Resolver object', () => {
     const resolver = removeMany(UserModel, UserTypeComposer);
-    expect(resolver).to.be.instanceof(Resolver);
+    expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have required `filter` arg', () => {
       const resolver = removeMany(UserModel, UserTypeComposer);
       const filterField = resolver.getArg('filter');
-      expect(filterField).to.be.ok;
-      expect(filterField).property('type').instanceof(GraphQLNonNull);
+      expect(filterField).toBeTruthy();
+      expect(filterField.type).toBeInstanceOf(GraphQLNonNull);
     });
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be promise', () => {
       const result = removeMany(UserModel, UserTypeComposer).resolve({});
-      expect(result).instanceof(Promise);
+      expect(result).toBeInstanceOf(Promise);
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
     it('should rejected with Error if args.filter is empty', async () => {
       const result = removeMany(UserModel, UserTypeComposer).resolve({ args: {} });
-      await expect(result).be.rejectedWith(Error, 'at least one value in args.filter');
+      await expect(result).rejects.toMatchSnapshot();
     });
 
-    it('should remove data in database', (done) => {
-      removeMany(UserModel, UserTypeComposer).resolve({
+    it('should remove data in database', async () => {
+      await removeMany(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { _id: user1.id },
         },
-      }).then(() => {
-        UserModel.collection.findOne({ _id: user1._id }, (err, doc) => {
-          expect(err).to.be.null;
-          expect(doc).to.be.null;
-          done();
-        });
       });
+
+      await expect(UserModel.findOne({ _id: user1._id })).resolves.toBeNull();
     });
 
-    it('should not remove unsuitable data to filter in database', (done) => {
-      removeMany(UserModel, UserTypeComposer).resolve({
+    it('should not remove unsuitable data to filter in database', async () => {
+      await removeMany(UserModel, UserTypeComposer).resolve({
         args: {
           filter: { _id: user1.id },
         },
-      }).then(() => {
-        UserModel.collection.findOne({ _id: user2._id }, (err, doc) => {
-          expect(err).to.be.null;
-          expect(doc).to.be.ok;
-          done();
-        });
       });
+      await expect(UserModel.findOne({ _id: user2._id })).resolves.toBeDefined();
     });
 
     it('should return payload.numAffected', async () => {
@@ -122,7 +103,7 @@ describe('removeMany() ->', () => {
           filter: { gender: 'female' },
         },
       });
-      expect(result).have.property('numAffected', 2);
+      expect(result.numAffected).toBe(2);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
@@ -131,28 +112,29 @@ describe('removeMany() ->', () => {
         args: {
           filter: { gender: 'female' },
         },
-        beforeQuery: (query) => {
-          expect(query).instanceof(Query);
+        beforeQuery: query => {
+          expect(query).toBeInstanceOf(Query);
           beforeQueryCalled = true;
           return query;
-        }
+        },
       });
-      expect(beforeQueryCalled).to.be.true;
-      expect(result).have.property('numAffected', 2);
+      expect(beforeQueryCalled).toBe(true);
+      expect(result.numAffected).toBe(2);
     });
   });
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
       const outputType = removeMany(UserModel, UserTypeComposer).getType();
-      expect(outputType).property('name')
-        .to.equal(`RemoveMany${UserTypeComposer.getTypeName()}Payload`);
+      // $FlowFixMe
+      expect(outputType.name).toBe(`RemoveMany${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have numAffected field', () => {
       const outputType = removeMany(UserModel, UserTypeComposer).getType();
+      // $FlowFixMe
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
-      expect(numAffectedField).property('type').to.equal(GraphQLInt);
+      expect(numAffectedField.type).toBe(GraphQLInt);
     });
 
     it('should reuse existed outputType', () => {
@@ -163,7 +145,7 @@ describe('removeMany() ->', () => {
       });
       typeStorage.set(outputTypeName, existedType);
       const outputType = removeMany(UserModel, UserTypeComposer).getType();
-      expect(outputType).to.equal(existedType);
+      expect(outputType).toBe(existedType);
     });
   });
 });

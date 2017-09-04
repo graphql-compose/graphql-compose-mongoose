@@ -1,35 +1,25 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLObjectType } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
 import { filterHelperArgs } from './helpers/filter';
 import { sortHelperArgs } from './helpers/sort';
 import findOne from './findOne';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-
+import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
 
 export default function removeOne(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts
-): Resolver {
+  opts?: GenResolverOpts
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver removeOne() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver removeOne() should be instance of Mongoose Model.');
   }
 
   if (!(typeComposer instanceof TypeComposer)) {
-    throw new Error(
-      'Second arg for Resolver removeOne() should be instance of TypeComposer.'
-    );
+    throw new Error('Second arg for Resolver removeOne() should be instance of TypeComposer.');
   }
 
   const findOneResolver = findOne(model, typeComposer, opts);
@@ -37,7 +27,7 @@ export default function removeOne(
   const outputTypeName = `RemoveOne${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
     outputTypeName,
-    new GraphQLObjectType({
+    TypeComposer.create({
       name: outputTypeName,
       fields: {
         recordId: {
@@ -55,9 +45,10 @@ export default function removeOne(
   const resolver = new Resolver({
     name: 'removeOne',
     kind: 'mutation',
-    description: 'Remove one document: '
-               + '1) Remove with hooks via findOneAndRemove. '
-               + '2) Return removed document.',
+    description:
+      'Remove one document: ' +
+      '1) Remove with hooks via findOneAndRemove. ' +
+      '2) Return removed document.',
     type: outputType,
     args: {
       ...filterHelperArgs(typeComposer, model, {
@@ -70,16 +61,15 @@ export default function removeOne(
         ...(opts && opts.sort),
       }),
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const filterData = (resolveParams.args && resolveParams.args.filter) || {};
 
-      if (!(typeof filterData === 'object')
-        || Object.keys(filterData).length === 0
-      ) {
+      if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
         return Promise.reject(
-          new Error(`${typeComposer.getTypeName()}.removeOne resolver requires `
-                  + 'at least one value in args.filter')
+          new Error(
+            `${typeComposer.getTypeName()}.removeOne resolver requires ` +
+              'at least one value in args.filter'
+          )
         );
       }
 
@@ -88,33 +78,34 @@ export default function removeOne(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      // $FlowFixMe
-      return findOneResolver.resolve(resolveParams)
-        .then((doc) => {
-          // $FlowFixMe
-          if (resolveParams.beforeRecordMutate) {
-            return resolveParams.beforeRecordMutate(doc, resolveParams);
-          }
-          return doc;
-        })
-        // remove record from DB
-        .then((doc) => {
-          if (!doc) {
-            return Promise.reject(new Error('Document not found'));
-          }
-          return doc.remove();
-        })
-        // prepare output payload
-        .then((record) => {
-          if (record) {
-            return {
-              record,
-              recordId: typeComposer.getRecordIdFn()(record),
-            };
-          }
+      return (
+        findOneResolver
+          .resolve(resolveParams)
+          .then(doc => {
+            if (resolveParams.beforeRecordMutate) {
+              return resolveParams.beforeRecordMutate(doc, resolveParams);
+            }
+            return doc;
+          })
+          // remove record from DB
+          .then(doc => {
+            if (!doc) {
+              return Promise.reject(new Error('Document not found'));
+            }
+            return doc.remove();
+          })
+          // prepare output payload
+          .then(record => {
+            if (record) {
+              return {
+                record,
+                recordId: typeComposer.getRecordIdFn()(record),
+              };
+            }
 
-          return null;
-        });
+            return null;
+          })
+      );
     },
   });
 

@@ -2,8 +2,9 @@
 /* eslint-disable */
 
 import type { TypeComposer } from 'graphql-compose';
-import type { connectionSortMapOpts as _connectionSortMapOpts} from 'graphql-compose-connection/lib/definition';
-export type connectionSortMapOpts = _connectionSortMapOpts;
+import type { ConnectionSortMapOpts as _ConnectionSortMapOpts} from 'graphql-compose-connection/lib/definition';
+
+export type ConnectionSortMapOpts = _ConnectionSortMapOpts;
 
 export type ObjectMap = { [optName: string]: any };
 
@@ -46,12 +47,12 @@ export type MongooseFieldOptionsT = {
 }
 
 export type MongooseFieldT = {
-  path: string,
+  path?: string,
   instance: string,
   caster?: ?MongooseFieldT,
   options?: ?MongooseFieldOptionsT,
   enumValues?: ?string[],
-  schema: MongooseModelSchemaT,
+  schema?: MongooseModelSchemaT,
 };
 
 export type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
@@ -63,7 +64,7 @@ export type ResolverNames = 'findById' | 'findByIds' | 'findOne' | 'findMany' |
 
 export type MongooseQuery = {
   exec(): Promise<any>,
-  where(criteriaOrFieldName: ObjectMap | string): MongooseQuery,
+  where(criteria: ObjectMap): MongooseQuery,
   // where(fieldName: string, equalTo: string): MongooseQuery,
   skip(num: number): MongooseQuery,
   limit(num: number): MongooseQuery,
@@ -86,19 +87,20 @@ import type {
   GraphQLObjectType as _GraphQLObjectType,
   GraphQLOutputType as _GraphQLOutputType,
   ResolveParams as _ResolveParams,
-  GraphQLFieldConfigArgumentMap as _GraphQLFieldConfigArgumentMap,
+  ComposeFieldConfigArgumentMap as _ComposeFieldConfigArgumentMap,
   ResolverMWResolveFn as _ResolverMWResolveFn,
   GraphQLResolveInfo as _GraphQLResolveInfo,
 } from 'graphql-compose/lib/definition.js';
 
 export type GraphQLObjectType = _GraphQLObjectType;
 export type GraphQLOutputType = _GraphQLOutputType;
-export type GraphQLFieldConfigArgumentMap = _GraphQLFieldConfigArgumentMap;
-export type ResolveParams = _ResolveParams;
+export type ComposeFieldConfigArgumentMap = _ComposeFieldConfigArgumentMap;
+export type ResolveParams<TSource, TContext> = _ResolveParams<TSource, TContext>;
 export type GraphQLResolveInfo = _GraphQLResolveInfo;
-export type ResolverMWResolveFn = _ResolverMWResolveFn;
-export type ExtendedResolveParams = ResolveParams & {
+export type ResolverMWResolveFn<TSource, TContext> = _ResolverMWResolveFn<TSource, TContext>;
+export type ExtendedResolveParams = $Shape<ResolveParams<*, *>> & {
   query: MongooseQuery,
+  rawQuery: ObjectMap,
   beforeQuery?: (query: mixed, rp: ExtendedResolveParams) => Promise<*>,
   beforeRecordMutate?: (record: mixed, rp: ExtendedResolveParams) => Promise<*>,
 };
@@ -106,15 +108,15 @@ export type ExtendedResolveParams = ResolveParams & {
 
 // HELPERS OPTIONS
 
-export type genResolverOpts = {
-  filter?: filterHelperArgsOpts,
-  sort?: sortHelperArgsOpts,
-  record?: recordHelperArgsOpts,
-  limit?: limitHelperArgsOpts,
+export type GenResolverOpts = {
+  filter?: FilterHelperArgsOpts,
+  sort?: SortHelperArgsOpts,
+  record?: RecordHelperArgsOpts,
+  limit?: LimitHelperArgsOpts,
 }
 
 
-export type typeConverterOpts = {
+export type TypeConverterOpts = {
   name?: string,
   description?: string,
   fields?: {
@@ -122,11 +124,11 @@ export type typeConverterOpts = {
     // rename?: { [oldName: string]: string },
     remove?: string[],
   },
-  inputType?: typeConverterInputTypeOpts,
-  resolvers?: false | typeConverterResolversOpts,
+  inputType?: TypeConverterInputTypeOpts,
+  resolvers?: false | TypeConverterResolversOpts,
 };
 
-export type typeConverterInputTypeOpts = {
+export type TypeConverterInputTypeOpts = {
   name?: string,
   description?: string,
   fields?: {
@@ -136,82 +138,87 @@ export type typeConverterInputTypeOpts = {
   },
 };
 
-export type typeConverterResolversOpts = {
+export type TypeConverterResolversOpts = {
   findById?: false,
   findByIds?: false | {
-    limit?: limitHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
+    limit?: LimitHelperArgsOpts | false,
+    sort?: SortHelperArgsOpts | false,
   },
   findOne?: false | {
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
+    filter?: FilterHelperArgsOpts | false,
+    sort?: SortHelperArgsOpts | false,
     skip?: false,
   },
   findMany?: false | {
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
-    limit?: limitHelperArgsOpts | false,
+    filter?: FilterHelperArgsOpts | false,
+    sort?: SortHelperArgsOpts | false,
+    limit?: LimitHelperArgsOpts | false,
     skip?: false,
   },
   updateById?: false | {
-    input?: recordHelperArgsOpts | false,
+    input?: RecordHelperArgsOpts | false,
   },
   updateOne?: false | {
-    input?: recordHelperArgsOpts | false,
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
+    input?: RecordHelperArgsOpts | false,
+    filter?: FilterHelperArgsOpts | false,
+    sort?: SortHelperArgsOpts | false,
     skip?: false,
   },
   updateMany?: false | {
-    input?: recordHelperArgsOpts | false,
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
-    limit?: limitHelperArgsOpts | false,
+    input?: RecordHelperArgsOpts | false,
+    filter?: FilterHelperArgsOpts | false,
+    sort?: SortHelperArgsOpts | false,
+    limit?: LimitHelperArgsOpts | false,
     skip?: false,
   },
   removeById?: false,
   removeOne?: false | {
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
+    filter?: FilterHelperArgsOpts | false,
+    sort?: SortHelperArgsOpts | false,
   },
   removeMany?: false | {
-    filter?: filterHelperArgsOpts | false,
+    filter?: FilterHelperArgsOpts | false,
   },
   createOne?: false | {
-    input?: recordHelperArgsOpts | false,
+    input?: RecordHelperArgsOpts | false,
   },
   count?: false | {
-    filter?: filterHelperArgsOpts | false,
+    filter?: FilterHelperArgsOpts | false,
   },
-  connection?: connectionSortMapOpts | false,
+  connection?: ConnectionSortMapOpts | false,
+  pagination?: PaginationOpts | false,
 };
 
-export type filterHelperArgsOpts = {
+export type PaginationOpts = {
+  perPage?: number
+};
+
+export type FilterHelperArgsOpts = {
   filterTypeName?: string,
   isRequired?: boolean,
   onlyIndexed?: boolean,
   requiredFields?: string | string[],
-  operators?: filterOperatorsOpts | false,
+  operators?: FilterOperatorsOpts | false,
   removeFields?: string | string[],
 };
 
-export type filterOperatorNames =  'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
+export type FilterOperatorNames =  'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
 
-export type filterOperatorsOpts = {
-  [fieldName: string]: filterOperatorNames[] | false,
+export type FilterOperatorsOpts = {
+  [fieldName: string]: FilterOperatorNames[] | false,
 };
 
-export type sortHelperArgsOpts = {
+export type SortHelperArgsOpts = {
   sortTypeName?: string,
 };
 
-export type recordHelperArgsOpts = {
+export type RecordHelperArgsOpts = {
   recordTypeName?: string,
   isRequired?: boolean,
   removeFields?: string[],
   requiredFields?: string[],
 };
 
-export type limitHelperArgsOpts = {
+export type LimitHelperArgsOpts = {
   defaultValue?: number,
 };

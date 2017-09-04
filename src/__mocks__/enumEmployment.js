@@ -1,3 +1,5 @@
+/* @flow */
+
 const enumEmployment = {
   full: { description: 'Full time' },
   partial: { description: 'Partial time' },

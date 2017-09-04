@@ -1,27 +1,23 @@
 /* @flow */
-/* eslint-disable no-use-before-define, no-param-reassign */
+/* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
-import composeWithConnection from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
-import {
-  getUniqueIndexes,
-  extendByReversedIndexes,
-} from './utils/getIndexesFromModel';
+import { getUniqueIndexes, extendByReversedIndexes } from './utils/getIndexesFromModel';
 
 import type {
   MongooseModelT,
-  typeConverterOpts,
-  typeConverterResolversOpts,
-  typeConverterInputTypeOpts,
-  connectionSortMapOpts,
+  TypeConverterOpts,
+  TypeConverterResolversOpts,
+  TypeConverterInputTypeOpts,
+  ConnectionSortMapOpts,
+  PaginationOpts,
 } from './definition';
 
-
 export function composeWithMongoose(
-  model: MongooseModelT,
-  opts: typeConverterOpts = {}
+  model: Object, // MongooseModelT, TODO use Model from mongoose_v4.x.x definition when it will be public
+  opts: TypeConverterOpts = {}
 ): TypeComposer {
   const name: string = (opts && opts.name) || model.modelName;
 
@@ -35,7 +31,6 @@ export function composeWithMongoose(
     prepareFields(typeComposer, opts.fields);
   }
 
-  // $FlowFixMe
   typeComposer.setRecordIdFn(source => (source ? `${source._id}` : ''));
 
   createInputType(typeComposer, opts.inputType);
@@ -47,7 +42,6 @@ export function composeWithMongoose(
   return typeComposer;
 }
 
-
 export function prepareFields(
   typeComposer: TypeComposer,
   opts: {
@@ -57,8 +51,9 @@ export function prepareFields(
 ) {
   if (Array.isArray(opts.only)) {
     const onlyFieldNames: string[] = opts.only;
-    const removeFields =
-      Object.keys(typeComposer.getFields()).filter(fName => !onlyFieldNames.includes(fName));
+    const removeFields = Object.keys(typeComposer.getFields()).filter(
+      fName => onlyFieldNames.indexOf(fName) === -1
+    );
     typeComposer.removeField(removeFields);
   }
   if (opts.remove) {
@@ -76,8 +71,9 @@ export function prepareInputFields(
 ) {
   if (Array.isArray(inputFieldsOpts.only)) {
     const onlyFieldNames: string[] = inputFieldsOpts.only;
-    const removeFields =
-      Object.keys(inputTypeComposer.getFields()).filter(fName => !onlyFieldNames.includes(fName));
+    const removeFields = Object.keys(inputTypeComposer.getFields()).filter(
+      fName => onlyFieldNames.indexOf(fName) === -1
+    );
     inputTypeComposer.removeField(removeFields);
   }
   if (inputFieldsOpts.remove) {
@@ -90,7 +86,7 @@ export function prepareInputFields(
 
 export function createInputType(
   typeComposer: TypeComposer,
-  inputTypeOpts?: typeConverterInputTypeOpts = {}
+  inputTypeOpts?: TypeConverterInputTypeOpts = {}
 ): void {
   const inputTypeComposer = typeComposer.getInputTypeComposer();
 
@@ -107,22 +103,17 @@ export function createInputType(
   }
 }
 
-
 export function createResolvers(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts: typeConverterResolversOpts
+  opts: TypeConverterResolversOpts
 ): void {
   const names = resolvers.getAvailableNames();
-  names.forEach((resolverName) => {
+  names.forEach(resolverName => {
     if (!{}.hasOwnProperty.call(opts, resolverName) || opts[resolverName] !== false) {
       const createResolverFn = resolvers[resolverName];
       if (createResolverFn) {
-        const resolver = createResolverFn(
-          model,
-          typeComposer,
-          opts[resolverName] || {}
-        );
+        const resolver = createResolverFn(model, typeComposer, opts[resolverName] || {});
         typeComposer.setResolver(resolverName, resolver);
       }
     }
@@ -131,16 +122,43 @@ export function createResolvers(
   if (!{}.hasOwnProperty.call(opts, 'connection') || opts.connection !== false) {
     prepareConnectionResolver(model, typeComposer, opts.connection ? opts.connection : {});
   }
+
+  if (!{}.hasOwnProperty.call(opts, 'pagination') || opts.pagination !== false) {
+    preparePaginationResolver(typeComposer, opts.pagination || {});
+  }
+}
+
+export function preparePaginationResolver(typeComposer: TypeComposer, opts: PaginationOpts) {
+  try {
+    require.resolve('graphql-compose-pagination');
+  } catch (e) {
+    return;
+  }
+  const composeWithPagination = require('graphql-compose-pagination').default;
+  composeWithPagination(typeComposer, {
+    findResolverName: 'findMany',
+    countResolverName: 'count',
+    ...opts,
+  });
 }
 
 export function prepareConnectionResolver(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts: connectionSortMapOpts
+  opts: ConnectionSortMapOpts
 ) {
-  const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), { reversedFirst: true });
+  try {
+    require.resolve('graphql-compose-connection');
+  } catch (e) {
+    return;
+  }
+  const composeWithConnection = require('graphql-compose-connection').default;
+
+  const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), {
+    reversedFirst: true,
+  });
   const sortConfigs = {};
-  uniqueIndexes.forEach((indexData) => {
+  uniqueIndexes.forEach(indexData => {
     const keys = Object.keys(indexData);
     let name = keys.join('__').toUpperCase().replace(/[^_a-zA-Z0-9]/i, '__');
     if (indexData[keys[0]] === 1) {
@@ -152,7 +170,7 @@ export function prepareConnectionResolver(
       value: indexData,
       cursorFields: keys,
       beforeCursorQuery: (rawQuery, cursorData) => {
-        keys.forEach((k) => {
+        keys.forEach(k => {
           if (!rawQuery[k]) rawQuery[k] = {};
           if (indexData[k] === 1) {
             rawQuery[k].$lt = cursorData[k];
@@ -162,7 +180,7 @@ export function prepareConnectionResolver(
         });
       },
       afterCursorQuery: (rawQuery, cursorData) => {
-        keys.forEach((k) => {
+        keys.forEach(k => {
           if (!rawQuery[k]) rawQuery[k] = {};
           if (indexData[k] === 1) {
             rawQuery[k].$gt = cursorData[k];

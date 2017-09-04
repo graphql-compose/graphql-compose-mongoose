@@ -1,36 +1,25 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import {
-  GraphQLObjectType,
-  GraphQLNonNull,
-} from 'graphql';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, TypeComposer, graphql } from 'graphql-compose';
 import findById from './findById';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
+import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
 
+const { GraphQLNonNull } = graphql;
 
 export default function removeById(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts // eslint-disable-line no-unused-vars
-): Resolver {
+  opts?: GenResolverOpts // eslint-disable-line no-unused-vars
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver removeById() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');
   }
 
   if (!(typeComposer instanceof TypeComposer)) {
-    throw new Error(
-      'Second arg for Resolver removeById() should be instance of TypeComposer.'
-    );
+    throw new Error('Second arg for Resolver removeById() should be instance of TypeComposer.');
   }
 
   const findByIdResolver = findById(model, typeComposer);
@@ -38,7 +27,7 @@ export default function removeById(
   const outputTypeName = `RemoveById${typeComposer.getTypeName()}Payload`;
   const outputType = typeStorage.getOrSet(
     outputTypeName,
-    new GraphQLObjectType({
+    TypeComposer.create({
       name: outputTypeName,
       fields: {
         recordId: {
@@ -56,9 +45,10 @@ export default function removeById(
   const resolver = new Resolver({
     name: 'removeById',
     kind: 'mutation',
-    description: 'Remove one document: '
-               + '1) Retrieve one document and remove with hooks via findByIdAndRemove. '
-               + '2) Return removed document.',
+    description:
+      'Remove one document: ' +
+      '1) Retrieve one document and remove with hooks via findByIdAndRemove. ' +
+      '2) Return removed document.',
     type: outputType,
     args: {
       _id: {
@@ -66,7 +56,6 @@ export default function removeById(
         type: new GraphQLNonNull(GraphQLMongoID),
       },
     },
-    // $FlowFixMe
     resolve: (resolveParams: ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
@@ -81,35 +70,36 @@ export default function removeById(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      // $FlowFixMe
-      return findByIdResolver.resolve(resolveParams)
-        .then((doc) => {
-          // $FlowFixMe
-          if (resolveParams.beforeRecordMutate) {
-            return resolveParams.beforeRecordMutate(doc, resolveParams);
-          }
-          return doc;
-        })
-        // remove record from DB
-        .then((doc) => {
-          if (!doc) {
-            return Promise.reject(new Error('Document not found'));
-          }
-          return doc.remove();
-        })
-        // prepare output payload
-        .then((record) => {
-          if (record) {
-            return {
-              record,
-              recordId: typeComposer.getRecordIdFn()(record),
-            };
-          }
+      return (
+        findByIdResolver
+          .resolve(resolveParams)
+          .then(doc => {
+            if (resolveParams.beforeRecordMutate) {
+              return resolveParams.beforeRecordMutate(doc, resolveParams);
+            }
+            return doc;
+          })
+          // remove record from DB
+          .then(doc => {
+            if (!doc) {
+              return Promise.reject(new Error('Document not found'));
+            }
+            return doc.remove();
+          })
+          // prepare output payload
+          .then(record => {
+            if (record) {
+              return {
+                record,
+                recordId: typeComposer.getRecordIdFn()(record),
+              };
+            }
 
-          return {
-            recordId: args._id,
-          };
-        });
+            return {
+              recordId: args._id,
+            };
+          })
+      );
     },
   });
 

@@ -1,22 +1,7 @@
+/* @flow */
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
-import { expect } from 'chai';
-import {
-  GraphQLString,
-  GraphQLFloat,
-  GraphQLBoolean,
-  GraphQLList,
-  GraphQLEnumType,
-  GraphQLSchema,
-  GraphQLObjectType,
-  graphql,
-} from 'graphql';
-import {
-  GraphQLDate,
-  GraphQLBuffer,
-  GraphQLGeneric,
-  GraphQLJSON,
-} from 'graphql-compose';
+import { GraphQLDate, GraphQLBuffer, GraphQLGeneric, GraphQLJSON, graphql } from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel';
 import {
   deriveComplexType,
@@ -34,73 +19,108 @@ import {
 import { composeWithMongoose } from '../composeWithMongoose';
 import GraphQLMongoID from '../types/mongoid';
 
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
+
+const {
+  GraphQLString,
+  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLList,
+  GraphQLEnumType,
+  GraphQLSchema,
+  GraphQLObjectType,
+} = graphql;
+
 describe('fieldConverter', () => {
   const fields = getFieldsFromModel(UserModel);
   const fieldNames = Object.keys(fields);
 
   describe('getFieldsFromModel()', () => {
     it('should get fieldsMap from mongoose model', () => {
-      expect(fields).to.contain.all.keys(['name', 'createdAt', '_id']);
+      expect(Object.keys(fields)).toEqual(expect.arrayContaining(['name', 'createdAt', '_id']));
     });
 
     it('should skip double undescored fields', () => {
       const hiddenFields = fieldNames.filter(name => name.startsWith('__'));
-      expect(hiddenFields).to.have.lengthOf(0);
+      expect(hiddenFields).toHaveLength(0);
     });
 
     it('should throw Exception, if model does `schema.path` property', () => {
-      expect(() => { getFieldsFromModel({ a: 1 }); }).to.throw(/incorrect mongoose model/);
-      expect(() => { getFieldsFromModel({ schema: {} }); }).to.throw(/incorrect mongoose model/);
+      expect(() => {
+        // $FlowFixMe
+        getFieldsFromModel({ a: 1 });
+      }).toThrowError(/incorrect mongoose model/);
+      expect(() => {
+        // $FlowFixMe
+        getFieldsFromModel({ schema: {} });
+      }).toThrowError(/incorrect mongoose model/);
     });
   });
 
   describe('deriveComplexType()', () => {
     it('should throw error on incorrect mongoose field', () => {
       const err = /incorrect mongoose field/;
-      expect(() => { deriveComplexType(); }).to.throw(err);
-      expect(() => { deriveComplexType(123); }).to.throw(err);
-      expect(() => { deriveComplexType({ a: 1 }); }).to.throw(err);
-      expect(() => { deriveComplexType({ path: 'name' }); }).to.throw(err);
-      expect(() => { deriveComplexType({ path: 'name', instance: 'Abc' }); }).not.to.throw(err);
+      expect(() => {
+        // $FlowFixMe
+        deriveComplexType();
+      }).toThrowError(err);
+      expect(() => {
+        // $FlowFixMe
+        deriveComplexType(123);
+      }).toThrowError(err);
+      expect(() => {
+        // $FlowFixMe
+        deriveComplexType({ a: 1 });
+      }).toThrowError(err);
+      expect(() => {
+        // $FlowFixMe
+        deriveComplexType({ path: 'name' });
+      }).toThrowError(err);
+      expect(() => {
+        deriveComplexType({ path: 'name', instance: 'Abc' });
+      }).not.toThrowError(err);
     });
 
     it('should derive DOCUMENT_ARRAY', () => {
-      expect(deriveComplexType(fields.languages)).to.be.equal(ComplexTypes.DOCUMENT_ARRAY);
+      expect(deriveComplexType(fields.languages)).toBe(ComplexTypes.DOCUMENT_ARRAY);
     });
 
     it('should derive EMBEDDED', () => {
-      expect(deriveComplexType(fields.contacts)).to.equal(ComplexTypes.EMBEDDED);
-      expect(deriveComplexType(fields.subDoc)).to.equal(ComplexTypes.EMBEDDED);
+      expect(deriveComplexType(fields.contacts)).toBe(ComplexTypes.EMBEDDED);
+      expect(deriveComplexType(fields.subDoc)).toBe(ComplexTypes.EMBEDDED);
     });
 
     it('schould derive ARRAY', () => {
-      expect(deriveComplexType(fields.users)).to.equal(ComplexTypes.ARRAY);
-      expect(deriveComplexType(fields.skills)).to.equal(ComplexTypes.ARRAY);
-      expect(deriveComplexType(fields.employment)).to.equal(ComplexTypes.ARRAY);
+      expect(deriveComplexType(fields.users)).toBe(ComplexTypes.ARRAY);
+      expect(deriveComplexType(fields.skills)).toBe(ComplexTypes.ARRAY);
+      expect(deriveComplexType(fields.employment)).toBe(ComplexTypes.ARRAY);
     });
 
     it('schould derive ENUM', () => {
-      expect(deriveComplexType(fields.gender)).to.equal(ComplexTypes.ENUM);
-      expect(deriveComplexType(fields.languages.schema.paths.ln)).to.equal(ComplexTypes.ENUM);
-      expect(deriveComplexType(fields.languages.schema.paths.sk)).to.equal(ComplexTypes.ENUM);
+      expect(deriveComplexType(fields.gender)).toBe(ComplexTypes.ENUM);
+      // $FlowFixMe
+      expect(deriveComplexType(fields.languages.schema.paths.ln)).toBe(ComplexTypes.ENUM);
+      // $FlowFixMe
+      expect(deriveComplexType(fields.languages.schema.paths.sk)).toBe(ComplexTypes.ENUM);
     });
 
     it('schould derive REFERENCE', () => {
-      expect(deriveComplexType(fields.user)).to.equal(ComplexTypes.REFERENCE);
+      expect(deriveComplexType(fields.user)).toBe(ComplexTypes.REFERENCE);
     });
 
     it('schould derive SCALAR', () => {
-      expect(deriveComplexType(fields.name)).to.equal(ComplexTypes.SCALAR);
-      expect(deriveComplexType(fields.relocation)).to.equal(ComplexTypes.SCALAR);
-      expect(deriveComplexType(fields.age)).to.equal(ComplexTypes.SCALAR);
-      expect(deriveComplexType(fields.createdAt)).to.equal(ComplexTypes.SCALAR);
+      expect(deriveComplexType(fields.name)).toBe(ComplexTypes.SCALAR);
+      expect(deriveComplexType(fields.relocation)).toBe(ComplexTypes.SCALAR);
+      expect(deriveComplexType(fields.age)).toBe(ComplexTypes.SCALAR);
+      expect(deriveComplexType(fields.createdAt)).toBe(ComplexTypes.SCALAR);
 
-      expect(deriveComplexType(fields.gender)).not.to.equal(ComplexTypes.SCALAR);
-      expect(deriveComplexType(fields.subDoc)).not.to.equal(ComplexTypes.SCALAR);
+      expect(deriveComplexType(fields.gender)).not.toBe(ComplexTypes.SCALAR);
+      expect(deriveComplexType(fields.subDoc)).not.toBe(ComplexTypes.SCALAR);
     });
 
     it('schould derive MIXED mongoose type', () => {
-      expect(deriveComplexType(fields.someDynamic)).to.equal(ComplexTypes.MIXED);
+      expect(deriveComplexType(fields.someDynamic)).toBe(ComplexTypes.MIXED);
     });
   });
 
@@ -110,67 +130,71 @@ describe('fieldConverter', () => {
         path: 'strFieldName',
         instance: 'String',
       };
-      expect(convertFieldToGraphQL(mongooseField)).to.equal(GraphQLString);
+      expect(convertFieldToGraphQL(mongooseField)).toBe(GraphQLString);
     });
   });
 
   describe('scalarToGraphQL()', () => {
     it('should properly convert mongoose scalar type to default graphQL types', () => {
-      expect(scalarToGraphQL({ instance: 'String' })).to.equal(GraphQLString);
-      expect(scalarToGraphQL({ instance: 'Number' })).to.equal(GraphQLFloat);
-      expect(scalarToGraphQL({ instance: 'Boolean' })).to.equal(GraphQLBoolean);
-      expect(scalarToGraphQL({ instance: 'ObjectID' })).to.equal(GraphQLMongoID);
+      expect(scalarToGraphQL({ instance: 'String' })).toBe(GraphQLString);
+      expect(scalarToGraphQL({ instance: 'Number' })).toBe(GraphQLFloat);
+      expect(scalarToGraphQL({ instance: 'Boolean' })).toBe(GraphQLBoolean);
+      expect(scalarToGraphQL({ instance: 'ObjectID' })).toBe(GraphQLMongoID);
     });
 
     it('should properly convert mongoose scalar type to scalar graphql-compose types', () => {
-      expect(scalarToGraphQL({ instance: 'Date' })).to.equal(GraphQLDate);
-      expect(scalarToGraphQL({ instance: 'Buffer' })).to.equal(GraphQLBuffer);
-      expect(scalarToGraphQL({ instance: 'abrakadabra' })).to.equal(GraphQLGeneric);
+      expect(scalarToGraphQL({ instance: 'Date' })).toBe(GraphQLDate);
+      expect(scalarToGraphQL({ instance: 'Buffer' })).toBe(GraphQLBuffer);
+      expect(scalarToGraphQL({ instance: 'abrakadabra' })).toBe(GraphQLGeneric);
     });
   });
 
   describe('arrayToGraphQL()', () => {
     it('should produce GraphQLList', () => {
       const skillsType = arrayToGraphQL(fields.skills);
-      expect(skillsType).to.be.instanceof(GraphQLList);
+      expect(skillsType).toBeInstanceOf(GraphQLList);
     });
 
     it('should has string in ofType', () => {
       const skillsType = arrayToGraphQL(fields.skills);
-      expect(skillsType.ofType.name).to.equal('String');
+      // $FlowFixMe
+      expect(skillsType.ofType.name).toBe('String');
     });
   });
 
   describe('enumToGraphQL()', () => {
     it('should be instance of GraphQLEnumType', () => {
       const genderEnum = enumToGraphQL(fields.gender);
-      expect(genderEnum).be.instanceof(GraphQLEnumType);
+      expect(genderEnum).toBeInstanceOf(GraphQLEnumType);
     });
 
     it('should have type name `Enum${FieldName}`', () => {
       const genderEnum = enumToGraphQL(fields.gender);
-      expect(genderEnum.name).to.equal('EnumGender');
+      expect(genderEnum.name).toBe('EnumGender');
     });
 
     it('should pass all enum values to GQ type', () => {
       const genderEnum = enumToGraphQL(fields.gender);
-      expect(genderEnum._values.length).to.equal(fields.gender.enumValues.length);
-      expect(genderEnum._values[0].value).to.equal(fields.gender.enumValues[0]);
+      // $FlowFixMe
+      expect(genderEnum._values.length).toBe(fields.gender.enumValues.length);
+      // $FlowFixMe
+      expect(genderEnum._values[0].value).toBe(fields.gender.enumValues[0]);
     });
   });
 
   describe('embeddedToGraphQL()', () => {
     it('should set name to graphql type', () => {
       const embeddedType = embeddedToGraphQL(fields.contacts);
-      expect(embeddedType.name).to.equal('UserContacts');
+      expect(embeddedType.name).toBe('UserContacts');
     });
 
     it('should have embedded fields', () => {
       const embeddedType = embeddedToGraphQL(fields.contacts);
+      // $FlowFixMe
       const embeddedFields = embeddedType._typeConfig.fields();
-      expect(embeddedFields.email).to.be.ok;
-      expect(embeddedFields.locationId).to.be.ok;
-      expect(embeddedFields._id).to.be.ok;
+      expect(embeddedFields.email).toBeTruthy();
+      expect(embeddedFields.locationId).toBeTruthy();
+      expect(embeddedFields._id).toBeTruthy();
     });
 
     it('should return null if subdocument is empty', async () => {
@@ -184,12 +208,13 @@ describe('fieldConverter', () => {
         }),
       });
 
-
       const user = new UserModel({
         name: 'Test empty subDoc',
       });
       await user.save();
-      const result = await graphql(schema, `{
+      const result = await graphql.graphql(
+        schema,
+        `{
         user(_id: "${user._id}") {
           name
           subDoc {
@@ -199,8 +224,10 @@ describe('fieldConverter', () => {
             }
           }
         }
-      }`);
-      expect(result).deep.property('data.user').to.deep.equal({
+      }`
+      );
+      // $FlowFixMe
+      expect(result.data.user).toEqual({
         name: 'Test empty subDoc',
         subDoc: null,
       });
@@ -228,7 +255,9 @@ describe('fieldConverter', () => {
         subDoc: { field2: { field21: 'ok' } },
       });
       await user2.save();
-      const result2 = await graphql(schema, `{
+      const result2 = await graphql.graphql(
+        schema,
+        `{
         user(_id: "${user2._id}") {
           name
           subDoc {
@@ -238,8 +267,10 @@ describe('fieldConverter', () => {
             }
           }
         }
-      }`);
-      expect(result2).deep.property('data.user').to.deep.equal({
+      }`
+      );
+      // $FlowFixMe
+      expect(result2.data.user).toEqual({
         name: 'Test non empty subDoc',
         subDoc: {
           field1: null,
@@ -251,19 +282,21 @@ describe('fieldConverter', () => {
 
   describe('documentArrayToGraphQL()', () => {
     const languagesType = documentArrayToGraphQL(fields.languages);
+    // $FlowFixMe
     const languagesFields = languagesType.ofType._typeConfig.fields();
 
     it('should produce GraphQLList', () => {
-      expect(languagesType).to.be.instanceof(GraphQLList);
+      expect(languagesType).toBeInstanceOf(GraphQLList);
     });
 
     it('should has Language type in ofType', () => {
       // see src/__mocks__/languageSchema.js where type name `Language` is defined
-      expect(languagesType.ofType.name).to.equal('Language');
+      // $FlowFixMe
+      expect(languagesType.ofType.name).toBe('Language');
     });
 
     it('should include pseudo mongoose _id field in document', () => {
-      expect(languagesFields._id).to.be.ok;
+      expect(languagesFields._id).toBeTruthy();
     });
   });
 
@@ -271,7 +304,7 @@ describe('fieldConverter', () => {
     let user;
     const UserTC = composeWithMongoose(UserModel);
 
-    before('add test user document to mongoDB', (done) => {
+    beforeEach(async () => {
       user = new UserModel({
         name: 'nodkz',
         someDynamic: {
@@ -284,12 +317,12 @@ describe('fieldConverter', () => {
           g: false,
         },
       });
-      user.save(done);
+      await user.save();
     });
 
     it('should produce GraphQLJSON', () => {
       const someDynamicType = mixedToGraphQL(fields.someDynamic);
-      expect(someDynamicType).to.equal(GraphQLJSON);
+      expect(someDynamicType).toBe(GraphQLJSON);
     });
 
     it('should properly return data via graphql query', async () => {
@@ -308,17 +341,17 @@ describe('fieldConverter', () => {
           someDynamic
         }
       }`;
-      const result = await graphql(schema, query);
-      expect(result).deep.property('data.user.name').to.equals(user.name);
-      expect(result)
-        .deep.property('data.user.someDynamic')
-        .deep.equals(user.someDynamic);
+      const result = await graphql.graphql(schema, query);
+      // $FlowFixMe
+      expect(result.data.user.name).toBe(user.name);
+      // $FlowFixMe
+      expect(result.data.user.someDynamic).toEqual(user.someDynamic);
     });
   });
 
   describe('referenceToGraphQL()', () => {
     it('should return type of field', () => {
-      expect(referenceToGraphQL(fields.user)).equal(GraphQLMongoID);
+      expect(referenceToGraphQL(fields.user)).toBe(GraphQLMongoID);
     });
   });
 });

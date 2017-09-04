@@ -1,29 +1,21 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { GraphQLList } from 'graphql';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { skipHelperArgs, skipHelper } from './helpers/skip';
 import { limitHelperArgs, limitHelper } from './helpers/limit';
 import { filterHelperArgs, filterHelper } from './helpers/filter';
 import { sortHelperArgs, sortHelper } from './helpers/sort';
 import { projectionHelper } from './helpers/projection';
-import type {
-  MongooseModelT,
-  ExtendedResolveParams,
-  genResolverOpts,
-} from '../definition';
-
+import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
 
 export default function findMany(
   model: MongooseModelT,
   typeComposer: TypeComposer,
-  opts?: genResolverOpts
-): Resolver {
+  opts?: GenResolverOpts
+): Resolver<*, *> {
   if (!model || !model.modelName || !model.schema) {
-    throw new Error(
-      'First arg for Resolver findMany() should be instance of Mongoose Model.'
-    );
+    throw new Error('First arg for Resolver findMany() should be instance of Mongoose Model.');
   }
 
   if (!(typeComposer instanceof TypeComposer)) {
@@ -31,7 +23,7 @@ export default function findMany(
   }
 
   return new Resolver({
-    type: new GraphQLList(typeComposer.getType()),
+    type: [typeComposer],
     name: 'findMany',
     kind: 'query',
     args: {
@@ -49,7 +41,7 @@ export default function findMany(
         ...(opts && opts.sort),
       }),
     },
-    resolve: (resolveParams : ExtendedResolveParams) => {
+    resolve: (resolveParams: ExtendedResolveParams) => {
       resolveParams.query = model.find();
       filterHelper(resolveParams);
       skipHelper(resolveParams);

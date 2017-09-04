@@ -1,8 +1,6 @@
 /* @flow */
 
-import { expect, spy } from 'chai';
-import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql';
-import { InputTypeComposer } from 'graphql-compose';
+import { InputTypeComposer, graphql } from 'graphql-compose';
 import {
   filterHelperArgs,
   filterHelper,
@@ -10,9 +8,12 @@ import {
   addFieldsWithOperator,
   OPERATORS_FIELDNAME,
 } from '../filter';
+import GraphQLMongoID from '../../../types/mongoid';
 import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
+
+const { GraphQLInputObjectType, GraphQLNonNull, GraphQLList } = graphql;
 
 describe('Resolver helper `filter` ->', () => {
   let UserTypeComposer;
@@ -26,12 +27,8 @@ describe('Resolver helper `filter` ->', () => {
   describe('getIndexedFieldNames()', () => {
     it('should return array of indexed fieldNames', () => {
       const indexedFields = getIndexedFieldNames(UserModel);
-      expect(indexedFields).have.members(
-        ['_id', 'employment', 'name']
-      );
-      expect(indexedFields).not.have.members(
-        ['age', 'gender']
-      );
+      expect(indexedFields).toEqual(expect.arrayContaining(['_id', 'employment', 'name']));
+      expect(indexedFields).not.toEqual(expect.arrayContaining(['age', 'gender']));
     });
   });
 
@@ -49,21 +46,23 @@ describe('Resolver helper `filter` ->', () => {
 
     it('should add OPERATORS_FIELDNAME to filterType', () => {
       addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, {});
-      expect(inputTypeComposer.hasField(OPERATORS_FIELDNAME)).to.be.true;
+      expect(inputTypeComposer.hasField(OPERATORS_FIELDNAME)).toBe(true);
     });
 
     it('should by default have only indexed fields', () => {
       addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, {});
       const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
       const opComposer = new InputTypeComposer(operatorsType);
-      expect(opComposer.getFieldNames()).to.have.members(['name', '_id', 'employment']);
+      expect(opComposer.getFieldNames()).toEqual(
+        expect.arrayContaining(['name', '_id', 'employment'])
+      );
     });
 
     it('should have only provided fields via options', () => {
       addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, { age: ['lt'] });
       const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
       const opComposer = new InputTypeComposer(operatorsType);
-      expect(opComposer.getFieldNames()).to.have.members(['age']);
+      expect(opComposer.getFieldNames()).toEqual(expect.arrayContaining(['age']));
     });
 
     it('should have only provided operators via options for field', () => {
@@ -71,7 +70,7 @@ describe('Resolver helper `filter` ->', () => {
       const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
       const opComposer = new InputTypeComposer(operatorsType);
       const ageComposer = new InputTypeComposer(opComposer.getFieldType('age'));
-      expect(ageComposer.getFieldNames()).to.have.members(['lt', 'gte']);
+      expect(ageComposer.getFieldNames()).toEqual(expect.arrayContaining(['lt', 'gte']));
     });
 
     it('should reuse existed operatorsType', () => {
@@ -82,33 +81,44 @@ describe('Resolver helper `filter` ->', () => {
       typeStorage.set('ExistedType', existedType);
       addFieldsWithOperator('ExistedType', inputTypeComposer, UserModel, { age: ['lt'] });
       const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
-      expect(operatorsType).to.equal(existedType);
+      expect(operatorsType).toBe(existedType);
     });
   });
 
   describe('filterHelperArgs()', () => {
     it('should throw error if first arg is not TypeComposer', () => {
-      expect(() => filterHelperArgs({}))
-        .to.throw('should be instance of TypeComposer');
+      // $FlowFixMe
+      expect(() => filterHelperArgs({})).toThrowError('should be instance of TypeComposer');
     });
 
     it('should throw error if second arg is not MongooseModel', () => {
-      expect(() => filterHelperArgs(UserTypeComposer, {}))
-        .to.throw('should be instance of MongooseModel');
+      // $FlowFixMe
+      expect(() => filterHelperArgs(UserTypeComposer, {})).toThrowError(
+        'should be instance of MongooseModel'
+      );
     });
 
     it('should throw error if `filterTypeName` not provided in opts', () => {
-      expect(() => filterHelperArgs(UserTypeComposer, UserModel))
-        .to.throw('provide non-empty `filterTypeName`');
+      expect(() => filterHelperArgs(UserTypeComposer, UserModel)).toThrowError(
+        'provide non-empty `filterTypeName`'
+      );
     });
 
     it('should return filter field', () => {
       const args = filterHelperArgs(UserTypeComposer, UserModel, {
         filterTypeName: 'FilterUserType',
       });
-      expect(args).has.property('filter');
-      expect(args).has.deep.property('filter.name', 'filter');
-      expect(args).has.deep.property('filter.type').instanceof(GraphQLInputObjectType);
+      expect(args.filter.name).toBe('filter');
+      expect(args.filter.type).toBeInstanceOf(GraphQLInputObjectType);
+    });
+
+    it('should return filter with field _ids', () => {
+      const args = filterHelperArgs(UserTypeComposer, UserModel, {
+        filterTypeName: 'FilterUserType',
+      });
+      const itc = new InputTypeComposer(args.filter.type);
+      expect(itc.getFieldType('_ids')).toBeInstanceOf(GraphQLList);
+      expect(itc.getFieldType('_ids').ofType).toBe(GraphQLMongoID);
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
@@ -116,9 +126,8 @@ describe('Resolver helper `filter` ->', () => {
         filterTypeName: 'FilterUserType',
         isRequired: true,
       });
-      expect(args).has.property('filter');
-      expect(args).has.deep.property('filter.name', 'filter');
-      expect(args).has.deep.property('filter.type').instanceof(GraphQLNonNull);
+      expect(args.filter.name).toBe('filter');
+      expect(args.filter.type).toBeInstanceOf(GraphQLNonNull);
     });
 
     it('should remove fields via opts.removeFields', () => {
@@ -127,9 +136,9 @@ describe('Resolver helper `filter` ->', () => {
         removeFields: ['name', 'age'],
       });
       const inputTypeComposer = new InputTypeComposer(args.filter.type);
-      expect(inputTypeComposer.hasField('name')).to.be.false;
-      expect(inputTypeComposer.hasField('age')).to.be.false;
-      expect(inputTypeComposer.hasField('gender')).to.be.true;
+      expect(inputTypeComposer.hasField('name')).toBe(false);
+      expect(inputTypeComposer.hasField('age')).toBe(false);
+      expect(inputTypeComposer.hasField('gender')).toBe(true);
     });
 
     it('should set required fields via opts.requiredFields', () => {
@@ -138,9 +147,9 @@ describe('Resolver helper `filter` ->', () => {
         requiredFields: ['name', 'age'],
       });
       const inputTypeComposer = new InputTypeComposer(args.filter.type);
-      expect(inputTypeComposer.getFieldType('name')).instanceof(GraphQLNonNull);
-      expect(inputTypeComposer.getFieldType('age')).instanceof(GraphQLNonNull);
-      expect(inputTypeComposer.getFieldType('gender')).not.instanceof(GraphQLNonNull);
+      expect(inputTypeComposer.getFieldType('name')).toBeInstanceOf(GraphQLNonNull);
+      expect(inputTypeComposer.getFieldType('age')).toBeInstanceOf(GraphQLNonNull);
+      expect(inputTypeComposer.getFieldType('gender')).not.toBeInstanceOf(GraphQLNonNull);
     });
 
     it('should leave only indexed fields if opts.onlyIndexed=true', () => {
@@ -150,10 +159,10 @@ describe('Resolver helper `filter` ->', () => {
         model: UserModel,
       });
       const inputTypeComposer = new InputTypeComposer(args.filter.type);
-      expect(inputTypeComposer.hasField('_id')).to.be.true;
-      expect(inputTypeComposer.hasField('name')).to.be.true;
-      expect(inputTypeComposer.hasField('age')).to.be.false;
-      expect(inputTypeComposer.hasField('gender')).to.be.false;
+      expect(inputTypeComposer.hasField('_id')).toBe(true);
+      expect(inputTypeComposer.hasField('name')).toBe(true);
+      expect(inputTypeComposer.hasField('age')).toBe(false);
+      expect(inputTypeComposer.hasField('gender')).toBe(false);
     });
 
     it('should opts.onlyIndexed=true and opts.removeFields works together', () => {
@@ -164,29 +173,24 @@ describe('Resolver helper `filter` ->', () => {
         removeFields: ['name'],
       });
       const inputTypeComposer = new InputTypeComposer(args.filter.type);
-      expect(inputTypeComposer.hasField('_id')).to.be.true;
-      expect(inputTypeComposer.hasField('name')).to.be.false;
-      expect(inputTypeComposer.hasField('age')).to.be.false;
-      expect(inputTypeComposer.hasField('gender')).to.be.false;
+      expect(inputTypeComposer.hasField('_id')).toBe(true);
+      expect(inputTypeComposer.hasField('name')).toBe(false);
+      expect(inputTypeComposer.hasField('age')).toBe(false);
+      expect(inputTypeComposer.hasField('gender')).toBe(false);
     });
   });
 
   describe('filterHelper()', () => {
     let spyWhereFn;
-    let spyWhere2Fn;
     let spyFindFn;
-    let resolveParams;
+    let resolveParams: any;
 
     beforeEach(() => {
-      spyWhereFn = spy((queryObj) => {
-        spyWhere2Fn = spy();
-        return {
-          ...UserModel.find(),
-          where: spyWhere2Fn,
-        };
+      spyWhereFn = jest.fn(() => {
+        return resolveParams.query;
       });
 
-      spyFindFn = spy();
+      spyFindFn = jest.fn();
       resolveParams = {
         query: {
           ...UserModel.find(),
@@ -198,7 +202,7 @@ describe('Resolver helper `filter` ->', () => {
 
     it('should not call query.where if args.filter is empty', () => {
       filterHelper(resolveParams);
-      expect(spyWhereFn).to.have.not.been.called();
+      expect(spyWhereFn).not.toBeCalled();
     });
 
     it('should call query.where if args.filter is provided', () => {
@@ -206,7 +210,18 @@ describe('Resolver helper `filter` ->', () => {
         filter: { name: 'nodkz' },
       };
       filterHelper(resolveParams);
-      expect(spyWhereFn).to.have.been.called.with({ name: 'nodkz' });
+      expect(spyWhereFn).toBeCalledWith({ name: 'nodkz' });
+    });
+
+    it('should call query.where if args.filter provided with _ids', () => {
+      resolveParams.args = {
+        filter: {
+          age: 30,
+          _ids: [1, 2, 3],
+        },
+      };
+      filterHelper(resolveParams);
+      expect(spyWhereFn.mock.calls).toEqual([[{ _id: { $in: [1, 2, 3] } }], [{ age: 30 }]]);
     });
 
     it('should convert deep object in args.filter to dotted object', () => {
@@ -219,7 +234,7 @@ describe('Resolver helper `filter` ->', () => {
         },
       };
       filterHelper(resolveParams);
-      expect(spyWhereFn).to.have.been.called.with({
+      expect(spyWhereFn).toBeCalledWith({
         'name.first': 'Pavel',
         age: 30,
       });
@@ -232,9 +247,7 @@ describe('Resolver helper `filter` ->', () => {
         },
       };
       filterHelper(resolveParams);
-      expect(spyWhereFn).to.have.been.called.with(
-        { age: { $gt: 10, $lt: 20 } }
-      );
+      expect(spyWhereFn).toBeCalledWith({ age: { $gt: 10, $lt: 20 } });
     });
 
     it('should add rawQuery to query', () => {
@@ -249,12 +262,10 @@ describe('Resolver helper `filter` ->', () => {
       };
 
       filterHelper(resolveParams);
-      expect(spyWhereFn).to.have.been.called.with(
-        { age: { $gt: 10, $lt: 20 } }
-      );
-      expect(spyWhere2Fn).to.have.been.called.with(
-        { age: { max: 30 }, active: true }
-      );
+      expect(spyWhereFn.mock.calls).toEqual([
+        [{ age: { $gt: 10, $lt: 20 } }],
+        [{ active: true, age: { max: 30 } }],
+      ]);
     });
   });
 });

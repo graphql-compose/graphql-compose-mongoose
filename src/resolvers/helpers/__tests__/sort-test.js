@@ -1,15 +1,12 @@
 /* @flow */
 
-import { expect, spy } from 'chai';
-import { GraphQLEnumType } from 'graphql';
-import {
-  sortHelperArgs,
-  sortHelper,
-  getSortTypeFromModel,
-} from '../sort';
+import { graphql } from 'graphql-compose';
+import { sortHelperArgs, sortHelper, getSortTypeFromModel } from '../sort';
 import { UserModel } from '../../../__mocks__/userModel';
 import { getIndexesFromModel } from '../../../utils/getIndexesFromModel';
 import typeStorage from '../../../typeStorage';
+
+const { GraphQLEnumType } = graphql;
 
 describe('Resolver helper `sort` ->', () => {
   beforeEach(() => {
@@ -20,15 +17,15 @@ describe('Resolver helper `sort` ->', () => {
     it('should return EnumType', () => {
       const typeName = 'SortType';
       const type = getSortTypeFromModel(typeName, UserModel);
-      expect(type).to.be.instanceof(GraphQLEnumType);
-      expect(type).have.property('name', typeName);
+      expect(type).toBeInstanceOf(GraphQLEnumType);
+      expect(type.name).toBe(typeName);
     });
 
     it('should reuse existed EnumType', () => {
       const typeName = 'SortType';
       typeStorage.set(typeName, 'EXISTED_TYPE');
       const type = getSortTypeFromModel(typeName, UserModel);
-      expect(type).to.equal('EXISTED_TYPE');
+      expect(type).toBe('EXISTED_TYPE');
     });
 
     it('should have proper enum values', () => {
@@ -37,43 +34,43 @@ describe('Resolver helper `sort` ->', () => {
 
       // only indexed fields in enum
       const ascDescNum = indexedFields.length * 2;
-      expect(type).property('_values').have.lengthOf(ascDescNum);
+      expect(type._values).toHaveLength(ascDescNum);
 
       // should have ASC DESC keys
       const enumNames = type._values.map(enumConfig => enumConfig.name);
-      expect(enumNames).to.include.members(['_ID_ASC', '_ID_DESC']);
+      expect(enumNames).toEqual(expect.arrayContaining(['_ID_ASC', '_ID_DESC']));
 
       // should have ASC criteria for mongoose
       const complexASC = type._values.find(enumConfig => enumConfig.name === 'NAME__AGE_ASC');
-      expect(complexASC).property('value').deep.equal({ name: 1, age: -1 });
+      // $FlowFixMe
+      expect(complexASC.value).toEqual({ name: 1, age: -1 });
 
       // should have DESC criteria for mongoose
       const complexDESC = type._values.find(enumConfig => enumConfig.name === 'NAME__AGE_DESC');
-      expect(complexDESC).property('value').deep.equal({ name: -1, age: 1 });
+      // $FlowFixMe
+      expect(complexDESC.value).toEqual({ name: -1, age: 1 });
     });
   });
 
   describe('sortHelperArgs()', () => {
     it('should throw error if `sortTypeName` not provided in opts', () => {
-      expect(() => sortHelperArgs(UserModel))
-        .to.throw('provide non-empty `sortTypeName`');
+      expect(() => sortHelperArgs(UserModel)).toThrowError('provide non-empty `sortTypeName`');
     });
     it('should return sort field', () => {
       const args = sortHelperArgs(UserModel, {
         sortTypeName: 'SortInput',
       });
-      expect(args).has.property('sort');
-      expect(args).has.deep.property('sort.name', 'sort');
-      expect(args).has.deep.property('sort.type').instanceof(GraphQLEnumType);
+      expect(args.sort.name).toBe('sort');
+      expect(args.sort.type).toBeInstanceOf(GraphQLEnumType);
     });
   });
 
   describe('sortHelper()', () => {
     let spyFn;
-    let resolveParams;
+    let resolveParams: any;
 
     beforeEach(() => {
-      spyFn = spy();
+      spyFn = jest.fn();
       resolveParams = {
         query: {
           sort: spyFn,
@@ -83,14 +80,14 @@ describe('Resolver helper `sort` ->', () => {
 
     it('should not call query.sort if args.sort is empty', () => {
       sortHelper(resolveParams);
-      expect(spyFn).to.have.not.been.called();
+      expect(spyFn).not.toHaveBeenCalled();
     });
 
     it('should call query.sort if args.sort is provided', () => {
       const sortValue = { _id: 1 };
       resolveParams.args = { sort: sortValue };
       sortHelper(resolveParams);
-      expect(spyFn).to.have.been.called.with(sortValue);
+      expect(spyFn).toBeCalledWith(sortValue);
     });
   });
 });
