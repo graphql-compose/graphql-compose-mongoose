@@ -19,8 +19,10 @@ export default function toMongoDottedObject(
   target?: Object = {},
   path?: string[] = []
 ): { [dottedPath: string]: mixed } {
+  const objKeys = Object.keys(obj);
+
   /* eslint-disable */
-   Object.keys(obj).forEach(key => {
+  objKeys.forEach(key => {
      if (key.startsWith('$')) {
        target[path.join('.')] = { 
          ...target[path.join('.')],
@@ -32,6 +34,11 @@ export default function toMongoDottedObject(
        target[path.concat(key).join('.')] = obj[key];
      }
    });
+
+   if (objKeys.length === 0) {
+     target[path.join('.')] = obj;
+   }
+   
    return target;
    /* eslint-enable */
 }
