@@ -2,18 +2,15 @@
 /* eslint-disable no-param-reassign */
 
 import { Resolver, TypeComposer } from 'graphql-compose';
-import { skipHelperArgs } from './helpers/skip';
-import { recordHelperArgs } from './helpers/record';
-import { filterHelperArgs } from './helpers/filter';
-import { sortHelperArgs } from './helpers/sort';
+import type { MongooseModel } from 'mongoose';
+import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { skipHelperArgs, recordHelperArgs, filterHelperArgs, sortHelperArgs } from './helpers';
 import findOne from './findOne';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
 
-import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
-
 export default function updateOne(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
 ): Resolver<*, *> {

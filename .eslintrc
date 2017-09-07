@@ -26,7 +26,8 @@
       "trailingComma": "es5",
     }],
     "import/prefer-default-export": 0,
-    "arrow-parens": 0
+    "arrow-parens": 0,
+    "prefer-destructuring": 0
   },
   "env": {
     "jasmine": true,
@@ -40,5 +41,6 @@
     "Class": true,
     "Iterator": true,
     "$Shape": true,
+    "$Keys": true,
   }
 }

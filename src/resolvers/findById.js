@@ -1,14 +1,14 @@
 /* @flow */
 
-import { Resolver, TypeComposer, graphql } from 'graphql-compose';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import type { MongooseModel } from 'mongoose';
+import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import GraphQLMongoID from '../types/mongoid';
-import { projectionHelper } from './helpers/projection';
-import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
-
-const { GraphQLNonNull } = graphql;
+import { projectionHelper } from './helpers';
+import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function findById(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts // eslint-disable-line no-unused-vars
 ): Resolver<*, *> {

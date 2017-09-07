@@ -1,12 +1,11 @@
 /* @flow */
 
-import { Resolver, graphql } from 'graphql-compose';
+import { Resolver } from 'graphql-compose';
+import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import findOne from '../findOne';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
-
-const { GraphQLNonNull } = graphql;
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());

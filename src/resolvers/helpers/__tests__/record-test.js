@@ -1,12 +1,11 @@
 /* @flow */
 
-import { InputTypeComposer, graphql } from 'graphql-compose';
+import { InputTypeComposer } from 'graphql-compose';
+import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { recordHelperArgs } from '../record';
 import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
-
-const { GraphQLInputObjectType, GraphQLNonNull } = graphql;
 
 describe('Resolver helper `record` ->', () => {
   let UserTypeComposer;

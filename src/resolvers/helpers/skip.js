@@ -1,6 +1,7 @@
 /* @flow */
 
-import type { ComposeFieldConfigArgumentMap, ExtendedResolveParams } from '../../definition';
+import type { ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import type { ExtendedResolveParams } from '../index';
 
 export const skipHelperArgs = (): ComposeFieldConfigArgumentMap => {
   return {

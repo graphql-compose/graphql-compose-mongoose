@@ -2,6 +2,7 @@
 /* eslint-disable no-use-before-define */
 
 import mongoose from 'mongoose';
+import type { Schema, MongooseModel, MongooseSchemaField } from 'mongoose';
 import objectPath from 'object-path';
 import {
   TypeComposer,
@@ -9,30 +10,27 @@ import {
   GraphQLBuffer,
   GraphQLGeneric,
   GraphQLJSON,
-  graphql,
 } from 'graphql-compose';
-
-import GraphQLMongoID from './types/mongoid';
-import typeStorage from './typeStorage';
-
-import type {
-  MongooseModelT,
-  // MongooseModelSchemaT,
-  MongoosePseudoModelT,
-  MongooseFieldT,
-  MongooseFieldMapT,
-  ComplexTypesT,
-  GraphQLOutputType,
-} from './definition';
-
-const {
+import {
   GraphQLString,
   GraphQLFloat,
   GraphQLBoolean,
   GraphQLList,
   GraphQLEnumType,
   GraphQLObjectType,
-} = graphql;
+  type GraphQLOutputType,
+} from 'graphql-compose/lib/graphql';
+
+import GraphQLMongoID from './types/mongoid';
+import typeStorage from './typeStorage';
+
+type MongooseFieldT = MongooseSchemaField<any>;
+type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
+
+export type MongoosePseudoModelT = {
+  _gqcTypeComposer?: TypeComposer,
+  schema: Schema<any>,
+};
 
 export const ComplexTypes = {
   ARRAY: 'ARRAY',
@@ -109,9 +107,7 @@ export function dotPathsToEmbedded(fields: MongooseFieldMapT): MongooseFieldMapT
   return result;
 }
 
-export function getFieldsFromModel(
-  model: MongooseModelT | MongoosePseudoModelT
-): MongooseFieldMapT {
+export function getFieldsFromModel(model: MongooseModel | MongoosePseudoModelT): MongooseFieldMapT {
   if (!model || !model.schema || !model.schema.paths) {
     throw new Error(
       'You provide incorrect mongoose model to `getFieldsFromModel()`. ' +
@@ -132,7 +128,7 @@ export function getFieldsFromModel(
 }
 
 export function convertModelToGraphQL(
-  model: MongooseModelT | MongoosePseudoModelT,
+  model: MongooseModel | MongoosePseudoModelT,
   typeName: string
 ): TypeComposer {
   // if model already has generated TypeComposer early, then return it
@@ -155,6 +151,8 @@ export function convertModelToGraphQL(
       })
     )
   );
+
+  // $FlowFixMe
   model.schema._gqcTypeComposer = typeComposer; // eslint-disable-line
 
   const mongooseFields = getFieldsFromModel(model);
@@ -231,7 +229,7 @@ export function convertFieldToGraphQL(
   }
 }
 
-export function deriveComplexType(field: MongooseFieldT): ComplexTypesT {
+export function deriveComplexType(field: MongooseFieldT): $Keys<typeof ComplexTypes> {
   if (!field || !field.path || !field.instance) {
     throw new Error(
       'You provide incorrect mongoose field to `deriveComplexType()`. ' +

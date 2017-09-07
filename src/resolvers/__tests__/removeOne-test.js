@@ -1,14 +1,13 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { Resolver, TypeComposer, graphql } from 'graphql-compose';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import { GraphQLObjectType } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import removeOne from '../removeOne';
 import GraphQLMongoID from '../../types/mongoid';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import typeStorage from '../../typeStorage';
-
-const { GraphQLObjectType } = graphql;
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());

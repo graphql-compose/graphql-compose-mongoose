@@ -1,27 +1,41 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import { TypeComposer, InputTypeComposer, isObject, graphql } from 'graphql-compose';
+import { TypeComposer, InputTypeComposer, isObject } from 'graphql-compose';
+import type { ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import type { MongooseModel } from 'mongoose';
+import {
+  GraphQLNonNull,
+  GraphQLInputObjectType,
+  GraphQLList,
+  getNamedType,
+} from 'graphql-compose/lib/graphql';
 import { getIndexesFromModel } from '../../utils/getIndexesFromModel';
 import GraphQLMongoID from '../../types/mongoid';
 import { toMongoDottedObject, upperFirst } from '../../utils';
 import typeStorage from '../../typeStorage';
-import type {
-  ComposeFieldConfigArgumentMap,
-  ExtendedResolveParams,
-  MongooseModelT,
-  FilterHelperArgsOpts,
-  FilterOperatorsOpts,
-  FilterOperatorNames,
-} from '../../definition';
-
-const { GraphQLNonNull, GraphQLInputObjectType, GraphQLList, getNamedType } = graphql;
+import type { ExtendedResolveParams } from '../index';
 
 export const OPERATORS_FIELDNAME = '_operators';
 
+export type FilterOperatorNames = 'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
+
+export type FilterOperatorsOpts = {
+  [fieldName: string]: FilterOperatorNames[] | false,
+};
+
+export type FilterHelperArgsOpts = {
+  filterTypeName?: string,
+  isRequired?: boolean,
+  onlyIndexed?: boolean,
+  requiredFields?: string | string[],
+  operators?: FilterOperatorsOpts | false,
+  removeFields?: string | string[],
+};
+
 export const filterHelperArgs = (
   typeComposer: TypeComposer,
-  model: MongooseModelT,
+  model: MongooseModel,
   opts?: FilterHelperArgsOpts
 ): ComposeFieldConfigArgumentMap => {
   if (!(typeComposer instanceof TypeComposer)) {
@@ -138,7 +152,7 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
   }
 }
 
-export function getIndexedFieldNames(model: MongooseModelT): string[] {
+export function getIndexedFieldNames(model: MongooseModel): string[] {
   const indexes = getIndexesFromModel(model);
 
   const fieldNames = [];
@@ -162,7 +176,7 @@ export function getIndexedFieldNames(model: MongooseModelT): string[] {
 export function addFieldsWithOperator(
   typeName: string,
   inputComposer: InputTypeComposer,
-  model: MongooseModelT,
+  model: MongooseModel,
   operatorsOpts: FilterOperatorsOpts
 ): InputTypeComposer {
   const operatorsComposer = new InputTypeComposer(
@@ -218,6 +232,7 @@ export function addFieldsWithOperator(
           } else {
             fields[operatorName] = {
               ...existedFields[fieldName],
+              // $FlowFixMe
               type: namedType,
             };
           }

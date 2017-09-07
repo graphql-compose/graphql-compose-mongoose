@@ -2,7 +2,7 @@
 
 import { isFunction } from 'graphql-compose';
 
-class TypeStorage extends Map {
+class TypeStorage extends Map<string, any> {
   // this `create` hack due TypeError:
   // Constructor Map requires 'new' at TypeStorage.Map (native)
   static create(array?: any[]): TypeStorage {

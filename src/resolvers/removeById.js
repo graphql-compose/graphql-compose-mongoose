@@ -1,16 +1,16 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { Resolver, TypeComposer, graphql } from 'graphql-compose';
+import { Resolver, TypeComposer } from 'graphql-compose';
+import type { MongooseModel } from 'mongoose';
+import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import findById from './findById';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
-import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
-
-const { GraphQLNonNull } = graphql;
+import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function removeById(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts // eslint-disable-line no-unused-vars
 ): Resolver<*, *> {

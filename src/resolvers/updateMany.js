@@ -2,17 +2,24 @@
 /* eslint-disable no-param-reassign */
 
 import { Resolver, TypeComposer } from 'graphql-compose';
-import { recordHelperArgs } from './helpers/record';
-import { skipHelperArgs, skipHelper } from './helpers/skip';
-import { limitHelperArgs, limitHelper } from './helpers/limit';
-import { filterHelperArgs, filterHelper } from './helpers/filter';
-import { sortHelperArgs, sortHelper } from './helpers/sort';
+import type { MongooseModel } from 'mongoose';
+import {
+  limitHelper,
+  limitHelperArgs,
+  skipHelper,
+  skipHelperArgs,
+  recordHelperArgs,
+  filterHelper,
+  filterHelperArgs,
+  sortHelper,
+  sortHelperArgs,
+} from './helpers';
 import toMongoDottedObject from '../utils/toMongoDottedObject';
 import typeStorage from '../typeStorage';
-import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
+import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function updateMany(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
 ): Resolver<*, *> {

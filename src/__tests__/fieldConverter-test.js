@@ -1,7 +1,17 @@
 /* @flow */
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
-import { GraphQLDate, GraphQLBuffer, GraphQLGeneric, GraphQLJSON, graphql } from 'graphql-compose';
+import { GraphQLDate, GraphQLBuffer, GraphQLGeneric, GraphQLJSON } from 'graphql-compose';
+import {
+  GraphQLString,
+  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLList,
+  GraphQLEnumType,
+  GraphQLSchema,
+  GraphQLObjectType,
+  graphql,
+} from 'graphql-compose/lib/graphql';
 import { UserModel } from '../__mocks__/userModel';
 import {
   deriveComplexType,
@@ -21,16 +31,6 @@ import GraphQLMongoID from '../types/mongoid';
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
-
-const {
-  GraphQLString,
-  GraphQLFloat,
-  GraphQLBoolean,
-  GraphQLList,
-  GraphQLEnumType,
-  GraphQLSchema,
-  GraphQLObjectType,
-} = graphql;
 
 describe('fieldConverter', () => {
   const fields = getFieldsFromModel(UserModel);
@@ -212,7 +212,7 @@ describe('fieldConverter', () => {
         name: 'Test empty subDoc',
       });
       await user.save();
-      const result = await graphql.graphql(
+      const result = await graphql(
         schema,
         `{
         user(_id: "${user._id}") {
@@ -255,7 +255,7 @@ describe('fieldConverter', () => {
         subDoc: { field2: { field21: 'ok' } },
       });
       await user2.save();
-      const result2 = await graphql.graphql(
+      const result2 = await graphql(
         schema,
         `{
         user(_id: "${user2._id}") {
@@ -341,7 +341,7 @@ describe('fieldConverter', () => {
           someDynamic
         }
       }`;
-      const result = await graphql.graphql(schema, query);
+      const result = await graphql(schema, query);
       // $FlowFixMe
       expect(result.data.user.name).toBe(user.name);
       // $FlowFixMe

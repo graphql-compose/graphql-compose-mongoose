@@ -1,10 +1,11 @@
 /* @flow */
 
-import type {
-  ComposeFieldConfigArgumentMap,
-  ExtendedResolveParams,
-  LimitHelperArgsOpts,
-} from '../../definition';
+import type { ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import type { ExtendedResolveParams } from '../index';
+
+export type LimitHelperArgsOpts = {
+  defaultValue?: number,
+};
 
 export const limitHelperArgs = (opts?: LimitHelperArgsOpts): ComposeFieldConfigArgumentMap => {
   return {

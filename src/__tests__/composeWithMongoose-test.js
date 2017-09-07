@@ -16,7 +16,7 @@ describe('composeWithMongoose ->', () => {
     UserModel.schema._gqcTypeComposer = undefined;
   });
 
-  describe('mongooseModelToTypeComposer()', () => {
+  describe('MongooseModeloTypeComposer()', () => {
     describe('basics', () => {
       it('should return TypeComposer', () => {
         expect(composeWithMongoose(UserModel)).toBeInstanceOf(TypeComposer);

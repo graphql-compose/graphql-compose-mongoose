@@ -1,11 +1,16 @@
 /* @flow */
 
-import { TypeComposer, InputTypeComposer, graphql } from 'graphql-compose';
+import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import type { ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import typeStorage from '../../typeStorage';
 
-import type { ComposeFieldConfigArgumentMap, RecordHelperArgsOpts } from '../../definition';
-
-const { GraphQLNonNull } = graphql;
+export type RecordHelperArgsOpts = {
+  recordTypeName?: string,
+  isRequired?: boolean,
+  removeFields?: string[],
+  requiredFields?: string[],
+};
 
 export const recordHelperArgs = (
   typeComposer: TypeComposer,
@@ -24,7 +29,10 @@ export const recordHelperArgs = (
   const recordComposer = new InputTypeComposer(
     typeStorage.getOrSet(
       recordTypeName,
-      typeComposer.getInputTypeComposer().clone(recordTypeName).getType()
+      typeComposer
+        .getInputTypeComposer()
+        .clone(recordTypeName)
+        .getType()
     )
   );
   if (opts && opts.removeFields) {

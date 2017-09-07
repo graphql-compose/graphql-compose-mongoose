@@ -2,21 +2,117 @@
 /* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import type { MongooseModel } from 'mongoose';
+import type { ConnectionSortMapOpts } from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
 import { getUniqueIndexes, extendByReversedIndexes } from './utils/getIndexesFromModel';
-
 import type {
-  MongooseModelT,
-  TypeConverterOpts,
-  TypeConverterResolversOpts,
-  TypeConverterInputTypeOpts,
-  ConnectionSortMapOpts,
-  PaginationOpts,
-} from './definition';
+  FilterHelperArgsOpts,
+  LimitHelperArgsOpts,
+  SortHelperArgsOpts,
+  RecordHelperArgsOpts,
+} from './resolvers/helpers';
+
+export type TypeConverterOpts = {
+  name?: string,
+  description?: string,
+  fields?: {
+    only?: string[],
+    // rename?: { [oldName: string]: string },
+    remove?: string[],
+  },
+  inputType?: TypeConverterInputTypeOpts,
+  resolvers?: false | TypeConverterResolversOpts,
+};
+
+export type TypeConverterInputTypeOpts = {
+  name?: string,
+  description?: string,
+  fields?: {
+    only?: string[],
+    remove?: string[],
+    required?: string[],
+  },
+};
+
+export type TypeConverterResolversOpts = {
+  findById?: false,
+  findByIds?:
+    | false
+    | {
+        limit?: LimitHelperArgsOpts | false,
+        sort?: SortHelperArgsOpts | false,
+      },
+  findOne?:
+    | false
+    | {
+        filter?: FilterHelperArgsOpts | false,
+        sort?: SortHelperArgsOpts | false,
+        skip?: false,
+      },
+  findMany?:
+    | false
+    | {
+        filter?: FilterHelperArgsOpts | false,
+        sort?: SortHelperArgsOpts | false,
+        limit?: LimitHelperArgsOpts | false,
+        skip?: false,
+      },
+  updateById?:
+    | false
+    | {
+        input?: RecordHelperArgsOpts | false,
+      },
+  updateOne?:
+    | false
+    | {
+        input?: RecordHelperArgsOpts | false,
+        filter?: FilterHelperArgsOpts | false,
+        sort?: SortHelperArgsOpts | false,
+        skip?: false,
+      },
+  updateMany?:
+    | false
+    | {
+        input?: RecordHelperArgsOpts | false,
+        filter?: FilterHelperArgsOpts | false,
+        sort?: SortHelperArgsOpts | false,
+        limit?: LimitHelperArgsOpts | false,
+        skip?: false,
+      },
+  removeById?: false,
+  removeOne?:
+    | false
+    | {
+        filter?: FilterHelperArgsOpts | false,
+        sort?: SortHelperArgsOpts | false,
+      },
+  removeMany?:
+    | false
+    | {
+        filter?: FilterHelperArgsOpts | false,
+      },
+  createOne?:
+    | false
+    | {
+        input?: RecordHelperArgsOpts | false,
+      },
+  count?:
+    | false
+    | {
+        filter?: FilterHelperArgsOpts | false,
+      },
+  connection?: ConnectionSortMapOpts | false,
+  pagination?: PaginationResolverOpts | false,
+};
+
+export type PaginationResolverOpts = {
+  perPage?: number,
+};
 
 export function composeWithMongoose(
-  model: Object, // MongooseModelT, TODO use Model from mongoose_v4.x.x definition when it will be public
+  model: Object, // MongooseModel, TODO use Model from mongoose_v4.x.x definition when it will be public
   opts: TypeConverterOpts = {}
 ): TypeComposer {
   const name: string = (opts && opts.name) || model.modelName;
@@ -104,7 +200,7 @@ export function createInputType(
 }
 
 export function createResolvers(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts: TypeConverterResolversOpts
 ): void {
@@ -128,7 +224,10 @@ export function createResolvers(
   }
 }
 
-export function preparePaginationResolver(typeComposer: TypeComposer, opts: PaginationOpts) {
+export function preparePaginationResolver(
+  typeComposer: TypeComposer,
+  opts: PaginationResolverOpts
+) {
   try {
     require.resolve('graphql-compose-pagination');
   } catch (e) {
@@ -143,7 +242,7 @@ export function preparePaginationResolver(typeComposer: TypeComposer, opts: Pagi
 }
 
 export function prepareConnectionResolver(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts: ConnectionSortMapOpts
 ) {
@@ -160,7 +259,10 @@ export function prepareConnectionResolver(
   const sortConfigs = {};
   uniqueIndexes.forEach(indexData => {
     const keys = Object.keys(indexData);
-    let name = keys.join('__').toUpperCase().replace(/[^_a-zA-Z0-9]/i, '__');
+    let name = keys
+      .join('__')
+      .toUpperCase()
+      .replace(/[^_a-zA-Z0-9]/i, '__');
     if (indexData[keys[0]] === 1) {
       name = `${name}_ASC`;
     } else if (indexData[keys[0]] === -1) {

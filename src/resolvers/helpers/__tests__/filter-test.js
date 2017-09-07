@@ -1,6 +1,7 @@
 /* @flow */
 
-import { InputTypeComposer, graphql } from 'graphql-compose';
+import { InputTypeComposer } from 'graphql-compose';
+import { GraphQLInputObjectType, GraphQLNonNull, GraphQLList } from 'graphql-compose/lib/graphql';
 import {
   filterHelperArgs,
   filterHelper,
@@ -12,8 +13,6 @@ import GraphQLMongoID from '../../../types/mongoid';
 import { UserModel } from '../../../__mocks__/userModel';
 import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
-
-const { GraphQLInputObjectType, GraphQLNonNull, GraphQLList } = graphql;
 
 describe('Resolver helper `filter` ->', () => {
   let UserTypeComposer;

@@ -1,11 +1,13 @@
 /* @flow */
 
-import type { ObjectMap, MongooseModelT } from '../definition';
+import type { MongooseModel } from 'mongoose';
 
 export type getIndexesFromModelOpts = {
   extractCompound?: boolean, // true by default
   skipSpecificIndeces?: boolean, // eg text, 2d, 2dsphere (true by default)
 };
+
+export type IndexT = { [fieldName: string]: any };
 
 function isSpecificIndex(idx) {
   let hasSpecialIndex = false;
@@ -22,9 +24,9 @@ function isSpecificIndex(idx) {
 *  MongooseModel  ->  [ { _id: 1 }, { name: 1, surname: -1 } ]
 */
 export function getIndexesFromModel(
-  mongooseModel: MongooseModelT,
+  mongooseModel: MongooseModel,
   opts: getIndexesFromModelOpts = {}
-): ObjectMap[] {
+): IndexT[] {
   const extractCompound = opts.extractCompound === undefined ? true : Boolean(opts.extractCompound);
   const skipSpecificIndexes =
     opts.skipSpecificIndexes === undefined ? true : Boolean(opts.skipSpecificIndexes);
@@ -76,7 +78,7 @@ export function getIndexesFromModel(
   return result;
 }
 
-export function getUniqueIndexes(mongooseModel: MongooseModelT): ObjectMap[] {
+export function getUniqueIndexes(mongooseModel: MongooseModel): IndexT[] {
   const indexedFields = [];
 
   // add _id field if existed
@@ -109,13 +111,10 @@ export type extendByReversedIndexesOpts = {
   reversedFirst?: boolean, // false by default
 };
 
-export function extendByReversedIndexes(
-  indexes: ObjectMap[],
-  opts: extendByReversedIndexesOpts = {}
-) {
+export function extendByReversedIndexes(indexes: IndexT[], opts: extendByReversedIndexesOpts = {}) {
   const reversedFirst = opts.reversedFirst === undefined ? false : Boolean(opts.reversedFirst);
 
-  const result: ObjectMap[] = [];
+  const result: IndexT[] = [];
 
   indexes.forEach(indexObj => {
     let hasSpecificIndex = false;

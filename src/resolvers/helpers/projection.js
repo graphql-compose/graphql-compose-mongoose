@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { ExtendedResolveParams } from '../../definition';
+import type { ExtendedResolveParams } from '../index';
 
 export function projectionHelper(resolveParams: ExtendedResolveParams): void { // eslint-disable-line
   const projection = resolveParams.projection;

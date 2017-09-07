@@ -2,15 +2,22 @@
 /* eslint-disable no-param-reassign */
 
 import { Resolver, TypeComposer } from 'graphql-compose';
-import { skipHelperArgs, skipHelper } from './helpers/skip';
-import { limitHelperArgs, limitHelper } from './helpers/limit';
-import { filterHelperArgs, filterHelper } from './helpers/filter';
-import { sortHelperArgs, sortHelper } from './helpers/sort';
-import { projectionHelper } from './helpers/projection';
-import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
+import type { MongooseModel } from 'mongoose';
+import {
+  limitHelper,
+  limitHelperArgs,
+  skipHelper,
+  skipHelperArgs,
+  filterHelper,
+  filterHelperArgs,
+  sortHelper,
+  sortHelperArgs,
+  projectionHelper,
+} from './helpers';
+import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function findMany(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
 ): Resolver<*, *> {

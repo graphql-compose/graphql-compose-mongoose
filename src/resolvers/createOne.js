@@ -2,13 +2,14 @@
 /* eslint-disable no-param-reassign, new-cap */
 
 import { Resolver, TypeComposer } from 'graphql-compose';
-import { recordHelperArgs } from './helpers/record';
+import type { MongooseModel } from 'mongoose';
+import { recordHelperArgs } from './helpers';
 import typeStorage from '../typeStorage';
 import GraphQLMongoID from '../types/mongoid';
-import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
+import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function createOne(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
 ): Resolver<*, *> {

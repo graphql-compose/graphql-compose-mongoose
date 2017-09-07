@@ -2,15 +2,16 @@
 /* eslint-disable no-param-reassign */
 
 import { Resolver, TypeComposer } from 'graphql-compose';
+import type { MongooseModel } from 'mongoose';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
 import GraphQLMongoID from '../types/mongoid';
 import typeStorage from '../typeStorage';
 
-import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
+import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function updateById(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
 ): Resolver<*, *> {

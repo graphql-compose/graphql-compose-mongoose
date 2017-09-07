@@ -1,12 +1,10 @@
 /* @flow */
 
-import { graphql } from 'graphql-compose';
+import { GraphQLEnumType } from 'graphql-compose/lib/graphql';
 import { sortHelperArgs, sortHelper, getSortTypeFromModel } from '../sort';
 import { UserModel } from '../../../__mocks__/userModel';
 import { getIndexesFromModel } from '../../../utils/getIndexesFromModel';
 import typeStorage from '../../../typeStorage';
-
-const { GraphQLEnumType } = graphql;
 
 describe('Resolver helper `sort` ->', () => {
   beforeEach(() => {

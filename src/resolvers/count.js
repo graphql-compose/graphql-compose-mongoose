@@ -2,11 +2,12 @@
 /* eslint-disable no-param-reassign */
 
 import { Resolver, TypeComposer } from 'graphql-compose';
-import { filterHelperArgs, filterHelper } from './helpers/filter';
-import type { MongooseModelT, ExtendedResolveParams, GenResolverOpts } from '../definition';
+import type { MongooseModel } from 'mongoose';
+import { filterHelper, filterHelperArgs } from './helpers';
+import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function count(
-  model: MongooseModelT,
+  model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
 ): Resolver<*, *> {

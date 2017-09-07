@@ -1,20 +1,19 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import { graphql } from 'graphql-compose';
+import type { MongooseModel } from 'mongoose';
+import { GraphQLEnumType } from 'graphql-compose/lib/graphql';
+import type { ComposeFieldConfigArgumentMap } from 'graphql-compose';
 import { getIndexesFromModel, extendByReversedIndexes } from '../../utils/getIndexesFromModel';
 import typeStorage from '../../typeStorage';
-import type {
-  ExtendedResolveParams,
-  ComposeFieldConfigArgumentMap,
-  MongooseModelT,
-  SortHelperArgsOpts,
-} from '../../definition';
+import type { ExtendedResolveParams } from '../index';
 
-const { GraphQLEnumType } = graphql;
+export type SortHelperArgsOpts = {
+  sortTypeName?: string,
+};
 
 export const sortHelperArgs = (
-  model: MongooseModelT,
+  model: MongooseModel,
   opts?: SortHelperArgsOpts
 ): ComposeFieldConfigArgumentMap => {
   if (!model || !model.modelName || !model.schema) {
@@ -42,13 +41,16 @@ export function sortHelper(resolveParams: ExtendedResolveParams): void {
   }
 }
 
-export function getSortTypeFromModel(typeName: string, model: MongooseModelT): GraphQLEnumType {
+export function getSortTypeFromModel(typeName: string, model: MongooseModel): GraphQLEnumType {
   const indexes = extendByReversedIndexes(getIndexesFromModel(model));
 
   const sortEnumValues = {};
   indexes.forEach(indexData => {
     const keys = Object.keys(indexData);
-    let name = keys.join('__').toUpperCase().replace(/[^_a-zA-Z0-9]/i, '__');
+    let name = keys
+      .join('__')
+      .toUpperCase()
+      .replace(/[^_a-zA-Z0-9]/i, '__');
     if (indexData[keys[0]] === 1) {
       name = `${name}_ASC`;
     } else if (indexData[keys[0]] === -1) {

@@ -10,9 +10,9 @@ describe('typeStorage', () => {
   it('should work `get`, `set`, `has`, `clear` methods and `size` property', () => {
     typeStorage.clear();
     expect(typeStorage.size).toBe(0);
-    typeStorage.set(123, 567);
-    expect(typeStorage.get(123)).toBe(567);
-    expect(typeStorage.has(123)).toBe(true);
+    typeStorage.set('Type', 567);
+    expect(typeStorage.get('Type')).toBe(567);
+    expect(typeStorage.has('Type')).toBe(true);
     expect(typeStorage.size).toBe(1);
     typeStorage.clear();
     expect(typeStorage.size).toBe(0);

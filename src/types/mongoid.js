@@ -1,8 +1,6 @@
 /* @flow */
 
-import { graphql } from 'graphql-compose';
-
-const { GraphQLScalarType, Kind } = graphql;
+import { GraphQLScalarType, Kind } from 'graphql-compose/lib/graphql';
 
 const GraphQLMongoID = new GraphQLScalarType({
   name: 'MongoID',
