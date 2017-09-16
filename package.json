@@ -59,7 +59,7 @@
     "mongoose": "^4.11.10",
     "prettier": "^1.6.1",
     "rimraf": "^2.6.1",
-    "semantic-release": "^7.0.2"
+    "semantic-release": "^8.0.0"
   },
   "config": {
     "commitizen": {
