@@ -2,6 +2,7 @@
 /* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import type { MongooseModel } from 'mongoose';
 import type { ConnectionSortMapOpts } from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
@@ -133,6 +134,14 @@ export function composeWithMongoose(
 
   if (!{}.hasOwnProperty.call(opts, 'resolvers') || opts.resolvers !== false) {
     createResolvers(model, typeComposer, opts.resolvers || {});
+  }
+
+  if (typeComposer.hasField('_id')) {
+    const fc = typeComposer.getField('_id');
+    if (fc.type && !(fc.type instanceof GraphQLNonNull)) {
+      fc.type = new GraphQLNonNull(fc.type);
+      typeComposer.setField('_id', fc);
+    }
   }
 
   return typeComposer;

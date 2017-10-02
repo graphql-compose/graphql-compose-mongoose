@@ -3,9 +3,11 @@
 
 import mongoose from 'mongoose';
 import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../__mocks__/userModel';
 import { composeWithMongoose } from '../composeWithMongoose';
 import typeStorage from '../typeStorage';
+import GraphQLMongoID from '../types/mongoid';
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
@@ -40,6 +42,13 @@ describe('composeWithMongoose ->', () => {
         expect(tc.getFieldNames()).toEqual(
           expect.arrayContaining(['_id', 'name', 'gender', 'age'])
         );
+      });
+
+      it('should have NonNull _id field', () => {
+        const tc = composeWithMongoose(UserModel);
+        expect(tc.getFieldType('_id')).toBeInstanceOf(GraphQLNonNull);
+        // $FlowFixMe
+        expect(tc.getFieldType('_id').ofType).toBe(GraphQLMongoID);
       });
     });
 
