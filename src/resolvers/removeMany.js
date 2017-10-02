@@ -72,7 +72,8 @@ export default function removeMany(
         // this option is excessive
         (resolveParams.beforeQuery
           ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query, resolveParams))
-          : resolveParams.query.exec()).then(res => {
+          : resolveParams.query.exec()
+        ).then(res => {
           if (res.result && res.result.ok) {
             return {
               numAffected: res.result.n,

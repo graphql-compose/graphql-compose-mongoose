@@ -99,7 +99,8 @@ export default function updateMany(
       // this option is excessive
       return (resolveParams.beforeQuery
         ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query, resolveParams))
-        : resolveParams.query.exec()).then(res => {
+        : resolveParams.query.exec()
+      ).then(res => {
         if (res.ok) {
           return {
             numAffected: res.nModified,
