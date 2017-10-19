@@ -5,7 +5,6 @@ import { mongoose, Schema } from './mongooseCommon';
 const PostSchema = new Schema({
   _id: {
     type: Number,
-    unique: true,
   },
   title: {
     type: String,
