@@ -54,10 +54,9 @@ describe('findOne() ->', () => {
     });
 
     it('should have `filter` arg only with indexed fields', async () => {
-      const result = findOne(UserModel, UserTypeComposer, {
+      const result: any = findOne(UserModel, UserTypeComposer, {
         filter: { onlyIndexed: true, operators: false },
       });
-      // $FlowFixMe
       const filterFields = result.args.filter.type._typeConfig.fields();
       expect(Object.keys(filterFields)).toEqual(
         expect.arrayContaining(['_id', 'name', 'employment'])
@@ -65,8 +64,9 @@ describe('findOne() ->', () => {
     });
 
     it('should have `filter` arg with required `name` field', async () => {
-      const result = findOne(UserModel, UserTypeComposer, { filter: { requiredFields: 'name' } });
-      // $FlowFixMe
+      const result: any = findOne(UserModel, UserTypeComposer, {
+        filter: { requiredFields: 'name' },
+      });
       const filterFields = result.args.filter.type._typeConfig.fields();
       expect(filterFields.name.type).toBeInstanceOf(GraphQLNonNull);
     });

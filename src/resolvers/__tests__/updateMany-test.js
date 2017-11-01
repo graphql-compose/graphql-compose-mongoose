@@ -71,9 +71,8 @@ describe('updateMany() ->', () => {
 
     it('should have `record` arg', () => {
       const resolver = updateMany(UserModel, UserTypeComposer);
-      const argConfig = resolver.getArg('record');
+      const argConfig: any = resolver.getArg('record');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
-      // $FlowFixMe
       expect(argConfig.type.ofType.name).toBe('UpdateManyUserInput');
     });
   });
@@ -133,14 +132,12 @@ describe('updateMany() ->', () => {
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType = updateMany(UserModel, UserTypeComposer).getType();
-      // $FlowFixMe
+      const outputType: any = updateMany(UserModel, UserTypeComposer).getType();
       expect(outputType.name).toBe(`UpdateMany${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have numAffected field', () => {
-      const outputType = updateMany(UserModel, UserTypeComposer).getType();
-      // $FlowFixMe
+      const outputType: any = updateMany(UserModel, UserTypeComposer).getType();
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
       expect(numAffectedField.type).toBe(GraphQLInt);
     });

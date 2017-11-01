@@ -1,6 +1,6 @@
 /* @flow */
 
-import { InputTypeComposer } from 'graphql-compose';
+import { InputTypeComposer, type TypeComposer } from 'graphql-compose';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { recordHelperArgs } from '../record';
 import { UserModel } from '../../../__mocks__/userModel';
@@ -8,7 +8,7 @@ import { composeWithMongoose } from '../../../composeWithMongoose';
 import typeStorage from '../../../typeStorage';
 
 describe('Resolver helper `record` ->', () => {
-  let UserTypeComposer;
+  let UserTypeComposer: TypeComposer;
 
   beforeEach(() => {
     typeStorage.clear();
@@ -24,7 +24,7 @@ describe('Resolver helper `record` ->', () => {
     });
 
     it('should return input field', () => {
-      const args = recordHelperArgs(UserTypeComposer, {
+      const args: any = recordHelperArgs(UserTypeComposer, {
         recordTypeName: 'RecordUserType',
       });
       expect(args.record.name).toBe('record');
@@ -37,14 +37,14 @@ describe('Resolver helper `record` ->', () => {
         fields: {},
       });
       typeStorage.set('RecordUserType', existedType);
-      const args = recordHelperArgs(UserTypeComposer, {
+      const args: any = recordHelperArgs(UserTypeComposer, {
         recordTypeName: 'RecordUserType',
       });
       expect(args.record.type).toBe(existedType);
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
-      const args = recordHelperArgs(UserTypeComposer, {
+      const args: any = recordHelperArgs(UserTypeComposer, {
         recordTypeName: 'RecordUserType',
         isRequired: true,
       });
@@ -53,7 +53,7 @@ describe('Resolver helper `record` ->', () => {
     });
 
     it('should remove fields via opts.removeFields', () => {
-      const args = recordHelperArgs(UserTypeComposer, {
+      const args: any = recordHelperArgs(UserTypeComposer, {
         recordTypeName: 'RecordUserType',
         removeFields: ['name', 'age'],
       });
@@ -64,7 +64,7 @@ describe('Resolver helper `record` ->', () => {
     });
 
     it('should set required fields via opts.requiredFields', () => {
-      const args = recordHelperArgs(UserTypeComposer, {
+      const args: any = recordHelperArgs(UserTypeComposer, {
         recordTypeName: 'RecordUserType',
         requiredFields: ['name', 'age'],
       });

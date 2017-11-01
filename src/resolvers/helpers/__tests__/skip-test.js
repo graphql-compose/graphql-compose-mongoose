@@ -5,7 +5,7 @@ import { skipHelperArgs, skipHelper } from '../skip';
 describe('Resolver helper `skip` ->', () => {
   describe('limitHelperArgs()', () => {
     it('should return skip field', () => {
-      const args = skipHelperArgs();
+      const args: any = skipHelperArgs();
       expect(args.skip.name).toBe('skip');
       expect(args.skip.type).toBe('Int');
     });

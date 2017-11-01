@@ -39,13 +39,13 @@ describe('Resolver helper `sort` ->', () => {
       expect(enumNames).toEqual(expect.arrayContaining(['_ID_ASC', '_ID_DESC']));
 
       // should have ASC criteria for mongoose
-      const complexASC = type._values.find(enumConfig => enumConfig.name === 'NAME__AGE_ASC');
-      // $FlowFixMe
+      const complexASC: any = type._values.find(enumConfig => enumConfig.name === 'NAME__AGE_ASC');
       expect(complexASC.value).toEqual({ name: 1, age: -1 });
 
       // should have DESC criteria for mongoose
-      const complexDESC = type._values.find(enumConfig => enumConfig.name === 'NAME__AGE_DESC');
-      // $FlowFixMe
+      const complexDESC: any = type._values.find(
+        enumConfig => enumConfig.name === 'NAME__AGE_DESC'
+      );
       expect(complexDESC.value).toEqual({ name: -1, age: 1 });
     });
   });
@@ -55,7 +55,7 @@ describe('Resolver helper `sort` ->', () => {
       expect(() => sortHelperArgs(UserModel)).toThrowError('provide non-empty `sortTypeName`');
     });
     it('should return sort field', () => {
-      const args = sortHelperArgs(UserModel, {
+      const args: any = sortHelperArgs(UserModel, {
         sortTypeName: 'SortInput',
       });
       expect(args.sort.name).toBe('sort');

@@ -124,14 +124,12 @@ describe('removeMany() ->', () => {
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType = removeMany(UserModel, UserTypeComposer).getType();
-      // $FlowFixMe
+      const outputType: any = removeMany(UserModel, UserTypeComposer).getType();
       expect(outputType.name).toBe(`RemoveMany${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have numAffected field', () => {
-      const outputType = removeMany(UserModel, UserTypeComposer).getType();
-      // $FlowFixMe
+      const outputType: any = removeMany(UserModel, UserTypeComposer).getType();
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
       expect(numAffectedField.type).toBe(GraphQLInt);
     });

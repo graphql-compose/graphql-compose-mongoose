@@ -57,19 +57,16 @@ describe('updateById() ->', () => {
   describe('Resolver.args', () => {
     it('should have `record` arg', () => {
       const resolver = updateById(UserModel, UserTypeComposer);
-      const argConfig = resolver.getArg('record');
+      const argConfig: any = resolver.getArg('record');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
-      // $FlowFixMe
       expect(argConfig.type.ofType.name).toBe('UpdateByIdUserInput');
     });
 
     it('should have `record._id` required arg', () => {
       const resolver = updateById(UserModel, UserTypeComposer);
-      const argConfig = resolver.getArg('record') || {};
-      // $FlowFixMe
+      const argConfig: any = resolver.getArg('record') || {};
       expect(argConfig.type.ofType).toBeInstanceOf(GraphQLInputObjectType);
       if (argConfig.type && argConfig.type.ofType) {
-        // $FlowFixMe
         const _idFieldType = new InputTypeComposer(argConfig.type.ofType).getFieldType('_id');
         expect(_idFieldType).toBeInstanceOf(GraphQLNonNull);
         expect(getNullableType(_idFieldType)).toBe(GraphQLMongoID);
@@ -193,22 +190,19 @@ describe('updateById() ->', () => {
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType = updateById(UserModel, UserTypeComposer).getType();
-      // $FlowFixMe
+      const outputType: any = updateById(UserModel, UserTypeComposer).getType();
       expect(outputType.name).toBe(`UpdateById${UserTypeComposer.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
-      const outputType = updateById(UserModel, UserTypeComposer).getType();
-      // $FlowFixMe
+      const outputType: any = updateById(UserModel, UserTypeComposer).getType();
       const typeComposer = new TypeComposer(outputType);
       expect(typeComposer.hasField('recordId')).toBe(true);
       expect(typeComposer.getField('recordId').type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
-      const outputType = updateById(UserModel, UserTypeComposer).getType();
-      // $FlowFixMe
+      const outputType: any = updateById(UserModel, UserTypeComposer).getType();
       const typeComposer = new TypeComposer(outputType);
       expect(typeComposer.hasField('record')).toBe(true);
       expect(typeComposer.getField('record').type).toBe(UserTypeComposer.getType());

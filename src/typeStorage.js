@@ -9,18 +9,15 @@ class TypeStorage extends Map<string, any> {
     const inst = new Map(array);
     // $FlowFixMe
     inst.__proto__ = TypeStorage.prototype; // eslint-disable-line
-    // $FlowFixMe
-    return inst;
+    return (inst: any);
   }
 
   getOrSet<T>(typeName: string, typeOrThunk: T | (() => T)): T {
     if (this.has(typeName)) {
-      // $FlowFixMe
-      return this.get(typeName);
+      return (this.get(typeName): any);
     }
 
-    // $FlowFixMe
-    const gqType: T = isFunction(typeOrThunk) ? typeOrThunk() : typeOrThunk;
+    const gqType: any = isFunction(typeOrThunk) ? typeOrThunk() : typeOrThunk;
     if (gqType) {
       this.set(typeName, gqType);
     }

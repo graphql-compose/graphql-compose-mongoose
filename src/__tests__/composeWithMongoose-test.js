@@ -45,9 +45,8 @@ describe('composeWithMongoose ->', () => {
       });
 
       it('should have NonNull _id field', () => {
-        const tc = composeWithMongoose(UserModel);
+        const tc: any = composeWithMongoose(UserModel);
         expect(tc.getFieldType('_id')).toBeInstanceOf(GraphQLNonNull);
-        // $FlowFixMe
         expect(tc.getFieldType('_id').ofType).toBe(GraphQLMongoID);
       });
     });
@@ -204,8 +203,7 @@ describe('composeWithMongoose ->', () => {
           },
         },
       });
-      const filterArgInFindOne = typeComposer.getResolver('findOne').getArg('filter');
-      // $FlowFixMe
+      const filterArgInFindOne: any = typeComposer.getResolver('findOne').getArg('filter');
       const inputConposer = new InputTypeComposer(filterArgInFindOne.type);
       expect(inputConposer.isRequired('age')).toBe(true);
     });

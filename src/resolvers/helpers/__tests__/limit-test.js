@@ -5,16 +5,16 @@ import { limitHelperArgs, limitHelper } from '../limit';
 describe('Resolver helper `limit` ->', () => {
   describe('limitHelperArgs()', () => {
     it('should return limit field', () => {
-      const args = limitHelperArgs();
+      const args: any = limitHelperArgs();
       expect(args.limit.name).toBe('limit');
       expect(args.limit.type).toBe('Int');
     });
     it('should process `opts.defaultValue` arg', () => {
-      expect(limitHelperArgs().limit.defaultValue).toBe(1000);
+      expect((limitHelperArgs(): any).limit.defaultValue).toBe(1000);
       expect(
-        limitHelperArgs({
+        (limitHelperArgs({
           defaultValue: 333,
-        }).limit.defaultValue
+        }): any).limit.defaultValue
       ).toBe(333);
     });
   });

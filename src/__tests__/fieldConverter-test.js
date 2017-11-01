@@ -33,7 +33,7 @@ beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 describe('fieldConverter', () => {
-  const fields = getFieldsFromModel(UserModel);
+  const fields: { [key: string]: any } = getFieldsFromModel(UserModel);
   const fieldNames = Object.keys(fields);
 
   describe('getFieldsFromModel()', () => {
@@ -48,12 +48,12 @@ describe('fieldConverter', () => {
 
     it('should throw Exception, if model does `schema.path` property', () => {
       expect(() => {
-        // $FlowFixMe
-        getFieldsFromModel({ a: 1 });
+        const wrongArgs: any = [{ a: 1 }];
+        getFieldsFromModel(...wrongArgs);
       }).toThrowError(/incorrect mongoose model/);
       expect(() => {
-        // $FlowFixMe
-        getFieldsFromModel({ schema: {} });
+        const wrongArgs: any = [{ schema: {} }];
+        getFieldsFromModel(...wrongArgs);
       }).toThrowError(/incorrect mongoose model/);
     });
   });
@@ -62,20 +62,20 @@ describe('fieldConverter', () => {
     it('should throw error on incorrect mongoose field', () => {
       const err = /incorrect mongoose field/;
       expect(() => {
-        // $FlowFixMe
-        deriveComplexType();
+        const wrongArgs: any = [];
+        deriveComplexType(...wrongArgs);
       }).toThrowError(err);
       expect(() => {
-        // $FlowFixMe
-        deriveComplexType(123);
+        const wrongArgs: any = [123];
+        deriveComplexType(...wrongArgs);
       }).toThrowError(err);
       expect(() => {
-        // $FlowFixMe
-        deriveComplexType({ a: 1 });
+        const wrongArgs: any = [{ a: 1 }];
+        deriveComplexType(...wrongArgs);
       }).toThrowError(err);
       expect(() => {
-        // $FlowFixMe
-        deriveComplexType({ path: 'name' });
+        const wrongArgs: any = [{ path: 'name' }];
+        deriveComplexType(...wrongArgs);
       }).toThrowError(err);
       expect(() => {
         deriveComplexType({ path: 'name', instance: 'Abc' });
@@ -99,9 +99,7 @@ describe('fieldConverter', () => {
 
     it('schould derive ENUM', () => {
       expect(deriveComplexType(fields.gender)).toBe(ComplexTypes.ENUM);
-      // $FlowFixMe
       expect(deriveComplexType(fields.languages.schema.paths.ln)).toBe(ComplexTypes.ENUM);
-      // $FlowFixMe
       expect(deriveComplexType(fields.languages.schema.paths.sk)).toBe(ComplexTypes.ENUM);
     });
 
@@ -156,8 +154,7 @@ describe('fieldConverter', () => {
     });
 
     it('should has string in ofType', () => {
-      const skillsType = arrayToGraphQL(fields.skills);
-      // $FlowFixMe
+      const skillsType: any = arrayToGraphQL(fields.skills);
       expect(skillsType.ofType.name).toBe('String');
     });
   });
@@ -174,10 +171,8 @@ describe('fieldConverter', () => {
     });
 
     it('should pass all enum values to GQ type', () => {
-      const genderEnum = enumToGraphQL(fields.gender);
-      // $FlowFixMe
+      const genderEnum: any = enumToGraphQL(fields.gender);
       expect(genderEnum._values.length).toBe(fields.gender.enumValues.length);
-      // $FlowFixMe
       expect(genderEnum._values[0].value).toBe(fields.gender.enumValues[0]);
     });
   });
@@ -189,8 +184,7 @@ describe('fieldConverter', () => {
     });
 
     it('should have embedded fields', () => {
-      const embeddedType = embeddedToGraphQL(fields.contacts);
-      // $FlowFixMe
+      const embeddedType: any = embeddedToGraphQL(fields.contacts);
       const embeddedFields = embeddedType._typeConfig.fields();
       expect(embeddedFields.email).toBeTruthy();
       expect(embeddedFields.locationId).toBeTruthy();
@@ -212,7 +206,7 @@ describe('fieldConverter', () => {
         name: 'Test empty subDoc',
       });
       await user.save();
-      const result = await graphql(
+      const result: any = await graphql(
         schema,
         `{
         user(_id: "${user._id}") {
@@ -226,7 +220,7 @@ describe('fieldConverter', () => {
         }
       }`
       );
-      // $FlowFixMe
+
       expect(result.data.user).toEqual({
         name: 'Test empty subDoc',
         subDoc: null,
@@ -255,7 +249,7 @@ describe('fieldConverter', () => {
         subDoc: { field2: { field21: 'ok' } },
       });
       await user2.save();
-      const result2 = await graphql(
+      const result2: any = await graphql(
         schema,
         `{
         user(_id: "${user2._id}") {
@@ -269,7 +263,7 @@ describe('fieldConverter', () => {
         }
       }`
       );
-      // $FlowFixMe
+
       expect(result2.data.user).toEqual({
         name: 'Test non empty subDoc',
         subDoc: {
@@ -281,8 +275,7 @@ describe('fieldConverter', () => {
   });
 
   describe('documentArrayToGraphQL()', () => {
-    const languagesType = documentArrayToGraphQL(fields.languages);
-    // $FlowFixMe
+    const languagesType: any = documentArrayToGraphQL(fields.languages);
     const languagesFields = languagesType.ofType._typeConfig.fields();
 
     it('should produce GraphQLList', () => {
@@ -291,7 +284,6 @@ describe('fieldConverter', () => {
 
     it('should has Language type in ofType', () => {
       // see src/__mocks__/languageSchema.js where type name `Language` is defined
-      // $FlowFixMe
       expect(languagesType.ofType.name).toBe('Language');
     });
 
@@ -341,10 +333,8 @@ describe('fieldConverter', () => {
           someDynamic
         }
       }`;
-      const result = await graphql(schema, query);
-      // $FlowFixMe
+      const result: any = await graphql(schema, query);
       expect(result.data.user.name).toBe(user.name);
-      // $FlowFixMe
       expect(result.data.user.someDynamic).toEqual(user.someDynamic);
     });
   });

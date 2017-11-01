@@ -83,8 +83,7 @@ export const filterHelperArgs = (
 
   if (!{}.hasOwnProperty.call(opts, 'operators') || opts.operators !== false) {
     addFieldsWithOperator(
-      // $FlowFixMe
-      `Operators${opts.filterTypeName}`,
+      `Operators${opts.filterTypeName || ''}`,
       inputComposer,
       model,
       opts.operators || {}
@@ -232,7 +231,6 @@ export function addFieldsWithOperator(
           } else {
             fields[operatorName] = {
               ...existedFields[fieldName],
-              // $FlowFixMe
               type: namedType,
             };
           }

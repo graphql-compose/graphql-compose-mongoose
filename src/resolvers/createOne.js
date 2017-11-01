@@ -64,7 +64,6 @@ export default function createOne(
         );
       }
 
-      // $FlowFixMe
       return Promise.resolve(new model(recordData))
         .then(doc => {
           if (resolveParams.beforeRecordMutate) {
