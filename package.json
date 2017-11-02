@@ -49,7 +49,7 @@
     "eslint-plugin-flowtype": "^2.39.1",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-prettier": "^2.3.1",
-    "flow-bin": "^0.57.3",
+    "flow-bin": "^0.58.0",
     "graphql": "^0.11.7",
     "graphql-compose": "^2.9.5",
     "graphql-compose-connection": ">=2.5.0",
