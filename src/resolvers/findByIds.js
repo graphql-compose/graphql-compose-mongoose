@@ -46,7 +46,7 @@ export default function findByIds(
     resolve: (resolveParams: ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
-      if (!Array.isArray(args._ids)) {
+      if (!Array.isArray(args._ids) || args._ids.length === 0) {
         return Promise.resolve([]);
       }
 
