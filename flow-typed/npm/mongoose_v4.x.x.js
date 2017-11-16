@@ -5,12 +5,7 @@
 
 import mongoose from "mongoose";
 
-type MongoId =
-  | typeof mongoose.Types.ObjectId
-  | {
-      toString(): string
-    };
-
+type MongoId = ObjectId;
 type MongoOrScalarId = MongoId | string | number;
 
 type SchemaFields = {
@@ -63,10 +58,22 @@ type IndexOpts = {|
   weights?: Object
 |};
 
+declare class ObjectId {
+  constructor(id?: string | number | ObjectId): this,
+  toHexString(): string,
+  toString(): string,
+  toJSON(): string,
+  inspect(): string,
+  equals(otherId: string | number | ObjectId): boolean;
+  getTimestamp(): Date,
+
+  static createFromTime(time: number): ObjectId,
+  static createFromHexString(str: string): ObjectId,
+  static isValid(id: string | number | ObjectId): boolean,
+}
+
 type Mongoose$Types = {|
-  ObjectId: {
-    $call: (id: string | MongoId) => MongoId
-  },
+  ObjectId: Class<ObjectId>,
   Mixed: Object,
   Embedded: Object,
   Document: Object,
