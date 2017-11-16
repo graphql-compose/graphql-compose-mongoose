@@ -12,7 +12,7 @@ const originalConnect = mongoose.connect;
 mongoose.connect = async () => {
   const mongoServer = new MongodbMemoryServer();
 
-  const mongoUri = await mongoServer.getConnectionString();
+  const mongoUri = await mongoServer.getConnectionString(true);
 
   originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true });
 

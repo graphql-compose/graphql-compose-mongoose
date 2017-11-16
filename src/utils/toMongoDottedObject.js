@@ -1,5 +1,9 @@
 /* @flow */
 
+import { Types } from 'mongoose';
+
+const ObjectId = Types.ObjectId;
+
 /**
  * Convert object to dotted-key/value pair
  * { a: { b: { c: 1 }}} ->  { 'a.b.c': 1 }
@@ -24,11 +28,11 @@ export default function toMongoDottedObject(
   /* eslint-disable */
   objKeys.forEach(key => {
      if (key.startsWith('$')) {
-       target[path.join('.')] = { 
+       target[path.join('.')] = {
          ...target[path.join('.')],
          [key]: obj[key],
        };
-     } else if (Object(obj[key]) === obj[key]) {
+     } else if (Object(obj[key]) === obj[key] && !(obj[key] instanceof ObjectId)) {
        toMongoDottedObject(obj[key], target, path.concat(key));
      } else {
        target[path.concat(key).join('.')] = obj[key];
@@ -38,7 +42,7 @@ export default function toMongoDottedObject(
    if (objKeys.length === 0) {
      target[path.join('.')] = obj;
    }
-   
+
    return target;
    /* eslint-enable */
 }

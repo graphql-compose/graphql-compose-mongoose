@@ -1,5 +1,6 @@
 /* @flow */
 
+import { Types } from 'mongoose';
 import toMongoDottedObject from '../toMongoDottedObject';
 
 describe('toMongoDottedObject()', () => {
@@ -38,6 +39,13 @@ describe('toMongoDottedObject()', () => {
   it('should handle date object values when nested', () => {
     expect(toMongoDottedObject({ a: { dateField: new Date(100) } })).toEqual({
       'a.dateField': new Date(100),
+    });
+  });
+
+  it('should keep BSON ObjectId untouched', () => {
+    const id = new Types.ObjectId();
+    expect(toMongoDottedObject({ a: { someField: id } })).toEqual({
+      'a.someField': id,
     });
   });
 });
