@@ -33,6 +33,12 @@ describe('Resolver helper `projection` ->', () => {
       expect(spyFn).toBeCalledWith({ name: true });
     });
 
+    it('should not call query.select if projection has * key', () => {
+      resolveParams.projection = { '*': true };
+      projectionHelper(resolveParams);
+      expect(spyFn).not.toBeCalled();
+    });
+
     describe('projection operators', () => {
       // see more details here https://docs.mongodb.com/v3.2/reference/operator/projection/meta/
       it('should pass $meta unflatted', () => {

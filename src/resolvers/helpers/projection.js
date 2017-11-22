@@ -5,6 +5,10 @@ import type { ExtendedResolveParams } from '../index';
 export function projectionHelper(resolveParams: ExtendedResolveParams): void { // eslint-disable-line
   const projection = resolveParams.projection;
   if (projection) {
+    // if projection has '*' key, then omit field projection (fetch all fields from database)
+    if (projection['*']) {
+      return;
+    }
     const flatProjection = {};
     Object.keys(projection).forEach(key => {
       const val = (projection[key]: any);

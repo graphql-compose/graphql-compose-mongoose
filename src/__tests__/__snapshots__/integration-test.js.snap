@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`projection from all fields 1`] = `
+Array [
+  "_id",
+  "updatedAt",
+  "createdAt",
+  "name",
+  "age",
+  "gender",
+  "relocation",
+  "__v",
+  "languages",
+  "contacts",
+  "employment",
+  "skills",
+  "users",
+  "nameVirtual",
+  "id",
+]
+`;
+
+exports[`projection from query fields 1`] = `
+Object {
+  "data": Object {
+    "user": Object {
+      "name": "Name",
+    },
+  },
+}
+`;
