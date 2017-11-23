@@ -184,6 +184,7 @@ export function addFieldsWithOperator(
       new GraphQLInputObjectType({
         name: typeName,
         fields: {},
+        description: 'For performance reason this type contains only *indexed* fields.',
       })
     )
   );
@@ -255,7 +256,7 @@ export function addFieldsWithOperator(
   if (Object.keys(operatorsComposer.getFields()).length > 0) {
     inputComposer.setField(OPERATORS_FIELDNAME, {
       type: operatorsComposer.getType(),
-      description: 'List of fields that can be filtered via operators',
+      description: 'List of *indexed* fields that can be filtered via operators.',
     });
   }
 
