@@ -54,7 +54,7 @@
     "graphql-compose": "^2.9.6",
     "graphql-compose-connection": ">=2.5.0",
     "graphql-compose-pagination": ">=1.1.0",
-    "jest": "^21.2.1",
+    "jest": "^22.0.0",
     "mongodb-memory-server": "^1.6.3",
     "mongoose": "^4.13.3",
     "prettier": "^1.8.2",
