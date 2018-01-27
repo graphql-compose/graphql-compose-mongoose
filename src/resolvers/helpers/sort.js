@@ -50,7 +50,7 @@ export function getSortTypeFromModel(typeName: string, model: MongooseModel): Gr
     let name = keys
       .join('__')
       .toUpperCase()
-      .replace(/[^_a-zA-Z0-9]/i, '__');
+      .replace(/[^_a-zA-Z0-9]/gi, '__');
     if (indexData[keys[0]] === 1) {
       name = `${name}_ASC`;
     } else if (indexData[keys[0]] === -1) {
