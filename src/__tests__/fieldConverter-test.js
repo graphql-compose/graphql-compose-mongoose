@@ -1,7 +1,13 @@
 /* @flow */
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
-import { GraphQLDate, GraphQLBuffer, GraphQLGeneric, GraphQLJSON } from 'graphql-compose';
+import {
+  GraphQLDate,
+  GraphQLBuffer,
+  GraphQLGeneric,
+  GraphQLJSON,
+  EnumTypeComposer,
+} from 'graphql-compose';
 import {
   GraphQLString,
   GraphQLFloat,
@@ -172,8 +178,9 @@ describe('fieldConverter', () => {
 
     it('should pass all enum values to GQ type', () => {
       const genderEnum: any = enumToGraphQL(fields.gender);
-      expect(genderEnum._values.length).toBe(fields.gender.enumValues.length);
-      expect(genderEnum._values[0].value).toBe(fields.gender.enumValues[0]);
+      const etc = EnumTypeComposer.create(genderEnum);
+      expect(etc.getFieldNames().length).toBe(fields.gender.enumValues.length);
+      expect(etc.getField('male').value).toBe(fields.gender.enumValues[0]);
     });
   });
 

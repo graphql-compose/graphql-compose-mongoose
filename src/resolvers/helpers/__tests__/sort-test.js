@@ -1,5 +1,6 @@
 /* @flow */
 
+import { EnumTypeComposer } from 'graphql-compose';
 import { GraphQLEnumType } from 'graphql-compose/lib/graphql';
 import { sortHelperArgs, sortHelper, getSortTypeFromModel } from '../sort';
 import { UserModel } from '../../../__mocks__/userModel';
@@ -32,7 +33,8 @@ describe('Resolver helper `sort` ->', () => {
 
       // only indexed fields in enum
       const ascDescNum = indexedFields.length * 2;
-      expect(type._values).toHaveLength(ascDescNum);
+      const etc = EnumTypeComposer.create(type);
+      expect(etc.getFieldNames()).toHaveLength(ascDescNum);
 
       // should have ASC DESC keys
       const enumNames = type._values.map(enumConfig => enumConfig.name);

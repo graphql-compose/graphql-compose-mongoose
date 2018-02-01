@@ -74,13 +74,19 @@ export default function removeMany(
           ? Promise.resolve(resolveParams.beforeQuery(resolveParams.query, resolveParams))
           : resolveParams.query.exec()
         ).then(res => {
-          if (res.result && res.result.ok) {
+          if (res.ok) {
+            // mongoose 5
+            return {
+              numAffected: res.n,
+            };
+          } else if (res.result && res.result.ok) {
+            // mongoose 4
             return {
               numAffected: res.result.n,
             };
           }
 
-          return Promise.reject(res);
+          return Promise.reject(new Error(JSON.stringify(res)));
         })
       );
     },

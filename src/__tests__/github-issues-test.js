@@ -9,7 +9,9 @@ import { composeWithMongoose } from '../index';
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
 let mongoServer;
-const opts = { useMongoClient: true };
+
+// const opts = { useMongoClient: true }; // Mongoose 4
+const opts = {}; // Mongoose 5
 
 beforeAll(async () => {
   mongoServer = new MongodbMemoryServer();

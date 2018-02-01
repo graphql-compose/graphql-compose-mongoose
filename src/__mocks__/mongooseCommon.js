@@ -14,7 +14,8 @@ mongoose.connect = async () => {
 
   const mongoUri = await mongoServer.getConnectionString(true);
 
-  originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true });
+  // originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true }); // mongoose 4
+  originalConnect.bind(mongoose)(mongoUri); // mongoose 5
 
   mongoose.connection.on('error', e => {
     if (e.message.code === 'ETIMEDOUT') {
