@@ -16,7 +16,7 @@ export default function findById(
     throw new Error('First arg for Resolver findById() should be instance of Mongoose Model.');
   }
 
-  if (!(typeComposer instanceof TypeComposer)) {
+  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver findById() should be instance of TypeComposer.');
   }
 

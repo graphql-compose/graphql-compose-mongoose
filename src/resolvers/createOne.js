@@ -17,7 +17,7 @@ export default function createOne(
     throw new Error('First arg for Resolver createOne() should be instance of Mongoose Model.');
   }
 
-  if (!(typeComposer instanceof TypeComposer)) {
+  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver createOne() should be instance of TypeComposer.');
   }
 

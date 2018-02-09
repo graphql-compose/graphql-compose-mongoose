@@ -132,8 +132,8 @@ export function convertModelToGraphQL(
   typeName: string
 ): TypeComposer {
   // if model already has generated TypeComposer early, then return it
-  if (model.schema && model.schema._gqcTypeComposer instanceof TypeComposer) {
-    return model.schema._gqcTypeComposer;
+  if (model.schema && model.schema._gqcTypeComposer) {
+    return (model.schema._gqcTypeComposer: any);
   }
 
   if (!typeName) {

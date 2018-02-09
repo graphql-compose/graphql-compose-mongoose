@@ -38,7 +38,7 @@ export const filterHelperArgs = (
   model: MongooseModel,
   opts?: FilterHelperArgsOpts
 ): ComposeFieldConfigArgumentMap => {
-  if (!(typeComposer instanceof TypeComposer)) {
+  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
     throw new Error('First arg for filterHelperArgs() should be instance of TypeComposer.');
   }
 

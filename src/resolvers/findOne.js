@@ -23,7 +23,7 @@ export default function findOne(
     throw new Error('First arg for Resolver findOne() should be instance of Mongoose Model.');
   }
 
-  if (!(typeComposer instanceof TypeComposer)) {
+  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver findOne() should be instance of TypeComposer.');
   }
 

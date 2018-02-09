@@ -26,7 +26,7 @@ export default function updateMany(
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateMany() should be instance of Mongoose Model.');
   }
-  if (!(typeComposer instanceof TypeComposer)) {
+  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver updateMany() should be instance of TypeComposer.');
   }
 

@@ -17,7 +17,7 @@ export default function updateOne(
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateOne() should be instance of Mongoose Model.');
   }
-  if (!(typeComposer instanceof TypeComposer)) {
+  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver updateOne() should be instance of TypeComposer.');
   }
 

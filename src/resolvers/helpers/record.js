@@ -16,7 +16,7 @@ export const recordHelperArgs = (
   typeComposer: TypeComposer,
   opts?: RecordHelperArgsOpts
 ): ComposeFieldConfigArgumentMap => {
-  if (!(typeComposer instanceof TypeComposer)) {
+  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
     throw new Error('First arg for recordHelperArgs() should be instance of TypeComposer.');
   }
 

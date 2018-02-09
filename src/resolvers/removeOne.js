@@ -18,7 +18,7 @@ export default function removeOne(
     throw new Error('First arg for Resolver removeOne() should be instance of Mongoose Model.');
   }
 
-  if (!(typeComposer instanceof TypeComposer)) {
+  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver removeOne() should be instance of TypeComposer.');
   }
 
