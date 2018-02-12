@@ -10,7 +10,7 @@ export default function count(
   model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
-): Resolver<*, *> {
+): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver count() should be instance of Mongoose Model.');
   }

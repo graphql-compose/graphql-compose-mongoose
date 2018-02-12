@@ -50,7 +50,7 @@ describe('Resolver helper `filter` ->', () => {
 
     it('should by default have only indexed fields', () => {
       addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, {});
-      const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
+      const operatorsType: any = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
       const opComposer = new InputTypeComposer(operatorsType);
       expect(opComposer.getFieldNames()).toEqual(
         expect.arrayContaining(['name', '_id', 'employment'])
@@ -59,16 +59,17 @@ describe('Resolver helper `filter` ->', () => {
 
     it('should have only provided fields via options', () => {
       addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, { age: ['lt'] });
-      const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
+      const operatorsType: any = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
       const opComposer = new InputTypeComposer(operatorsType);
       expect(opComposer.getFieldNames()).toEqual(expect.arrayContaining(['age']));
     });
 
     it('should have only provided operators via options for field', () => {
       addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, { age: ['lt', 'gte'] });
-      const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
+      const operatorsType: any = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
       const opComposer = new InputTypeComposer(operatorsType);
-      const ageComposer = new InputTypeComposer(opComposer.getFieldType('age'));
+      const ageType: any = opComposer.getFieldType('age');
+      const ageComposer = new InputTypeComposer(ageType);
       expect(ageComposer.getFieldNames()).toEqual(expect.arrayContaining(['lt', 'gte']));
     });
 
@@ -118,8 +119,9 @@ describe('Resolver helper `filter` ->', () => {
         filterTypeName: 'FilterUserType',
       });
       const itc = new InputTypeComposer(args.filter.type);
-      expect(itc.getFieldType('_ids')).toBeInstanceOf(GraphQLList);
-      expect(itc.getFieldType('_ids').ofType).toBe(GraphQLMongoID);
+      const ft: any = itc.getFieldType('_ids');
+      expect(ft).toBeInstanceOf(GraphQLList);
+      expect(ft.ofType).toBe(GraphQLMongoID);
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {

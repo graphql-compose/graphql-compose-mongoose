@@ -11,7 +11,7 @@ export default function removeMany(
   model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
-): Resolver<*, *> {
+): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeMany() should be instance of Mongoose Model.');
   }

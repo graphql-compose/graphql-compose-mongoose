@@ -13,7 +13,7 @@ export default function removeOne(
   model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
-): Resolver<*, *> {
+): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeOne() should be instance of Mongoose Model.');
   }

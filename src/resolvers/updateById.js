@@ -14,7 +14,7 @@ export default function updateById(
   model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
-): Resolver<*, *> {
+): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateById() should be instance of Mongoose Model.');
   }

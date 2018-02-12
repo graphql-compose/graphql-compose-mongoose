@@ -18,7 +18,7 @@ export default function findOne(
   model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
-): Resolver<*, *> {
+): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findOne() should be instance of Mongoose Model.');
   }

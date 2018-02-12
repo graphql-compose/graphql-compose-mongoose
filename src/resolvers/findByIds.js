@@ -17,7 +17,7 @@ export default function findByIds(
   model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
-): Resolver<*, *> {
+): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIds() should be instance of Mongoose Model.');
   }

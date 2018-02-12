@@ -13,7 +13,7 @@ export default function removeById(
   model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts // eslint-disable-line no-unused-vars
-): Resolver<*, *> {
+): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');
   }

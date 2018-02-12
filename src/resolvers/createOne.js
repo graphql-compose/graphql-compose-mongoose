@@ -12,7 +12,7 @@ export default function createOne(
   model: MongooseModel,
   typeComposer: TypeComposer,
   opts?: GenResolverOpts
-): Resolver<*, *> {
+): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createOne() should be instance of Mongoose Model.');
   }
