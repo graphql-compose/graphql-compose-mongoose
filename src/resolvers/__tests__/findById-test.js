@@ -1,28 +1,27 @@
 /* @flow */
 
-import { Resolver } from 'graphql-compose';
+import { Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import { PostModel } from '../../__mocks__/postModel';
 import findById from '../findById';
 import GraphQLMongoID from '../../types/mongoid';
-import { composeWithMongoose } from '../../composeWithMongoose';
-import typeStorage from '../../typeStorage';
+import { convertModelToGraphQL } from '../../fieldsConverter';
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 describe('findById() ->', () => {
-  let UserTypeComposer;
+  let UserTC;
   let PostTypeComposer;
 
   beforeEach(() => {
-    typeStorage.clear();
+    schemaComposer.clear();
     UserModel.schema._gqcTypeComposer = undefined;
-    UserTypeComposer = composeWithMongoose(UserModel);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
 
     PostModel.schema._gqcTypeComposer = undefined;
-    PostTypeComposer = composeWithMongoose(PostModel);
+    PostTypeComposer = convertModelToGraphQL(PostModel, 'Post', schemaComposer);
   });
 
   let user;
@@ -41,13 +40,13 @@ describe('findById() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = findById(UserModel, UserTypeComposer);
+    const resolver = findById(UserModel, UserTC);
     expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have non-null `_id` arg', () => {
-      const resolver = findById(UserModel, UserTypeComposer);
+      const resolver = findById(UserModel, UserTC);
       expect(resolver.hasArg('_id')).toBe(true);
       const argConfig: any = resolver.getArg('_id');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
@@ -57,29 +56,29 @@ describe('findById() ->', () => {
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled promise', async () => {
-      const result = findById(UserModel, UserTypeComposer).resolve({});
+      const result = findById(UserModel, UserTC).resolve({});
       await expect(result).resolves.toBeDefined();
     });
 
     it('should be rejected if args.id is not objectId', async () => {
-      const result = findById(UserModel, UserTypeComposer).resolve({ args: { _id: 1 } });
+      const result = findById(UserModel, UserTC).resolve({ args: { _id: 1 } });
       await expect(result).rejects.toBeDefined();
     });
 
     it('should return null if args.id is empty', async () => {
-      const result = await findById(UserModel, UserTypeComposer).resolve({});
+      const result = await findById(UserModel, UserTC).resolve({});
       expect(result).toBe(null);
     });
 
     it('should return document if provided existed id', async () => {
-      const result = await findById(UserModel, UserTypeComposer).resolve({
+      const result = await findById(UserModel, UserTC).resolve({
         args: { _id: user._id },
       });
       expect(result.name).toBe(user.name);
     });
 
     it('should return mongoose document', async () => {
-      const result = await findById(UserModel, UserTypeComposer).resolve({
+      const result = await findById(UserModel, UserTC).resolve({
         args: { _id: user._id },
       });
       expect(result).toBeInstanceOf(UserModel);

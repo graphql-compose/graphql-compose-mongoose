@@ -1,28 +1,27 @@
 /* @flow */
 
-import { Resolver } from 'graphql-compose';
+import { Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull, GraphQLList } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import { PostModel } from '../../__mocks__/postModel';
 import findByIds from '../findByIds';
 import GraphQLMongoID from '../../types/mongoid';
-import { composeWithMongoose } from '../../composeWithMongoose';
-import typeStorage from '../../typeStorage';
+import { convertModelToGraphQL } from '../../fieldsConverter';
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 describe('findByIds() ->', () => {
-  let UserTypeComposer;
+  let UserTC;
   let PostTypeComposer;
 
   beforeEach(() => {
-    typeStorage.clear();
+    schemaComposer.clear();
     UserModel.schema._gqcTypeComposer = undefined;
-    UserTypeComposer = composeWithMongoose(UserModel);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
 
     PostModel.schema._gqcTypeComposer = undefined;
-    PostTypeComposer = composeWithMongoose(PostModel);
+    PostTypeComposer = convertModelToGraphQL(PostModel, 'Post', schemaComposer);
   });
 
   let user1;
@@ -51,13 +50,13 @@ describe('findByIds() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = findByIds(UserModel, UserTypeComposer);
+    const resolver = findByIds(UserModel, UserTC);
     expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have non-null `_ids` arg', () => {
-      const resolver = findByIds(UserModel, UserTypeComposer);
+      const resolver = findByIds(UserModel, UserTC);
       expect(resolver.hasArg('_ids')).toBe(true);
       const argConfig: any = resolver.getArg('_ids');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
@@ -66,30 +65,30 @@ describe('findByIds() ->', () => {
     });
 
     it('should have `limit` arg', () => {
-      const resolver = findByIds(UserModel, UserTypeComposer);
+      const resolver = findByIds(UserModel, UserTC);
       expect(resolver.hasArg('limit')).toBe(true);
     });
 
     it('should have `sort` arg', () => {
-      const resolver = findByIds(UserModel, UserTypeComposer);
+      const resolver = findByIds(UserModel, UserTC);
       expect(resolver.hasArg('sort')).toBe(true);
     });
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled promise', async () => {
-      const result = findByIds(UserModel, UserTypeComposer).resolve({});
+      const result = findByIds(UserModel, UserTC).resolve({});
       await expect(result).resolves.toBeDefined();
     });
 
     it('should return empty array if args._ids is empty', async () => {
-      const result = await findByIds(UserModel, UserTypeComposer).resolve({});
+      const result = await findByIds(UserModel, UserTC).resolve({});
       expect(result).toBeInstanceOf(Array);
       expect(Object.keys(result)).toHaveLength(0);
     });
 
     it('should return array of documents', async () => {
-      const result = await findByIds(UserModel, UserTypeComposer).resolve({
+      const result = await findByIds(UserModel, UserTC).resolve({
         args: { _ids: [user1._id, user2._id, user3._id] },
       });
 
@@ -102,7 +101,7 @@ describe('findByIds() ->', () => {
 
     it('should return array of documents if object id is string', async () => {
       const stringId = `${user1._id}`;
-      const result = await findByIds(UserModel, UserTypeComposer).resolve({
+      const result = await findByIds(UserModel, UserTC).resolve({
         args: { _ids: [stringId] },
       });
 
@@ -119,7 +118,7 @@ describe('findByIds() ->', () => {
     });
 
     it('should return mongoose documents', async () => {
-      const result = await findByIds(UserModel, UserTypeComposer).resolve({
+      const result = await findByIds(UserModel, UserTC).resolve({
         args: { _ids: [user1._id, user2._id] },
       });
       expect(result[0]).toBeInstanceOf(UserModel);

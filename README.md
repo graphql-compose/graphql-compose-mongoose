@@ -23,6 +23,19 @@ If you want to add additional resolvers [`connection`](https://github.com/nodkz/
 npm install graphql-compose-connection graphql-compose-pagination --save
 ```
 
+#### Different builds
+This library contains different builds for any purposes:
+```js
+// Default import for using under node v6 and above
+import { composeWithMongoose } from 'graphql-compose-mongoose';
+
+// For using node 8 and above (native async/await)
+import { composeWithMongoose } from 'graphql-compose-mongoose/node8';
+
+// Source code without Flowtype declarations
+import { composeWithMongoose } from 'graphql-compose-mongoose/es';
+```
+
 Example
 =======
 Live demo: [https://graphql-compose.herokuapp.com/](https://graphql-compose.herokuapp.com/)
@@ -31,7 +44,7 @@ Source code: https://github.com/nodkz/graphql-compose-mongoose-example
 
 ```js
 import mongoose from 'mongoose';
-import composeWithMongoose from 'graphql-compose-mongoose';
+import { composeWithMongoose } from 'graphql-compose-mongoose';
 import { GQC } from 'graphql-compose';
 
 // STEP 1: DEFINE MONGOOSE SCHEMA AND MODEL

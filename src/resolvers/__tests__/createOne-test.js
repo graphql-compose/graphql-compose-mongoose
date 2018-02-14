@@ -1,24 +1,24 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { Resolver, TypeComposer } from 'graphql-compose';
-import { GraphQLNonNull, GraphQLObjectType } from 'graphql-compose/lib/graphql';
+import { Resolver, TypeComposer, schemaComposer } from 'graphql-compose';
+import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import createOne from '../createOne';
-import { composeWithMongoose } from '../../composeWithMongoose';
+import { convertModelToGraphQL } from '../../fieldsConverter';
 import GraphQLMongoID from '../../types/mongoid';
-import typeStorage from '../../typeStorage';
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 describe('createOne() ->', () => {
-  let UserTypeComposer;
+  let UserTC;
 
   beforeEach(() => {
-    typeStorage.clear();
     UserModel.schema._gqcTypeComposer = undefined;
-    UserTypeComposer = composeWithMongoose(UserModel);
+    schemaComposer.clear();
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+    UserTC.setRecordIdFn(source => (source ? `${source._id}` : ''));
   });
 
   beforeEach(async () => {
@@ -26,13 +26,13 @@ describe('createOne() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = createOne(UserModel, UserTypeComposer);
+    const resolver = createOne(UserModel, UserTC);
     expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have required `record` arg', () => {
-      const resolver = createOne(UserModel, UserTypeComposer);
+      const resolver = createOne(UserModel, UserTC);
       const argConfig: any = resolver.getArg('record');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
       expect(argConfig.type.ofType.name).toBe('CreateOneUserInput');
@@ -41,18 +41,18 @@ describe('createOne() ->', () => {
 
   describe('Resolver.resolve():Promise', () => {
     it('should be promise', () => {
-      const result = createOne(UserModel, UserTypeComposer).resolve({});
+      const result = createOne(UserModel, UserTC).resolve({});
       expect(result).toBeInstanceOf(Promise);
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
     it('should rejected with Error if args.record is empty', async () => {
-      const result = createOne(UserModel, UserTypeComposer).resolve({ args: {} });
+      const result = createOne(UserModel, UserTC).resolve({ args: {} });
       await expect(result).rejects.toMatchSnapshot();
     });
 
     it('should return payload.recordId', async () => {
-      const result = await createOne(UserModel, UserTypeComposer).resolve({
+      const result = await createOne(UserModel, UserTC).resolve({
         args: {
           record: { name: 'newName' },
         },
@@ -61,7 +61,7 @@ describe('createOne() ->', () => {
     });
 
     it('should create document with args.record', async () => {
-      const result = await createOne(UserModel, UserTypeComposer).resolve({
+      const result = await createOne(UserModel, UserTC).resolve({
         args: {
           record: { name: 'newName' },
         },
@@ -69,24 +69,20 @@ describe('createOne() ->', () => {
       expect(result.record.name).toBe('newName');
     });
 
-    it('should save document to database', done => {
+    it('should save document to database', async () => {
       const checkedName = 'nameForMongoDB';
-      createOne(UserModel, UserTypeComposer)
-        .resolve({
-          args: {
-            record: { name: checkedName },
-          },
-        })
-        .then(res => {
-          UserModel.collection.findOne({ _id: res.record._id }, (err, doc) => {
-            expect(doc.name).toBe(checkedName);
-            done();
-          });
-        });
+      const res = await createOne(UserModel, UserTC).resolve({
+        args: {
+          record: { name: checkedName },
+        },
+      });
+
+      const doc = await UserModel.collection.findOne({ _id: res.record._id });
+      expect(doc.name).toBe(checkedName);
     });
 
     it('should return payload.record', async () => {
-      const result = await createOne(UserModel, UserTypeComposer).resolve({
+      const result = await createOne(UserModel, UserTC).resolve({
         args: {
           record: { name: 'NewUser' },
         },
@@ -95,14 +91,14 @@ describe('createOne() ->', () => {
     });
 
     it('should return mongoose document', async () => {
-      const result = await createOne(UserModel, UserTypeComposer).resolve({
+      const result = await createOne(UserModel, UserTC).resolve({
         args: { record: { name: 'NewUser' } },
       });
       expect(result.record).toBeInstanceOf(UserModel);
     });
 
     it('should call `beforeRecordMutate` method with created `record` and `resolveParams` as args', async () => {
-      const result = await createOne(UserModel, UserTypeComposer).resolve({
+      const result = await createOne(UserModel, UserTC).resolve({
         args: { record: { name: 'NewUser' } },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record, rp) => {
@@ -119,31 +115,28 @@ describe('createOne() ->', () => {
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType: any = createOne(UserModel, UserTypeComposer).getType();
-      expect(outputType.name).toBe(`CreateOne${UserTypeComposer.getTypeName()}Payload`);
+      const outputType: any = createOne(UserModel, UserTC).getType();
+      expect(outputType.name).toBe(`CreateOne${UserTC.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
-      const outputType: any = createOne(UserModel, UserTypeComposer).getType();
+      const outputType: any = createOne(UserModel, UserTC).getType();
       const recordIdField = new TypeComposer(outputType).getField('recordId');
       expect(recordIdField.type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
-      const outputType: any = createOne(UserModel, UserTypeComposer).getType();
+      const outputType: any = createOne(UserModel, UserTC).getType();
       const recordField = new TypeComposer(outputType).getField('record');
-      expect(recordField.type).toBe(UserTypeComposer.getType());
+      expect(recordField.type).toBe(UserTC.getType());
     });
 
     it('should reuse existed outputType', () => {
-      const outputTypeName = `CreateOne${UserTypeComposer.getTypeName()}Payload`;
-      const existedType = new GraphQLObjectType({
-        name: outputTypeName,
-        fields: () => ({}),
-      });
-      typeStorage.set(outputTypeName, existedType);
-      const outputType = createOne(UserModel, UserTypeComposer).getType();
-      expect(outputType).toBe(existedType);
+      const outputTypeName = `CreateOne${UserTC.getTypeName()}Payload`;
+      const existedType = TypeComposer.create(outputTypeName);
+      schemaComposer.set(outputTypeName, existedType);
+      const outputType = createOne(UserModel, UserTC).getType();
+      expect(outputType).toBe(existedType.getType());
     });
   });
 });

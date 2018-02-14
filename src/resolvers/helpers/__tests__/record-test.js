@@ -1,59 +1,54 @@
 /* @flow */
 
-import { InputTypeComposer, type TypeComposer } from 'graphql-compose';
+import { InputTypeComposer, schemaComposer, type TypeComposer } from 'graphql-compose';
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { recordHelperArgs } from '../record';
 import { UserModel } from '../../../__mocks__/userModel';
-import { composeWithMongoose } from '../../../composeWithMongoose';
-import typeStorage from '../../../typeStorage';
+import { convertModelToGraphQL } from '../../../fieldsConverter';
 
 describe('Resolver helper `record` ->', () => {
-  let UserTypeComposer: TypeComposer;
+  let UserTC: TypeComposer;
 
   beforeEach(() => {
-    typeStorage.clear();
     UserModel.schema._gqcTypeComposer = undefined;
-    UserTypeComposer = composeWithMongoose(UserModel);
+    schemaComposer.clear();
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
   });
 
   describe('recordHelperArgs()', () => {
     it('should throw error if `recordTypeName` not provided in opts', () => {
-      expect(() => recordHelperArgs(UserTypeComposer)).toThrowError(
-        'provide non-empty `recordTypeName`'
-      );
+      expect(() => recordHelperArgs(UserTC)).toThrowError('provide non-empty `recordTypeName`');
     });
 
     it('should return input field', () => {
-      const args: any = recordHelperArgs(UserTypeComposer, {
+      const args: any = recordHelperArgs(UserTC, {
         recordTypeName: 'RecordUserType',
       });
-      expect(args.record.name).toBe('record');
       expect(args.record.type).toBeInstanceOf(GraphQLInputObjectType);
     });
 
     it('should reuse existed inputType', () => {
-      const existedType = new GraphQLInputObjectType({
+      const existedType = InputTypeComposer.create({
         name: 'RecordUserType',
         fields: {},
       });
-      typeStorage.set('RecordUserType', existedType);
-      const args: any = recordHelperArgs(UserTypeComposer, {
+      schemaComposer.set('RecordUserType', existedType);
+      const args: any = recordHelperArgs(UserTC, {
         recordTypeName: 'RecordUserType',
       });
-      expect(args.record.type).toBe(existedType);
+      expect(args.record.type).toBe(existedType.getType());
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
-      const args: any = recordHelperArgs(UserTypeComposer, {
+      const args: any = recordHelperArgs(UserTC, {
         recordTypeName: 'RecordUserType',
         isRequired: true,
       });
-      expect(args.record.name).toBe('record');
       expect(args.record.type).toBeInstanceOf(GraphQLNonNull);
     });
 
     it('should remove fields via opts.removeFields', () => {
-      const args: any = recordHelperArgs(UserTypeComposer, {
+      const args: any = recordHelperArgs(UserTC, {
         recordTypeName: 'RecordUserType',
         removeFields: ['name', 'age'],
       });
@@ -64,7 +59,7 @@ describe('Resolver helper `record` ->', () => {
     });
 
     it('should set required fields via opts.requiredFields', () => {
-      const args: any = recordHelperArgs(UserTypeComposer, {
+      const args: any = recordHelperArgs(UserTC, {
         recordTypeName: 'RecordUserType',
         requiredFields: ['name', 'age'],
       });

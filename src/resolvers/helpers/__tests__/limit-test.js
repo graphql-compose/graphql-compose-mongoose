@@ -6,7 +6,6 @@ describe('Resolver helper `limit` ->', () => {
   describe('limitHelperArgs()', () => {
     it('should return limit field', () => {
       const args: any = limitHelperArgs();
-      expect(args.limit.name).toBe('limit');
       expect(args.limit.type).toBe('Int');
     });
     it('should process `opts.defaultValue` arg', () => {

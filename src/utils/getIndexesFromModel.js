@@ -141,3 +141,24 @@ export function extendByReversedIndexes(indexes: IndexT[], opts: extendByReverse
 
   return result;
 }
+
+export function getIndexedFieldNamesForGraphQL(model: MongooseModel): string[] {
+  const indexes = getIndexesFromModel(model);
+
+  const fieldNames = [];
+  indexes.forEach(indexData => {
+    const keys = Object.keys(indexData);
+    const clearedName = keys[0].replace(/[^_a-zA-Z0-9]/i, '__');
+    fieldNames.push(clearedName);
+  });
+
+  // filter duplicates
+  const uniqueNames = [];
+  const result = fieldNames.filter(val => {
+    if (uniqueNames.indexOf(val) > -1) return false;
+    uniqueNames.push(val);
+    return true;
+  });
+
+  return result;
+}

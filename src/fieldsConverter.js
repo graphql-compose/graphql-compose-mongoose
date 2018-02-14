@@ -4,28 +4,15 @@
 import mongoose from 'mongoose';
 import type { Schema, MongooseModel, MongooseSchemaField } from 'mongoose';
 import objectPath from 'object-path';
-import {
-  TypeComposer,
-  GraphQLDate,
-  GraphQLBuffer,
-  GraphQLGeneric,
-  GraphQLJSON,
-} from 'graphql-compose';
-import {
-  GraphQLString,
-  GraphQLFloat,
-  GraphQLBoolean,
-  GraphQLList,
-  GraphQLEnumType,
-  GraphQLObjectType,
-  type GraphQLOutputType,
-} from 'graphql-compose/lib/graphql';
-
+import type { SchemaComposer, TypeComposer, EnumTypeComposer } from 'graphql-compose';
+import { upperFirst } from 'graphql-compose';
+import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
 import GraphQLMongoID from './types/mongoid';
-import typeStorage from './typeStorage';
 
 type MongooseFieldT = MongooseSchemaField<any>;
 type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
+type ComposeScalarType = string | GraphQLScalarType;
+type ComposeOutputType = TypeComposer | ComposeScalarType | EnumTypeComposer | [ComposeOutputType];
 
 export type MongoosePseudoModelT = {
   _gqcTypeComposer?: TypeComposer,
@@ -64,10 +51,6 @@ function _getFieldEnums(field: MongooseFieldT): ?(string[]) {
   }
 
   return undefined;
-}
-
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 export function dotPathsToEmbedded(fields: MongooseFieldMapT): MongooseFieldMapT {
@@ -129,7 +112,8 @@ export function getFieldsFromModel(model: MongooseModel | MongoosePseudoModelT):
 
 export function convertModelToGraphQL(
   model: MongooseModel | MongoosePseudoModelT,
-  typeName: string
+  typeName: string,
+  schemaComposer: SchemaComposer<any>
 ): TypeComposer {
   // if model already has generated TypeComposer early, then return it
   if (model.schema && model.schema._gqcTypeComposer) {
@@ -140,20 +124,10 @@ export function convertModelToGraphQL(
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
   }
 
-  const typeComposer = new TypeComposer(
-    typeStorage.getOrSet(
-      typeName,
-      new GraphQLObjectType({
-        name: typeName,
-        interfaces: [],
-        description: undefined,
-        fields: {},
-      })
-    )
-  );
+  const typeComposer = schemaComposer.getOrCreateTC(typeName);
 
   // $FlowFixMe
-  model.schema._gqcTypeComposer = typeComposer; // eslint-disable-line
+  model.schema._gqcTypeComposer = typeComposer; // eslint-disable-line no-param-reassign
 
   const mongooseFields = getFieldsFromModel(model);
   const graphqlFields = {};
@@ -161,7 +135,7 @@ export function convertModelToGraphQL(
   Object.keys(mongooseFields).forEach(fieldName => {
     const mongooseField: MongooseFieldT = mongooseFields[fieldName];
     graphqlFields[fieldName] = {
-      type: convertFieldToGraphQL(mongooseField, typeName),
+      type: convertFieldToGraphQL(mongooseField, typeName, schemaComposer),
       description: _getFieldDescription(mongooseField),
     };
 
@@ -186,7 +160,8 @@ export function convertModelToGraphQL(
 
 export function convertSchemaToGraphQL(
   schema: Object, // MongooseModelSchemaT, TODO use Model from mongoose_v4.x.x definition when it will be public
-  typeName: string
+  typeName: string,
+  schemaComposer: SchemaComposer<any>
 ): TypeComposer {
   if (!typeName) {
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
@@ -196,7 +171,7 @@ export function convertSchemaToGraphQL(
     return schema._gqcTypeComposer;
   }
 
-  const tc = convertModelToGraphQL({ schema }, typeName);
+  const tc = convertModelToGraphQL({ schema }, typeName, schemaComposer);
   // also generate InputType
   tc.getInputTypeComposer();
 
@@ -206,24 +181,25 @@ export function convertSchemaToGraphQL(
 
 export function convertFieldToGraphQL(
   field: MongooseFieldT,
-  prefix?: string = ''
-): GraphQLOutputType {
+  prefix?: string = '',
+  schemaComposer: SchemaComposer<any>
+): ComposeOutputType {
   const complexType = deriveComplexType(field);
   switch (complexType) {
     case ComplexTypes.SCALAR:
       return scalarToGraphQL(field);
     case ComplexTypes.ARRAY:
-      return arrayToGraphQL(field, prefix);
+      return arrayToGraphQL(field, prefix, schemaComposer);
     case ComplexTypes.EMBEDDED:
-      return embeddedToGraphQL(field, prefix);
+      return embeddedToGraphQL(field, prefix, schemaComposer);
     case ComplexTypes.ENUM:
-      return enumToGraphQL(field, prefix);
+      return enumToGraphQL(field, prefix, schemaComposer);
     case ComplexTypes.REFERENCE:
       return referenceToGraphQL(field);
     case ComplexTypes.DOCUMENT_ARRAY:
-      return documentArrayToGraphQL(field, prefix);
+      return (documentArrayToGraphQL(field, prefix, schemaComposer): any);
     case ComplexTypes.MIXED:
-      return mixedToGraphQL(field);
+      return 'JSON';
     default:
       return scalarToGraphQL(field);
   }
@@ -262,28 +238,32 @@ export function deriveComplexType(field: MongooseFieldT): $Keys<typeof ComplexTy
   return ComplexTypes.SCALAR;
 }
 
-export function scalarToGraphQL(field: MongooseFieldT): GraphQLOutputType {
+export function scalarToGraphQL(field: MongooseFieldT): ComposeScalarType {
   const typeName = _getFieldType(field);
 
   switch (typeName) {
     case 'String':
-      return GraphQLString;
+      return 'String';
     case 'Number':
-      return GraphQLFloat;
+      return 'Float';
     case 'Date':
-      return GraphQLDate;
+      return 'Date';
     case 'Buffer':
-      return GraphQLBuffer;
+      return 'Buffer';
     case 'Boolean':
-      return GraphQLBoolean;
+      return 'Boolean';
     case 'ObjectID':
       return GraphQLMongoID;
     default:
-      return GraphQLGeneric;
+      return 'JSON';
   }
 }
 
-export function arrayToGraphQL(field: MongooseFieldT, prefix?: string = ''): GraphQLOutputType {
+export function arrayToGraphQL(
+  field: MongooseFieldT,
+  prefix?: string = '',
+  schemaComposer: SchemaComposer<any>
+): ComposeOutputType {
   if (!field || !field.caster) {
     throw new Error(
       'You provide incorrect mongoose field to `arrayToGraphQL()`. ' +
@@ -294,11 +274,15 @@ export function arrayToGraphQL(field: MongooseFieldT, prefix?: string = ''): Gra
   const unwrappedField = { ...field.caster };
   objectPath.set(unwrappedField, 'options.ref', objectPath.get(field, 'options.ref', undefined));
 
-  const outputType = convertFieldToGraphQL(unwrappedField, prefix);
-  return new GraphQLList(outputType);
+  const outputType = convertFieldToGraphQL(unwrappedField, prefix, schemaComposer);
+  return [outputType];
 }
 
-export function embeddedToGraphQL(field: MongooseFieldT, prefix?: string = ''): GraphQLObjectType {
+export function embeddedToGraphQL(
+  field: MongooseFieldT,
+  prefix?: string = '',
+  schemaComposer: SchemaComposer<any>
+): TypeComposer {
   const fieldName = _getFieldName(field);
   const fieldType = _getFieldType(field);
 
@@ -314,13 +298,15 @@ export function embeddedToGraphQL(field: MongooseFieldT, prefix?: string = ''): 
     throw new Error(`Mongoose field '${prefix}.${fieldName}' should have 'schema' property`);
   }
 
-  const typeName = `${prefix}${capitalize(fieldName)}`;
-  const typeComposer = convertSchemaToGraphQL(fieldSchema, typeName);
-
-  return typeComposer.getType();
+  const typeName = `${prefix}${upperFirst(fieldName)}`;
+  return convertSchemaToGraphQL(fieldSchema, typeName, schemaComposer);
 }
 
-export function enumToGraphQL(field: MongooseFieldT, prefix?: string = ''): GraphQLEnumType {
+export function enumToGraphQL(
+  field: MongooseFieldT,
+  prefix?: string = '',
+  schemaComposer: SchemaComposer<any>
+): EnumTypeComposer {
   const valueList = _getFieldEnums(field);
   if (!valueList) {
     throw new Error(
@@ -329,26 +315,25 @@ export function enumToGraphQL(field: MongooseFieldT, prefix?: string = ''): Grap
     );
   }
 
-  const graphQLEnumValues = valueList.reduce((result, val) => {
-    result[val] = { value: val }; // eslint-disable-line no-param-reassign
-    return result;
-  }, {});
+  const typeName = `Enum${prefix}${upperFirst(_getFieldName(field))}`;
 
-  const typeName = `Enum${prefix}${capitalize(_getFieldName(field))}`;
-  return typeStorage.getOrSet(
-    typeName,
-    new GraphQLEnumType({
-      name: typeName,
-      description: _getFieldDescription(field),
-      values: graphQLEnumValues,
-    })
-  );
+  return schemaComposer.getOrCreateETC(typeName, etc => {
+    const desc = _getFieldDescription(field);
+    if (desc) etc.setDescription(desc);
+
+    const fields = valueList.reduce((result, val) => {
+      result[val] = { value: val }; // eslint-disable-line no-param-reassign
+      return result;
+    }, {});
+    etc.setFields(fields);
+  });
 }
 
 export function documentArrayToGraphQL(
   field: MongooseFieldT,
-  prefix?: string = ''
-): GraphQLList<GraphQLOutputType> {
+  prefix?: string = '',
+  schemaComposer: SchemaComposer<any>
+): [TypeComposer] {
   if (!(field instanceof mongoose.Schema.Types.DocumentArray)) {
     throw new Error(
       'You provide incorrect mongoose field to `documentArrayToGraphQL()`. ' +
@@ -356,42 +341,13 @@ export function documentArrayToGraphQL(
     );
   }
 
-  const typeName = `${prefix}${capitalize(_getFieldName(field))}`;
+  const typeName = `${prefix}${upperFirst(_getFieldName(field))}`;
 
-  const typeComposer = convertModelToGraphQL(field, typeName);
+  const tc = convertModelToGraphQL(field, typeName, schemaComposer);
 
-  return new GraphQLList(typeComposer.getType());
+  return [tc];
 }
 
-export function referenceToGraphQL(field: MongooseFieldT): GraphQLOutputType {
-  const fieldType = _getFieldType(field);
-  if (fieldType !== 'ObjectID') {
-    throw new Error(
-      'You provide incorrect mongoose field to `referenceToGraphQL()`. ' +
-        'Correct field should has mongoose-type `ObjectID`'
-    );
-  }
-
-  // const refModelName = objectPath.get(field, 'options.ref');
-  // if (refModelName) {
-  //   return GQLReference;
-  //   // throw new Error('Mongoose REFERENCE to graphQL TYPE not implemented yet. '
-  //   //                + `Field ${_getFieldName(field)}`);
-  //   // Storage.UnresolvedRefs.setSubKey(parentTypeName, fieldName, { refModelName });
-  //   // return GraphQLReference;
-  // }
-
-  // this is mongo id field
+export function referenceToGraphQL(field: MongooseFieldT): ComposeScalarType {
   return scalarToGraphQL(field);
-}
-
-export function mixedToGraphQL(field: MongooseFieldT): GraphQLOutputType {
-  if (!(field instanceof mongoose.Schema.Types.Mixed)) {
-    throw new Error(
-      'You provide incorrect mongoose field to `mixedToGraphQL()`. ' +
-        'Correct field should be instance of `mongoose.Schema.Types.Mixed`'
-    );
-  }
-
-  return GraphQLJSON;
 }

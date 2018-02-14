@@ -1,9 +1,6 @@
 /* @flow */
 
-import { TypeComposer, InputTypeComposer } from 'graphql-compose';
-import type { ComposeFieldConfigArgumentMap } from 'graphql-compose';
-import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
-import typeStorage from '../../typeStorage';
+import type { TypeComposer, ComposeFieldConfigArgumentMap } from 'graphql-compose';
 
 export type RecordHelperArgsOpts = {
   recordTypeName?: string,
@@ -13,10 +10,10 @@ export type RecordHelperArgsOpts = {
 };
 
 export const recordHelperArgs = (
-  typeComposer: TypeComposer,
+  tc: TypeComposer,
   opts?: RecordHelperArgsOpts
 ): ComposeFieldConfigArgumentMap => {
-  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
+  if (!tc || tc.constructor.name !== 'TypeComposer') {
     throw new Error('First arg for recordHelperArgs() should be instance of TypeComposer.');
   }
 
@@ -26,29 +23,25 @@ export const recordHelperArgs = (
 
   const recordTypeName: string = opts.recordTypeName;
 
-  const recordComposer = new InputTypeComposer(
-    typeStorage.getOrSet(
-      recordTypeName,
-      typeComposer
-        .getInputTypeComposer()
-        .clone(recordTypeName)
-        .getType()
-    )
-  );
+  let recordITC;
+  const schemaComposer = tc.constructor.schemaComposer;
+  if (schemaComposer.hasInstance(recordTypeName, schemaComposer.InputTypeComposer)) {
+    recordITC = schemaComposer.getITC(recordTypeName);
+  } else {
+    recordITC = tc.getInputTypeComposer().clone(recordTypeName);
+  }
+
   if (opts && opts.removeFields) {
-    recordComposer.removeField(opts.removeFields);
+    recordITC.removeField(opts.removeFields);
   }
 
   if (opts && opts.requiredFields) {
-    recordComposer.makeRequired(opts.requiredFields);
+    recordITC.makeRequired(opts.requiredFields);
   }
 
   return {
     record: {
-      name: 'record',
-      type: opts.isRequired
-        ? new GraphQLNonNull(recordComposer.getType())
-        : recordComposer.getType(),
+      type: opts.isRequired ? recordITC.getTypeAsRequired() : recordITC.getType(),
     },
   };
 };

@@ -1,2 +1,4 @@
 lib/*
+es/*
+node8/*
 flow-typed

@@ -1,48 +1,43 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { Resolver, TypeComposer } from 'graphql-compose';
+import type { Resolver, TypeComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import GraphQLMongoID from '../types/mongoid';
-import typeStorage from '../typeStorage';
 import { filterHelperArgs, sortHelperArgs } from './helpers';
 import findOne from './findOne';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function removeOne(
   model: MongooseModel,
-  typeComposer: TypeComposer,
+  tc: TypeComposer,
   opts?: GenResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeOne() should be instance of Mongoose Model.');
   }
 
-  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
+  if (!tc || tc.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver removeOne() should be instance of TypeComposer.');
   }
 
-  const findOneResolver = findOne(model, typeComposer, opts);
+  const findOneResolver = findOne(model, tc, opts);
 
-  const outputTypeName = `RemoveOne${typeComposer.getTypeName()}Payload`;
-  const outputType = typeStorage.getOrSet(
-    outputTypeName,
-    TypeComposer.create({
-      name: outputTypeName,
-      fields: {
-        recordId: {
-          type: GraphQLMongoID,
-          description: 'Removed document ID',
-        },
-        record: {
-          type: typeComposer.getType(),
-          description: 'Removed document',
-        },
+  const outputTypeName = `RemoveOne${tc.getTypeName()}Payload`;
+  const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
+    t.addFields({
+      recordId: {
+        type: GraphQLMongoID,
+        description: 'Removed document ID',
       },
-    })
-  );
+      record: {
+        type: tc,
+        description: 'Removed document',
+      },
+    });
+  });
 
-  const resolver = new Resolver({
+  const resolver = new tc.constructor.schemaComposer.Resolver({
     name: 'removeOne',
     kind: 'mutation',
     description:
@@ -51,24 +46,23 @@ export default function removeOne(
       '2) Return removed document.',
     type: outputType,
     args: {
-      ...filterHelperArgs(typeComposer, model, {
-        filterTypeName: `FilterRemoveOne${typeComposer.getTypeName()}Input`,
+      ...filterHelperArgs(tc, model, {
+        filterTypeName: `FilterRemoveOne${tc.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),
       }),
-      ...sortHelperArgs(model, {
-        sortTypeName: `SortRemoveOne${typeComposer.getTypeName()}Input`,
+      ...sortHelperArgs(tc, model, {
+        sortTypeName: `SortRemoveOne${tc.getTypeName()}Input`,
         ...(opts && opts.sort),
       }),
     },
-    resolve: (resolveParams: ExtendedResolveParams) => {
+    resolve: async (resolveParams: ExtendedResolveParams) => {
       const filterData = (resolveParams.args && resolveParams.args.filter) || {};
 
       if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
         return Promise.reject(
           new Error(
-            `${typeComposer.getTypeName()}.removeOne resolver requires ` +
-              'at least one value in args.filter'
+            `${tc.getTypeName()}.removeOne resolver requires at least one value in args.filter`
           )
         );
       }
@@ -78,34 +72,22 @@ export default function removeOne(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      return (
-        findOneResolver
-          .resolve(resolveParams)
-          .then(doc => {
-            if (resolveParams.beforeRecordMutate) {
-              return resolveParams.beforeRecordMutate(doc, resolveParams);
-            }
-            return doc;
-          })
-          // remove record from DB
-          .then(doc => {
-            if (!doc) {
-              return Promise.reject(new Error('Document not found'));
-            }
-            return doc.remove();
-          })
-          // prepare output payload
-          .then(record => {
-            if (record) {
-              return {
-                record,
-                recordId: typeComposer.getRecordIdFn()(record),
-              };
-            }
+      let doc = await findOneResolver.resolve(resolveParams);
 
-            return null;
-          })
-      );
+      if (resolveParams.beforeRecordMutate) {
+        doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
+      }
+
+      if (doc) {
+        await doc.remove();
+
+        return {
+          record: doc,
+          recordId: tc.getRecordIdFn()(doc),
+        };
+      }
+
+      return null;
     },
   });
 

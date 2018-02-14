@@ -1,21 +1,20 @@
 /* @flow */
 
-import { Resolver } from 'graphql-compose';
+import { Resolver, schemaComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import findMany from '../findMany';
-import { composeWithMongoose } from '../../composeWithMongoose';
-import typeStorage from '../../typeStorage';
+import { convertModelToGraphQL } from '../../fieldsConverter';
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 describe('findMany() ->', () => {
-  let UserTypeComposer;
+  let UserTC;
 
   beforeEach(() => {
-    typeStorage.clear();
+    schemaComposer.clear();
     UserModel.schema._gqcTypeComposer = undefined;
-    UserTypeComposer = composeWithMongoose(UserModel);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
   });
 
   let user1;
@@ -42,38 +41,38 @@ describe('findMany() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = findMany(UserModel, UserTypeComposer);
+    const resolver = findMany(UserModel, UserTC);
     expect(resolver).toBeInstanceOf(Resolver);
   });
 
   it('Resolver object should have `filter` arg', () => {
-    const resolver = findMany(UserModel, UserTypeComposer);
+    const resolver = findMany(UserModel, UserTC);
     expect(resolver.hasArg('filter')).toBe(true);
   });
 
   it('Resolver object should have `limit` arg', () => {
-    const resolver = findMany(UserModel, UserTypeComposer);
+    const resolver = findMany(UserModel, UserTC);
     expect(resolver.hasArg('limit')).toBe(true);
   });
 
   it('Resolver object should have `skip` arg', () => {
-    const resolver = findMany(UserModel, UserTypeComposer);
+    const resolver = findMany(UserModel, UserTC);
     expect(resolver.hasArg('skip')).toBe(true);
   });
 
   it('Resolver object should have `sort` arg', () => {
-    const resolver = findMany(UserModel, UserTypeComposer);
+    const resolver = findMany(UserModel, UserTC);
     expect(resolver.hasArg('sort')).toBe(true);
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled Promise', async () => {
-      const result = findMany(UserModel, UserTypeComposer).resolve({});
+      const result = findMany(UserModel, UserTC).resolve({});
       await expect(result).resolves.toBeDefined();
     });
 
     it('should return array of documents if args is empty', async () => {
-      const result = await findMany(UserModel, UserTypeComposer).resolve({});
+      const result = await findMany(UserModel, UserTC).resolve({});
 
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(2);
@@ -81,25 +80,25 @@ describe('findMany() ->', () => {
     });
 
     it('should limit records', async () => {
-      const result = await findMany(UserModel, UserTypeComposer).resolve({ args: { limit: 1 } });
+      const result = await findMany(UserModel, UserTC).resolve({ args: { limit: 1 } });
 
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(1);
     });
 
     it('should skip records', async () => {
-      const result = await findMany(UserModel, UserTypeComposer).resolve({ args: { skip: 1000 } });
+      const result = await findMany(UserModel, UserTC).resolve({ args: { skip: 1000 } });
 
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(0);
     });
 
     it('should sort records', async () => {
-      const result1 = await findMany(UserModel, UserTypeComposer).resolve({
+      const result1 = await findMany(UserModel, UserTC).resolve({
         args: { sort: { _id: 1 } },
       });
 
-      const result2 = await findMany(UserModel, UserTypeComposer).resolve({
+      const result2 = await findMany(UserModel, UserTC).resolve({
         args: { sort: { _id: -1 } },
       });
 
@@ -107,7 +106,7 @@ describe('findMany() ->', () => {
     });
 
     it('should return mongoose documents', async () => {
-      const result = await findMany(UserModel, UserTypeComposer).resolve({ args: { limit: 2 } });
+      const result = await findMany(UserModel, UserTC).resolve({ args: { limit: 2 } });
       expect(result[0]).toBeInstanceOf(UserModel);
       expect(result[1]).toBeInstanceOf(UserModel);
     });

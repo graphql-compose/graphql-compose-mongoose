@@ -1,88 +1,20 @@
 /* @flow */
 
-import { InputTypeComposer, type TypeComposer } from 'graphql-compose';
+import { InputTypeComposer, schemaComposer, type TypeComposer } from 'graphql-compose';
 import { GraphQLInputObjectType, GraphQLNonNull, GraphQLList } from 'graphql-compose/lib/graphql';
-import {
-  filterHelperArgs,
-  filterHelper,
-  getIndexedFieldNames,
-  addFieldsWithOperator,
-  OPERATORS_FIELDNAME,
-} from '../filter';
+import { filterHelperArgs, filterHelper } from '../filter';
+import { OPERATORS_FIELDNAME } from '../filterOperators';
 import GraphQLMongoID from '../../../types/mongoid';
 import { UserModel } from '../../../__mocks__/userModel';
-import { composeWithMongoose } from '../../../composeWithMongoose';
-import typeStorage from '../../../typeStorage';
+import { convertModelToGraphQL } from '../../../fieldsConverter';
 
 describe('Resolver helper `filter` ->', () => {
-  let UserTypeComposer: TypeComposer;
+  let UserTC: TypeComposer;
 
   beforeEach(() => {
-    typeStorage.clear();
     UserModel.schema._gqcTypeComposer = undefined;
-    UserTypeComposer = composeWithMongoose(UserModel);
-  });
-
-  describe('getIndexedFieldNames()', () => {
-    it('should return array of indexed fieldNames', () => {
-      const indexedFields = getIndexedFieldNames(UserModel);
-      expect(indexedFields).toEqual(expect.arrayContaining(['_id', 'employment', 'name']));
-      expect(indexedFields).not.toEqual(expect.arrayContaining(['age', 'gender']));
-    });
-  });
-
-  describe('addFieldsWithOperator()', () => {
-    let args: any;
-    let inputTypeComposer;
-
-    beforeEach(() => {
-      typeStorage.clear();
-      args = (filterHelperArgs(UserTypeComposer, UserModel, {
-        filterTypeName: 'FilterUserType',
-      }): any);
-      inputTypeComposer = new InputTypeComposer(args.filter.type);
-    });
-
-    it('should add OPERATORS_FIELDNAME to filterType', () => {
-      addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, {});
-      expect(inputTypeComposer.hasField(OPERATORS_FIELDNAME)).toBe(true);
-    });
-
-    it('should by default have only indexed fields', () => {
-      addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, {});
-      const operatorsType: any = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
-      const opComposer = new InputTypeComposer(operatorsType);
-      expect(opComposer.getFieldNames()).toEqual(
-        expect.arrayContaining(['name', '_id', 'employment'])
-      );
-    });
-
-    it('should have only provided fields via options', () => {
-      addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, { age: ['lt'] });
-      const operatorsType: any = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
-      const opComposer = new InputTypeComposer(operatorsType);
-      expect(opComposer.getFieldNames()).toEqual(expect.arrayContaining(['age']));
-    });
-
-    it('should have only provided operators via options for field', () => {
-      addFieldsWithOperator('testTypeName', inputTypeComposer, UserModel, { age: ['lt', 'gte'] });
-      const operatorsType: any = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
-      const opComposer = new InputTypeComposer(operatorsType);
-      const ageType: any = opComposer.getFieldType('age');
-      const ageComposer = new InputTypeComposer(ageType);
-      expect(ageComposer.getFieldNames()).toEqual(expect.arrayContaining(['lt', 'gte']));
-    });
-
-    it('should reuse existed operatorsType', () => {
-      const existedType = new GraphQLInputObjectType({
-        name: 'ExistedType',
-        fields: {},
-      });
-      typeStorage.set('ExistedType', existedType);
-      addFieldsWithOperator('ExistedType', inputTypeComposer, UserModel, { age: ['lt'] });
-      const operatorsType = inputTypeComposer.getFieldType(OPERATORS_FIELDNAME);
-      expect(operatorsType).toBe(existedType);
-    });
+    schemaComposer.clear();
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
   });
 
   describe('filterHelperArgs()', () => {
@@ -95,27 +27,26 @@ describe('Resolver helper `filter` ->', () => {
 
     it('should throw error if second arg is not MongooseModel', () => {
       expect(() => {
-        const wrongArgs: any = [UserTypeComposer, {}];
+        const wrongArgs: any = [UserTC, {}];
         filterHelperArgs(...wrongArgs);
       }).toThrowError('should be instance of MongooseModel');
     });
 
     it('should throw error if `filterTypeName` not provided in opts', () => {
-      expect(() => filterHelperArgs(UserTypeComposer, UserModel)).toThrowError(
+      expect(() => filterHelperArgs(UserTC, UserModel)).toThrowError(
         'provide non-empty `filterTypeName`'
       );
     });
 
     it('should return filter field', () => {
-      const args: any = filterHelperArgs(UserTypeComposer, UserModel, {
+      const args: any = filterHelperArgs(UserTC, UserModel, {
         filterTypeName: 'FilterUserType',
       });
-      expect(args.filter.name).toBe('filter');
       expect(args.filter.type).toBeInstanceOf(GraphQLInputObjectType);
     });
 
     it('should return filter with field _ids', () => {
-      const args: any = filterHelperArgs(UserTypeComposer, UserModel, {
+      const args: any = filterHelperArgs(UserTC, UserModel, {
         filterTypeName: 'FilterUserType',
       });
       const itc = new InputTypeComposer(args.filter.type);
@@ -125,61 +56,60 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
-      const args: any = filterHelperArgs(UserTypeComposer, UserModel, {
+      const args: any = filterHelperArgs(UserTC, UserModel, {
         filterTypeName: 'FilterUserType',
         isRequired: true,
       });
-      expect(args.filter.name).toBe('filter');
       expect(args.filter.type).toBeInstanceOf(GraphQLNonNull);
     });
 
     it('should remove fields via opts.removeFields', () => {
-      const args: any = filterHelperArgs(UserTypeComposer, UserModel, {
+      const args: any = filterHelperArgs(UserTC, UserModel, {
         filterTypeName: 'FilterUserType',
         removeFields: ['name', 'age'],
       });
-      const inputTypeComposer = new InputTypeComposer(args.filter.type);
-      expect(inputTypeComposer.hasField('name')).toBe(false);
-      expect(inputTypeComposer.hasField('age')).toBe(false);
-      expect(inputTypeComposer.hasField('gender')).toBe(true);
+      const itc = new InputTypeComposer(args.filter.type);
+      expect(itc.hasField('name')).toBe(false);
+      expect(itc.hasField('age')).toBe(false);
+      expect(itc.hasField('gender')).toBe(true);
     });
 
     it('should set required fields via opts.requiredFields', () => {
-      const args: any = filterHelperArgs(UserTypeComposer, UserModel, {
+      const args: any = filterHelperArgs(UserTC, UserModel, {
         filterTypeName: 'FilterUserType',
         requiredFields: ['name', 'age'],
       });
-      const inputTypeComposer = new InputTypeComposer(args.filter.type);
-      expect(inputTypeComposer.getFieldType('name')).toBeInstanceOf(GraphQLNonNull);
-      expect(inputTypeComposer.getFieldType('age')).toBeInstanceOf(GraphQLNonNull);
-      expect(inputTypeComposer.getFieldType('gender')).not.toBeInstanceOf(GraphQLNonNull);
+      const itc = new InputTypeComposer(args.filter.type);
+      expect(itc.getFieldType('name')).toBeInstanceOf(GraphQLNonNull);
+      expect(itc.getFieldType('age')).toBeInstanceOf(GraphQLNonNull);
+      expect(itc.getFieldType('gender')).not.toBeInstanceOf(GraphQLNonNull);
     });
 
     it('should leave only indexed fields if opts.onlyIndexed=true', () => {
-      const args: any = filterHelperArgs(UserTypeComposer, UserModel, {
+      const args: any = filterHelperArgs(UserTC, UserModel, {
         filterTypeName: 'FilterUserType',
         onlyIndexed: true,
         model: UserModel,
       });
-      const inputTypeComposer = new InputTypeComposer(args.filter.type);
-      expect(inputTypeComposer.hasField('_id')).toBe(true);
-      expect(inputTypeComposer.hasField('name')).toBe(true);
-      expect(inputTypeComposer.hasField('age')).toBe(false);
-      expect(inputTypeComposer.hasField('gender')).toBe(false);
+      const itc = new InputTypeComposer(args.filter.type);
+      expect(itc.hasField('_id')).toBe(true);
+      expect(itc.hasField('name')).toBe(true);
+      expect(itc.hasField('age')).toBe(false);
+      expect(itc.hasField('gender')).toBe(false);
     });
 
     it('should opts.onlyIndexed=true and opts.removeFields works together', () => {
-      const args: any = filterHelperArgs(UserTypeComposer, UserModel, {
+      const args: any = filterHelperArgs(UserTC, UserModel, {
         filterTypeName: 'FilterUserType',
         onlyIndexed: true,
         model: UserModel,
         removeFields: ['name'],
       });
-      const inputTypeComposer = new InputTypeComposer(args.filter.type);
-      expect(inputTypeComposer.hasField('_id')).toBe(true);
-      expect(inputTypeComposer.hasField('name')).toBe(false);
-      expect(inputTypeComposer.hasField('age')).toBe(false);
-      expect(inputTypeComposer.hasField('gender')).toBe(false);
+      const itc = new InputTypeComposer(args.filter.type);
+      expect(itc.hasField('_id')).toBe(true);
+      expect(itc.hasField('name')).toBe(false);
+      expect(itc.hasField('age')).toBe(false);
+      expect(itc.hasField('gender')).toBe(false);
     });
   });
 

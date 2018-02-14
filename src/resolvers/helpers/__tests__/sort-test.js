@@ -1,67 +1,83 @@
 /* @flow */
 
-import { EnumTypeComposer } from 'graphql-compose';
-import { GraphQLEnumType } from 'graphql-compose/lib/graphql';
+import { EnumTypeComposer, schemaComposer, type TypeComposer } from 'graphql-compose';
 import { sortHelperArgs, sortHelper, getSortTypeFromModel } from '../sort';
 import { UserModel } from '../../../__mocks__/userModel';
-import { getIndexesFromModel } from '../../../utils/getIndexesFromModel';
-import typeStorage from '../../../typeStorage';
+import { convertModelToGraphQL } from '../../../fieldsConverter';
+import { getIndexesFromModel } from '../../../utils';
 
 describe('Resolver helper `sort` ->', () => {
+  let UserTC: TypeComposer;
+
   beforeEach(() => {
-    typeStorage.clear();
+    UserModel.schema._gqcTypeComposer = undefined;
+    schemaComposer.clear();
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
   });
 
   describe('getSortTypeFromModel()', () => {
     it('should return EnumType', () => {
       const typeName = 'SortType';
-      const type = getSortTypeFromModel(typeName, UserModel);
-      expect(type).toBeInstanceOf(GraphQLEnumType);
-      expect(type.name).toBe(typeName);
+      const etc = getSortTypeFromModel(typeName, UserModel, schemaComposer);
+      expect(etc).toBeInstanceOf(EnumTypeComposer);
+      expect(etc.getTypeName()).toBe(typeName);
     });
 
     it('should reuse existed EnumType', () => {
       const typeName = 'SortType';
-      typeStorage.set(typeName, 'EXISTED_TYPE');
-      const type = getSortTypeFromModel(typeName, UserModel);
-      expect(type).toBe('EXISTED_TYPE');
+      const existedETC = schemaComposer.getOrCreateETC(typeName);
+      const etc = getSortTypeFromModel(typeName, UserModel, schemaComposer);
+      expect(etc).toBe(existedETC);
     });
 
     it('should have proper enum values', () => {
-      const type = getSortTypeFromModel('SortType', UserModel);
+      const etc = getSortTypeFromModel('SortType', UserModel, schemaComposer);
       const indexedFields = getIndexesFromModel(UserModel);
 
       // only indexed fields in enum
       const ascDescNum = indexedFields.length * 2;
-      const etc = EnumTypeComposer.create(type);
       expect(etc.getFieldNames()).toHaveLength(ascDescNum);
 
       // should have ASC DESC keys
-      const enumNames = type._values.map(enumConfig => enumConfig.name);
+      const enumNames = etc.getFieldNames();
       expect(enumNames).toEqual(expect.arrayContaining(['_ID_ASC', '_ID_DESC']));
 
       // should have ASC criteria for mongoose
-      const complexASC: any = type._values.find(enumConfig => enumConfig.name === 'NAME__AGE_ASC');
+      const complexASC = etc.getField('NAME__AGE_ASC');
       expect(complexASC.value).toEqual({ name: 1, age: -1 });
 
       // should have DESC criteria for mongoose
-      const complexDESC: any = type._values.find(
-        enumConfig => enumConfig.name === 'NAME__AGE_DESC'
-      );
+      const complexDESC = etc.getField('NAME__AGE_DESC');
       expect(complexDESC.value).toEqual({ name: -1, age: 1 });
     });
   });
 
   describe('sortHelperArgs()', () => {
-    it('should throw error if `sortTypeName` not provided in opts', () => {
-      expect(() => sortHelperArgs(UserModel)).toThrowError('provide non-empty `sortTypeName`');
+    it('should throw error if first arg is not TypeComposer', () => {
+      expect(() => {
+        const wrongArgs: any = [{}];
+        sortHelperArgs(...wrongArgs);
+      }).toThrowError('should be instance of TypeComposer');
     });
+
+    it('should throw error if second arg is not Mongoose model', () => {
+      expect(() => {
+        const wrongArgs: any = [UserTC, {}];
+        sortHelperArgs(...wrongArgs);
+      }).toThrowError('should be instance of Mongoose Model');
+    });
+
+    it('should throw error if `sortTypeName` not provided in opts', () => {
+      expect(() => sortHelperArgs(UserTC, UserModel)).toThrowError(
+        'provide non-empty `sortTypeName`'
+      );
+    });
+
     it('should return sort field', () => {
-      const args: any = sortHelperArgs(UserModel, {
+      const args: any = sortHelperArgs(UserTC, UserModel, {
         sortTypeName: 'SortInput',
       });
-      expect(args.sort.name).toBe('sort');
-      expect(args.sort.type).toBeInstanceOf(GraphQLEnumType);
+      expect(args.sort.type).toBeInstanceOf(EnumTypeComposer);
     });
   });
 

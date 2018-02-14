@@ -1,5 +1,6 @@
 /* @flow */
 
+import { schemaComposer } from 'graphql-compose';
 import { Schema } from './mongooseCommon';
 import { convertSchemaToGraphQL } from '../fieldsConverter';
 
@@ -34,4 +35,4 @@ export default LanguageSchema;
 
 // Such way we can set Type name for Schema which is used in another schema.
 // Otherwise by default it will have name `${ParentSchemaName}${ParentSchemaFieldName}`
-convertSchemaToGraphQL(LanguageSchema, 'Language');
+convertSchemaToGraphQL(LanguageSchema, 'Language', schemaComposer);
