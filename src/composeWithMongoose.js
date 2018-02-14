@@ -1,7 +1,8 @@
 /* @flow */
 /* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
-import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import type { TypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
+import { schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import type { MongooseModel } from 'mongoose';
 import type { ConnectionSortMapOpts } from 'graphql-compose-connection';
@@ -16,6 +17,7 @@ import type {
 } from './resolvers/helpers';
 
 export type TypeConverterOpts = {
+  schemaComposer?: SchemaComposer<any>,
   name?: string,
   description?: string,
   fields?: {
@@ -118,37 +120,38 @@ export function composeWithMongoose(
 ): TypeComposer {
   const name: string = (opts && opts.name) || model.modelName;
 
-  const typeComposer = convertModelToGraphQL(model, name);
+  const sc = opts.schemaComposer || schemaComposer;
+  const tc = convertModelToGraphQL(model, name, sc);
 
   if (opts.description) {
-    typeComposer.setDescription(opts.description);
+    tc.setDescription(opts.description);
   }
 
   if (opts.fields) {
-    prepareFields(typeComposer, opts.fields);
+    prepareFields(tc, opts.fields);
   }
 
-  typeComposer.setRecordIdFn(source => (source ? `${source._id}` : ''));
+  tc.setRecordIdFn(source => (source ? `${source._id}` : ''));
 
-  createInputType(typeComposer, opts.inputType);
+  createInputType(tc, opts.inputType);
 
   if (!{}.hasOwnProperty.call(opts, 'resolvers') || opts.resolvers !== false) {
-    createResolvers(model, typeComposer, opts.resolvers || {});
+    createResolvers(model, tc, opts.resolvers || {});
   }
 
-  if (typeComposer.hasField('_id')) {
-    const fc = typeComposer.getField('_id');
+  if (tc.hasField('_id')) {
+    const fc = tc.getField('_id');
     if (fc.type && !(fc.type instanceof GraphQLNonNull)) {
       fc.type = new GraphQLNonNull(fc.type);
-      typeComposer.setField('_id', fc);
+      tc.setField('_id', fc);
     }
   }
 
-  return typeComposer;
+  return tc;
 }
 
 export function prepareFields(
-  typeComposer: TypeComposer,
+  tc: TypeComposer,
   opts: {
     only?: string[],
     remove?: string[],
@@ -156,13 +159,13 @@ export function prepareFields(
 ) {
   if (Array.isArray(opts.only)) {
     const onlyFieldNames: string[] = opts.only;
-    const removeFields = Object.keys(typeComposer.getFields()).filter(
+    const removeFields = Object.keys(tc.getFields()).filter(
       fName => onlyFieldNames.indexOf(fName) === -1
     );
-    typeComposer.removeField(removeFields);
+    tc.removeField(removeFields);
   }
   if (opts.remove) {
-    typeComposer.removeField(opts.remove);
+    tc.removeField(opts.remove);
   }
 }
 
@@ -190,10 +193,10 @@ export function prepareInputFields(
 }
 
 export function createInputType(
-  typeComposer: TypeComposer,
+  tc: TypeComposer,
   inputTypeOpts?: TypeConverterInputTypeOpts = {}
 ): void {
-  const inputTypeComposer = typeComposer.getInputTypeComposer();
+  const inputTypeComposer = tc.getInputTypeComposer();
 
   if (inputTypeOpts.name) {
     inputTypeComposer.setTypeName(inputTypeOpts.name);
@@ -210,7 +213,7 @@ export function createInputType(
 
 export function createResolvers(
   model: MongooseModel,
-  typeComposer: TypeComposer,
+  tc: TypeComposer,
   opts: TypeConverterResolversOpts
 ): void {
   const names = resolvers.getAvailableNames();
@@ -218,32 +221,29 @@ export function createResolvers(
     if (!{}.hasOwnProperty.call(opts, resolverName) || opts[resolverName] !== false) {
       const createResolverFn = resolvers[resolverName];
       if (createResolverFn) {
-        const resolver = createResolverFn(model, typeComposer, opts[resolverName] || {});
-        typeComposer.setResolver(resolverName, resolver);
+        const resolver = createResolverFn(model, tc, opts[resolverName] || {});
+        tc.setResolver(resolverName, resolver);
       }
     }
   });
 
   if (!{}.hasOwnProperty.call(opts, 'connection') || opts.connection !== false) {
-    prepareConnectionResolver(model, typeComposer, opts.connection ? opts.connection : {});
+    prepareConnectionResolver(model, tc, opts.connection ? opts.connection : {});
   }
 
   if (!{}.hasOwnProperty.call(opts, 'pagination') || opts.pagination !== false) {
-    preparePaginationResolver(typeComposer, opts.pagination || {});
+    preparePaginationResolver(tc, opts.pagination || {});
   }
 }
 
-export function preparePaginationResolver(
-  typeComposer: TypeComposer,
-  opts: PaginationResolverOpts
-) {
+export function preparePaginationResolver(tc: TypeComposer, opts: PaginationResolverOpts) {
   try {
     require.resolve('graphql-compose-pagination');
   } catch (e) {
     return;
   }
   const composeWithPagination = require('graphql-compose-pagination').default;
-  composeWithPagination(typeComposer, {
+  composeWithPagination(tc, {
     findResolverName: 'findMany',
     countResolverName: 'count',
     ...opts,
@@ -252,7 +252,7 @@ export function preparePaginationResolver(
 
 export function prepareConnectionResolver(
   model: MongooseModel,
-  typeComposer: TypeComposer,
+  tc: TypeComposer,
   opts: ConnectionSortMapOpts
 ) {
   try {
@@ -303,7 +303,7 @@ export function prepareConnectionResolver(
     };
   });
 
-  composeWithConnection(typeComposer, {
+  composeWithConnection(tc, {
     findResolverName: 'findMany',
     countResolverName: 'count',
     sort: {

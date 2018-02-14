@@ -10,7 +10,6 @@ export type LimitHelperArgsOpts = {
 export const limitHelperArgs = (opts?: LimitHelperArgsOpts): ComposeFieldConfigArgumentMap => {
   return {
     limit: {
-      name: 'limit',
       type: 'Int',
       defaultValue: (opts && opts.defaultValue) || 1000,
     },

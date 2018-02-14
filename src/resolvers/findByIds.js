@@ -1,6 +1,6 @@
 /* @flow */
 
-import { Resolver, TypeComposer } from 'graphql-compose';
+import type { Resolver, TypeComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import { GraphQLNonNull, GraphQLList } from 'graphql-compose/lib/graphql';
 import GraphQLMongoID from '../types/mongoid';
@@ -15,19 +15,19 @@ import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function findByIds(
   model: MongooseModel,
-  typeComposer: TypeComposer,
+  tc: TypeComposer,
   opts?: GenResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIds() should be instance of Mongoose Model.');
   }
 
-  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
+  if (!tc || tc.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver findByIds() should be instance of TypeComposer.');
   }
 
-  return new Resolver({
-    type: [typeComposer],
+  return new tc.constructor.schemaComposer.Resolver({
+    type: [tc],
     name: 'findByIds',
     kind: 'query',
     args: {
@@ -38,8 +38,8 @@ export default function findByIds(
       ...limitHelperArgs({
         ...(opts && opts.limit),
       }),
-      ...sortHelperArgs(model, {
-        sortTypeName: `SortFindByIds${typeComposer.getTypeName()}Input`,
+      ...sortHelperArgs(tc, model, {
+        sortTypeName: `SortFindByIds${tc.getTypeName()}Input`,
         ...(opts && opts.sort),
       }),
     },

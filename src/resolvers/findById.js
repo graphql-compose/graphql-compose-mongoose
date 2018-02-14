@@ -1,6 +1,6 @@
 /* @flow */
 
-import { Resolver, TypeComposer } from 'graphql-compose';
+import type { Resolver, TypeComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import GraphQLMongoID from '../types/mongoid';
@@ -9,19 +9,19 @@ import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function findById(
   model: MongooseModel,
-  typeComposer: TypeComposer,
+  tc: TypeComposer,
   opts?: GenResolverOpts // eslint-disable-line no-unused-vars
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findById() should be instance of Mongoose Model.');
   }
 
-  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
+  if (!tc || tc.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver findById() should be instance of TypeComposer.');
   }
 
-  return new Resolver({
-    type: typeComposer.getType(),
+  return new tc.constructor.schemaComposer.Resolver({
+    type: tc.getType(),
     name: 'findById',
     kind: 'query',
     args: {

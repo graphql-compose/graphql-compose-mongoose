@@ -2,11 +2,10 @@
 /* eslint-disable no-unused-expressions */
 
 import mongoose from 'mongoose';
-import { TypeComposer, InputTypeComposer } from 'graphql-compose';
+import { TypeComposer, InputTypeComposer, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../__mocks__/userModel';
 import { composeWithMongoose } from '../composeWithMongoose';
-import typeStorage from '../typeStorage';
 import GraphQLMongoID from '../types/mongoid';
 
 beforeAll(() => UserModel.base.connect());
@@ -14,11 +13,11 @@ afterAll(() => UserModel.base.disconnect());
 
 describe('composeWithMongoose ->', () => {
   beforeEach(() => {
-    typeStorage.clear();
+    schemaComposer.clear();
     UserModel.schema._gqcTypeComposer = undefined;
   });
 
-  describe('MongooseModeloTypeComposer()', () => {
+  describe('MongooseModelToTypeComposer()', () => {
     describe('basics', () => {
       it('should return TypeComposer', () => {
         expect(composeWithMongoose(UserModel)).toBeInstanceOf(TypeComposer);

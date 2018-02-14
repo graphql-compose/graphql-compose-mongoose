@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { Resolver, TypeComposer } from 'graphql-compose';
+import type { Resolver, TypeComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import {
   limitHelper,
@@ -18,24 +18,24 @@ import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function findMany(
   model: MongooseModel,
-  typeComposer: TypeComposer,
+  tc: TypeComposer,
   opts?: GenResolverOpts
 ): Resolver {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findMany() should be instance of Mongoose Model.');
   }
 
-  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
+  if (!tc || tc.constructor.name !== 'TypeComposer') {
     throw new Error('Second arg for Resolver findMany() should be instance of TypeComposer.');
   }
 
-  return new Resolver({
-    type: [typeComposer],
+  return new tc.constructor.schemaComposer.Resolver({
+    type: [tc],
     name: 'findMany',
     kind: 'query',
     args: {
-      ...filterHelperArgs(typeComposer, model, {
-        filterTypeName: `FilterFindMany${typeComposer.getTypeName()}Input`,
+      ...filterHelperArgs(tc, model, {
+        filterTypeName: `FilterFindMany${tc.getTypeName()}Input`,
         model,
         ...(opts && opts.filter),
       }),
@@ -43,8 +43,8 @@ export default function findMany(
       ...limitHelperArgs({
         ...(opts && opts.limit),
       }),
-      ...sortHelperArgs(model, {
-        sortTypeName: `SortFindMany${typeComposer.getTypeName()}Input`,
+      ...sortHelperArgs(tc, model, {
+        sortTypeName: `SortFindMany${tc.getTypeName()}Input`,
         ...(opts && opts.sort),
       }),
     },

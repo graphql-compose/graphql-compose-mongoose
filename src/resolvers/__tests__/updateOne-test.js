@@ -1,24 +1,24 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { Resolver, TypeComposer } from 'graphql-compose';
-import { GraphQLNonNull, GraphQLObjectType } from 'graphql-compose/lib/graphql';
+import { Resolver, TypeComposer, schemaComposer } from 'graphql-compose';
+import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import updateOne from '../updateOne';
 import GraphQLMongoID from '../../types/mongoid';
-import { composeWithMongoose } from '../../composeWithMongoose';
-import typeStorage from '../../typeStorage';
+import { convertModelToGraphQL } from '../../fieldsConverter';
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 describe('updateOne() ->', () => {
-  let UserTypeComposer;
+  let UserTC;
 
   beforeEach(() => {
-    typeStorage.clear();
+    schemaComposer.clear();
     UserModel.schema._gqcTypeComposer = undefined;
-    UserTypeComposer = composeWithMongoose(UserModel);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+    UserTC.setRecordIdFn(source => (source ? `${source._id}` : ''));
   });
 
   let user1;
@@ -45,28 +45,28 @@ describe('updateOne() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = updateOne(UserModel, UserTypeComposer);
+    const resolver = updateOne(UserModel, UserTC);
     expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have `filter` arg', () => {
-      const resolver = updateOne(UserModel, UserTypeComposer);
+      const resolver = updateOne(UserModel, UserTC);
       expect(resolver.hasArg('filter')).toBe(true);
     });
 
     it('should have `skip` arg', () => {
-      const resolver = updateOne(UserModel, UserTypeComposer);
+      const resolver = updateOne(UserModel, UserTC);
       expect(resolver.hasArg('skip')).toBe(true);
     });
 
     it('should have `sort` arg', () => {
-      const resolver = updateOne(UserModel, UserTypeComposer);
+      const resolver = updateOne(UserModel, UserTC);
       expect(resolver.hasArg('sort')).toBe(true);
     });
 
     it('should have required `record` arg', () => {
-      const resolver = updateOne(UserModel, UserTypeComposer);
+      const resolver = updateOne(UserModel, UserTC);
       const argConfig: any = resolver.getArg('record');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
       expect(argConfig.type.ofType.name).toBe('UpdateOneUserInput');
@@ -75,25 +75,25 @@ describe('updateOne() ->', () => {
 
   describe('Resolver.resolve():Promise', () => {
     it('should be promise', () => {
-      const result = updateOne(UserModel, UserTypeComposer).resolve({});
+      const result = updateOne(UserModel, UserTC).resolve({});
       expect(result).toBeInstanceOf(Promise);
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
     it('should rejected with Error if args.filter is empty', async () => {
-      const result = updateOne(UserModel, UserTypeComposer).resolve({ args: {} });
+      const result = updateOne(UserModel, UserTC).resolve({ args: {} });
       await expect(result).rejects.toMatchSnapshot();
     });
 
     it('should return payload.recordId', async () => {
-      const result = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result = await updateOne(UserModel, UserTC).resolve({
         args: { filter: { _id: user1.id } },
       });
       expect(result.recordId).toBe(user1.id);
     });
 
     it('should change data via args.record in model', async () => {
-      const result = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { _id: user1.id },
           record: { name: 'newName' },
@@ -104,7 +104,7 @@ describe('updateOne() ->', () => {
 
     it('should change data via args.record in database', async () => {
       const checkedName = 'nameForMongoDB';
-      await updateOne(UserModel, UserTypeComposer).resolve({
+      await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { _id: user1.id },
           record: { name: checkedName },
@@ -119,20 +119,20 @@ describe('updateOne() ->', () => {
     });
 
     it('should return payload.record', async () => {
-      const result = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result = await updateOne(UserModel, UserTC).resolve({
         args: { filter: { _id: user1.id } },
       });
       expect(result.record.id).toBe(user1.id);
     });
 
     it('should skip records', async () => {
-      const result1 = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result1 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
           skip: 0,
         },
       });
-      const result2 = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result2 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
           skip: 1,
@@ -142,13 +142,13 @@ describe('updateOne() ->', () => {
     });
 
     it('should sort records', async () => {
-      const result1 = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result1 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
           sort: { _id: 1 },
         },
       });
-      const result2 = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result2 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
           sort: { _id: -1 },
@@ -158,7 +158,7 @@ describe('updateOne() ->', () => {
     });
 
     it('should pass empty projection to findOne and got full document data', async () => {
-      const result = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { _id: user1.id },
         },
@@ -174,7 +174,7 @@ describe('updateOne() ->', () => {
     });
 
     it('should return mongoose document', async () => {
-      const result = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result = await updateOne(UserModel, UserTC).resolve({
         args: { filter: { _id: user1.id } },
       });
       expect(result.record).toBeInstanceOf(UserModel);
@@ -182,7 +182,7 @@ describe('updateOne() ->', () => {
 
     it('should call `beforeRecordMutate` method with founded `record`  and `resolveParams` as args', async () => {
       let beforeMutationId;
-      const result = await updateOne(UserModel, UserTypeComposer).resolve({
+      const result = await updateOne(UserModel, UserTC).resolve({
         args: { filter: { _id: user1.id } },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record, rp) => {
@@ -197,7 +197,7 @@ describe('updateOne() ->', () => {
     });
 
     it('`beforeRecordMutate` may reject operation', async () => {
-      const result = updateOne(UserModel, UserTypeComposer).resolve({
+      const result = updateOne(UserModel, UserTC).resolve({
         args: { filter: { _id: user1.id }, record: { name: 'new name' } },
         context: { readOnly: true },
         beforeRecordMutate: (record, rp) => {
@@ -215,31 +215,28 @@ describe('updateOne() ->', () => {
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType: any = updateOne(UserModel, UserTypeComposer).getType();
-      expect(outputType.name).toBe(`UpdateOne${UserTypeComposer.getTypeName()}Payload`);
+      const outputType: any = updateOne(UserModel, UserTC).getType();
+      expect(outputType.name).toBe(`UpdateOne${UserTC.getTypeName()}Payload`);
     });
 
     it('should have recordId field', () => {
-      const outputType: any = updateOne(UserModel, UserTypeComposer).getType();
+      const outputType: any = updateOne(UserModel, UserTC).getType();
       const recordIdField = new TypeComposer(outputType).getField('recordId');
       expect(recordIdField.type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
-      const outputType: any = updateOne(UserModel, UserTypeComposer).getType();
+      const outputType: any = updateOne(UserModel, UserTC).getType();
       const recordField = new TypeComposer(outputType).getField('record');
-      expect(recordField.type).toBe(UserTypeComposer.getType());
+      expect(recordField.type).toBe(UserTC.getType());
     });
 
     it('should reuse existed outputType', () => {
-      const outputTypeName = `UpdateOne${UserTypeComposer.getTypeName()}Payload`;
-      const existedType = new GraphQLObjectType({
-        name: outputTypeName,
-        fields: () => ({}),
-      });
-      typeStorage.set(outputTypeName, existedType);
-      const outputType = updateOne(UserModel, UserTypeComposer).getType();
-      expect(outputType).toBe(existedType);
+      const outputTypeName = `UpdateOne${UserTC.getTypeName()}Payload`;
+      const existedType = TypeComposer.create(outputTypeName);
+      schemaComposer.set(outputTypeName, existedType);
+      const outputType = updateOne(UserModel, UserTC).getType();
+      expect(outputType).toBe(existedType.getType());
     });
   });
 });

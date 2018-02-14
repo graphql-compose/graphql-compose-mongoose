@@ -1,22 +1,21 @@
 /* @flow */
 
-import { Resolver } from 'graphql-compose';
+import { Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLInt } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import count from '../count';
-import { composeWithMongoose } from '../../composeWithMongoose';
-import typeStorage from '../../typeStorage';
+import { convertModelToGraphQL } from '../../fieldsConverter';
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 describe('count() ->', () => {
-  let UserTypeComposer;
+  let UserTC;
 
   beforeEach(() => {
-    typeStorage.clear();
     UserModel.schema._gqcTypeComposer = undefined;
-    UserTypeComposer = composeWithMongoose(UserModel);
+    schemaComposer.clear();
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
   });
 
   let user1;
@@ -43,30 +42,30 @@ describe('count() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = count(UserModel, UserTypeComposer);
+    const resolver = count(UserModel, UserTC);
     expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have `filter` arg', () => {
-      const resolver = count(UserModel, UserTypeComposer);
+      const resolver = count(UserModel, UserTC);
       expect(resolver.hasArg('filter')).toBe(true);
     });
   });
 
   describe('Resolver.resolve():Promise', () => {
     it('should be fulfilled promise', async () => {
-      const result = count(UserModel, UserTypeComposer).resolve({});
+      const result = count(UserModel, UserTC).resolve({});
       await expect(result).resolves.toBeDefined();
     });
 
     it('should return total number of documents in collection if args is empty', async () => {
-      const result = await count(UserModel, UserTypeComposer).resolve({ args: {} });
+      const result = await count(UserModel, UserTC).resolve({ args: {} });
       expect(result).toBe(2);
     });
 
     it('should return number of document by filter data', async () => {
-      const result = await count(UserModel, UserTypeComposer).resolve({
+      const result = await count(UserModel, UserTC).resolve({
         args: { filter: { gender: 'male' } },
       });
       expect(result).toBe(1);
@@ -75,7 +74,7 @@ describe('count() ->', () => {
 
   describe('Resolver.getType()', () => {
     it('should return GraphQLInt type', () => {
-      const outputType = count(UserModel, UserTypeComposer).getType();
+      const outputType = count(UserModel, UserTC).getType();
       expect(outputType).toBe(GraphQLInt);
     });
   });

@@ -6,7 +6,6 @@ import type { ExtendedResolveParams } from '../index';
 export const skipHelperArgs = (): ComposeFieldConfigArgumentMap => {
   return {
     skip: {
-      name: 'skip',
       type: 'Int',
     },
   };

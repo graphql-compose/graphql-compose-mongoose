@@ -1,23 +1,22 @@
 /* @flow */
 
 import { Query } from 'mongoose';
-import { Resolver, TypeComposer } from 'graphql-compose';
-import { GraphQLInt, GraphQLNonNull, GraphQLObjectType } from 'graphql-compose/lib/graphql';
+import { Resolver, TypeComposer, schemaComposer } from 'graphql-compose';
+import { GraphQLInt, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import updateMany from '../updateMany';
-import { composeWithMongoose } from '../../composeWithMongoose';
-import typeStorage from '../../typeStorage';
+import { convertModelToGraphQL } from '../../fieldsConverter';
 
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 describe('updateMany() ->', () => {
-  let UserTypeComposer;
+  let UserTC;
 
   beforeEach(() => {
-    typeStorage.clear();
+    schemaComposer.clear();
     UserModel.schema._gqcTypeComposer = undefined;
-    UserTypeComposer = composeWithMongoose(UserModel);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
   });
 
   let user1;
@@ -44,33 +43,33 @@ describe('updateMany() ->', () => {
   });
 
   it('should return Resolver object', () => {
-    const resolver = updateMany(UserModel, UserTypeComposer);
+    const resolver = updateMany(UserModel, UserTC);
     expect(resolver).toBeInstanceOf(Resolver);
   });
 
   describe('Resolver.args', () => {
     it('should have `filter` arg', () => {
-      const resolver = updateMany(UserModel, UserTypeComposer);
+      const resolver = updateMany(UserModel, UserTC);
       expect(resolver.hasArg('filter')).toBe(true);
     });
 
     it('should have `limit` arg', () => {
-      const resolver = updateMany(UserModel, UserTypeComposer);
+      const resolver = updateMany(UserModel, UserTC);
       expect(resolver.hasArg('limit')).toBe(true);
     });
 
     it('should have `skip` arg', () => {
-      const resolver = updateMany(UserModel, UserTypeComposer);
+      const resolver = updateMany(UserModel, UserTC);
       expect(resolver.hasArg('skip')).toBe(true);
     });
 
     it('should have `sort` arg', () => {
-      const resolver = updateMany(UserModel, UserTypeComposer);
+      const resolver = updateMany(UserModel, UserTC);
       expect(resolver.hasArg('sort')).toBe(true);
     });
 
     it('should have `record` arg', () => {
-      const resolver = updateMany(UserModel, UserTypeComposer);
+      const resolver = updateMany(UserModel, UserTC);
       const argConfig: any = resolver.getArg('record');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
       expect(argConfig.type.ofType.name).toBe('UpdateManyUserInput');
@@ -79,19 +78,19 @@ describe('updateMany() ->', () => {
 
   describe('Resolver.resolve():Promise', () => {
     it('should be promise', () => {
-      const result = updateMany(UserModel, UserTypeComposer).resolve({});
+      const result = updateMany(UserModel, UserTC).resolve({});
       expect(result).toBeInstanceOf(Promise);
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
     it('should rejected with Error if args.record is empty', async () => {
-      const result = updateMany(UserModel, UserTypeComposer).resolve({ args: {} });
+      const result = updateMany(UserModel, UserTC).resolve({ args: {} });
       await expect(result).rejects.toMatchSnapshot();
     });
 
     it('should change data via args.record in database', async () => {
       const checkedName = 'nameForMongoDB';
-      await updateMany(UserModel, UserTypeComposer).resolve({
+      await updateMany(UserModel, UserTC).resolve({
         args: {
           filter: { _id: user1.id },
           record: { name: checkedName },
@@ -104,7 +103,7 @@ describe('updateMany() ->', () => {
     });
 
     it('should return payload.numAffected', async () => {
-      const result = await updateMany(UserModel, UserTypeComposer).resolve({
+      const result = await updateMany(UserModel, UserTC).resolve({
         args: {
           record: { gender: 'female' },
         },
@@ -114,7 +113,7 @@ describe('updateMany() ->', () => {
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
       let beforeQueryCalled = false;
-      const result = await updateMany(UserModel, UserTypeComposer).resolve({
+      const result = await updateMany(UserModel, UserTC).resolve({
         args: {
           record: { gender: 'female' },
         },
@@ -132,25 +131,22 @@ describe('updateMany() ->', () => {
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType: any = updateMany(UserModel, UserTypeComposer).getType();
-      expect(outputType.name).toBe(`UpdateMany${UserTypeComposer.getTypeName()}Payload`);
+      const outputType: any = updateMany(UserModel, UserTC).getType();
+      expect(outputType.name).toBe(`UpdateMany${UserTC.getTypeName()}Payload`);
     });
 
     it('should have numAffected field', () => {
-      const outputType: any = updateMany(UserModel, UserTypeComposer).getType();
+      const outputType: any = updateMany(UserModel, UserTC).getType();
       const numAffectedField = new TypeComposer(outputType).getField('numAffected');
       expect(numAffectedField.type).toBe(GraphQLInt);
     });
 
     it('should reuse existed outputType', () => {
-      const outputTypeName = `UpdateMany${UserTypeComposer.getTypeName()}Payload`;
-      const existedType = new GraphQLObjectType({
-        name: outputTypeName,
-        fields: () => ({}),
-      });
-      typeStorage.set(outputTypeName, existedType);
-      const outputType = updateMany(UserModel, UserTypeComposer).getType();
-      expect(outputType).toBe(existedType);
+      const outputTypeName = `UpdateMany${UserTC.getTypeName()}Payload`;
+      const existedType = TypeComposer.create(outputTypeName);
+      schemaComposer.set(outputTypeName, existedType);
+      const outputType = updateMany(UserModel, UserTC).getType();
+      expect(outputType).toBe(existedType.getType());
     });
   });
 });

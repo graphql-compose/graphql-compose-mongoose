@@ -5,6 +5,7 @@ import {
   getIndexesFromModel,
   getUniqueIndexes,
   extendByReversedIndexes,
+  getIndexedFieldNamesForGraphQL,
 } from '../getIndexesFromModel';
 
 const AgentSchema = new mongoose.Schema({
@@ -135,5 +136,15 @@ describe('extendByReversedIndexes()', () => {
       { name: -1, someOtherField: 1 },
       { name: 1, someOtherField: -1 },
     ]);
+  });
+});
+
+describe('getIndexedFieldNamesForGraphQL()', () => {
+  it('should return array of indexed fieldNames', () => {
+    const indexedFields = getIndexedFieldNamesForGraphQL(AgentModel);
+    expect(indexedFields).toEqual(
+      expect.arrayContaining(['_id', 'someUniqField', 'name', 'subDoc__field2'])
+    );
+    expect(indexedFields).not.toEqual(expect.arrayContaining(['age', 'gender']));
   });
 });

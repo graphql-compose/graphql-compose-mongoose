@@ -3,5 +3,3 @@
 exports[`removeById() -> Resolver.resolve():Promise \`beforeRecordMutate\` may reject operation 1`] = `[Error: Denied due context ReadOnly]`;
 
 exports[`removeById() -> Resolver.resolve():Promise should rejected with Error if args._id is empty 1`] = `[Error: User.removeById resolver requires args._id value]`;
-
-exports[`removeById() -> Resolver.resolve():Promise should return error if document does not exist 1`] = `[Error: Document not found]`;
