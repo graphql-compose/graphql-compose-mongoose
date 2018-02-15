@@ -2318,21 +2318,21 @@ graceful-fs@^4.1.10, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.4
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphql-compose-connection@>=2.5.7:
-  version "2.5.7"
-  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-2.5.7.tgz#09179730de1183e20edc768a5a8eae157f516d4b"
+graphql-compose-connection@>=3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-3.0.0.tgz#d637e4e54e26e96b4a2c8792209ec6cd2e9d413c"
   dependencies:
     babel-runtime "^6.26.0"
 
-graphql-compose-pagination@>=1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/graphql-compose-pagination/-/graphql-compose-pagination-1.1.5.tgz#770f8f8c2ee56d613a26dcd28f87736879e305a0"
+graphql-compose-pagination@>=3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/graphql-compose-pagination/-/graphql-compose-pagination-3.0.0.tgz#d445e37ca3939cdf7c73850fba5e6c793d28afaa"
   dependencies:
     babel-runtime "^6.26.0"
 
-graphql-compose@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-3.0.2.tgz#bf053722153d1c51f6d4573f6cf442ab5ee50ef5"
+graphql-compose@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-3.0.3.tgz#c90a8991e71a149997c17d554fbf73adac26dd35"
   dependencies:
     babel-runtime "^6.26.0"
     object-path "^0.11.4"
@@ -3505,9 +3505,9 @@ mongodb-core@3.0.2:
     bson "~1.0.4"
     require_optional "^1.0.1"
 
-mongodb-memory-server@^1.6.5:
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.6.5.tgz#6dd8ab3c67ed238d46f981ab565b3c07bb368644"
+mongodb-memory-server@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-1.7.0.tgz#726eca78b4d71399b8182ad87bead068b3e44416"
   dependencies:
     babel-runtime "^6.26.0"
     debug "^3.1.0"
@@ -3521,7 +3521,7 @@ mongodb-memory-server@^1.6.5:
     request "^2.83.0"
     request-promise "^4.2.2"
     tmp "^0.0.33"
-    uuid "^3.0.1"
+    uuid "^3.2.1"
 
 mongodb@3.0.2:
   version "3.0.2"
@@ -4936,9 +4936,13 @@ util.promisify@^1.0.0:
     define-properties "^1.1.2"
     object.getownpropertydescriptors "^2.0.3"
 
-uuid@^3.0.0, uuid@^3.0.1, uuid@^3.1.0:
+uuid@^3.0.0, uuid@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.1.0.tgz#3dd3d3e790abc24d7b0d3a034ffababe28ebbc04"
+
+uuid@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.2.1.tgz#12c528bb9d58d0b9265d9a2f6f0fe8be17ff1f14"
 
 v8flags@^2.1.1:
   version "2.1.1"
