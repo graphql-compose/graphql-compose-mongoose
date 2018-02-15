@@ -3,7 +3,9 @@
   "version": "0.0.0-semantically-released",
   "description": "Plugin for `graphql-compose` which derive a graphql types from a mongoose model.",
   "files": [
-    "lib"
+    "lib",
+    "node8",
+    "es"
   ],
   "main": "lib/index.js",
   "repository": {
