@@ -1,15 +1,15 @@
 # graphql-compose-mongoose
 
-[![travis build](https://img.shields.io/travis/nodkz/graphql-compose-mongoose.svg)](https://travis-ci.org/nodkz/graphql-compose-mongoose)
-[![codecov coverage](https://img.shields.io/codecov/c/github/nodkz/graphql-compose-mongoose.svg)](https://codecov.io/github/nodkz/graphql-compose-mongoose)
+[![travis build](https://img.shields.io/travis/graphql-compose/graphql-compose-mongoose.svg)](https://travis-ci.org/graphql-compose/graphql-compose-mongoose)
+[![codecov coverage](https://img.shields.io/codecov/c/github/graphql-compose/graphql-compose-mongoose.svg)](https://codecov.io/github/graphql-compose/graphql-compose-mongoose)
 [![](https://img.shields.io/npm/v/graphql-compose-mongoose.svg)](https://www.npmjs.com/package/graphql-compose-mongoose)
 [![npm](https://img.shields.io/npm/dt/graphql-compose-mongoose.svg)](http://www.npmtrends.com/graphql-compose-mongoose)
-[![Join the chat at https://gitter.im/graphql-compose/Lobby](https://badges.gitter.im/nodkz/graphql-compose.svg)](https://gitter.im/graphql-compose/Lobby)
+[![Join the chat at https://gitter.im/graphql-compose/Lobby](https://badges.gitter.im/graphql-compose/graphql-compose.svg)](https://gitter.im/graphql-compose/Lobby)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![Greenkeeper badge](https://badges.greenkeeper.io/nodkz/graphql-compose-mongoose.svg)](https://greenkeeper.io/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/graphql-compose/graphql-compose-mongoose.svg)](https://greenkeeper.io/)
 
 
-This is a plugin for [graphql-compose](https://github.com/nodkz/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internal GraphQL Types. Provide all CRUD resolvers, including `graphql connection`, also provided basic search via operators ($lt, $gt and so on).
+This is a plugin for [graphql-compose](https://github.com/graphql-compose/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internal GraphQL Types. Provide all CRUD resolvers, including `graphql connection`, also provided basic search via operators ($lt, $gt and so on).
 
 Installation
 ============
@@ -18,7 +18,7 @@ npm install graphql graphql-compose mongoose graphql-compose-mongoose --save
 ```
 Modules `graphql`, `graphql-compose`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
 
-If you want to add additional resolvers [`connection`](https://github.com/nodkz/graphql-compose-connection) and/or [`pagination`](https://github.com/nodkz/graphql-compose-pagination) - just install following packages and `graphql-compose-mongoose` will add them automatically.
+If you want to add additional resolvers [`connection`](https://github.com/graphql-compose/graphql-compose-connection) and/or [`pagination`](https://github.com/graphql-compose/graphql-compose-pagination) - just install following packages and `graphql-compose-mongoose` will add them automatically.
 ```
 npm install graphql-compose-connection graphql-compose-pagination --save
 ```
@@ -40,7 +40,7 @@ Example
 =======
 Live demo: [https://graphql-compose.herokuapp.com/](https://graphql-compose.herokuapp.com/)
 
-Source code: https://github.com/nodkz/graphql-compose-mongoose-example
+Source code: https://github.com/graphql-compose/graphql-compose-mongoose-example
 
 ```js
 import mongoose from 'mongoose';
@@ -375,7 +375,7 @@ export type limitHelperArgsOpts = {
 
 Used plugins
 ============
-### [graphql-compose-connection](https://github.com/nodkz/graphql-compose-connection)
+### [graphql-compose-connection](https://github.com/graphql-compose/graphql-compose-connection)
 This plugin adds `connection` resolver. Build in mechanism allows sort by any unique indexes (not only by id). Also supported compound sorting (by several fields).
 
 Besides standard connection arguments `first`, `last`, `before` and `after`, also added great arguments:
@@ -384,9 +384,9 @@ Besides standard connection arguments `first`, `last`, `before` and `after`, als
 
 This plugin completely follows to [Relay Cursor Connections Specification](https://facebook.github.io/relay/graphql/connections.htm).
 
-### [graphql-compose-pagination](https://github.com/nodkz/graphql-compose-pagination)
+### [graphql-compose-pagination](https://github.com/graphql-compose/graphql-compose-pagination)
 This plugin adds `pagination` resolver.
 
 License
 =======
-[MIT](https://github.com/nodkz/graphql-compose-mongoose/blob/master/LICENSE.md)
+[MIT](https://github.com/graphql-compose/graphql-compose-mongoose/blob/master/LICENSE.md)
