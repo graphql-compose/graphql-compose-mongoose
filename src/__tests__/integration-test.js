@@ -167,7 +167,7 @@ describe('integration tests', () => {
   it('filter nested OR/AND', async () => {
     const UserTC = composeWithMongoose(UserModel);
     schemaComposer.rootQuery().addFields({
-      user: UserTC.getResolver('findMany'),
+      users: UserTC.getResolver('findMany'),
     });
     const schema = schemaComposer.buildSchema();
     await UserModel.create({
@@ -192,12 +192,12 @@ describe('integration tests', () => {
       schema,
       `
         {
-          user(filter: { OR: [{ age: 301 }, { AND: [{ gender: male }, { age: 302 }] }] }) {
+          users(filter: { OR: [{ age: 301 }, { AND: [{ gender: male }, { age: 302 }] }] }) {
             name
           }
         }
       `
     );
-    expect(res).toEqual({ data: { user: [{ name: 'User301' }, { name: 'User302' }] } });
+    expect(res).toEqual({ data: { users: [{ name: 'User301' }, { name: 'User302' }] } });
   });
 });
