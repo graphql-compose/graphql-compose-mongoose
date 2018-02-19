@@ -163,41 +163,4 @@ describe('integration tests', () => {
       expect(Object.keys(res.data.user.rawData)).toMatchSnapshot('projection from all fields');
     });
   });
-
-  it('filter nested OR/AND', async () => {
-    const UserTC = composeWithMongoose(UserModel);
-    schemaComposer.rootQuery().addFields({
-      users: UserTC.getResolver('findMany'),
-    });
-    const schema = schemaComposer.buildSchema();
-    await UserModel.create({
-      _id: '100000000000000000000301',
-      name: 'User301',
-      age: 301,
-    });
-    await UserModel.create({
-      _id: '100000000000000000000302',
-      name: 'User302',
-      age: 302,
-      gender: 'male',
-    });
-    await UserModel.create({
-      _id: '100000000000000000000303',
-      name: 'User303',
-      age: 302,
-      gender: 'female',
-    });
-
-    const res = await graphql(
-      schema,
-      `
-        {
-          users(filter: { OR: [{ age: 301 }, { AND: [{ gender: male }, { age: 302 }] }] }) {
-            name
-          }
-        }
-      `
-    );
-    expect(res).toEqual({ data: { users: [{ name: 'User301' }, { name: 'User302' }] } });
-  });
 });
