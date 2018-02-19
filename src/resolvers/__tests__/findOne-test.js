@@ -9,38 +9,38 @@ import { convertModelToGraphQL } from '../../fieldsConverter';
 beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
+let UserTC;
+
+beforeEach(() => {
+  schemaComposer.clear();
+  UserModel.schema._gqcTypeComposer = undefined;
+  UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+});
+
+let user1;
+let user2;
+
+beforeEach(async () => {
+  await UserModel.remove({});
+
+  user1 = new UserModel({
+    name: 'userName1',
+    skills: ['js', 'ruby', 'php', 'python'],
+    gender: 'male',
+    relocation: true,
+  });
+
+  user2 = new UserModel({
+    name: 'userName2',
+    skills: ['go', 'erlang'],
+    gender: 'female',
+    relocation: false,
+  });
+
+  await Promise.all([user1.save(), user2.save()]);
+});
+
 describe('findOne() ->', () => {
-  let UserTC;
-
-  beforeEach(() => {
-    schemaComposer.clear();
-    UserModel.schema._gqcTypeComposer = undefined;
-    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
-  });
-
-  let user1;
-  let user2;
-
-  beforeEach(async () => {
-    await UserModel.remove({});
-
-    user1 = new UserModel({
-      name: 'userName1',
-      skills: ['js', 'ruby', 'php', 'python'],
-      gender: 'male',
-      relocation: true,
-    });
-
-    user2 = new UserModel({
-      name: 'userName2',
-      skills: ['go', 'erlang'],
-      gender: 'female',
-      relocation: false,
-    });
-
-    await Promise.all([user1.save(), user2.save()]);
-  });
-
   it('should return Resolver object', () => {
     const resolver = findOne(UserModel, UserTC);
     expect(resolver).toBeInstanceOf(Resolver);

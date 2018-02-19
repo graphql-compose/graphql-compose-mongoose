@@ -28,10 +28,14 @@ export default function toMongoDottedObject(
   /* eslint-disable */
   objKeys.forEach(key => {
      if (key.startsWith('$')) {
-       target[path.join('.')] = {
-         ...target[path.join('.')],
-         [key]: obj[key],
-       };
+       if (path.length === 0) {
+         target[key] = obj[key];
+       } else {
+         target[path.join('.')] = {
+           ...target[path.join('.')],
+           [key]: obj[key],
+         };
+       }
      } else if (Object(obj[key]) === obj[key] && !(obj[key] instanceof ObjectId)) {
        toMongoDottedObject(obj[key], target, path.concat(key));
      } else {

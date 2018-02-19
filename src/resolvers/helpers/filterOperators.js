@@ -1,10 +1,12 @@
 /* @flow */
+/* eslint-disable no-use-before-define */
 
 import { getNamedType } from 'graphql-compose/lib/graphql';
 import type { MongooseModel } from 'mongoose';
 import type { InputTypeComposer } from 'graphql-compose';
 import type { ExtendedResolveParams } from '../index';
-import { upperFirst, getIndexedFieldNamesForGraphQL } from '../../utils';
+import { upperFirst, getIndexedFieldNamesForGraphQL, toMongoDottedObject } from '../../utils';
+import type { FilterHelperArgsOpts } from './filter';
 
 export type FilterOperatorNames = 'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
 const availableOperators: FilterOperatorNames[] = ['gt', 'gte', 'lt', 'lte', 'ne', 'in[]', 'nin[]'];
@@ -15,7 +17,83 @@ export type FilterOperatorsOpts = {
   [fieldName: string]: FilterOperatorNames[] | false,
 };
 
-export function addFieldWithOperators(
+export function addFilterOperators(
+  itc: InputTypeComposer,
+  model: MongooseModel,
+  opts: FilterHelperArgsOpts
+) {
+  if (!{}.hasOwnProperty.call(opts, 'operators') || opts.operators !== false) {
+    _createOperatorsField(
+      itc,
+      `Operators${opts.filterTypeName || ''}`,
+      model,
+      opts.operators || {}
+    );
+  }
+
+  itc.addFields({
+    OR: [itc.getTypeAsRequired()],
+    AND: [itc.getTypeAsRequired()],
+  });
+}
+
+export function processFilterOperators(filter: Object, resolveParams: ExtendedResolveParams) {
+  _prepareAndOrFilter(filter, resolveParams);
+
+  if (filter[OPERATORS_FIELDNAME]) {
+    const operatorFields = filter[OPERATORS_FIELDNAME];
+    Object.keys(operatorFields).forEach(fieldName => {
+      const fieldOperators = { ...operatorFields[fieldName] };
+      const criteria = {};
+      Object.keys(fieldOperators).forEach(operatorName => {
+        criteria[`$${operatorName}`] = fieldOperators[operatorName];
+      });
+      if (Object.keys(criteria).length > 0) {
+        // eslint-disable-next-line
+        resolveParams.query = resolveParams.query.where({
+          [fieldName]: criteria,
+        });
+      }
+    });
+  }
+}
+
+export function _prepareAndOrFilter(filter: Object, resolveParams?: ExtendedResolveParams) {
+  /* eslint-disable no-param-reassign */
+  if (!filter.OR && !filter.AND) return;
+
+  const { OR, AND } = filter;
+  if (OR) {
+    const $or = OR.map(d => {
+      _prepareAndOrFilter(d);
+      return toMongoDottedObject(d);
+    });
+
+    if (resolveParams) {
+      resolveParams.query.where({ $or });
+    } else {
+      filter.$or = $or;
+      delete filter.OR;
+    }
+  }
+
+  if (AND) {
+    const $and = AND.map(d => {
+      _prepareAndOrFilter(d);
+      return toMongoDottedObject(d);
+    });
+
+    if (resolveParams) {
+      resolveParams.query.where({ $and });
+    } else {
+      filter.$and = $and;
+      delete filter.AND;
+    }
+  }
+  /* eslint-enable no-param-reassign */
+}
+
+export function _createOperatorsField(
   itc: InputTypeComposer,
   typeName: string,
   model: MongooseModel,
@@ -82,23 +160,4 @@ export function addFieldWithOperators(
   }
 
   return operatorsITC;
-}
-
-export function processFilterOperators(filter: Object, resolveParams: ExtendedResolveParams) {
-  if (filter[OPERATORS_FIELDNAME]) {
-    const operatorFields = filter[OPERATORS_FIELDNAME];
-    Object.keys(operatorFields).forEach(fieldName => {
-      const fieldOperators = { ...operatorFields[fieldName] };
-      const criteria = {};
-      Object.keys(fieldOperators).forEach(operatorName => {
-        criteria[`$${operatorName}`] = fieldOperators[operatorName];
-      });
-      if (Object.keys(criteria).length > 0) {
-        // eslint-disable-next-line
-        resolveParams.query = resolveParams.query.where({
-          [fieldName]: criteria,
-        });
-      }
-    });
-  }
 }

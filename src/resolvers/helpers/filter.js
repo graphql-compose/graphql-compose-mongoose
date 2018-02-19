@@ -8,7 +8,7 @@ import { isObject, toMongoDottedObject, getIndexedFieldNamesForGraphQL } from '.
 import type { ExtendedResolveParams } from '../index';
 import {
   type FilterOperatorsOpts,
-  addFieldWithOperators,
+  addFilterOperators,
   processFilterOperators,
 } from './filterOperators';
 
@@ -69,18 +69,11 @@ export const filterHelperArgs = (
     itc.makeRequired(opts.requiredFields);
   }
 
-  if (!{}.hasOwnProperty.call(opts, 'operators') || opts.operators !== false) {
-    addFieldWithOperators(
-      itc,
-      `Operators${opts.filterTypeName || ''}`,
-      model,
-      opts.operators || {}
-    );
-  }
-
   if (itc.getFieldNames().length === 0) {
     return {};
   }
+
+  addFilterOperators(itc, model, opts);
 
   return {
     filter: {
@@ -117,8 +110,6 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
 
   if (isObject(resolveParams.rawQuery)) {
     // eslint-disable-next-line
-    resolveParams.query = resolveParams.query.where(
-      resolveParams.rawQuery
-    );
+    resolveParams.query = resolveParams.query.where(resolveParams.rawQuery);
   }
 }
