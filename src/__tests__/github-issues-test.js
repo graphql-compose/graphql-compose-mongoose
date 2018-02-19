@@ -2,8 +2,9 @@
 
 import mongoose from 'mongoose';
 import MongodbMemoryServer from 'mongodb-memory-server';
-import { graphql, GQC } from 'graphql-compose';
+import { schemaComposer, graphql } from 'graphql-compose';
 import { composeWithMongoose } from '../index';
+import { UserModel } from '../__mocks__/userModel';
 
 // May require additional time for downloading MongoDB binaries
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
@@ -24,6 +25,11 @@ beforeAll(async () => {
 afterAll(() => {
   mongoose.disconnect();
   mongoServer.stop();
+});
+
+const UserTC = composeWithMongoose(UserModel);
+schemaComposer.rootQuery().addFields({
+  users: UserTC.getResolver('findMany'),
 });
 
 describe('github issues checks', () => {
@@ -65,10 +71,10 @@ describe('github issues checks', () => {
       await ClickedLinkEvent.create({ refId: 'ccc', url: 'url1' });
       await ClickedLinkEvent.create({ refId: 'ddd', url: 'url2' });
 
-      GQC.rootQuery().addFields({
+      schemaComposer.rootQuery().addFields({
         eventFindMany: EventTC.getResolver('findMany'),
       });
-      const schema = GQC.buildSchema();
+      const schema = schemaComposer.buildSchema();
 
       const res = await graphql.graphql(
         schema,
@@ -96,6 +102,54 @@ describe('github issues checks', () => {
           ],
         },
       });
+    });
+  });
+
+  describe('#92 How to verify the fields?', async () => {
+    UserTC.wrapResolverResolve('createOne', next => rp => {
+      if (rp.args.record.age < 21) throw new Error('You are too young');
+      if (rp.args.record.age > 60) throw new Error('You are too old');
+      return next(rp);
+    });
+
+    schemaComposer.rootMutation().addFields({
+      addUser: UserTC.getResolver('createOne'),
+    });
+    const schema = schemaComposer.buildSchema();
+
+    it('correct request', async () => {
+      const result: any = await graphql.graphql(
+        schema,
+        `
+          mutation {
+            addUser(record: { name: "User1", age: 30 }) {
+              record {
+                name
+                age
+              }
+            }
+          }
+        `
+      );
+      expect(result).toEqual({ data: { addUser: { record: { age: 30, name: 'User1' } } } });
+    });
+
+    it('wrong request', async () => {
+      const result: any = await graphql.graphql(
+        schema,
+        `
+          mutation {
+            addUser(record: { name: "User1", age: 10 }) {
+              record {
+                name
+                age
+              }
+            }
+          }
+        `
+      );
+      expect(result).toEqual({ data: { addUser: null }, errors: expect.anything() });
+      expect(result.errors[0].message).toBe('You are too young');
     });
   });
 });
