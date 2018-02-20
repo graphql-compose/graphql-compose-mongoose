@@ -207,8 +207,12 @@ If you want the `ImageDataStructure` to use the same GraphQL type in both `Artic
 
 Do the following:
 ```js
+import { schemaComposer } from 'graphql-compose'; // get the default schemaComposer or your created schemaComposer
+//import { GQC } from 'graphql-compose'; // <- or use your GQC which is actually the default schemaComposer
 import { convertSchemaToGraphQL } from 'graphql-compose-mongoose';
-convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage'); // Force this type on this mongoose schema
+
+convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage', schemaComposer); // Force this type on this mongoose schema
+//convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage', GQC); // Using GQC as the schemaComposer
 ```
 Before continuing to convert your models to TypeComposers:
 ```js
