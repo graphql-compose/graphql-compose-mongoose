@@ -45,7 +45,7 @@ Source code: https://github.com/graphql-compose/graphql-compose-mongoose-example
 ```js
 import mongoose from 'mongoose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
-import { GQC } from 'graphql-compose';
+import { schemaComposer } from 'graphql-compose';
 
 // STEP 1: DEFINE MONGOOSE SCHEMA AND MODEL
 const LanguagesSchema = new mongoose.Schema({
@@ -89,7 +89,7 @@ const UserTC = composeWithMongoose(UserModel, customizationOptions);
 
 // STEP 3: CREATE CRAZY GraphQL SCHEMA WITH ALL CRUD USER OPERATIONS
 // via graphql-compose it will be much much easier, with less typing
-GQC.rootQuery().addFields({
+schemaComposer.rootQuery().addFields({
   userById: UserTC.getResolver('findById'),
   userByIds: UserTC.getResolver('findByIds'),
   userOne: UserTC.getResolver('findOne'),
@@ -99,7 +99,7 @@ GQC.rootQuery().addFields({
   userPagination: UserTC.getResolver('pagination'),
 });
 
-GQC.rootMutation().addFields({
+schemaComposer.rootMutation().addFields({
   userCreate: UserTC.getResolver('createOne'),
   userUpdateById: UserTC.getResolver('updateById'),
   userUpdateOne: UserTC.getResolver('updateOne'),
@@ -109,7 +109,7 @@ GQC.rootMutation().addFields({
   userRemoveMany: UserTC.getResolver('removeMany'),
 });
 
-const graphqlSchema = GQC.buildSchema();
+const graphqlSchema = schemaComposer.buildSchema();
 export default graphqlSchema;
 ```
 That's all!
@@ -208,11 +208,9 @@ If you want the `ImageDataStructure` to use the same GraphQL type in both `Artic
 Do the following:
 ```js
 import { schemaComposer } from 'graphql-compose'; // get the default schemaComposer or your created schemaComposer
-//import { GQC } from 'graphql-compose'; // <- or use your GQC which is actually the default schemaComposer
 import { convertSchemaToGraphQL } from 'graphql-compose-mongoose';
 
 convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage', schemaComposer); // Force this type on this mongoose schema
-//convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage', GQC); // Using GQC as the schemaComposer
 ```
 Before continuing to convert your models to TypeComposers:
 ```js
