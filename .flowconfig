@@ -2,6 +2,8 @@
 .*/coverage/.*
 .*/resources/.*
 <PROJECT_ROOT>/lib/.*
+<PROJECT_ROOT>/es/.*
+<PROJECT_ROOT>/node8/.*
 <PROJECT_ROOT>/dist/.*
 .*/node_modules/ajv.*
 .*/node_modules/acorn.*

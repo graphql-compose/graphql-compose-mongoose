@@ -118,8 +118,9 @@ export function convertModelToGraphQL(
   const schemaComposer = sc || globalSchemaComposer;
 
   // if model already has generated TypeComposer early, then return it
-  if (model.schema && model.schema._gqcTypeComposer) {
-    return (model.schema._gqcTypeComposer: any);
+  const modelSchema: any = model.schema;
+  if (modelSchema && modelSchema._gqcTypeComposer) {
+    return modelSchema._gqcTypeComposer;
   }
 
   if (!typeName) {
@@ -128,8 +129,7 @@ export function convertModelToGraphQL(
 
   const typeComposer = schemaComposer.getOrCreateTC(typeName);
 
-  // $FlowFixMe
-  model.schema._gqcTypeComposer = typeComposer; // eslint-disable-line no-param-reassign
+  modelSchema._gqcTypeComposer = typeComposer; // eslint-disable-line no-param-reassign
 
   const mongooseFields = getFieldsFromModel(model);
   const graphqlFields = {};

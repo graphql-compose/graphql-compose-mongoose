@@ -1,7 +1,6 @@
 /* @flow */
 
 import mongoose from 'mongoose';
-import MongodbMemoryServer from 'mongodb-memory-server';
 import { schemaComposer, graphql } from 'graphql-compose';
 import { composeWithMongoose } from '../index';
 import { UserModel } from '../__mocks__/userModel';
@@ -9,23 +8,8 @@ import { UserModel } from '../__mocks__/userModel';
 // May require additional time for downloading MongoDB binaries
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
-let mongoServer;
-
-// const opts = { useMongoClient: true }; // Mongoose 4
-const opts = {}; // Mongoose 5
-
-beforeAll(async () => {
-  mongoServer = new MongodbMemoryServer();
-  const mongoUri = await mongoServer.getConnectionString();
-  mongoose.connect(mongoUri, opts, err => {
-    if (err) console.error(err);
-  });
-});
-
-afterAll(() => {
-  mongoose.disconnect();
-  mongoServer.stop();
-});
+beforeAll(() => UserModel.base.connect());
+afterAll(() => UserModel.base.disconnect());
 
 const UserTC = composeWithMongoose(UserModel);
 schemaComposer.rootQuery().addFields({

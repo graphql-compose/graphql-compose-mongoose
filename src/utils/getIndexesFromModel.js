@@ -4,7 +4,7 @@ import type { MongooseModel } from 'mongoose';
 
 export type getIndexesFromModelOpts = {
   extractCompound?: boolean, // true by default
-  skipSpecificIndeces?: boolean, // eg text, 2d, 2dsphere (true by default)
+  skipSpecificIndexes?: boolean, // eg text, 2d, 2dsphere (true by default)
 };
 
 export type IndexT = { [fieldName: string]: any };

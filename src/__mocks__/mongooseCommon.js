@@ -9,7 +9,7 @@ mongoose.Promise = Promise;
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
 const originalConnect = mongoose.connect;
-mongoose.connect = async () => {
+mongoose.connect = (async () => {
   const mongoServer = new MongodbMemoryServer();
 
   const mongoUri = await mongoServer.getConnectionString(true);
@@ -33,6 +33,6 @@ mongoose.connect = async () => {
     // console.log('MongoDB disconnected!');
     mongoServer.stop();
   });
-};
+}: any);
 
 export { mongoose, Schema };
