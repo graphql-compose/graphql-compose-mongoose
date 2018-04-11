@@ -8,7 +8,7 @@ import type { MongooseModel } from 'mongoose';
 import type { ConnectionSortMapOpts } from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
-import { getUniqueIndexes, extendByReversedIndexes } from './utils/getIndexesFromModel';
+import { prepareConnectionResolver } from './prepareConnectionResolver';
 import type {
   FilterHelperArgsOpts,
   LimitHelperArgsOpts,
@@ -247,68 +247,5 @@ export function preparePaginationResolver(tc: TypeComposer, opts: PaginationReso
     findResolverName: 'findMany',
     countResolverName: 'count',
     ...opts,
-  });
-}
-
-export function prepareConnectionResolver(
-  model: MongooseModel,
-  tc: TypeComposer,
-  opts: ConnectionSortMapOpts
-) {
-  try {
-    require.resolve('graphql-compose-connection');
-  } catch (e) {
-    return;
-  }
-  const composeWithConnection = require('graphql-compose-connection').default;
-
-  const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), {
-    reversedFirst: true,
-  });
-  const sortConfigs = {};
-  uniqueIndexes.forEach(indexData => {
-    const keys = Object.keys(indexData);
-    let name = keys
-      .join('__')
-      .toUpperCase()
-      .replace(/[^_a-zA-Z0-9]/i, '__');
-    if (indexData[keys[0]] === 1) {
-      name = `${name}_ASC`;
-    } else if (indexData[keys[0]] === -1) {
-      name = `${name}_DESC`;
-    }
-    sortConfigs[name] = {
-      value: indexData,
-      cursorFields: keys,
-      beforeCursorQuery: (rawQuery, cursorData) => {
-        keys.forEach(k => {
-          if (!rawQuery[k]) rawQuery[k] = {};
-          if (indexData[k] === 1) {
-            rawQuery[k].$lt = cursorData[k];
-          } else {
-            rawQuery[k].$gt = cursorData[k];
-          }
-        });
-      },
-      afterCursorQuery: (rawQuery, cursorData) => {
-        keys.forEach(k => {
-          if (!rawQuery[k]) rawQuery[k] = {};
-          if (indexData[k] === 1) {
-            rawQuery[k].$gt = cursorData[k];
-          } else {
-            rawQuery[k].$lt = cursorData[k];
-          }
-        });
-      },
-    };
-  });
-
-  composeWithConnection(tc, {
-    findResolverName: 'findMany',
-    countResolverName: 'count',
-    sort: {
-      ...sortConfigs,
-      ...opts,
-    },
   });
 }
