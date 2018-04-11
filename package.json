@@ -59,11 +59,11 @@
     "graphql-compose-pagination": ">=3.0.0",
     "jest": "^22.4.3",
     "mongodb-memory-server": "^1.7.3",
-    "mongoose": "^5.0.12",
+    "mongoose": "^5.0.14",
     "prettier": "^1.11.1",
     "request": "^2.85.0",
     "rimraf": "^2.6.2",
-    "semantic-release": "^15.1.4"
+    "semantic-release": "^15.1.5"
   },
   "config": {
     "commitizen": {

@@ -2479,11 +2479,12 @@ git-url-parse@^8.0.0:
   dependencies:
     git-up "^2.0.0"
 
-git-url-parse@^8.1.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/git-url-parse/-/git-url-parse-8.2.0.tgz#74969b0105f805df58873ee5b96bc1a4dc0573b1"
+git-url-parse@^8.3.1:
+  version "8.3.1"
+  resolved "https://registry.yarnpkg.com/git-url-parse/-/git-url-parse-8.3.1.tgz#9d7d762993dc498aab16937c844e11afe3748817"
   dependencies:
     git-up "^2.0.0"
+    parse-domain "^2.0.0"
 
 glob-base@^0.3.0:
   version "0.3.0"
@@ -3955,9 +3956,9 @@ mongoose-legacy-pluralize@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/mongoose-legacy-pluralize/-/mongoose-legacy-pluralize-1.0.2.tgz#3ba9f91fa507b5186d399fb40854bff18fb563e4"
 
-mongoose@^5.0.12:
-  version "5.0.12"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-5.0.12.tgz#608a3829bf2edae47b0078cd1970ede2a033b3a0"
+mongoose@^5.0.14:
+  version "5.0.14"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-5.0.14.tgz#b2157eaa00eacded6e849b4fe36f58eeeda41119"
   dependencies:
     async "2.1.4"
     bson "~1.0.4"
@@ -3965,15 +3966,15 @@ mongoose@^5.0.12:
     lodash.get "4.4.2"
     mongodb "3.0.4"
     mongoose-legacy-pluralize "1.0.2"
-    mpath "0.3.0"
+    mpath "0.4.1"
     mquery "3.0.0"
     ms "2.0.0"
     regexp-clone "0.0.1"
     sliced "1.0.1"
 
-mpath@0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/mpath/-/mpath-0.3.0.tgz#7a58f789e9b5fd3c94520634157960f26bd5ef44"
+mpath@0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/mpath/-/mpath-0.4.1.tgz#ed10388430380bf7bbb5be1391e5d6969cb08e89"
 
 mquery@3.0.0:
   version "3.0.0"
@@ -4253,6 +4254,10 @@ p-retry@^1.0.0:
   resolved "https://registry.yarnpkg.com/p-retry/-/p-retry-1.0.0.tgz#3927332a4b7d70269b535515117fc547da1a6968"
   dependencies:
     retry "^0.10.0"
+
+parse-domain@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/parse-domain/-/parse-domain-2.0.0.tgz#e9f42f697c30f7c2051dc5c55ff4d8a80da7943c"
 
 parse-github-url@^1.0.1:
   version "1.0.2"
@@ -4922,9 +4927,9 @@ seek-bzip@^1.0.5:
   dependencies:
     commander "~2.8.1"
 
-semantic-release@^15.1.4:
-  version "15.1.4"
-  resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-15.1.4.tgz#000ddbd8a8977dc1a68cacfbeef2fb551e4b9791"
+semantic-release@^15.1.5:
+  version "15.1.5"
+  resolved "https://registry.yarnpkg.com/semantic-release/-/semantic-release-15.1.5.tgz#e97c2fa1defe6f65cd22d10f3ec2c242dc0e5632"
   dependencies:
     "@semantic-release/commit-analyzer" "^5.0.0"
     "@semantic-release/error" "^2.2.0"
@@ -4939,7 +4944,7 @@ semantic-release@^15.1.4:
     execa "^0.10.0"
     get-stream "^3.0.0"
     git-log-parser "^1.2.0"
-    git-url-parse "^8.1.0"
+    git-url-parse "^8.3.1"
     hook-std "^0.4.0"
     hosted-git-info "^2.6.0"
     lodash "^4.17.4"
