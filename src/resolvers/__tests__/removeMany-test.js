@@ -58,7 +58,7 @@ describe('removeMany() ->', () => {
   describe('Resolver.args', () => {
     it('should have required `filter` arg', () => {
       const resolver = removeMany(UserModel, UserTC);
-      const filterField = resolver.getArg('filter');
+      const filterField = resolver.getArgConfig('filter');
       expect(filterField).toBeTruthy();
       expect(filterField.type).toBeInstanceOf(GraphQLNonNull);
     });
@@ -129,7 +129,7 @@ describe('removeMany() ->', () => {
 
     it('should have numAffected field', () => {
       const outputType: any = removeMany(UserModel, UserTC).getType();
-      const numAffectedField = new TypeComposer(outputType).getField('numAffected');
+      const numAffectedField = new TypeComposer(outputType).getFieldConfig('numAffected');
       expect(numAffectedField.type).toBe(GraphQLInt);
     });
 

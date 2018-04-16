@@ -197,14 +197,14 @@ describe('updateById() ->', () => {
       const outputType: any = updateById(UserModel, UserTC).getType();
       const typeComposer = new TypeComposer(outputType);
       expect(typeComposer.hasField('recordId')).toBe(true);
-      expect(typeComposer.getField('recordId').type).toBe(GraphQLMongoID);
+      expect(typeComposer.getFieldType('recordId')).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType: any = updateById(UserModel, UserTC).getType();
       const typeComposer = new TypeComposer(outputType);
       expect(typeComposer.hasField('record')).toBe(true);
-      expect(typeComposer.getField('record').type).toBe(UserTC.getType());
+      expect(typeComposer.getFieldType('record')).toBe(UserTC.getType());
     });
 
     it('should reuse existed outputType', () => {

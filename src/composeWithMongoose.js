@@ -3,7 +3,6 @@
 
 import type { TypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
 import { schemaComposer } from 'graphql-compose';
-import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import type { MongooseModel } from 'mongoose';
 import type { ConnectionSortMapOpts } from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
@@ -139,13 +138,7 @@ export function composeWithMongoose(
     createResolvers(model, tc, opts.resolvers || {});
   }
 
-  if (tc.hasField('_id')) {
-    const fc = tc.getField('_id');
-    if (fc.type && !(fc.type instanceof GraphQLNonNull)) {
-      fc.type = new GraphQLNonNull(fc.type);
-      tc.setField('_id', fc);
-    }
-  }
+  tc.makeFieldNonNull('_id');
 
   return tc;
 }

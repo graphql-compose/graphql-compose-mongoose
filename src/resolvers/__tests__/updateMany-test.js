@@ -137,7 +137,7 @@ describe('updateMany() ->', () => {
 
     it('should have numAffected field', () => {
       const outputType: any = updateMany(UserModel, UserTC).getType();
-      const numAffectedField = new TypeComposer(outputType).getField('numAffected');
+      const numAffectedField = new TypeComposer(outputType).getFieldConfig('numAffected');
       expect(numAffectedField.type).toBe(GraphQLInt);
     });
 

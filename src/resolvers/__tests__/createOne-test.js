@@ -121,13 +121,13 @@ describe('createOne() ->', () => {
 
     it('should have recordId field', () => {
       const outputType: any = createOne(UserModel, UserTC).getType();
-      const recordIdField = new TypeComposer(outputType).getField('recordId');
+      const recordIdField = new TypeComposer(outputType).getFieldConfig('recordId');
       expect(recordIdField.type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType: any = createOne(UserModel, UserTC).getType();
-      const recordField = new TypeComposer(outputType).getField('record');
+      const recordField = new TypeComposer(outputType).getFieldConfig('record');
       expect(recordField.type).toBe(UserTC.getType());
     });
 

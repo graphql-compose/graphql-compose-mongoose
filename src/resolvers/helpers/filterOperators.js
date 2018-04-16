@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import { getNamedType } from 'graphql-compose/lib/graphql';
+import { getNamedType, type GraphQLInputType } from 'graphql-compose/lib/graphql';
 import type { MongooseModel } from 'mongoose';
 import type { InputTypeComposer } from 'graphql-compose';
 import type { ExtendedResolveParams } from '../index';
@@ -112,8 +112,7 @@ export function _createOperatorsField(
     });
   }
 
-  const existedFields = itc.getFields();
-  Object.keys(existedFields).forEach(fieldName => {
+  itc.getFieldNames().forEach(fieldName => {
     if (operatorsOpts[fieldName] && operatorsOpts[fieldName] !== false) {
       const fields = {};
       let operators;
@@ -123,19 +122,20 @@ export function _createOperatorsField(
         operators = availableOperators;
       }
       operators.forEach(operatorName => {
+        const fc = itc.getFieldConfig(fieldName);
         // unwrap from GraphQLNonNull and GraphQLList, if present
-        const namedType = getNamedType(existedFields[fieldName].type);
+        const namedType: GraphQLInputType = (getNamedType(fc.type): any);
         if (namedType) {
           if (operatorName.slice(-2) === '[]') {
             // wrap with GraphQLList, if operator required this with `[]`
             const newName = operatorName.slice(0, -2);
             fields[newName] = {
-              ...existedFields[fieldName],
+              ...fc,
               type: [namedType],
             };
           } else {
             fields[operatorName] = {
-              ...existedFields[fieldName],
+              ...fc,
               type: namedType,
             };
           }
