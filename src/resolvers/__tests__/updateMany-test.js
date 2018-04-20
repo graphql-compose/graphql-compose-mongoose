@@ -70,7 +70,7 @@ describe('updateMany() ->', () => {
 
     it('should have `record` arg', () => {
       const resolver = updateMany(UserModel, UserTC);
-      const argConfig: any = resolver.getArg('record');
+      const argConfig: any = resolver.getArgConfig('record');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
       expect(argConfig.type.ofType.name).toBe('UpdateManyUserInput');
     });

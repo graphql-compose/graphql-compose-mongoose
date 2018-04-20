@@ -6,7 +6,6 @@ import type { MongooseModel } from 'mongoose';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { skipHelperArgs, recordHelperArgs, filterHelperArgs, sortHelperArgs } from './helpers';
 import findOne from './findOne';
-import GraphQLMongoID from '../types/mongoid';
 
 export default function updateOne(
   model: MongooseModel,
@@ -26,7 +25,7 @@ export default function updateOne(
   const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
     t.addFields({
       recordId: {
-        type: GraphQLMongoID,
+        type: 'MongoID',
         description: 'Updated document ID',
       },
       record: {

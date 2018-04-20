@@ -3,9 +3,7 @@
 
 import type { Resolver, TypeComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
-import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import findById from './findById';
-import GraphQLMongoID from '../types/mongoid';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function removeById(
@@ -27,7 +25,7 @@ export default function removeById(
   const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
     t.addFields({
       recordId: {
-        type: GraphQLMongoID,
+        type: 'MongoID',
         description: 'Removed document ID',
       },
       record: {
@@ -46,10 +44,7 @@ export default function removeById(
       '2) Return removed document.',
     type: outputType,
     args: {
-      _id: {
-        name: '_id',
-        type: new GraphQLNonNull(GraphQLMongoID),
-      },
+      _id: 'MongoID!',
     },
     resolve: async (resolveParams: ExtendedResolveParams) => {
       const args = resolveParams.args || {};

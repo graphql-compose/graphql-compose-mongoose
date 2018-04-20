@@ -14,6 +14,7 @@ import type {
   SortHelperArgsOpts,
   RecordHelperArgsOpts,
 } from './resolvers/helpers';
+import MongoID from './types/mongoid';
 
 export type TypeConverterOpts = {
   schemaComposer?: SchemaComposer<any>,
@@ -120,6 +121,7 @@ export function composeWithMongoose(
   const name: string = (opts && opts.name) || model.modelName;
 
   const sc = opts.schemaComposer || schemaComposer;
+  sc.set('MongoID', MongoID);
   const tc = convertModelToGraphQL(model, name, sc);
 
   if (opts.description) {

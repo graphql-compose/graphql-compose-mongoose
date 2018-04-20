@@ -56,14 +56,14 @@ describe('updateById() ->', () => {
   describe('Resolver.args', () => {
     it('should have `record` arg', () => {
       const resolver = updateById(UserModel, UserTC);
-      const argConfig: any = resolver.getArg('record');
+      const argConfig: any = resolver.getArgConfig('record');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
       expect(argConfig.type.ofType.name).toBe('UpdateByIdUserInput');
     });
 
     it('should have `record._id` required arg', () => {
       const resolver = updateById(UserModel, UserTC);
-      const argConfig: any = resolver.getArg('record') || {};
+      const argConfig: any = resolver.getArgConfig('record') || {};
       expect(argConfig.type.ofType).toBeInstanceOf(GraphQLInputObjectType);
       if (argConfig.type && argConfig.type.ofType) {
         const _idFieldType = new InputTypeComposer(argConfig.type.ofType).getFieldType('_id');

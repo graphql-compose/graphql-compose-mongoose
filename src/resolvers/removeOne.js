@@ -3,7 +3,6 @@
 
 import type { Resolver, TypeComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
-import GraphQLMongoID from '../types/mongoid';
 import { filterHelperArgs, sortHelperArgs } from './helpers';
 import findOne from './findOne';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
@@ -27,7 +26,7 @@ export default function removeOne(
   const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
     t.addFields({
       recordId: {
-        type: GraphQLMongoID,
+        type: 'MongoID',
         description: 'Removed document ID',
       },
       record: {

@@ -2,8 +2,6 @@
 
 import type { Resolver, TypeComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
-import { GraphQLNonNull, GraphQLList } from 'graphql-compose/lib/graphql';
-import GraphQLMongoID from '../types/mongoid';
 import {
   limitHelper,
   limitHelperArgs,
@@ -31,10 +29,7 @@ export default function findByIds(
     name: 'findByIds',
     kind: 'query',
     args: {
-      _ids: {
-        name: '_ids',
-        type: new GraphQLNonNull(new GraphQLList(GraphQLMongoID)),
-      },
+      _ids: '[MongoID]!',
       ...limitHelperArgs({
         ...(opts && opts.limit),
       }),

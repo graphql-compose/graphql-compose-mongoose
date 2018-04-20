@@ -118,6 +118,30 @@ describe('fieldConverter', () => {
       };
       expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('String');
     });
+
+    it('should add GraphQLMongoID to schemaComposer', () => {
+      schemaComposer.clear();
+      expect(schemaComposer.has('MongoID')).toBeFalsy();
+      const mongooseField = {
+        path: 'strFieldName',
+        instance: 'ObjectID',
+      };
+      expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('MongoID');
+      expect(schemaComposer.get('MongoID')).toBe(GraphQLMongoID);
+    });
+
+    it('should use existed GraphQLMongoID in schemaComposer', () => {
+      schemaComposer.clear();
+      expect(schemaComposer.has('MongoID')).toBeFalsy();
+      schemaComposer.set('MongoID', ('MockGraphQLType': any));
+      const mongooseField = {
+        path: 'strFieldName',
+        instance: 'ObjectID',
+      };
+      expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('MongoID');
+      expect(schemaComposer.get('MongoID')).toBe('MockGraphQLType');
+      schemaComposer.delete('MongoID');
+    });
   });
 
   describe('scalarToGraphQL()', () => {
@@ -125,7 +149,7 @@ describe('fieldConverter', () => {
       expect(scalarToGraphQL({ instance: 'String' })).toBe('String');
       expect(scalarToGraphQL({ instance: 'Number' })).toBe('Float');
       expect(scalarToGraphQL({ instance: 'Boolean' })).toBe('Boolean');
-      expect(scalarToGraphQL({ instance: 'ObjectID' })).toBe(GraphQLMongoID);
+      expect(scalarToGraphQL({ instance: 'ObjectID' })).toBe('MongoID');
     });
 
     it('should properly convert mongoose scalar type to scalar graphql-compose types', () => {
@@ -196,7 +220,7 @@ describe('fieldConverter', () => {
 
   describe('referenceToGraphQL()', () => {
     it('should return type of field', () => {
-      expect(referenceToGraphQL(fields.user)).toBe(GraphQLMongoID);
+      expect(referenceToGraphQL(fields.user)).toBe('MongoID');
     });
   });
 });

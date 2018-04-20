@@ -67,7 +67,7 @@ describe('updateOne() ->', () => {
 
     it('should have required `record` arg', () => {
       const resolver = updateOne(UserModel, UserTC);
-      const argConfig: any = resolver.getArg('record');
+      const argConfig: any = resolver.getArgConfig('record');
       expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
       expect(argConfig.type.ofType.name).toBe('UpdateOneUserInput');
     });

@@ -5,7 +5,6 @@ import type { Resolver, TypeComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
-import GraphQLMongoID from '../types/mongoid';
 
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
@@ -28,7 +27,7 @@ export default function updateById(
   const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
     t.addFields({
       recordId: {
-        type: GraphQLMongoID,
+        type: 'MongoID',
         description: 'Updated document ID',
       },
       record: {

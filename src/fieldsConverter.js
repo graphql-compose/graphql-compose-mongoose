@@ -188,6 +188,10 @@ export function convertFieldToGraphQL(
   prefix?: string = '',
   schemaComposer: SchemaComposer<any>
 ): ComposeOutputType {
+  if (!schemaComposer.has('MongoID')) {
+    schemaComposer.set('MongoID', GraphQLMongoID);
+  }
+
   const complexType = deriveComplexType(field);
   switch (complexType) {
     case ComplexTypes.SCALAR:
@@ -257,7 +261,7 @@ export function scalarToGraphQL(field: MongooseFieldT): ComposeScalarType {
     case 'Boolean':
       return 'Boolean';
     case 'ObjectID':
-      return GraphQLMongoID;
+      return 'MongoID';
     default:
       return 'JSON';
   }
