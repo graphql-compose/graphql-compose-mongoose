@@ -32,8 +32,8 @@ export function addFilterOperators(
   }
 
   itc.addFields({
-    OR: [itc.getTypeAsRequired()],
-    AND: [itc.getTypeAsRequired()],
+    OR: [itc.getTypeNonNull()],
+    AND: [itc.getTypeNonNull()],
   });
 }
 

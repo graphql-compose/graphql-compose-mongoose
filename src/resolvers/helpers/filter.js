@@ -77,7 +77,7 @@ export const filterHelperArgs = (
 
   return {
     filter: {
-      type: opts.isRequired ? itc.getTypeAsRequired() : itc.getType(),
+      type: opts.isRequired ? itc.getTypeNonNull() : itc.getType(),
       description: opts.onlyIndexed ? 'Filter only by indexed fields' : 'Filter by fields',
     },
   };

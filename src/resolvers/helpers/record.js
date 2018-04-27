@@ -41,7 +41,7 @@ export const recordHelperArgs = (
 
   return {
     record: {
-      type: opts.isRequired ? recordITC.getTypeAsRequired() : recordITC.getType(),
+      type: opts.isRequired ? recordITC.getTypeNonNull() : recordITC.getType(),
     },
   };
 };
