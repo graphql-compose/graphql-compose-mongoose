@@ -11,8 +11,7 @@
 
 This is a plugin for [graphql-compose](https://github.com/graphql-compose/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internal GraphQL Types. Provide all CRUD resolvers, including `graphql connection`, also provided basic search via operators ($lt, $gt and so on).
 
-Installation
-============
+## Installation
 ```
 npm install graphql graphql-compose mongoose graphql-compose-mongoose --save
 ```
@@ -36,8 +35,8 @@ import { composeWithMongoose } from 'graphql-compose-mongoose/node8';
 import { composeWithMongoose } from 'graphql-compose-mongoose/es';
 ```
 
-Example
-=======
+## Example
+
 Live demo: [https://graphql-compose.herokuapp.com/](https://graphql-compose.herokuapp.com/)
 
 Source code: https://github.com/graphql-compose/graphql-compose-mongoose-example
@@ -45,8 +44,8 @@ Source code: https://github.com/graphql-compose/graphql-compose-mongoose-example
 Small explanation for varaibles naming:
 - `UserSchema` - this is a mongoose schema
 - `User` - this is a mongoose model
-- `UserTC` - this is a TypeComposer instance for User. TypeComposer has GraphQLObjectType inside, avaliable via method UserTC.getType().
-- Here and in all other places of code suffix `...TC` means that this is TypeComposer instance, `...ITC` - InputTypeComposer, `...ETC` - EnumTypeComposer.
+- `UserTC` - this is a `TypeComposer` instance for User. `TypeComposer` has `GraphQLObjectType` inside, avaliable via method `UserTC.getType()`.
+- Here and in all other places of code variables suffix `...TC` means that this is `TypeComposer` instance, `...ITC` - `InputTypeComposer`, `...ETC` - `EnumTypeComposer`.
 
 ```js
 import mongoose from 'mongoose';
@@ -123,8 +122,8 @@ You think that is to much code?
 I don't think so, because by default internally was created about 55 graphql types (for input, sorting, filtering). So you will need much much more lines of code to implement all these CRUD operations by hands.
 
 
-FAQ
-===
+## FAQ
+
 ### Can I get generated vanilla GraphQL types?
 ```js
 const UserTC = composeWithMongoose(User);
@@ -253,8 +252,8 @@ fragment fullImageData on EmbeddedImage {
 }
 ```
 
-Customization options
-=====================
+## Customization options
+
 When we convert model `const UserTC = composeWithMongoose(User, customizationOptions);` you may tune every piece of future derived types and resolvers.
 
 ### Here is flow typed definition of this options:
@@ -381,8 +380,8 @@ export type limitHelperArgsOpts = {
 };
 ```
 
-Used plugins
-============
+## Used plugins
+
 ### [graphql-compose-connection](https://github.com/graphql-compose/graphql-compose-connection)
 This plugin adds `connection` resolver. Build in mechanism allows sort by any unique indexes (not only by id). Also supported compound sorting (by several fields).
 
@@ -395,6 +394,6 @@ This plugin completely follows to [Relay Cursor Connections Specification](https
 ### [graphql-compose-pagination](https://github.com/graphql-compose/graphql-compose-pagination)
 This plugin adds `pagination` resolver.
 
-License
-=======
+## License
 [MIT](https://github.com/graphql-compose/graphql-compose-mongoose/blob/master/LICENSE.md)
+
