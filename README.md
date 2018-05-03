@@ -42,6 +42,12 @@ Live demo: [https://graphql-compose.herokuapp.com/](https://graphql-compose.hero
 
 Source code: https://github.com/graphql-compose/graphql-compose-mongoose-example
 
+Small explanation for varaibles naming:
+- `UserSchema` - this is a mongoose schema
+- `User` - this is a mongoose model
+- `UserTC` - this is a TypeComposer instance for User. TypeComposer has GraphQLObjectType inside, avaliable via method UserTC.getType().
+- Here and in all other places of code suffix `...TC` means that this is TypeComposer instance, `...ITC` - InputTypeComposer, `...ETC` - EnumTypeComposer.
+
 ```js
 import mongoose from 'mongoose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
@@ -79,13 +85,13 @@ const UserSchema = new mongoose.Schema({
     description: 'Can be any mixed type, that will be treated as JSON GraphQL Scalar Type',
   },
 });
-const UserModel = mongoose.model('UserModel', UserSchema);
+const User = mongoose.model('User', UserSchema);
 
 
 
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity, described below
-const UserTC = composeWithMongoose(UserModel, customizationOptions);
+const UserTC = composeWithMongoose(User, customizationOptions);
 
 // STEP 3: CREATE CRAZY GraphQL SCHEMA WITH ALL CRUD USER OPERATIONS
 // via graphql-compose it will be much much easier, with less typing
@@ -121,7 +127,7 @@ FAQ
 ===
 ### Can I get generated vanilla GraphQL types?
 ```js
-const UserTC = composeWithMongoose(UserModel);
+const UserTC = composeWithMongoose(User);
 UserTC.getType(); // returns GraphQLObjectType
 UserTC.getInputType(); // returns GraphQLInputObjectType, eg. for args
 UserTC.get('languages').getType(); // get GraphQLObjectType for nested field
@@ -146,7 +152,7 @@ UserTC.addFields({
 ```
 
 ### How to build nesting/relations?
-Suppose you Model has `friendsIds` field with array of user ids. So let build some relations:
+Suppose you `User` model has `friendsIds` field with array of user ids. So let build some relations:
 ```js
 UserTC.addRelation(
   'friends',
@@ -217,11 +223,11 @@ Before continuing to convert your models to TypeComposers:
 import mongoose from 'mongoose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
 
-const UserProfileModel = mongoose.model('UserProfile', UserProfile);
-const ArticleModel = mongoose.model('Article', Article);
+const UserProfile = mongoose.model('UserProfile', UserProfile);
+const Article = mongoose.model('Article', Article);
 
-const UserProfileTC = composeWithMongoose(UserProfileModel);
-const ArticleTC = composeWithMongoose(ArticleModel);
+const UserProfileTC = composeWithMongoose(UserProfile);
+const ArticleTC = composeWithMongoose(Article);
 ```
 Then, you can use queries like this:
 ```graphql
@@ -249,7 +255,7 @@ fragment fullImageData on EmbeddedImage {
 
 Customization options
 =====================
-When we convert model `const UserTC = composeWithMongoose(UserModel, customizationOptions);` you may tune every piece of future derived types and resolvers.
+When we convert model `const UserTC = composeWithMongoose(User, customizationOptions);` you may tune every piece of future derived types and resolvers.
 
 ### Here is flow typed definition of this options:
 
