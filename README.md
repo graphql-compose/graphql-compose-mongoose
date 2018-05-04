@@ -155,19 +155,19 @@ Suppose you `User` model has `friendsIds` field with array of user ids. So let b
 ```js
 UserTC.addRelation(
   'friends',
-  () => ({
-    resolver: UserTC.getResolver('findByIds'),
-    args: { // resolver `findByIds` has `_ids` arg, let provide value to it
+  {
+    resolver: () => UserTC.getResolver('findByIds'),
+    prepareArgs: { // resolver `findByIds` has `_ids` arg, let provide value to it
       _ids: (source) => source.friendsIds,
     },
     projection: { friendsIds: 1 }, // point fields in source object, which should be fetched from DB
-  })
+  }
 );
 UserTC.addRelation(
   'adultFriendsWithSameGender',
-  () => ({
-    resolver: UserTC.get('$findMany'), // shorthand for `UserTC.getResolver('findMany')`
-    args: { // resolver `findMany` has `filter` arg, we may provide mongoose query to it
+  {
+    resolver: () => UserTC.get('$findMany'), // shorthand for `UserTC.getResolver('findMany')`
+    prepareArgs: { // resolver `findMany` has `filter` arg, we may provide mongoose query to it
       filter: (source) => ({
         _operators : { // Applying criteria on fields which have
                        // operators enabled for them (by default, indexed fields only)
@@ -179,7 +179,7 @@ UserTC.addRelation(
       limit: 10,
     },
     projection: { friendsIds: 1, gender: 1 }, // required fields from source object
-  })
+  }
 );
 ```
 ### Reusing the same mongoose Schema in embedded object fields
