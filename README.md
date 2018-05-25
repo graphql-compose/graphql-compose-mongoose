@@ -182,6 +182,7 @@ UserTC.addRelation(
   }
 );
 ```
+
 ### Reusing the same mongoose Schema in embedded object fields
 Suppose you have a common structure you use as embedded object in multiple Schemas.
 Also suppose you want the structure to have the same GraphQL type across all parent types.
@@ -250,6 +251,74 @@ fragment fullImageData on EmbeddedImage {
     width height
   }
 }
+```
+
+### Access and modify mongoose doc before save
+This library provides some amount of ready resolvers for fetch and update data which was mentioned above. And you can [create your own resolver](https://github.com/graphql-compose/graphql-compose) of course. However you can find that add some actions or light modifications of mongoose document directly before save at existing resolvers appears more simple than create new resolver. Some of resolvers accepts *before save hook* wich can be provided in *resolver params* as param named `beforeRecordMutate`. This hook allows to have access and modify mongoose document before save. The resolvers which supports this hook are:
+
+* createOne
+* removeById
+* removeOne
+* updateById
+* updateOne
+
+The protype of before save hook:
+```js
+(record: mixed, rp: ExtendedResolveParams) => Promise<*>,
+```
+
+The typical implementation may be like this:
+
+```js
+// extend resolve params with hook
+rp.beforeRecordMutate = async function(doc, rp) {
+  doc.userTouchedAt = new Date();
+  
+  const canMakeUpdate  = await performAsyncTask( ...provide data from doc... )
+  if (!canMakeUpdate) {
+    throw new Error('Forbidden!');
+  }
+
+  return doc;
+}
+```
+
+You can provide your implementation directly in type composer:
+
+```js
+UserTC.wrapResolverResolve('updateById', next => async rp => {
+
+  // extend resolve params with hook
+  rp.beforeRecordMutate = async (doc, resolveParams) => { ... };
+
+  return next(rp);
+});
+```
+
+or you can create wrappers for example to protect access:
+
+```js
+function adminAccess(resolvers) {
+  Object.keys(resolvers).forEach((k) => {
+    resolvers[k] = resolvers[k].wrapResolve(next => async rp => {
+
+      // extend resolve params with hook
+      rp.beforeRecordMutate = async function(doc, rp) { ... }
+      
+      return next(rp)
+    })
+  })
+  return resolvers
+}
+
+// and wrap the resolvers
+schemaComposer.Mutation.addFields({
+  createResource: ResourceTC.getResolver('createOne'),
+  ...adminAccess({
+    updateResource: ResourceTC.getResolver('updateById'),
+    removeResource: ResourceTC.getResolver('removeById'),
+  }),
+});
 ```
 
 ## Customization options
