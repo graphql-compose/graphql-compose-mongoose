@@ -4,7 +4,7 @@
     "transform-flow-strip-types",
   ],
   "env": {
-    "lib": {
+    "cjs": {
       "plugins": [
         ["transform-runtime", { "polyfill": false }]
       ],
@@ -14,6 +14,20 @@
             "node": 6
           },
         }]
+      ]
+    },
+    "mjs": {
+      "presets": [
+        [
+          "env",
+          {
+            "targets": {
+              "node": "8.0.0"
+            },
+            "loose": true,
+            "modules": false
+          }
+        ]
       ]
     },
     "es": {
