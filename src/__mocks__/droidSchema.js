@@ -1,4 +1,6 @@
-import { Schema } from 'mongoose';
+/* @flow */
+
+import { Schema } from './mongooseCommon';
 
 export const DroidSchema = new Schema({
   makeDate: Date,

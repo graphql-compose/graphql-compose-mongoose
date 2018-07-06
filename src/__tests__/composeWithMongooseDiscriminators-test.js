@@ -8,6 +8,9 @@ import {
   DiscriminatorTypeComposer,
 } from '../composeWithMongooseDiscriminators';
 
+beforeAll(() => MovieModel.base.connect());
+afterAll(() => MovieModel.base.disconnect());
+
 export const allowedDKeys = ['type', 'kind', 'error'];
 
 const { CharacterModel, PersonModel, DroidModel } = getCharacterModels(allowedDKeys[0]);
@@ -99,11 +102,9 @@ describe('composeWithMongooseDiscriminators ->', () => {
   });
 
   describe('DiscriminatorTypeComposer', () => {
-    it('should not have as interface DInterface', () => {
+    it('should have as interface DInterface', () => {
       const cDTC = composeWithMongooseDiscriminators(CharacterModel);
-      expect(cDTC.getInterfaces()).not.toEqual(
-        expect.arrayContaining(Array.of(cDTC.getDInterface()))
-      );
+      expect(cDTC.hasInterface(cDTC.getDInterface())).toBeTruthy();
     });
 
     describe('hasChildDTC(DName)', () => {

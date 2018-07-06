@@ -1,4 +1,6 @@
-import mongoose, { Schema, Types } from 'mongoose';
+/* @flow */
+
+import { mongoose, Schema, Types } from './mongooseCommon';
 import { DroidSchema } from './droidSchema';
 import { PersonSchema } from './personSchema';
 

@@ -17,9 +17,6 @@ import {
 } from '../fieldsConverter';
 import GraphQLMongoID from '../types/mongoid';
 
-// beforeAll(() => UserModel.base.connect());
-// afterAll(() => UserModel.base.disconnect());
-
 describe('fieldConverter', () => {
   const fields: { [key: string]: any } = getFieldsFromModel(UserModel);
   const fieldNames = Object.keys(fields);

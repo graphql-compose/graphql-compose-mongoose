@@ -1,4 +1,6 @@
-import mongoose, { Schema } from 'mongoose';
+/* @flow */
+
+import { mongoose, Schema } from './mongooseCommon';
 
 const MovieSchema = new Schema({
   _id: String,

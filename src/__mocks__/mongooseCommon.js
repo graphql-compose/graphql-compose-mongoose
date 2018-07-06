@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign, no-console */
 
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
 import MongodbMemoryServer from 'mongodb-memory-server';
 
 mongoose.Promise = Promise;
@@ -35,4 +35,4 @@ mongoose.connect = (async () => {
   });
 }: any);
 
-export { mongoose, Schema };
+export { mongoose, Schema, Types };

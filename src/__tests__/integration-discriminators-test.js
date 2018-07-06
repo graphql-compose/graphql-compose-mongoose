@@ -1,5 +1,5 @@
 import { graphql, schemaComposer } from 'graphql-compose/lib/index';
-import mongoose from 'mongoose';
+import { mongoose } from '../__mocks__/mongooseCommon';
 import { getCharacterModels } from '../__mocks__/characterModels';
 import { composeWithMongooseDiscriminators } from '../composeWithMongooseDiscriminators';
 
@@ -152,7 +152,7 @@ describe('depicting other Enhancements to resolvers', () => {
                 name
               }
             }
-            
+
             personCreate: characterCreate(record: {name: "mernxl", type: Person }) {
               record {
                 __typename
@@ -191,7 +191,7 @@ describe('depicting other Enhancements to resolvers', () => {
                 modelNumber
               }
             }
-            
+
             personCreate(record: {name: "mernxl", dob: 57275272}) {
               record {
                 __typename
