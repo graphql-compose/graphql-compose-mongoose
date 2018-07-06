@@ -109,9 +109,12 @@ type Mongoose$SchemaHookTypes =
   | "save"
   | "validate"
   | "find"
+  | "findOne"
+  | "count"
   | "update"
   | "remove"
   | "findOneAndRemove"
+  | "findOneAndUpdate"
   | "init";
 
 type Mongoose$SchemaPlugin<Opts> = (
@@ -252,7 +255,7 @@ declare class Mongoose$Document {
   ): Promise<UpdateResult> & { exec(): Promise<UpdateResult> };
   static create(doc: $Shape<this> | Array<$Shape<this>>): Promise<this>;
   static where(criteria?: Object): Mongoose$Query<this, this>;
-  static aggregate(pipeline: Object[]): Promise<any>;
+  static aggregate(pipeline: Object[]): Aggregate$Query;
   static bulkWrite(ops: Object[]): Promise<any>;
   static deleteMany(criteria: Object): Promise<any>;
   static deleteOne(criteria: Object): Promise<any>;
@@ -420,6 +423,38 @@ declare class Mongoose$Query<Result, Doc> extends Promise<Result> {
   toConstructor(): Class<Mongoose$Query<Result, Doc>>;
 }
 
+declare class Aggregate$Query extends Promise<any> {
+  exec(): Promise<any>;
+  allowDiskUse(bool: boolean): Aggregate$Query;
+  addCursorFlag(str: string, bool: boolean): Aggregate$Query;
+  addFields(opts?: Object): Aggregate$Query;
+  append(opts?: Object): Aggregate$Query;
+  collation(opts?: Object): Aggregate$Query;
+  count(str: string): Promise<number>;
+  cursor(opts?: Object): Mongoose$QueryCursor<Object>;
+  exec(cb?:Function): Promise<any>;
+  explain(cb?:Function): Aggregate$Query;
+  facet(opts?: Object): Aggregate$Query;
+  graphLookup(opts?: Object): Aggregate$Query;
+  group(opts?: Object): Aggregate$Query;
+  hint(opts?: Object): Aggregate$Query;
+  limit(n: number): Aggregate$Query;
+  lookup(opts?: Object): Aggregate$Query;
+  match(opts?: Object): Aggregate$Query;
+  model(opts?: Object): Aggregate$Query;
+  near(opts?: Object): Aggregate$Query;
+  option(opts?: Object): Aggregate$Query;
+  pipeline(): Object[];
+  project(opts?: Object): Aggregate$Query;
+  read(str: string): Aggregate$Query;
+  replaceRoot(opts?: Object): Aggregate$Query;
+  sample(n: number): Aggregate$Query;
+  skip(n: number): Aggregate$Query;
+  sort(options: {} | string): Aggregate$Query;
+  sortByCount(options: {} | string): Aggregate$Query;
+  unwind(str: string): Aggregate$Query;
+}
+
 declare class Mongoose$QueryCursor<Doc> {
   on(type: "data" | "end" | string, cb: Function): void;
   next(cb?: (err: Error, doc: Doc) => void): Promise<?Doc>;
@@ -498,15 +533,15 @@ declare class Mongoose$Connection {
 }
 
 declare module "mongoose" {
-  declare type MongooseConnection = Mongoose$Connection;
-  declare type MongoId = MongoId;
-  declare type BSONObjectId = bson$ObjectId;
-  declare type ObjectId = bson$ObjectId;
-  declare type MongooseQuery<Result, Doc> = Mongoose$Query<Result, Doc>;
-  declare type MongooseDocument = Mongoose$Document;
-  declare type MongooseModel = typeof Mongoose$Document;
-  declare type MongooseSchema<Doc> = Mongoose$Schema<Doc>;
-  declare type MongooseSchemaField<Schema> = Mongoose$SchemaField<
+  declare export type MongooseConnection = Mongoose$Connection;
+  declare export type MongoId = MongoId;
+  declare export type BSONObjectId = bson$ObjectId;
+  declare export type ObjectId = bson$ObjectId;
+  declare export type MongooseQuery<Result, Doc> = Mongoose$Query<Result, Doc>;
+  declare export type MongooseDocument = Mongoose$Document;
+  declare export type MongooseModel = typeof Mongoose$Document;
+  declare export type MongooseSchema<Doc> = Mongoose$Schema<Doc>;
+  declare export type MongooseSchemaField<Schema> = Mongoose$SchemaField<
     Schema
   >;
 
@@ -515,6 +550,7 @@ declare module "mongoose" {
     Types: Mongoose$Types,
     Promise: any,
     model: $PropertyType<Mongoose$Connection, "model">,
+    models: { [name: string]: typeof Mongoose$Document },
     createConnection(uri?: string, options?: Object): Mongoose$Connection,
     set: (key: string, value: string | Function | boolean) => void,
     connect: (uri: string, options?: Object) => void,

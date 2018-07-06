@@ -19,12 +19,12 @@ export const CharacterObject = {
   type: {
     type: String,
     require: true,
-    enum: Object.keys(enumCharacterType),
+    enum: (Object.keys(enumCharacterType): Array<string>),
   },
   kind: {
     type: String,
     require: true,
-    enum: Object.keys(enumCharacterType),
+    enum: (Object.keys(enumCharacterType): Array<string>),
   },
 
   friends: [String], // another Character
@@ -34,7 +34,7 @@ export const CharacterObject = {
 const CharacterSchema = new Schema(CharacterObject);
 const ACharacterSchema = new Schema(Object.assign({}, CharacterObject));
 
-export function getCharacterModels(DKey) {
+export function getCharacterModels(DKey: string) {
   CharacterSchema.set('discriminatorKey', DKey);
 
   const CharacterModel = mongoose.models.Character
