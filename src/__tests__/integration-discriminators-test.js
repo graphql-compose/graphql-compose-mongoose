@@ -24,8 +24,8 @@ describe('#78 Mongoose and Discriminators', () => {
   afterAll(() => Event.remove({}));
 
   it('creating Types from models', () => {
-    expect(EventTC.getFieldNames()).toEqual([ '_id', 'kind', 'refId' ]);
-    expect(ClickedLinkEventTC.getFieldNames()).toEqual([ '_id', 'kind', 'refId', 'url' ]);
+    expect(EventTC.getFieldNames()).toEqual(['_id', 'kind', 'refId']);
+    expect(ClickedLinkEventTC.getFieldNames()).toEqual(['_id', 'kind', 'refId', 'url']);
   });
 
   it('manually override resolver output type for findMany', async () => {
@@ -73,9 +73,9 @@ describe('#78 Mongoose and Discriminators', () => {
 });
 
 describe('depicting other Enhancements to resolvers', () => {
-  let CharacterDTC = composeWithMongooseDiscriminators(CharacterModel);
-  let DroidCTC = CharacterDTC.discriminator(DroidModel);
-  let PersonCTC = CharacterDTC.discriminator(PersonModel);
+  const CharacterDTC = composeWithMongooseDiscriminators(CharacterModel);
+  const DroidCTC = CharacterDTC.discriminator(DroidModel);
+  const PersonCTC = CharacterDTC.discriminator(PersonModel);
 
   schemaComposer.rootQuery().addFields({
     characterById: CharacterDTC.getResolver('findById'),
@@ -140,9 +140,7 @@ describe('depicting other Enhancements to resolvers', () => {
   const schema = schemaComposer.buildSchema();
 
   describe('baseResolvers Enhancements', () => {
-
     describe('createOne', () => {
-
       it('should create base document with DKey provided, generic fields', async () => {
         const res = await graphql.graphql(
           schema,
@@ -168,21 +166,19 @@ describe('depicting other Enhancements to resolvers', () => {
         expect(res).toEqual({
           data: {
             droidCreate: {
-              record: { __typename: 'Droid', type: 'Droid', name: "Queue XL" }
+              record: { __typename: 'Droid', type: 'Droid', name: 'Queue XL' },
             },
             personCreate: {
-              record: { __typename: 'Person', type: 'Person', name: "mernxl" }
-            }
-          }
+              record: { __typename: 'Person', type: 'Person', name: 'mernxl' },
+            },
+          },
         });
       });
     });
   });
 
   describe('childResolvers Enhancements', () => {
-
     describe('createOne', () => {
-
       it('should create child document without specifying DKey', async () => {
         const res = await graphql.graphql(
           schema,
@@ -210,12 +206,12 @@ describe('depicting other Enhancements to resolvers', () => {
         expect(res).toEqual({
           data: {
             droidCreate: {
-              record: { __typename: 'Droid', type: 'Droid', name: "Queue XL", modelNumber: 360 }
+              record: { __typename: 'Droid', type: 'Droid', name: 'Queue XL', modelNumber: 360 },
             },
             personCreate: {
-              record: { __typename: 'Person', type: 'Person', name: "mernxl", dob: 57275272 }
-            }
-          }
+              record: { __typename: 'Person', type: 'Person', name: 'mernxl', dob: 57275272 },
+            },
+          },
         });
       });
     });

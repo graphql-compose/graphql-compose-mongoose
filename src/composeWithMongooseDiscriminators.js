@@ -1,8 +1,17 @@
 /* @flow */
 
 import type { ComposeFieldConfigMap } from 'graphql-compose';
-import { EnumTypeComposer, graphql, schemaComposer, SchemaComposer, TypeComposer } from 'graphql-compose';
-import type { ComposePartialFieldConfigAsObject, RelationOpts, } from 'graphql-compose/lib/TypeComposer';
+import {
+  EnumTypeComposer,
+  graphql,
+  schemaComposer,
+  SchemaComposer,
+  TypeComposer,
+} from 'graphql-compose';
+import type {
+  ComposePartialFieldConfigAsObject,
+  RelationOpts,
+} from 'graphql-compose/lib/TypeComposer';
 import { Model } from 'mongoose';
 import type { TypeConverterOpts } from './composeWithMongoose';
 import { composeWithMongoose } from './composeWithMongoose';
@@ -35,16 +44,16 @@ export const EMCResolvers = {
 };
 
 type Discriminators = {
-  [ DName: string ]: any,
+  [DName: string]: any,
 };
 
 // sets the values on DKey enum TC
 function setDKeyETCValues(discriminators: Discriminators): any {
-  const values: { [ propName: string ]: { value: string } } = {};
+  const values: { [propName: string]: { value: string } } = {};
 
   for (const DName in discriminators) {
     if (discriminators.hasOwnProperty(DName)) {
-      values[ DName ] = {
+      values[DName] = {
         value: DName,
       };
     }
@@ -57,7 +66,8 @@ function setDKeyETCValues(discriminators: Discriminators): any {
 // then sets this enum type as the discriminator key field type
 function createAndSetDKeyETC(dTC: DiscriminatorTypeComposer, discriminators: Discriminators) {
   const DKeyETC = EnumTypeComposer.create({
-    name: `EnumDKey${dTC.getDBaseName()}${dTC.getDKey()[ 0 ].toUpperCase() + dTC.getDKey().substr(1)}`,
+    name: `EnumDKey${dTC.getDBaseName()}${dTC.getDKey()[0].toUpperCase() +
+      dTC.getDKey().substr(1)}`,
     values: setDKeyETCValues(discriminators),
   });
 
@@ -131,7 +141,7 @@ function getBaseTCFieldsWithTypes(baseTC: TypeComposer) {
   const baseFieldsWithTypes: GraphQLFieldConfigMap<any, any> = {};
 
   for (const field of baseFields) {
-    baseFieldsWithTypes[ field ] = {
+    baseFieldsWithTypes[field] = {
       type: baseTC.getFieldType(field),
     };
   }
@@ -144,7 +154,7 @@ function createDInterface(baseModelTC: DiscriminatorTypeComposer): GraphQLInterf
     name: baseModelTC.getDBaseName(),
 
     resolveType: (value: any) => {
-      const childDName = value[ baseModelTC.getDKey() ];
+      const childDName = value[baseModelTC.getDKey()];
       const sComposer = baseModelTC.getGQC(); // get schemaComposer
 
       if (childDName) {
@@ -206,14 +216,16 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     reorderFields(this, this.opts.reorderFields);
 
     this.DInterface = createDInterface(this);
-    this.setInterfaces([ this.DInterface ]);
+    this.setInterfaces([this.DInterface]);
 
     // Add a Generic Field, else we have generic Errors when resolving interface
     // this is somehow i don't understand, but we don't get any type if we never query it
     // I guess under the hud, graphql-compose shakes it off.
     this.GQC.Query.addFields({
-      [ this.getTypeName()[0].toLowerCase() + this.getTypeName().substr(1) + 'One' ]: this.getResolver('findOne')
-        .clone({ name: 'GenericOne' }).setType(this.getType()),
+      [`${this.getTypeName()[0].toLowerCase() +
+        this.getTypeName().substr(1)}One`]: this.getResolver('findOne')
+        .clone({ name: 'GenericOne' })
+        .setType(this.getType()),
     });
 
     // recompose Base Resolvers
@@ -245,7 +257,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
   }
 
   hasChildDTC(DName: string): boolean {
-    return !!(this.CDTCs.find((ch) => (ch.getTypeName() === DName)));
+    return !!this.CDTCs.find(ch => ch.getTypeName() === DName);
   }
 
   // add fields only to DInterface, baseTC, childTC
@@ -316,15 +328,17 @@ export class ChildDiscriminatorTypeComposer extends TypeComposer {
     // !ORDER MATTERS
     this.dTC = dTC;
     this.dName = (childModel: any).modelName;
-    this.setInterfaces([ dTC.getDInterface() ]);
+    this.setInterfaces([dTC.getDInterface()]);
 
     // Add this field, else we have Unknown type Error when we query for this field when we haven't
     // added a query that returns this type on rootQuery.
     // this is somehow i don't understand, but we don't get any type if we never query it
     // I guess under the hud, graphql-compose shakes it off.
     dTC.getGQC().Query.addFields({
-      [ this.getTypeName()[0].toLowerCase() + this.getTypeName().substr(1) + 'One' ]: this.getResolver('findOne')
-        .clone({ name: `${this.getTypeName()}One` }).setType(this.getType()),
+      [`${this.getTypeName()[0].toLowerCase() +
+        this.getTypeName().substr(1)}One`]: this.getResolver('findOne')
+        .clone({ name: `${this.getTypeName()}One` })
+        .setType(this.getType()),
     });
 
     recomposeChildResolvers(this);
@@ -357,7 +371,7 @@ export function composeWithMongooseDiscriminators(
   baseModel: Model,
   opts: Options = {
     reorderFields: true,
-    customizationOptions: {}
+    customizationOptions: {},
   }
 ): DiscriminatorTypeComposer {
   return new DiscriminatorTypeComposer(baseModel, opts);

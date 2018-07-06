@@ -10,21 +10,23 @@ const enumCharacterType = {
 export const CharacterObject = {
   _id: {
     type: String,
-    default: () => new Types.ObjectId()
+    default: () => new Types.ObjectId(),
   },
   name: String,
 
   type: {
-    type: String, require: true,
+    type: String,
+    require: true,
     enum: Object.keys(enumCharacterType),
   },
   kind: {
-    type: String, require: true,
+    type: String,
+    require: true,
     enum: Object.keys(enumCharacterType),
   },
 
-  friends: [ String ],  // another Character
-  appearsIn: [ String ],  // movie
+  friends: [String], // another Character
+  appearsIn: [String], // movie
 };
 
 const CharacterSchema = new Schema(CharacterObject);
@@ -33,17 +35,22 @@ const ACharacterSchema = new Schema(Object.assign({}, CharacterObject));
 export function getCharacterModels(DKey) {
   CharacterSchema.set('discriminatorKey', DKey);
 
-  let CharacterModel = (mongoose.models[ 'Character' ]) ? mongoose.models[ 'Character' ] : mongoose.model('Character', CharacterSchema);
+  const CharacterModel = mongoose.models.Character
+    ? mongoose.models.Character
+    : mongoose.model('Character', CharacterSchema);
 
-  let PersonModel = (mongoose.models[ enumCharacterType.PERSON ]) ? mongoose.models[ enumCharacterType.PERSON ] : CharacterModel.discriminator(enumCharacterType.PERSON, PersonSchema);
+  const PersonModel = mongoose.models[enumCharacterType.PERSON]
+    ? mongoose.models[enumCharacterType.PERSON]
+    : CharacterModel.discriminator(enumCharacterType.PERSON, PersonSchema);
 
-  let DroidModel = (mongoose.models[ enumCharacterType.DROID ]) ? mongoose.models[ enumCharacterType.DROID ] : CharacterModel.discriminator(enumCharacterType.DROID, DroidSchema);
+  const DroidModel = mongoose.models[enumCharacterType.DROID]
+    ? mongoose.models[enumCharacterType.DROID]
+    : CharacterModel.discriminator(enumCharacterType.DROID, DroidSchema);
 
   return { CharacterModel, PersonModel, DroidModel };
 }
 
 export function getCharacterModelClone() {
-
   const NoDKeyCharacterModel = mongoose.model('NoDKeyCharacter', ACharacterSchema);
 
   /*
@@ -54,6 +61,3 @@ export function getCharacterModelClone() {
 
   return { NoDKeyCharacterModel }; // APersonModel, ADroidModel };
 }
-
-
-

@@ -27,13 +27,13 @@ function setQueryDKey<TSource, TContext>(
       resolve.projection = resolve.projection ? resolve.projection : {};
 
       if (fromField) {
-        resolve.args[ fromField ] = resolve.args[ fromField ] ? resolve.args[ fromField ] : {};
-        resolve.args[ fromField ][ DKey ] = DName;
+        resolve.args[fromField] = resolve.args[fromField] ? resolve.args[fromField] : {};
+        resolve.args[fromField][DKey] = DName;
       } else {
-        resolve.args[ DKey ] = DName;
+        resolve.args[DKey] = DName;
       }
 
-      resolve.projection[ DKey ] = 1;
+      resolve.projection[DKey] = 1;
       /* eslint no-param-reassign: 1 */
 
       return next(resolve);
@@ -147,7 +147,7 @@ export function recomposeChildResolvers(childTC: ChildDiscriminatorTypeComposer)
         case EMCResolvers.updateMany:
           setQueryDKey(resolver, childTC, 'filter');
 
-          hideDKey(resolver, childTC, [ 'record', 'filter' ]);
+          hideDKey(resolver, childTC, ['record', 'filter']);
           break;
 
         case EMCResolvers.findOne:
@@ -166,12 +166,12 @@ export function recomposeChildResolvers(childTC: ChildDiscriminatorTypeComposer)
         default:
       }
 
-      setBaseInputTypesOnInputTypes(resolver, childTC.getDTC(), [ 'filter', 'record' ]);
+      setBaseInputTypesOnInputTypes(resolver, childTC.getDTC(), ['filter', 'record']);
       reorderFieldsRecordFilter(
         resolver,
         childTC.getDTC(),
         childTC.getDTC().getOpts().reorderFields,
-        [ 'filter', 'record' ]
+        ['filter', 'record']
       );
     }
   }
