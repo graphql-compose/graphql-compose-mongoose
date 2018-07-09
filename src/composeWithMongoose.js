@@ -4,10 +4,8 @@
 import type { TypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
 import { schemaComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
-import type { ConnectionSortMapOpts } from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
-import { prepareConnectionResolver } from './prepareConnectionResolver';
 import type {
   FilterHelperArgsOpts,
   LimitHelperArgsOpts,
@@ -15,6 +13,8 @@ import type {
   RecordHelperArgsOpts,
 } from './resolvers/helpers';
 import MongoID from './types/mongoid';
+import type { PaginationResolverOpts } from './resolvers/pagination';
+import type { ConnectionSortMapOpts } from './resolvers/connection';
 
 export type TypeConverterOpts = {
   schemaComposer?: SchemaComposer<any>,
@@ -108,10 +108,6 @@ export type TypeConverterResolversOpts = {
       },
   connection?: ConnectionSortMapOpts | false,
   pagination?: PaginationResolverOpts | false,
-};
-
-export type PaginationResolverOpts = {
-  perPage?: number,
 };
 
 export function composeWithMongoose(
@@ -217,30 +213,10 @@ export function createResolvers(
       const createResolverFn = resolvers[resolverName];
       if (createResolverFn) {
         const resolver = createResolverFn(model, tc, opts[resolverName] || {});
-        tc.setResolver(resolverName, resolver);
+        if (resolver) {
+          tc.setResolver(resolverName, resolver);
+        }
       }
     }
-  });
-
-  if (!{}.hasOwnProperty.call(opts, 'connection') || opts.connection !== false) {
-    prepareConnectionResolver(model, tc, opts.connection ? opts.connection : {});
-  }
-
-  if (!{}.hasOwnProperty.call(opts, 'pagination') || opts.pagination !== false) {
-    preparePaginationResolver(tc, opts.pagination || {});
-  }
-}
-
-export function preparePaginationResolver(tc: TypeComposer, opts: PaginationResolverOpts) {
-  try {
-    require.resolve('graphql-compose-pagination');
-  } catch (e) {
-    return;
-  }
-  const composeWithPagination = require('graphql-compose-pagination').default;
-  composeWithPagination(tc, {
-    findResolverName: 'findMany',
-    countResolverName: 'count',
-    ...opts,
   });
 }

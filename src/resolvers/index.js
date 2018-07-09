@@ -19,6 +19,9 @@ import removeMany from './removeMany';
 import createOne from './createOne';
 import count from './count';
 
+import pagination from './pagination';
+import connection from './connection';
+
 import type {
   FilterHelperArgsOpts,
   SortHelperArgsOpts,
@@ -53,6 +56,8 @@ export {
   removeMany,
   createOne,
   count,
+  pagination,
+  connection,
 };
 
 export function getAvailableNames(): string[] {
@@ -69,5 +74,7 @@ export function getAvailableNames(): string[] {
     'removeMany',
     'createOne',
     'count',
+    'pagination', // should be defined after `findMany` and `count` resolvers
+    'connection', // should be defined after `findMany` and `count` resolvers
   ];
 }
