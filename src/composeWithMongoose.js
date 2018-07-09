@@ -4,10 +4,8 @@
 import type { TypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
 import { schemaComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
-import type { ConnectionSortMapOpts } from 'graphql-compose-connection';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
-import { prepareConnectionResolver } from './prepareConnectionResolver';
 import type {
   FilterHelperArgsOpts,
   LimitHelperArgsOpts,
@@ -16,6 +14,7 @@ import type {
 } from './resolvers/helpers';
 import MongoID from './types/mongoid';
 import type { PaginationResolverOpts } from './resolvers/pagination';
+import type { ConnectionSortMapOpts } from './resolvers/connection';
 
 export type TypeConverterOpts = {
   schemaComposer?: SchemaComposer<any>,
@@ -220,8 +219,4 @@ export function createResolvers(
       }
     }
   });
-
-  if (!{}.hasOwnProperty.call(opts, 'connection') || opts.connection !== false) {
-    prepareConnectionResolver(model, tc, opts.connection ? opts.connection : {});
-  }
 }

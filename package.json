@@ -31,7 +31,7 @@
     "object-path": "^0.11.4"
   },
   "optionalDependencies": {
-    "graphql-compose-connection": ">=3.0.0",
+    "graphql-compose-connection": ">=3.2.0",
     "graphql-compose-pagination": ">=3.3.0"
   },
   "peerDependencies": {
@@ -57,7 +57,7 @@
     "flow-bin": "^0.75.0",
     "graphql": "0.13.2",
     "graphql-compose": "^4.4.1",
-    "graphql-compose-connection": ">=3.0.0",
+    "graphql-compose-connection": ">=3.2.0",
     "graphql-compose-pagination": ">=3.3.0",
     "jest": "^23.2.0",
     "mongodb-memory-server": "^1.8.0",

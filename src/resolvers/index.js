@@ -20,6 +20,7 @@ import createOne from './createOne';
 import count from './count';
 
 import pagination from './pagination';
+import connection from './connection';
 
 import type {
   FilterHelperArgsOpts,
@@ -56,6 +57,7 @@ export {
   createOne,
   count,
   pagination,
+  connection,
 };
 
 export function getAvailableNames(): string[] {
@@ -73,5 +75,6 @@ export function getAvailableNames(): string[] {
     'createOne',
     'count',
     'pagination', // should be defined after `findMany` and `count` resolvers
+    'connection', // should be defined after `findMany` and `count` resolvers
   ];
 }
