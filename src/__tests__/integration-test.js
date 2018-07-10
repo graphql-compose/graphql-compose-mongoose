@@ -11,7 +11,6 @@ afterAll(() => UserModel.base.disconnect());
 describe('integration tests', () => {
   beforeEach(() => {
     schemaComposer.clear();
-    UserModel.schema._gqcTypeComposer = undefined;
   });
 
   describe('check subdocuments', () => {

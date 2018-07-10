@@ -15,7 +15,6 @@ describe('createOne() ->', () => {
   let UserTC;
 
   beforeEach(() => {
-    UserModel.schema._gqcTypeComposer = undefined;
     schemaComposer.clear();
     UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
     UserTC.setRecordIdFn(source => (source ? `${source._id}` : ''));

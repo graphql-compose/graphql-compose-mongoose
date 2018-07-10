@@ -16,7 +16,6 @@ describe('removeById() ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserModel.schema._gqcTypeComposer = undefined;
     UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
     UserTC.setRecordIdFn(source => (source ? `${source._id}` : ''));
   });

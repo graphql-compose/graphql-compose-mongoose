@@ -15,7 +15,6 @@ type ComposeScalarType = string | GraphQLScalarType;
 type ComposeOutputType = TypeComposer | ComposeScalarType | EnumTypeComposer | [ComposeOutputType];
 
 export type MongoosePseudoModelT = {
-  _gqcTypeComposer?: TypeComposer,
   schema: Schema<any>,
 };
 
@@ -117,19 +116,21 @@ export function convertModelToGraphQL(
 ): TypeComposer {
   const schemaComposer = sc || globalSchemaComposer;
 
-  // if model already has generated TypeComposer early, then return it
-  const modelSchema: any = model.schema;
-  if (modelSchema && modelSchema._gqcTypeComposer) {
-    return modelSchema._gqcTypeComposer;
-  }
-
   if (!typeName) {
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
   }
 
-  const typeComposer = schemaComposer.getOrCreateTC(typeName);
+  // if model already has generated TypeComposer early, then return it
+  // $FlowFixMe await landing graphql-compose@4.4.2 or above
+  if (schemaComposer.has(model.schema)) {
+    // $FlowFixMe await landing graphql-compose@4.4.2 or above
+    return schemaComposer.getTC(model.schema);
+  }
 
-  modelSchema._gqcTypeComposer = typeComposer; // eslint-disable-line no-param-reassign
+  const typeComposer = schemaComposer.getOrCreateTC(typeName);
+  // $FlowFixMe await landing graphql-compose@4.4.2 or above
+  schemaComposer.set(model.schema, typeComposer);
+  schemaComposer.set(typeName, typeComposer);
 
   const mongooseFields = getFieldsFromModel(model);
   const graphqlFields = {};
@@ -161,7 +162,7 @@ export function convertModelToGraphQL(
 }
 
 export function convertSchemaToGraphQL(
-  schema: Object, // MongooseModelSchemaT, TODO use Model from mongoose_v4.x.x definition when it will be public
+  schema: Schema<any>,
   typeName: string,
   sc?: SchemaComposer<any>
 ): TypeComposer {
@@ -171,15 +172,18 @@ export function convertSchemaToGraphQL(
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
   }
 
-  if (schema._gqcTypeComposer) {
-    return schema._gqcTypeComposer;
+  // $FlowFixMe await landing graphql-compose@4.4.2 or above
+  if (schemaComposer.has(schema)) {
+    // $FlowFixMe await landing graphql-compose@4.4.2 or above
+    return schemaComposer.getTC(schema);
   }
 
   const tc = convertModelToGraphQL({ schema }, typeName, schemaComposer);
   // also generate InputType
   tc.getInputTypeComposer();
 
-  schema._gqcTypeComposer = tc; // eslint-disable-line
+  // $FlowFixMe await landing graphql-compose@4.4.2 or above
+  schemaComposer.set(schema, tc);
   return tc;
 }
 

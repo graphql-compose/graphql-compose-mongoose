@@ -14,7 +14,6 @@ afterAll(() => UserModel.base.disconnect());
 describe('composeWithMongoose ->', () => {
   beforeEach(() => {
     schemaComposer.clear();
-    UserModel.schema._gqcTypeComposer = undefined;
   });
 
   describe('MongooseModelToTypeComposer()', () => {
@@ -27,7 +26,7 @@ describe('composeWithMongoose ->', () => {
       it('should set type name from model or opts.name', () => {
         expect(composeWithMongoose(UserModel).getTypeName()).toBe(UserModel.modelName);
 
-        UserModel.schema._gqcTypeComposer = undefined;
+        schemaComposer.clear();
         expect(composeWithMongoose(UserModel, { name: 'Ok' }).getTypeName()).toBe('Ok');
       });
 
@@ -47,6 +46,13 @@ describe('composeWithMongoose ->', () => {
         const tc: any = composeWithMongoose(UserModel);
         expect(tc.getFieldType('_id')).toBeInstanceOf(GraphQLNonNull);
         expect(tc.getFieldType('_id').ofType).toBe(GraphQLMongoID);
+      });
+
+      it('composeWithMongoose should generate new TypeComposer (without cache)', () => {
+        const tc1: any = composeWithMongoose(UserModel);
+        schemaComposer.clear();
+        const tc2: any = composeWithMongoose(UserModel);
+        expect(tc1).not.toBe(tc2);
       });
     });
 

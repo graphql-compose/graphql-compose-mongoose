@@ -15,7 +15,6 @@ describe('updateMany() ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserModel.schema._gqcTypeComposer = undefined;
     UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
   });
 
