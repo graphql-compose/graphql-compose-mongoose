@@ -1,7 +1,7 @@
 /* @flow */
 
 import { graphql } from 'graphql-compose';
-import { DiscriminatorTypeComposer, EMCResolvers } from '../composeWithMongooseDiscriminators';
+import { DiscriminatorTypeComposer, EMCResolvers } from '../../composeWithMongooseDiscriminators';
 
 const { GraphQLList, GraphQLNonNull } = graphql;
 
@@ -30,7 +30,7 @@ function setDKeyEnumOnITCArgs(resolver, baseTC: DiscriminatorTypeComposer) {
 // recomposing sets up the DInterface as the return types for
 // Also sets up DKey enum as type for DKey field on composers with filter and/or record args
 // composeWithMongoose composers
-export function recomposeBaseResolvers(baseTC: DiscriminatorTypeComposer) {
+export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer) {
   for (const resolverName in EMCResolvers) {
     if (baseTC.hasResolver(resolverName)) {
       const resolver = baseTC.getResolver(resolverName);

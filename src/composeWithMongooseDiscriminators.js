@@ -8,16 +8,16 @@ import {
   SchemaComposer,
   TypeComposer,
 } from 'graphql-compose';
+import type { GraphQLFieldConfigMap } from 'graphql-compose/lib/graphql';
 import type {
   ComposePartialFieldConfigAsObject,
   RelationOpts,
 } from 'graphql-compose/lib/TypeComposer';
-import type { GraphQLFieldConfigMap } from 'graphql-compose/lib/graphql';
 import { Model } from 'mongoose';
 import type { TypeConverterOpts } from './composeWithMongoose';
 import { composeWithMongoose } from './composeWithMongoose';
-import { recomposeBaseResolvers } from './utils/recomposeBaseResolvers';
-import { recomposeChildResolvers } from './utils/recomposeChildResolvers';
+import { prepareBaseResolvers } from './discriminators/prepare-resolvers/prepareBaseResolvers';
+import { prepareChildResolvers } from './discriminators/prepare-resolvers/prepareChildResolvers';
 
 const { GraphQLInterfaceType } = graphql;
 
@@ -229,8 +229,8 @@ export class DiscriminatorTypeComposer extends TypeComposer {
         .setType(this.getType()),
     });
 
-    // recompose Base Resolvers
-    recomposeBaseResolvers(this);
+    // prepare Base Resolvers
+    prepareBaseResolvers(this);
   }
 
   getOpts(): Options {
@@ -342,7 +342,7 @@ export class ChildDiscriminatorTypeComposer extends TypeComposer {
         .setType(this.getType()),
     });
 
-    recomposeChildResolvers(this);
+    prepareChildResolvers(this);
 
     reorderFields(this, opts.reorderFields);
   }

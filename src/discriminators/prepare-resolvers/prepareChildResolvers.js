@@ -6,7 +6,7 @@ import {
   ChildDiscriminatorTypeComposer,
   DiscriminatorTypeComposer,
   EMCResolvers,
-} from '../composeWithMongooseDiscriminators';
+} from '../../composeWithMongooseDiscriminators';
 
 // set the DKey as a query on filter, also project it
 // Also look at it like setting for filters, makes sure to limit
@@ -127,7 +127,7 @@ function reorderFieldsRecordFilter(
   }
 }
 
-export function recomposeChildResolvers(childTC: ChildDiscriminatorTypeComposer) {
+export function prepareChildResolvers(childTC: ChildDiscriminatorTypeComposer) {
   for (const resolverName in EMCResolvers) {
     if (childTC.hasResolver(resolverName)) {
       const resolver = childTC.getResolver(resolverName);

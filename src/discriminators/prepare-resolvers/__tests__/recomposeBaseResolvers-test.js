@@ -1,6 +1,6 @@
 import { graphql } from 'graphql-compose';
-import { getCharacterModels } from '../../__mocks__/characterModels';
-import { composeWithMongooseDiscriminators } from '../../composeWithMongooseDiscriminators';
+import { getCharacterModels } from '../../../__mocks__/characterModels';
+import { composeWithMongooseDiscriminators } from '../../../composeWithMongooseDiscriminators';
 
 const { CharacterModel } = getCharacterModels('type');
 
