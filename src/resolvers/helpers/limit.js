@@ -7,6 +7,9 @@ export type LimitHelperArgsOpts = {
   defaultValue?: number,
 };
 
+// for merging, discriminators merge-able only
+export const getLimitHelperArgsOptsMap = () => ({ defaultValue: 'number' });
+
 export const limitHelperArgs = (opts?: LimitHelperArgsOpts): ComposeFieldConfigArgumentMap => {
   return {
     limit: {

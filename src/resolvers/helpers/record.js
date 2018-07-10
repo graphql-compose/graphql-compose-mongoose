@@ -9,6 +9,13 @@ export type RecordHelperArgsOpts = {
   requiredFields?: string[],
 };
 
+// for merging, discriminators merge-able only
+export const getRecordHelperArgsOptsMap = () => ({
+  isRequired: 'boolean',
+  removeFields: 'string[]',
+  requiredFields: 'string[]',
+});
+
 export const recordHelperArgs = (
   tc: TypeComposer,
   opts?: RecordHelperArgsOpts

@@ -17,6 +17,7 @@ import { Model } from 'mongoose';
 import type { TypeConverterOpts } from './composeWithMongoose';
 import { composeWithMongoose } from './composeWithMongoose';
 import { composeChildTC } from './discriminators';
+import { mergeCustomizationOptions } from './discriminators/merge-customization-options';
 import { prepareBaseResolvers } from './discriminators/prepare-resolvers/prepareBaseResolvers';
 import { reorderFields } from './discriminators/utils';
 
@@ -122,7 +123,9 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     baseModel: Model,
     opts: Options = {
       reorderFields: true,
-      customizationOptions: {},
+      customizationOptions: {
+        schemaComposer,
+      },
     }
   ) {
     if (!baseModel || !(baseModel: any).discriminators) {
@@ -229,7 +232,9 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
   /* eslint no-use-before-define: 0 */
   discriminator(childModel: Model, opts?: TypeConverterOpts): TypeComposer {
-    let childTC = composeWithMongoose(childModel, opts || this.opts.customizationOptions);
+    const customizationOpts = mergeCustomizationOptions(this.opts.customizationOptions, opts);
+
+    let childTC = composeWithMongoose(childModel, customizationOpts);
 
     childTC = composeChildTC(this, childTC, this.opts);
 
