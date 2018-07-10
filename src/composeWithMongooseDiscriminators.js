@@ -16,8 +16,9 @@ import type {
 import { Model } from 'mongoose';
 import type { TypeConverterOpts } from './composeWithMongoose';
 import { composeWithMongoose } from './composeWithMongoose';
+import { composeChildTC } from './discriminators';
 import { prepareBaseResolvers } from './discriminators/prepare-resolvers/prepareBaseResolvers';
-import { prepareChildResolvers } from './discriminators/prepare-resolvers/prepareChildResolvers';
+import { reorderFields } from './discriminators/utils';
 
 const { GraphQLInterfaceType } = graphql;
 
@@ -85,58 +86,6 @@ function createAndSetDKeyETC(dTC: DiscriminatorTypeComposer, discriminators: Dis
   return DKeyETC;
 }
 
-function reorderFields(
-  modelTC: DiscriminatorTypeComposer | ChildDiscriminatorTypeComposer,
-  order: string[] | boolean
-) {
-  if (order) {
-    if (Array.isArray(order)) {
-      modelTC.reorderFields(order);
-    } else {
-      const newOrder = [];
-
-      // is child discriminator
-      if (modelTC instanceof ChildDiscriminatorTypeComposer) {
-        const baseModelTC = modelTC.getDTC();
-
-        newOrder.push(...baseModelTC.getFieldNames());
-
-        newOrder.filter(value => value === '_id' || value === modelTC.getDKey());
-
-        newOrder.unshift('_id', modelTC.getDKey());
-      } else {
-        if (modelTC.getField('_id')) {
-          newOrder.push('_id');
-        }
-        newOrder.push(modelTC.getDKey());
-      }
-
-      modelTC.reorderFields(newOrder);
-    }
-  }
-}
-
-// copy all baseTypeComposers fields to childTC
-// these are the fields before calling discriminator
-function childImplements(baseDTC: TypeComposer, childTC: TypeComposer) {
-  const baseFields = baseDTC.getFieldNames();
-  const childFields = childTC.getFieldNames();
-
-  for (const field of baseFields) {
-    const childFieldName = childFields.find(fld => fld === field);
-
-    if (childFieldName) {
-      childTC.extendField(field, {
-        type: baseDTC.getFieldType(field),
-      });
-    } else {
-      childTC.setField(field, baseDTC.getField(field));
-    }
-  }
-
-  return childTC;
-}
-
 function getBaseTCFieldsWithTypes(baseTC: TypeComposer) {
   const baseFields = baseTC.getFieldNames();
   const baseFieldsWithTypes: GraphQLFieldConfigMap<any, any> = {};
@@ -185,7 +134,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
   discriminators: Discriminators;
 
-  CDTCs: Array<ChildDiscriminatorTypeComposer>;
+  childTCs: TypeComposer[];
 
   constructor(
     baseModel: Model,
@@ -209,12 +158,12 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     // key being their DNames
     this.discriminators = (baseModel: any).discriminators;
 
-    this.CDTCs = [];
+    this.childTCs = [];
     this.GQC = opts.customizationOptions.schemaComposer || schemaComposer;
     this.setTypeName(`Generic${this.modelName}`);
     this.DKeyETC = createAndSetDKeyETC(this, this.discriminators);
 
-    reorderFields(this, this.opts.reorderFields);
+    reorderFields(this, this.opts.reorderFields, this.discriminatorKey);
 
     this.DInterface = createDInterface(this);
     this.setInterfaces([this.DInterface]);
@@ -231,10 +180,6 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
     // prepare Base Resolvers
     prepareBaseResolvers(this);
-  }
-
-  getOpts(): Options {
-    return this.opts;
   }
 
   getGQC(): SchemaComposer<any> {
@@ -257,16 +202,16 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this.DInterface;
   }
 
-  hasChildDTC(DName: string): boolean {
-    return !!this.CDTCs.find(ch => ch.getTypeName() === DName);
+  hasChildTC(DName: string): boolean {
+    return !!this.childTCs.find(ch => ch.getTypeName() === DName);
   }
 
   // add fields only to DInterface, baseTC, childTC
   addDFields(newDFields: ComposeFieldConfigMap<any, any>): this {
     super.addFields(newDFields);
 
-    for (const CDTC of this.CDTCs) {
-      CDTC.addFields(newDFields);
+    for (const childTC of this.childTCs) {
+      childTC.addFields(newDFields);
     }
 
     return this;
@@ -278,8 +223,8 @@ export class DiscriminatorTypeComposer extends TypeComposer {
   ): this {
     super.extendField(fieldName, partialFieldConfig);
 
-    for (const CDTC of this.CDTCs) {
-      CDTC.extendField(fieldName, partialFieldConfig);
+    for (const childTC of this.childTCs) {
+      childTC.extendField(fieldName, partialFieldConfig);
     }
 
     return this;
@@ -293,78 +238,22 @@ export class DiscriminatorTypeComposer extends TypeComposer {
   addDRelation(fieldName: string, relationOpts: RelationOpts<any, any>): this {
     this.addRelation(fieldName, relationOpts);
 
-    for (const CDTC of this.CDTCs) {
-      CDTC.addRelation(fieldName, relationOpts);
+    for (const childTC of this.childTCs) {
+      childTC.addRelation(fieldName, relationOpts);
     }
 
     return this;
   }
 
   /* eslint no-use-before-define: 0 */
-  discriminator(childModel: Model, opts?: TypeConverterOpts): ChildDiscriminatorTypeComposer {
-    const childDTC = new ChildDiscriminatorTypeComposer(this, childModel, {
-      customizationOptions: opts || this.opts.customizationOptions,
-      reorderFields: this.opts.reorderFields,
-    });
+  discriminator(childModel: Model, opts?: TypeConverterOpts): TypeComposer {
+    let childTC = composeWithMongoose(childModel, opts || this.opts.customizationOptions);
 
-    this.CDTCs.push(childDTC);
+    childTC = composeChildTC(this, childTC, this.opts);
 
-    return childDTC;
-  }
-}
+    this.childTCs.push(childTC);
 
-export class ChildDiscriminatorTypeComposer extends TypeComposer {
-  dName: string;
-
-  dTC: DiscriminatorTypeComposer;
-
-  constructor(dTC: DiscriminatorTypeComposer, childModel: Model, opts: Options) {
-    if (!childModel) {
-      throw Error('Please specify a childModel');
-    }
-    const childTC = composeWithMongoose(childModel, opts.customizationOptions);
-
-    super(childImplements(dTC, childTC).gqType);
-
-    // !ORDER MATTERS
-    this.dTC = dTC;
-    this.dName = (childModel: any).modelName;
-    this.setInterfaces([dTC.getDInterface()]);
-
-    // Add this field, else we have Unknown type Error when we query for this field when we haven't
-    // added a query that returns this type on rootQuery.
-    // this is somehow i don't understand, but we don't get any type if we never query it
-    // I guess under the hud, graphql-compose shakes it off.
-    dTC.getGQC().Query.addFields({
-      [`${this.getTypeName()[0].toLowerCase() +
-        this.getTypeName().substr(1)}One`]: this.getResolver('findOne')
-        .clone({ name: `${this.getTypeName()}One` })
-        .setType(this.getType()),
-    });
-
-    prepareChildResolvers(this);
-
-    reorderFields(this, opts.reorderFields);
-  }
-
-  getDTC(): DiscriminatorTypeComposer {
-    return this.dTC;
-  }
-
-  getDKey(): string {
-    return this.dTC.getDKey();
-  }
-
-  getDName(): string {
-    return this.dName;
-  }
-
-  getDBaseName(): string {
-    return this.dTC.getDBaseName();
-  }
-
-  getDInterface(): GraphQLInterfaceType {
-    return this.dTC.getDInterface();
+    return childTC;
   }
 }
 
