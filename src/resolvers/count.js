@@ -33,7 +33,13 @@ export default function count(
     resolve: (resolveParams: ExtendedResolveParams) => {
       resolveParams.query = model.find();
       filterHelper(resolveParams);
-      return resolveParams.query.count().exec();
+      if (resolveParams.query.countDocuments) {
+        // mongoose 5.2.0 and above
+        return resolveParams.query.countDocuments().exec();
+      } else {
+        // mongoose 5 and below
+        return resolveParams.query.count().exec();
+      }
     },
   });
 }
