@@ -3,7 +3,8 @@
 import type { ResolveParams } from 'graphql-compose';
 import { Resolver, TypeComposer } from 'graphql-compose';
 import type { Options } from '../../composeWithMongooseDiscriminators';
-import { DiscriminatorTypeComposer, EMCResolvers } from '../../composeWithMongooseDiscriminators';
+import { DiscriminatorTypeComposer } from '../../composeWithMongooseDiscriminators';
+import { EMCResolvers } from '../../resolvers';
 
 // set the DKey as a query on filter, also project it
 // Also look at it like setting for filters, makes sure to limit

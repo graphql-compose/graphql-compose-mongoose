@@ -78,3 +78,21 @@ export function getAvailableNames(): string[] {
     'connection', // should be defined after `findMany` and `count` resolvers
   ];
 }
+
+// Enum MongooseComposeResolvers
+export const EMCResolvers = {
+  findById: 'findById',
+  findByIds: 'findByIds',
+  findOne: 'findOne',
+  findMany: 'findMany',
+  updateById: 'updateById',
+  updateOne: 'updateOne',
+  updateMany: 'updateMany',
+  removeById: 'removeById',
+  removeOne: 'removeOne',
+  removeMany: 'removeMany',
+  createOne: 'createOne',
+  count: 'count',
+  connection: 'connection',
+  pagination: 'pagination',
+};

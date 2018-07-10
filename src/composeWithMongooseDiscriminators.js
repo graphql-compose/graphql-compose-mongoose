@@ -27,24 +27,6 @@ export type Options = {
   customizationOptions: TypeConverterOpts,
 };
 
-// Enum MongooseComposeResolvers
-export const EMCResolvers = {
-  count: 'count',
-  connection: 'connection',
-  pagination: 'pagination',
-  findById: 'findById',
-  findByIds: 'findByIds',
-  findOne: 'findOne',
-  findMany: 'findMany',
-  createOne: 'createOne',
-  updateById: 'updateById',
-  updateOne: 'updateOne',
-  updateMany: 'updateMany',
-  removeById: 'removeById',
-  removeOne: 'removeOne',
-  removeMany: 'removeMany',
-};
-
 type Discriminators = {
   [DName: string]: any,
 };

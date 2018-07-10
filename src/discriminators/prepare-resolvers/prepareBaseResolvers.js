@@ -1,7 +1,8 @@
 /* @flow */
 
 import { graphql } from 'graphql-compose';
-import { DiscriminatorTypeComposer, EMCResolvers } from '../../composeWithMongooseDiscriminators';
+import { DiscriminatorTypeComposer } from '../../composeWithMongooseDiscriminators';
+import { EMCResolvers } from '../../resolvers';
 
 const { GraphQLList, GraphQLNonNull } = graphql;
 
