@@ -12,7 +12,6 @@ describe('Resolver helper `filter` ->', () => {
   let UserTC: TypeComposer;
 
   beforeEach(() => {
-    UserModel.schema._gqcTypeComposer = undefined;
     schemaComposer.clear();
     UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
   });

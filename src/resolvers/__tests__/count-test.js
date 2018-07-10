@@ -13,7 +13,6 @@ describe('count() ->', () => {
   let UserTC;
 
   beforeEach(() => {
-    UserModel.schema._gqcTypeComposer = undefined;
     schemaComposer.clear();
     UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
   });

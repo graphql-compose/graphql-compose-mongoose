@@ -17,10 +17,7 @@ describe('findByIds() ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserModel.schema._gqcTypeComposer = undefined;
     UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
-
-    PostModel.schema._gqcTypeComposer = undefined;
     PostTypeComposer = convertModelToGraphQL(PostModel, 'Post', schemaComposer);
   });
 
