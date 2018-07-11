@@ -24,8 +24,9 @@ import { reorderFields } from './discriminators/utils';
 const { GraphQLInterfaceType } = graphql;
 
 export type Options = {
-  reorderFields: string[] | boolean, // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
-  customizationOptions: TypeConverterOpts,
+  test_disTypes?: boolean,
+  reorderFields?: boolean | string[], // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
+  customizationOptions?: TypeConverterOpts,
 };
 
 type Discriminators = {
@@ -119,23 +120,23 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
   childTCs: TypeComposer[];
 
-  constructor(
-    baseModel: Model,
-    opts: Options = {
-      reorderFields: true,
-      customizationOptions: {
-        schemaComposer,
-      },
-    }
-  ) {
+  constructor(baseModel: Model, opts?: any) {
     if (!baseModel || !(baseModel: any).discriminators) {
       throw Error('Discriminator Key not Set, Use composeWithMongoose for Normal Collections');
     }
 
+    opts = {  // eslint-disable-line
+      reorderFields: true,
+      customizationOptions: {
+        schemaComposer,
+      },
+      ...opts,
+    };
+
     super(composeWithMongoose(baseModel, opts.customizationOptions).gqType);
 
     // !ORDER MATTERS
-    this.opts = opts || {};
+    this.opts = opts;
     this.modelName = (baseModel: any).modelName;
     this.discriminatorKey = (baseModel: any).schema.get('discriminatorKey') || '__t';
 
@@ -144,24 +145,35 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     this.discriminators = (baseModel: any).discriminators;
 
     this.childTCs = [];
-    this.GQC = opts.customizationOptions.schemaComposer || schemaComposer;
+    this.GQC =
+      opts.customizationOptions && opts.customizationOptions.schemaComposer
+        ? opts.customizationOptions.schemaComposer
+        : schemaComposer;
     this.setTypeName(`Generic${this.modelName}`);
     this.DKeyETC = createAndSetDKeyETC(this, this.discriminators);
 
-    reorderFields(this, this.opts.reorderFields, this.discriminatorKey);
+    reorderFields(this, (this.opts: any).reorderFields, this.discriminatorKey);
 
     this.DInterface = createDInterface(this);
     this.setInterfaces([this.DInterface]);
 
-    // Add a Generic Field, else we have generic Errors when resolving interface
-    // this is somehow i don't understand, but we don't get any type if we never query it
-    // I guess under the hud, graphql-compose shakes it off.
-    this.GQC.Query.addFields({
-      [`${this.getTypeName()[0].toLowerCase() +
-        this.getTypeName().substr(1)}One`]: this.getResolver('findOne')
-        .clone({ name: 'GenericOne' })
-        .setType(this.getType()),
-    });
+    // Hoist on _disTypes
+    if (opts.test_disTypes) {
+      if (!this.GQC.rootQuery().hasField('_disTypes')) {
+        this.GQC.rootQuery().addFields({
+          _disTypes: TypeComposer.create({
+            name: '_disTypes',
+            description: 'Hoisting for Discriminator Types',
+          }),
+        });
+      }
+
+      this.GQC.rootQuery()
+        .getFieldTC('_disTypes')
+        .addFields({
+          [this.getTypeName()]: this,
+        });
+    }
 
     // prepare Base Resolvers
     prepareBaseResolvers(this);
@@ -232,7 +244,10 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
   /* eslint no-use-before-define: 0 */
   discriminator(childModel: Model, opts?: TypeConverterOpts): TypeComposer {
-    const customizationOpts = mergeCustomizationOptions(this.opts.customizationOptions, opts);
+    const customizationOpts = mergeCustomizationOptions(
+      (this.opts: any).customizationOptions,
+      opts
+    );
 
     let childTC = composeWithMongoose(childModel, customizationOpts);
 
@@ -246,10 +261,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
 export function composeWithMongooseDiscriminators(
   baseModel: Model,
-  opts: Options = {
-    reorderFields: true,
-    customizationOptions: {},
-  }
+  opts?: Options
 ): DiscriminatorTypeComposer {
   return new DiscriminatorTypeComposer(baseModel, opts);
 }

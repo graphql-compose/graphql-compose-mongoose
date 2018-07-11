@@ -35,21 +35,25 @@ export function composeChildTC(
 
   composedChildTC.setInterfaces([baseDTC.getDInterface()]);
 
-  // Add this field, else we have Unknown type Error when we query for this field when we haven't
-  // added a query that returns this type on rootQuery.
-  // this is somehow i don't understand, but we don't get any type if we never query it
-  // I guess under the hud, graphql-compose shakes it off.
-  baseDTC.getGQC().Query.addFields({
-    [`${composedChildTC.getTypeName()[0].toLowerCase() +
-      composedChildTC.getTypeName().substr(1)}One`]: composedChildTC
-      .getResolver('findOne')
-      .clone({ name: `${composedChildTC.getTypeName()}One` })
-      .setType(composedChildTC.getType()),
-  });
+  // hoist this type
+  if (opts.test_disTypes) {
+    baseDTC
+      .getGQC()
+      .rootQuery()
+      .getFieldTC('_disTypes')
+      .addFields({
+        [composedChildTC.getTypeName()]: composedChildTC,
+      });
+  }
 
   prepareChildResolvers(baseDTC, composedChildTC, opts);
 
-  reorderFields(composedChildTC, opts.reorderFields, baseDTC.getDKey(), baseDTC.getFieldNames());
+  reorderFields(
+    composedChildTC,
+    (opts: any).reorderFields,
+    baseDTC.getDKey(),
+    baseDTC.getFieldNames()
+  );
 
   return composedChildTC;
 }
