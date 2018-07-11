@@ -75,9 +75,7 @@ function getBaseTCFieldsWithTypes(baseTC: TypeComposer) {
   const baseFieldsWithTypes: GraphQLFieldConfigMap<any, any> = {};
 
   for (const field of baseFields) {
-    baseFieldsWithTypes[field] = {
-      type: baseTC.getFieldType(field),
-    };
+    baseFieldsWithTypes[field] = baseTC.getFieldConfig(field);
   }
 
   return baseFieldsWithTypes;

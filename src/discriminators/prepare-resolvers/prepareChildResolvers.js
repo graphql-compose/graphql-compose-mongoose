@@ -94,7 +94,7 @@ function setBaseInputTypesOnChildInputTypes(
 function reorderFieldsRecordFilter(
   resolver: Resolver,
   baseDTC: DiscriminatorTypeComposer,
-  order: string[] | boolean,
+  order: string[] | boolean | void | null,
   fromField: string[] | string
 ) {
   if (order) {
