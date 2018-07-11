@@ -22,8 +22,6 @@ describe('_disTypes Test With and Without test_disTypes Options set', () => {
 
     beforeAll(() => {
       schemaComposer.clear();
-      Event.schema._gqcTypeComposer = undefined;
-      ClickedLinkEvent.schema._gqcTypeComposer = undefined;
       EventTC = composeWithMongooseDiscriminators(Event);
       ClickedLinkEventTC = EventTC.discriminator(ClickedLinkEvent);
     });
@@ -85,8 +83,6 @@ describe('_disTypes Test With and Without test_disTypes Options set', () => {
 
     beforeAll(() => {
       schemaComposer.clear();
-      Event.schema._gqcTypeComposer = undefined;
-      ClickedLinkEvent.schema._gqcTypeComposer = undefined;
       EventTC = composeWithMongooseDiscriminators(Event, { test_disTypes: true });
       ClickedLinkEventTC = EventTC.discriminator(ClickedLinkEvent);
     });
@@ -146,8 +142,6 @@ describe('_disTypes Test With and Without test_disTypes Options set', () => {
 
     beforeAll(() => {
       schemaComposer.clear();
-      Event.schema._gqcTypeComposer = undefined;
-      ClickedLinkEvent.schema._gqcTypeComposer = undefined;
       EventTC = composeWithMongooseDiscriminators(Event, { test_disTypes: false });
       ClickedLinkEventTC = EventTC.discriminator(ClickedLinkEvent);
     });

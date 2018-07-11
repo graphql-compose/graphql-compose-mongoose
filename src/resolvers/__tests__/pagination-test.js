@@ -15,7 +15,6 @@ describe('pagination() ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserModel.schema._gqcTypeComposer = undefined;
     UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
     UserTC.setResolver('findMany', findMany(UserModel, UserTC));
     UserTC.setResolver('count', count(UserModel, UserTC));

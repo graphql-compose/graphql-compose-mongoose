@@ -2631,15 +2631,13 @@ graceful-fs@^4.1.10, graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.4
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
 
-graphql-compose-connection@^3.2.0:
-
+graphql-compose-connection@>=3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-3.2.0.tgz#87bb068564b76bfdf613c48134b1e47ed4a2f232"
   dependencies:
     babel-runtime "^6.26.0"
 
-graphql-compose-pagination@^3.3.0:
-
+graphql-compose-pagination@>=3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/graphql-compose-pagination/-/graphql-compose-pagination-3.3.0.tgz#9977bf416985e8c512b3dfba373e6a90f8d316cf"
   dependencies:

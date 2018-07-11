@@ -23,10 +23,6 @@ const { CharacterModel, PersonModel, DroidModel } = getCharacterModels(allowedDK
 describe('composeWithMongooseDiscriminators ->', () => {
   beforeEach(() => {
     schemaComposer.clear();
-    CharacterModel.schema._gqcTypeComposer = undefined;
-    PersonModel.schema._gqcTypeComposer = undefined;
-    DroidModel.schema._gqcTypeComposer = undefined;
-    MovieModel.schema._gqcTypeComposer = undefined;
   });
 
   describe('basics', () => {
