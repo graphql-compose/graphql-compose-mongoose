@@ -87,14 +87,13 @@ function createDInterface(baseModelTC: DiscriminatorTypeComposer): GraphQLInterf
 
     resolveType: (value: any) => {
       const childDName = value[baseModelTC.getDKey()];
-      const sComposer = baseModelTC.getGQC(); // get schemaComposer
 
       if (childDName) {
-        return sComposer.getTC(childDName).getType();
+        return baseModelTC.schemaComposer.getTC(childDName).getType();
       }
 
       // as fallback return BaseModelTC
-      return sComposer.getTC(baseModelTC.getTypeName()).getType();
+      return baseModelTC.schemaComposer.getTC(baseModelTC.getTypeName()).getType();
     },
     // hoisting issue solved, get at time :)
     fields: () => getBaseTCFieldsWithTypes(baseModelTC),
@@ -108,7 +107,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
   DKeyETC: EnumTypeComposer;
 
-  GQC: SchemaComposer<any>;
+  schemaComposer: SchemaComposer<any>;
 
   opts: Options;
 
@@ -143,7 +142,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     this.discriminators = (baseModel: any).discriminators;
 
     this.childTCs = [];
-    this.GQC =
+    this.schemaComposer =
       opts.customizationOptions && opts.customizationOptions.schemaComposer
         ? opts.customizationOptions.schemaComposer
         : schemaComposer;
@@ -175,10 +174,6 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
     // prepare Base Resolvers
     prepareBaseResolvers(this);
-  }
-
-  getGQC(): SchemaComposer<any> {
-    return this.GQC;
   }
 
   getDKey(): string {
