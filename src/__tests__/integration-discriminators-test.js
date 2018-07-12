@@ -47,7 +47,7 @@ describe('#78 Mongoose and Discriminators', () => {
       `{
         eventFindMany {
           __typename
-          ... on GenericEvent {
+          ... on Event {
             refId
           }
           ... on ClickedLinkEvent {
@@ -62,8 +62,8 @@ describe('#78 Mongoose and Discriminators', () => {
     expect(res).toEqual({
       data: {
         eventFindMany: [
-          { __typename: 'GenericEvent', refId: 'aaa' },
-          { __typename: 'GenericEvent', refId: 'bbb' },
+          { __typename: 'Event', refId: 'aaa' },
+          { __typename: 'Event', refId: 'bbb' },
           { __typename: 'ClickedLinkEvent', kind: 'ClickedLinkEvent', refId: 'ccc', url: 'url1' },
           { __typename: 'ClickedLinkEvent', kind: 'ClickedLinkEvent', refId: 'ddd', url: 'url2' },
         ],

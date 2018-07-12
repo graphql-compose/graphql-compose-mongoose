@@ -83,7 +83,7 @@ function getBaseTCFieldsWithTypes(baseTC: TypeComposer) {
 
 function createDInterface(baseModelTC: DiscriminatorTypeComposer): GraphQLInterfaceType {
   return new GraphQLInterfaceType({
-    name: baseModelTC.getDBaseName(),
+    name: `${baseModelTC.getDBaseName()}Interface`,
 
     resolveType: (value: any) => {
       const childDName = value[baseModelTC.getDKey()];
@@ -147,7 +147,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
       opts.customizationOptions && opts.customizationOptions.schemaComposer
         ? opts.customizationOptions.schemaComposer
         : schemaComposer;
-    this.setTypeName(`Generic${this.modelName}`);
+    this.setTypeName(this.modelName);
     this.DKeyETC = createAndSetDKeyETC(this, this.discriminators);
 
     reorderFields(this, (this.opts: any).reorderFields, this.discriminatorKey);
