@@ -35,14 +35,14 @@
     "graphql-compose-pagination": ">=3.3.0"
   },
   "peerDependencies": {
-    "graphql-compose": ">=4.0.0",
+    "graphql-compose": ">=4.6.0",
     "mongoose": ">=4.0.0 || >=5.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.5",
-    "babel-jest": "^23.2.0",
+    "babel-eslint": "^8.2.6",
+    "babel-jest": "^23.4.0",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.13.0",
     "babel-plugin-transform-runtime": "^6.23.0",
@@ -56,16 +56,16 @@
     "eslint-plugin-prettier": "^2.6.2",
     "flow-bin": "^0.76.0",
     "graphql": "0.13.2",
-    "graphql-compose": "^4.4.1",
+    "graphql-compose": "^4.6.0",
     "graphql-compose-connection": ">=3.2.0",
     "graphql-compose-pagination": ">=3.3.0",
-    "jest": "^23.3.0",
+    "jest": "^23.4.0",
     "mongodb-memory-server": "^1.9.0",
-    "mongoose": "^5.2.2",
+    "mongoose": "^5.2.3",
     "prettier": "^1.13.7",
     "request": "^2.87.0",
     "rimraf": "^2.6.2",
-    "semantic-release": "^15.6.3"
+    "semantic-release": "^15.7.1"
   },
   "config": {
     "commitizen": {
