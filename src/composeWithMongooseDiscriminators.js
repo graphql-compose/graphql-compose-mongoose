@@ -154,23 +154,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     this.DInterface = createDInterface(this);
     this.setInterfaces([this.DInterface]);
 
-    // Hoist on _disTypes
-    if (opts.test_disTypes) {
-      if (!this.GQC.rootQuery().hasField('_disTypes')) {
-        this.GQC.rootQuery().addFields({
-          _disTypes: TypeComposer.create({
-            name: '_disTypes',
-            description: 'Hoisting for Discriminator Types',
-          }),
-        });
-      }
-
-      this.GQC.rootQuery()
-        .getFieldTC('_disTypes')
-        .addFields({
-          [this.getTypeName()]: this,
-        });
-    }
+    this.schemaComposer.addSchemaMustHaveType(this);
 
     // prepare Base Resolvers
     prepareBaseResolvers(this);
@@ -246,6 +230,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
     childTC = composeChildTC(this, childTC, this.opts);
 
+    this.schemaComposer.addSchemaMustHaveType(childTC);
     this.childTCs.push(childTC);
 
     return childTC;

@@ -17,7 +17,7 @@ describe('#78 Mongoose and Discriminators', () => {
   const clickedLinkSchema = new mongoose.Schema({ url: String });
   const ClickedLinkEvent = Event.discriminator('ClickedLinkEvent', clickedLinkSchema);
 
-  const EventTC = composeWithMongooseDiscriminators(Event, { test_disTypes: true });
+  const EventTC = composeWithMongooseDiscriminators(Event);
   const ClickedLinkEventTC = EventTC.discriminator(ClickedLinkEvent);
 
   // Todo: Remove

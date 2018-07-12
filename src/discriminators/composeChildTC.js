@@ -35,17 +35,6 @@ export function composeChildTC(
 
   composedChildTC.setInterfaces([baseDTC.getDInterface()]);
 
-  // hoist this type
-  if (opts.test_disTypes) {
-    baseDTC
-      .getGQC()
-      .rootQuery()
-      .getFieldTC('_disTypes')
-      .addFields({
-        [composedChildTC.getTypeName()]: composedChildTC,
-      });
-  }
-
   prepareChildResolvers(baseDTC, composedChildTC, opts);
 
   reorderFields(
