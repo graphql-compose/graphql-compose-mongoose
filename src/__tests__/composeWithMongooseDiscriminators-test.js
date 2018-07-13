@@ -116,7 +116,7 @@ describe('composeWithMongooseDiscriminators ->', () => {
       });
     });
 
-    describe('addDFields(newDFields)', () => {
+    describe('addFields(newFields)', () => {
       const characterDTC = composeWithMongooseDiscriminators(CharacterModel);
       const personTC = characterDTC.discriminator(PersonModel);
       const droidTC = characterDTC.discriminator(DroidModel);
@@ -126,7 +126,7 @@ describe('composeWithMongooseDiscriminators ->', () => {
       };
 
       beforeAll(() => {
-        characterDTC.addDFields(newFields);
+        characterDTC.addFields(newFields);
       });
 
       it('should add fields to baseTC', () => {
@@ -147,7 +147,31 @@ describe('composeWithMongooseDiscriminators ->', () => {
       });
     });
 
-    describe('extendDFields(fieldName, extensionDField)', () => {
+    describe('removeField()', () => {
+      const characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+      const personTC = characterDTC.discriminator(PersonModel);
+      const droidTC = characterDTC.discriminator(DroidModel);
+      const field = 'friends';
+
+      beforeAll(() => {
+        characterDTC.removeField(field);
+      });
+
+      it('should remove fields from baseTC', () => {
+        expect(characterDTC.hasField(field)).toBeFalsy();
+      });
+
+      it('should remove fields from DInterface', () => {
+        expect(characterDTC.getDInterface().getFields()[field]).toBeFalsy();
+      });
+
+      it('should remove fields from childTC', () => {
+        expect(personTC.hasField(field)).toBeFalsy();
+        expect(droidTC.hasField(field)).toBeFalsy();
+      });
+    });
+
+    describe('extendFields(fieldName, extensionField)', () => {
       const characterDTC = composeWithMongooseDiscriminators(CharacterModel);
       const personTC = characterDTC.discriminator(PersonModel);
       const droidTC = characterDTC.discriminator(DroidModel);
@@ -158,7 +182,7 @@ describe('composeWithMongooseDiscriminators ->', () => {
       };
 
       beforeAll(() => {
-        characterDTC.extendDField(fieldName, fieldExtension);
+        characterDTC.extendField(fieldName, fieldExtension);
       });
 
       it('should extend field on baseTC', () => {
@@ -226,14 +250,12 @@ describe('composeWithMongooseDiscriminators ->', () => {
     });
   });
 
-  describe('ChildDiscriminatorTypeComposer', () => {
+  describe('DiscriminatorTypes', () => {
     it('should have as an interface DInterface', () => {
       const baseDTC = composeWithMongooseDiscriminators(CharacterModel);
       expect(baseDTC.discriminator(DroidModel).getInterfaces()).toEqual(
         expect.arrayContaining(Array.of(baseDTC.getDInterface()))
       );
     });
-
-    it('should have all resolvers', () => {});
   });
 });

@@ -12,9 +12,11 @@ import type { GraphQLFieldConfigMap } from 'graphql-compose/lib/graphql';
 import type {
   ComposePartialFieldConfigAsObject,
   RelationOpts,
+  ComposeFieldConfig,
+  GetRecordIdFn,
 } from 'graphql-compose/lib/TypeComposer';
 import { Model } from 'mongoose';
-import { type TypeConverterOpts, composeWithMongoose } from '../composeWithMongoose';
+import { composeWithMongoose, type TypeConverterOpts } from '../composeWithMongoose';
 import { composeChildTC } from './composeChildTC';
 import { mergeCustomizationOptions } from './merge-customization-options';
 import { prepareBaseResolvers } from './prepare-resolvers/prepareBaseResolvers';
@@ -164,18 +166,68 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return !!this.childTCs.find(ch => ch.getTypeName() === DName);
   }
 
-  // add fields only to DInterface, baseTC, childTC
-  addDFields(newDFields: ComposeFieldConfigMap<any, any>): this {
-    super.addFields(newDFields);
+  setFields(fields: ComposeFieldConfigMap<any, any>): this {
+    super.setFields(fields);
 
     for (const childTC of this.childTCs) {
-      childTC.addFields(newDFields);
+      childTC.setFields(fields);
     }
 
     return this;
   }
 
-  extendDField(
+  setField(fieldName: string, fieldConfig: ComposeFieldConfig<any, any>): this {
+    super.setField(fieldName, fieldConfig);
+
+    for (const childTC of this.childTCs) {
+      childTC.setField(fieldName, fieldConfig);
+    }
+
+    return this;
+  }
+
+  // discriminators must have all interface fields
+  addFields(newFields: ComposeFieldConfigMap<any, any>): this {
+    super.addFields(newFields);
+
+    for (const childTC of this.childTCs) {
+      childTC.addFields(newFields);
+    }
+
+    return this;
+  }
+
+  addNestedFields(newFields: ComposeFieldConfigMap<any, any>): this {
+    super.addNestedFields(newFields);
+
+    for (const childTC of this.childTCs) {
+      childTC.addNestedFields(newFields);
+    }
+
+    return this;
+  }
+
+  removeField(fieldNameOrArray: string | Array<string>): this {
+    super.removeField(fieldNameOrArray);
+
+    for (const childTC of this.childTCs) {
+      childTC.removeField(fieldNameOrArray);
+    }
+
+    return this;
+  }
+
+  removeOtherFields(fieldNameOrArray: string | Array<string>): this {
+    super.removeOtherFields(fieldNameOrArray);
+
+    for (const childTC of this.childTCs) {
+      childTC.removeOtherFields(fieldNameOrArray);
+    }
+
+    return this;
+  }
+
+  extendField(
     fieldName: string,
     partialFieldConfig: ComposePartialFieldConfigAsObject<any, any>
   ): this {
@@ -188,16 +240,65 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
+  reorderFields(names: string[]): this {
+    super.reorderFields(names);
+
+    for (const childTC of this.childTCs) {
+      childTC.reorderFields(names);
+    }
+
+    return this;
+  }
+
+  makeFieldNonNull(fieldNameOrArray: string | Array<string>): this {
+    super.makeFieldNonNull(fieldNameOrArray);
+
+    for (const childTC of this.childTCs) {
+      childTC.makeFieldNonNull(fieldNameOrArray);
+    }
+
+    return this;
+  }
+
+  makeFieldNullable(fieldNameOrArray: string | Array<string>): this {
+    super.makeFieldNullable(fieldNameOrArray);
+
+    for (const childTC of this.childTCs) {
+      childTC.makeFieldNullable(fieldNameOrArray);
+    }
+
+    return this;
+  }
+
+  deprecateFields(fields: { [fieldName: string]: string } | string[] | string): this {
+    super.deprecateFields(fields);
+
+    for (const childTC of this.childTCs) {
+      childTC.deprecateFields(fields);
+    }
+
+    return this;
+  }
+
   // relations with args are a bit hard to manage as interfaces i believe as of now do not
   // support field args. Well if one wants to have use args, you setType for resolver as this
   // this = this DiscriminantTypeComposer
   // NOTE, those relations will be propagated to the childTypeComposers and you can use normally.
-  // FixMe: Note, You must use this function after creating all discriminators
-  addDRelation(fieldName: string, relationOpts: RelationOpts<any, any>): this {
-    this.addRelation(fieldName, relationOpts);
+  addRelation(fieldName: string, relationOpts: RelationOpts<any, any>): this {
+    super.addRelation(fieldName, relationOpts);
 
     for (const childTC of this.childTCs) {
       childTC.addRelation(fieldName, relationOpts);
+    }
+
+    return this;
+  }
+
+  setRecordIdFn(fn: GetRecordIdFn<any, any>): this {
+    super.setRecordIdFn(fn);
+
+    for (const childTC of this.childTCs) {
+      childTC.setRecordIdFn(fn);
     }
 
     return this;
