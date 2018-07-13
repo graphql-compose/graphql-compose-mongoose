@@ -1,11 +1,11 @@
 /* @flow */
 
 import { TypeComposer } from 'graphql-compose';
-import type { DiscriminatorTypeComposer, Options } from '../composeWithMongooseDiscriminators';
+import type { DiscriminatorTypeComposer, Options } from './DiscriminatorTypeComposer';
 import { prepareChildResolvers } from './prepare-resolvers/prepareChildResolvers';
 import { reorderFields } from './utils';
 
-// copy all baseTypeComposers fields to childTC
+// copy all baseTypeComposer fields to childTC
 // these are the fields before calling discriminator
 function copyBaseTCFieldsToChildTC(baseDTC: TypeComposer, childTC: TypeComposer) {
   const baseFields = baseDTC.getFieldNames();

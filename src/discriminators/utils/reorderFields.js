@@ -1,7 +1,7 @@
 /* @flow */
 
 import { TypeComposer } from 'graphql-compose';
-import { DiscriminatorTypeComposer } from '../../composeWithMongooseDiscriminators';
+import { DiscriminatorTypeComposer } from '../DiscriminatorTypeComposer';
 
 export function reorderFields(
   modelTC: DiscriminatorTypeComposer | TypeComposer,

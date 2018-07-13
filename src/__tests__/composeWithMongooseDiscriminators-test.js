@@ -8,10 +8,8 @@ import {
 } from 'graphql-compose';
 import { getCharacterModels } from '../__mocks__/characterModels';
 import { MovieModel } from '../__mocks__/movieModel';
-import {
-  composeWithMongooseDiscriminators,
-  DiscriminatorTypeComposer,
-} from '../composeWithMongooseDiscriminators';
+import { composeWithMongooseDiscriminators } from '../composeWithMongooseDiscriminators';
+import { DiscriminatorTypeComposer } from '../discriminators';
 
 beforeAll(() => MovieModel.base.connect());
 afterAll(() => MovieModel.base.disconnect());
