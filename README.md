@@ -122,6 +122,129 @@ You think that is to much code?
 I don't think so, because by default internally was created about 55 graphql types (for input, sorting, filtering). So you will need much much more lines of code to implement all these CRUD operations by hands.
 
 
+### Working with Mongoose Collection Level Discriminators
+Variable Namings 
+* `...DTC` - Suffix for a `DiscriminatorTypeComposer` instance, which is also an instance of `TypeComposer`. All fields and Relations manipulations on this instance affects all registered discriminators and the Discriminator Interface. 
+
+```js
+  import mongoose from 'mongoose';
+  import { schemaComposer } from 'graphql-composer';
+  import { composeWithMongooseDiscriminators } from 'graphql-compose-mongoose';
+  
+  // pick a discriminatorKey
+  const DKey = 'type';
+  
+  const enumCharacterType = {
+    PERSON: 'Person',
+    DROID: 'Droid',
+  };
+  
+  // DEFINE BASE SCHEMA
+  const CharacterSchema = new mongoose.Schema({
+    // _id: field...
+    name: String,
+  
+    type: {
+      type: String,
+      require: true,
+      enum: (Object.keys(enumCharacterType): Array<string>),
+    },
+  
+    friends: [String], // another Character
+    appearsIn: [String], // movie
+  });
+  
+  // DEFINE DISCRIMINATOR SCHEMAS
+  const DroidSchema = new Schema({
+    makeDate: Date,
+    modelNumber: Number,
+    primaryFunction: [String],
+  });
+  
+  const PersonSchema = new Schema({
+    dob: Number,
+    starShips: [String],
+    totalCredits: Number,
+  });
+  
+  // set discriminator Key
+  CharacterSchema.set('discriminatorKey', DKey);
+  
+  // create base Model
+  const CharacterModel = mongoose.model('Character', CharacterSchema);
+  
+  // create mongoose discriminator models
+  const DroidModel = CharacterModel.discriminator(enumCharacterType.DROID, DroidSchema);
+  const PersonModel = CharacterModel.discriminator(enumCharacterType.PERSON, PersonSchema);
+  
+  // create DiscriminatorTypeComposer
+  // discrimatorOptions
+  const baseOptions = {
+    customizationOptions: {  // regular TypeConverterOptions, passed to composeWithMongoose
+      fields: {
+        remove: ['friends'],
+      }
+    }
+  }
+  const CharacterDTC = composeWithMongooseDiscriminators(CharacterModel, baseOptions);
+  
+  // create Discriminator Types
+  const droidTypeConverterOptions = {  // this options will be merged with baseOptions -> customisationsOptions
+    fields: {
+      remove: ['makeDate'],
+    }
+  };
+  const DroidTC = CharacterDTC.discriminator(DroidModel, droidTypeConverterOptions);
+  const PersonTC = CharacterDTC.discriminator(PersonModel);  // baseOptions -> customisationsOptions applied
+  
+  // You may now use CharacterDTC to add fields to all Discriminators
+  // Use DroidTC, `PersonTC as any other TypeComposer.
+  schemaComposer.rootMutation().addFields({
+    droidCreate: DroidTC.getResolver('createOne'),
+    personCreate: PersonTC.getResolver('createOne'),
+  });
+  
+  const schema = schemaComposer.buildSchema();
+  
+  describe('createOne', () => {
+    it('should create child document without specifying DKey', async () => {
+      const res = await graphql.graphql(
+        schema,
+        `mutation CreateCharacters {
+          droidCreate(record: {name: "Queue XL", modelNumber: 360 }) {
+            record {
+              __typename
+              type
+              name
+              modelNumber
+            }
+          }
+
+          personCreate(record: {name: "mernxl", dob: 57275272}) {
+            record {
+              __typename
+              type
+              name
+              dob
+            }
+          }
+        }`
+      );
+
+      expect(res).toEqual({
+        data: {
+          droidCreate: {
+            record: { __typename: 'Droid', type: 'Droid', name: 'Queue XL', modelNumber: 360 },
+          },
+          personCreate: {
+            record: { __typename: 'Person', type: 'Person', name: 'mernxl', dob: 57275272 },
+          },
+        },
+      });
+    });
+  });
+``` 
+
 ## FAQ
 
 ### Can I get generated vanilla GraphQL types?
