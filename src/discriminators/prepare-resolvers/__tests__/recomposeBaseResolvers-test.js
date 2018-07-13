@@ -142,7 +142,7 @@ describe('recomposeBaseResolvers()', () => {
   });
 
   it('should clone, rename edges field on connection resolver, connection', () => {
-    const newName = `${CharacterDTC.getDBaseName()}Edge`;
+    const newName = `${CharacterDTC.getTypeName()}Edge`;
     const connectionRS = CharacterDTC.getResolver('connection');
 
     expect(

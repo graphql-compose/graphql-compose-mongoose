@@ -23,7 +23,6 @@ import { reorderFields } from './utils';
 const { GraphQLInterfaceType } = graphql;
 
 export type Options = {
-  test_disTypes?: boolean,
   reorderFields?: boolean | string[], // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
   customizationOptions?: TypeConverterOpts,
 };
@@ -51,8 +50,7 @@ function setDKeyETCValues(discriminators: Discriminators): any {
 // then sets this enum type as the discriminator key field type
 function createAndSetDKeyETC(dTC: DiscriminatorTypeComposer, discriminators: Discriminators) {
   const DKeyETC = EnumTypeComposer.create({
-    name: `EnumDKey${dTC.getDBaseName()}${dTC.getDKey()[0].toUpperCase() +
-      dTC.getDKey().substr(1)}`,
+    name: `EnumDKey${dTC.getTypeName()}${dTC.getDKey()[0].toUpperCase() + dTC.getDKey().substr(1)}`,
     values: setDKeyETCValues(discriminators),
   });
 
@@ -82,7 +80,7 @@ function getBaseTCFieldsWithTypes(baseTC: TypeComposer) {
 
 function createDInterface(baseModelTC: DiscriminatorTypeComposer): GraphQLInterfaceType {
   return new GraphQLInterfaceType({
-    name: `${baseModelTC.getDBaseName()}Interface`,
+    name: `${baseModelTC.getTypeName()}Interface`,
 
     resolveType: (value: any) => {
       const childDName = value[baseModelTC.getDKey()];
@@ -100,8 +98,6 @@ function createDInterface(baseModelTC: DiscriminatorTypeComposer): GraphQLInterf
 }
 
 export class DiscriminatorTypeComposer extends TypeComposer {
-  modelName: string;
-
   discriminatorKey: string;
 
   DKeyETC: EnumTypeComposer;
@@ -111,8 +107,6 @@ export class DiscriminatorTypeComposer extends TypeComposer {
   opts: Options;
 
   DInterface: GraphQLInterfaceType;
-
-  discriminators: Discriminators;
 
   childTCs: TypeComposer[];
 
@@ -131,22 +125,17 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
     super(composeWithMongoose(baseModel, opts.customizationOptions).gqType);
 
-    // !ORDER MATTERS
     this.opts = opts;
-    this.modelName = (baseModel: any).modelName;
+    this.childTCs = [];
     this.discriminatorKey = (baseModel: any).schema.get('discriminatorKey') || '__t';
 
-    // discriminants and object containing all discriminants with key
-    // key being their DNames
-    this.discriminators = (baseModel: any).discriminators;
-
-    this.childTCs = [];
     this.schemaComposer =
       opts.customizationOptions && opts.customizationOptions.schemaComposer
         ? opts.customizationOptions.schemaComposer
         : schemaComposer;
-    this.setTypeName(this.modelName);
-    this.DKeyETC = createAndSetDKeyETC(this, this.discriminators);
+
+    // discriminators an object containing all discriminators with key being DNames
+    this.DKeyETC = createAndSetDKeyETC(this, (baseModel: any).discriminators);
 
     reorderFields(this, (this.opts: any).reorderFields, this.discriminatorKey);
 
@@ -165,10 +154,6 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
   getDKeyETC(): EnumTypeComposer {
     return this.DKeyETC;
-  }
-
-  getDBaseName(): string {
-    return this.modelName;
   }
 
   getDInterface(): GraphQLInterfaceType {

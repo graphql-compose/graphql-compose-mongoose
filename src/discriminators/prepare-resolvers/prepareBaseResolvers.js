@@ -67,7 +67,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer) {
           const edgesTC = resolver // eslint-disable-line no-case-declarations
             .getTypeComposer()
             .getFieldTC('edges')
-            .clone(`${baseTC.getDBaseName()}Edge`);
+            .clone(`${baseTC.getTypeName()}Edge`);
 
           edgesTC.extendField('node', {
             type: new GraphQLNonNull(baseTC.getDInterface()),
