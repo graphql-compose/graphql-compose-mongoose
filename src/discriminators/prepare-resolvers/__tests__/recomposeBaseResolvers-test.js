@@ -1,3 +1,5 @@
+/* @flow */
+
 import { graphql } from 'graphql-compose';
 import { getCharacterModels } from '../../../__mocks__/characterModels';
 import { composeWithMongooseDiscriminators } from '../../../composeWithMongooseDiscriminators';
@@ -75,22 +77,26 @@ describe('recomposeBaseResolvers()', () => {
 
   it('should set resolver type to DInterface List, findMany', () => {
     expect(CharacterDTC.getResolver('findMany').getType()).toEqual(
-      graphql.GraphQLList(CharacterDTC.getDInterface())
+      graphql.GraphQLList(CharacterDTC.getDInterface().getType())
     );
   });
 
   it('should set resolver type to DInterface List, findByIds', () => {
     expect(CharacterDTC.getResolver('findByIds').getType()).toEqual(
-      graphql.GraphQLList(CharacterDTC.getDInterface())
+      graphql.GraphQLList(CharacterDTC.getDInterface().getType())
     );
   });
 
   it('should set resolver type to DInterface, findOne', () => {
-    expect(CharacterDTC.getResolver('findOne').getType()).toEqual(CharacterDTC.getDInterface());
+    expect(CharacterDTC.getResolver('findOne').getType()).toEqual(
+      CharacterDTC.getDInterface().getType()
+    );
   });
 
   it('should set resolver type to DInterface, findById', () => {
-    expect(CharacterDTC.getResolver('findById').getType()).toEqual(CharacterDTC.getDInterface());
+    expect(CharacterDTC.getResolver('findById').getType()).toEqual(
+      CharacterDTC.getDInterface().getType()
+    );
   });
 
   it('should set resolver record field type to DInterface, createOne', () => {
@@ -98,7 +104,7 @@ describe('recomposeBaseResolvers()', () => {
       CharacterDTC.getResolver('createOne')
         .getTypeComposer()
         .getFieldType('record')
-    ).toEqual(CharacterDTC.getDInterface());
+    ).toEqual(CharacterDTC.getDInterface().getType());
   });
 
   it('should set resolver record field type to DInterface, updateOne', () => {
@@ -106,7 +112,7 @@ describe('recomposeBaseResolvers()', () => {
       CharacterDTC.getResolver('updateOne')
         .getTypeComposer()
         .getFieldType('record')
-    ).toEqual(CharacterDTC.getDInterface());
+    ).toEqual(CharacterDTC.getDInterface().getType());
   });
 
   it('should set resolver record field type to DInterface, updateById', () => {
@@ -114,7 +120,7 @@ describe('recomposeBaseResolvers()', () => {
       CharacterDTC.getResolver('updateById')
         .getTypeComposer()
         .getFieldType('record')
-    ).toEqual(CharacterDTC.getDInterface());
+    ).toEqual(CharacterDTC.getDInterface().getType());
   });
 
   it('should set resolver record field type to DInterface, ', () => {
@@ -122,7 +128,7 @@ describe('recomposeBaseResolvers()', () => {
       CharacterDTC.getResolver('removeById')
         .getTypeComposer()
         .getFieldType('record')
-    ).toEqual(CharacterDTC.getDInterface());
+    ).toEqual(CharacterDTC.getDInterface().getType());
   });
 
   it('should set resolver record arg field, DKey to NonNull DKeyETC type, createOne', () => {
@@ -138,7 +144,7 @@ describe('recomposeBaseResolvers()', () => {
       CharacterDTC.getResolver('pagination')
         .getTypeComposer()
         .getFieldType('items')
-    ).toEqual(graphql.GraphQLList(CharacterDTC.getDInterface()));
+    ).toEqual(graphql.GraphQLList(CharacterDTC.getDInterface().getType()));
   });
 
   it('should clone, rename edges field on connection resolver, connection', () => {

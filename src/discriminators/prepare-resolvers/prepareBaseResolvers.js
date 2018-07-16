@@ -39,7 +39,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any>) {
       switch (resolverName) {
         case EMCResolvers.findMany:
         case EMCResolvers.findByIds:
-          resolver.setType(new GraphQLList(baseTC.getDInterface()));
+          resolver.setType(new GraphQLList(baseTC.getDInterface().getType()));
           break;
 
         case EMCResolvers.findById:
@@ -59,7 +59,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any>) {
 
         case EMCResolvers.pagination:
           resolver.getTypeComposer().extendField('items', {
-            type: new GraphQLList(baseTC.getDInterface()),
+            type: new GraphQLList(baseTC.getDInterface().getType()),
           });
           break;
 
@@ -70,7 +70,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any>) {
             .clone(`${baseTC.getTypeName()}Edge`);
 
           edgesTC.extendField('node', {
-            type: new GraphQLNonNull(baseTC.getDInterface()),
+            type: new GraphQLNonNull(baseTC.getDInterface().getType()),
           });
 
           resolver

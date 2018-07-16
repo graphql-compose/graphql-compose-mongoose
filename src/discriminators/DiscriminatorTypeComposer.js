@@ -3,10 +3,10 @@
 import type { ComposeFieldConfigMap } from 'graphql-compose';
 import {
   EnumTypeComposer,
-  graphql,
   schemaComposer,
   SchemaComposer,
   TypeComposerClass,
+  type InterfaceTypeComposerClass,
 } from 'graphql-compose';
 import type { GraphQLFieldConfigMap } from 'graphql-compose/lib/graphql';
 import type {
@@ -21,8 +21,6 @@ import { composeChildTC } from './composeChildTC';
 import { mergeCustomizationOptions } from './merge-customization-options';
 import { prepareBaseResolvers } from './prepare-resolvers/prepareBaseResolvers';
 import { reorderFields } from './utils';
-
-const { GraphQLInterfaceType } = graphql;
 
 export type Options = {
   reorderFields?: boolean | string[], // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
@@ -69,36 +67,6 @@ function createAndSetDKeyETC(dTC: DiscriminatorTypeComposer<any>, discriminators
   return DKeyETC;
 }
 
-function getBaseTCFieldsWithTypes(baseTC: TypeComposerClass<any>) {
-  const baseFields = baseTC.getFieldNames();
-  const baseFieldsWithTypes: GraphQLFieldConfigMap<any, any> = {};
-
-  for (const field of baseFields) {
-    baseFieldsWithTypes[field] = baseTC.getFieldConfig(field);
-  }
-
-  return baseFieldsWithTypes;
-}
-
-function createDInterface(baseModelTC: DiscriminatorTypeComposer<any>): GraphQLInterfaceType {
-  return new GraphQLInterfaceType({
-    name: `${baseModelTC.getTypeName()}Interface`,
-
-    resolveType: (value: any) => {
-      const childDName = value[baseModelTC.getDKey()];
-
-      if (childDName) {
-        return baseModelTC.schemaComposer.getTC(childDName).getType();
-      }
-
-      // as fallback return BaseModelTC
-      return baseModelTC.schemaComposer.getTC(baseModelTC.getTypeName()).getType();
-    },
-    // hoisting issue solved, get at time :)
-    fields: () => getBaseTCFieldsWithTypes(baseModelTC),
-  });
-}
-
 export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TContext> {
   discriminatorKey: string;
 
@@ -106,7 +74,7 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
 
   opts: Options;
 
-  DInterface: GraphQLInterfaceType;
+  DInterface: InterfaceTypeComposerClass<TContext>;
 
   childTCs: TypeComposerClass<TContext>[];
 
@@ -156,7 +124,7 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
 
     reorderFields(baseDTC, (baseDTC.opts: any).reorderFields, baseDTC.discriminatorKey);
 
-    baseDTC.DInterface = createDInterface(baseDTC);
+    baseDTC.DInterface = baseDTC._createDInterface(baseDTC);
     baseDTC.setInterfaces([baseDTC.DInterface]);
 
     baseDTC.schemaComposer.addSchemaMustHaveType(baseDTC);
@@ -165,6 +133,31 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
     prepareBaseResolvers(baseDTC);
 
     return baseDTC;
+  }
+
+  _createDInterface(baseTC: DiscriminatorTypeComposer<any>): InterfaceTypeComposerClass<TContext> {
+    return this.schemaComposer.InterfaceTypeComposer.create({
+      name: `${baseTC.getTypeName()}Interface`,
+
+      resolveType: (value: any) => {
+        const childDName = value[baseTC.getDKey()];
+
+        if (childDName) {
+          return baseTC.schemaComposer.getTC(childDName).getType();
+        }
+
+        // as fallback return BaseModelTC
+        return baseTC.schemaComposer.getTC(baseTC.getTypeName()).getType();
+      },
+      fields: (): ComposeFieldConfigMap<any, TContext> => {
+        const baseFields = baseTC.getFieldNames();
+        const interfaceFields = {};
+        for (const field of baseFields) {
+          interfaceFields[field] = baseTC.getFieldConfig(field);
+        }
+        return interfaceFields;
+      },
+    });
   }
 
   getDKey(): string {

@@ -1,10 +1,12 @@
-import { GraphQLInterfaceType } from 'graphql';
+/* @flow */
+
 import {
   graphql,
   InputTypeComposer,
   SchemaComposer,
   schemaComposer,
   TypeComposer,
+  InterfaceTypeComposer,
 } from 'graphql-compose';
 import { getCharacterModels } from '../__mocks__/characterModels';
 import { MovieModel } from '../__mocks__/movieModel';
@@ -38,7 +40,7 @@ describe('composeWithMongooseDiscriminators ->', () => {
 
     it('should have an interface, accessed with getDInterface', () => {
       const cDTC = composeWithMongooseDiscriminators(CharacterModel);
-      expect(cDTC.getDInterface()).toBeInstanceOf(GraphQLInterfaceType);
+      expect(cDTC.getDInterface()).toBeInstanceOf(InterfaceTypeComposer);
     });
   });
 
@@ -196,8 +198,8 @@ describe('composeWithMongooseDiscriminators ->', () => {
         expect(
           characterDTC
             .getDInterface()
-            .getFields()
-            [fieldName].type.toString()
+            .getFieldType(fieldName)
+            .toString()
         ).toEqual(fieldExtension.type);
       });
 
