@@ -1,5 +1,6 @@
 /* @flow */
 
+import { SchemaComposer } from 'graphql-compose';
 import type { TypeConverterOpts } from '../../../composeWithMongoose';
 import {
   mergeCustomizationOptions,
@@ -224,12 +225,18 @@ describe('mergeCustomizationOptions()', () => {
     expect(mergeCustomizationOptions(baseCustomOptions, childCustomOptions)).toEqual(expected);
   });
 
-  /* it('should produce error if using different schema composers', () => {
-    expect(  fixme: error is not caught.
-      mergeCustomizationOptions(
+  it('should produce error if using different schema composers', () => {
+    try {
+      const mergedOpts = mergeCustomizationOptions(
         { schemaComposer: new SchemaComposer() },
         { schemaComposer: new SchemaComposer() }
-      )
-    ).toThrow('[Discriminators] ChildModel should have same schemaComposer as its BaseModels');
-  }); */
+      );
+
+      expect(mergedOpts).toBeFalsy();
+    } catch (error) {
+      expect(error.message).toBe(
+        '[Discriminators] ChildModels should have same schemaComposer as its BaseModel'
+      );
+    }
+  });
 });

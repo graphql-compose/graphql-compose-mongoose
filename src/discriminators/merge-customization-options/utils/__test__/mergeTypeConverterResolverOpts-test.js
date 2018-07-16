@@ -1,13 +1,12 @@
 /* @flow */
 
-import type { TypeConverterResolversOpts } from '../../../composeWithMongoose';
-import {} from '../index';
+import type { TypeConverterResolversOpts } from '../../../../composeWithMongoose';
 import {
   mergeTypeConverterResolverOpts,
   mergePrimitiveTypeFields,
   mergeMapTypeFields,
   mergeFilterOperatorsOptsMap,
-} from '../utils/mergeTypeConverterResolversOpts';
+} from '../mergeTypeConverterResolversOpts';
 
 const baseConverterResolverOpts: TypeConverterResolversOpts = {
   findMany: {

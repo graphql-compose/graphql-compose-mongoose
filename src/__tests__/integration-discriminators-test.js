@@ -22,7 +22,6 @@ describe('#78 Mongoose and Discriminators', () => {
   const EventTC = composeWithMongooseDiscriminators(Event);
   const ClickedLinkEventTC = EventTC.discriminator(ClickedLinkEvent);
 
-  // Todo: Remove
   afterAll(() => Event.remove({}));
 
   it('creating Types from models', () => {
