@@ -6,6 +6,7 @@
   "env": {
     "cjs": {
       "plugins": [
+        "transform-class-properties",
         ["transform-runtime", { "polyfill": false }]
       ],
       "presets": [
@@ -17,6 +18,7 @@
       ]
     },
     "mjs": {
+      "plugins": ["transform-class-properties"],
       "presets": [
         [
           "env",
@@ -34,6 +36,7 @@
     },
     "node8": {
       "plugins": [
+        "transform-class-properties",
         ["transform-runtime", { "polyfill": false }]
       ],
       "presets": [
@@ -47,6 +50,9 @@
       ]
     },
     "test": {
+      "plugins": [
+        "transform-class-properties",
+      ],
       "presets": [
         ["env", {
           "targets": {

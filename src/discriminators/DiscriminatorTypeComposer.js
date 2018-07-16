@@ -104,15 +104,29 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
   DKeyETC: EnumTypeComposer;
 
-  schemaComposer: SchemaComposer<any>;
-
   opts: Options;
 
   DInterface: GraphQLInterfaceType;
 
   childTCs: TypeComposer[];
+  static _getClassConnectedWithSchemaComposer(
+    sc?: SchemaComposer<TContext>
+  ): Class<DiscriminatorTypeComposer<TContext>> {
+    class _DiscriminatorTypeComposer extends DiscriminatorTypeComposer<TContext> {
+      static schemaComposer = sc || schemaComposer;
+    }
 
-  constructor(baseModel: Model, opts?: any) {
+    return _DiscriminatorTypeComposer;
+  }
+
+  /* ::
+  constructor(gqType: any): DiscriminatorTypeComposer<TContext> {
+    super(gqType);
+    return this;
+  }
+  */
+
+  static createFromModel(baseModel: Model, opts?: any): DiscriminatorTypeComposer<TContext> {
     if (!baseModel || !(baseModel: any).discriminators) {
       throw Error('Discriminator Key not Set, Use composeWithMongoose for Normal Collections');
     }
@@ -125,29 +139,31 @@ export class DiscriminatorTypeComposer extends TypeComposer {
       ...opts,
     };
 
-    super(composeWithMongoose(baseModel, opts.customizationOptions).gqType);
+    const baseTC = composeWithMongoose(baseModel, opts.customizationOptions);
 
-    this.opts = opts;
-    this.childTCs = [];
-    this.discriminatorKey = (baseModel: any).schema.get('discriminatorKey') || '__t';
-
-    this.schemaComposer =
+    const _DiscriminatorTypeComposer = this._getClassConnectedWithSchemaComposer(
       opts.customizationOptions && opts.customizationOptions.schemaComposer
-        ? opts.customizationOptions.schemaComposer
-        : schemaComposer;
+    );
+    const baseDTC = new _DiscriminatorTypeComposer(baseTC.getType());
+
+    baseDTC.opts = opts;
+    baseDTC.childTCs = [];
+    baseDTC.discriminatorKey = (baseModel: any).schema.get('discriminatorKey') || '__t';
 
     // discriminators an object containing all discriminators with key being DNames
-    this.DKeyETC = createAndSetDKeyETC(this, (baseModel: any).discriminators);
+    baseDTC.DKeyETC = createAndSetDKeyETC(baseDTC, (baseModel: any).discriminators);
 
-    reorderFields(this, (this.opts: any).reorderFields, this.discriminatorKey);
+    reorderFields(baseDTC, (baseDTC.opts: any).reorderFields, baseDTC.discriminatorKey);
 
-    this.DInterface = createDInterface(this);
-    this.setInterfaces([this.DInterface]);
+    baseDTC.DInterface = createDInterface(baseDTC);
+    baseDTC.setInterfaces([baseDTC.DInterface]);
 
-    this.schemaComposer.addSchemaMustHaveType(this);
+    baseDTC.schemaComposer.addSchemaMustHaveType(baseDTC);
 
     // prepare Base Resolvers
-    prepareBaseResolvers(this);
+    prepareBaseResolvers(baseDTC);
+
+    return baseDTC;
   }
 
   getDKey(): string {
