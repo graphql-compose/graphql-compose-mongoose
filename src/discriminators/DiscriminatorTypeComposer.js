@@ -6,7 +6,7 @@ import {
   graphql,
   schemaComposer,
   SchemaComposer,
-  TypeComposer,
+  TypeComposerClass,
 } from 'graphql-compose';
 import type { GraphQLFieldConfigMap } from 'graphql-compose/lib/graphql';
 import type {
@@ -50,7 +50,7 @@ function setDKeyETCValues(discriminators: Discriminators): any {
 
 // creates an enum from discriminator names
 // then sets this enum type as the discriminator key field type
-function createAndSetDKeyETC(dTC: DiscriminatorTypeComposer, discriminators: Discriminators) {
+function createAndSetDKeyETC(dTC: DiscriminatorTypeComposer<any>, discriminators: Discriminators) {
   const DKeyETC = EnumTypeComposer.create({
     name: `EnumDKey${dTC.getTypeName()}${dTC.getDKey()[0].toUpperCase() + dTC.getDKey().substr(1)}`,
     values: setDKeyETCValues(discriminators),
@@ -69,7 +69,7 @@ function createAndSetDKeyETC(dTC: DiscriminatorTypeComposer, discriminators: Dis
   return DKeyETC;
 }
 
-function getBaseTCFieldsWithTypes(baseTC: TypeComposer) {
+function getBaseTCFieldsWithTypes(baseTC: TypeComposerClass<any>) {
   const baseFields = baseTC.getFieldNames();
   const baseFieldsWithTypes: GraphQLFieldConfigMap<any, any> = {};
 
@@ -80,7 +80,7 @@ function getBaseTCFieldsWithTypes(baseTC: TypeComposer) {
   return baseFieldsWithTypes;
 }
 
-function createDInterface(baseModelTC: DiscriminatorTypeComposer): GraphQLInterfaceType {
+function createDInterface(baseModelTC: DiscriminatorTypeComposer<any>): GraphQLInterfaceType {
   return new GraphQLInterfaceType({
     name: `${baseModelTC.getTypeName()}Interface`,
 
@@ -99,7 +99,7 @@ function createDInterface(baseModelTC: DiscriminatorTypeComposer): GraphQLInterf
   });
 }
 
-export class DiscriminatorTypeComposer extends TypeComposer {
+export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TContext> {
   discriminatorKey: string;
 
   DKeyETC: EnumTypeComposer;
@@ -108,7 +108,8 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
   DInterface: GraphQLInterfaceType;
 
-  childTCs: TypeComposer[];
+  childTCs: TypeComposerClass<TContext>[];
+
   static _getClassConnectedWithSchemaComposer(
     sc?: SchemaComposer<TContext>
   ): Class<DiscriminatorTypeComposer<TContext>> {
@@ -182,7 +183,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return !!this.childTCs.find(ch => ch.getTypeName() === DName);
   }
 
-  setFields(fields: ComposeFieldConfigMap<any, any>): this {
+  setFields(fields: ComposeFieldConfigMap<any, any>): DiscriminatorTypeComposer<TContext> {
     super.setFields(fields);
 
     for (const childTC of this.childTCs) {
@@ -192,7 +193,10 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
-  setField(fieldName: string, fieldConfig: ComposeFieldConfig<any, any>): this {
+  setField(
+    fieldName: string,
+    fieldConfig: ComposeFieldConfig<any, any>
+  ): DiscriminatorTypeComposer<TContext> {
     super.setField(fieldName, fieldConfig);
 
     for (const childTC of this.childTCs) {
@@ -203,7 +207,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
   }
 
   // discriminators must have all interface fields
-  addFields(newFields: ComposeFieldConfigMap<any, any>): this {
+  addFields(newFields: ComposeFieldConfigMap<any, any>): DiscriminatorTypeComposer<TContext> {
     super.addFields(newFields);
 
     for (const childTC of this.childTCs) {
@@ -213,7 +217,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
-  addNestedFields(newFields: ComposeFieldConfigMap<any, any>): this {
+  addNestedFields(newFields: ComposeFieldConfigMap<any, any>): DiscriminatorTypeComposer<TContext> {
     super.addNestedFields(newFields);
 
     for (const childTC of this.childTCs) {
@@ -223,7 +227,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
-  removeField(fieldNameOrArray: string | Array<string>): this {
+  removeField(fieldNameOrArray: string | Array<string>): DiscriminatorTypeComposer<TContext> {
     super.removeField(fieldNameOrArray);
 
     for (const childTC of this.childTCs) {
@@ -233,7 +237,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
-  removeOtherFields(fieldNameOrArray: string | Array<string>): this {
+  removeOtherFields(fieldNameOrArray: string | Array<string>): DiscriminatorTypeComposer<TContext> {
     super.removeOtherFields(fieldNameOrArray);
 
     for (const childTC of this.childTCs) {
@@ -245,7 +249,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
 
   extendField(
     fieldName: string,
-    partialFieldConfig: ComposePartialFieldConfigAsObject<any, any>
+    partialFieldConfig: ComposePartialFieldConfigAsObject<any, TContext>
   ): this {
     super.extendField(fieldName, partialFieldConfig);
 
@@ -256,7 +260,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
-  reorderFields(names: string[]): this {
+  reorderFields(names: string[]): DiscriminatorTypeComposer<TContext> {
     super.reorderFields(names);
 
     for (const childTC of this.childTCs) {
@@ -266,7 +270,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
-  makeFieldNonNull(fieldNameOrArray: string | Array<string>): this {
+  makeFieldNonNull(fieldNameOrArray: string | Array<string>): DiscriminatorTypeComposer<TContext> {
     super.makeFieldNonNull(fieldNameOrArray);
 
     for (const childTC of this.childTCs) {
@@ -276,7 +280,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
-  makeFieldNullable(fieldNameOrArray: string | Array<string>): this {
+  makeFieldNullable(fieldNameOrArray: string | Array<string>): DiscriminatorTypeComposer<TContext> {
     super.makeFieldNullable(fieldNameOrArray);
 
     for (const childTC of this.childTCs) {
@@ -286,7 +290,9 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
-  deprecateFields(fields: { [fieldName: string]: string } | string[] | string): this {
+  deprecateFields(
+    fields: { [fieldName: string]: string } | string[] | string
+  ): DiscriminatorTypeComposer<TContext> {
     super.deprecateFields(fields);
 
     for (const childTC of this.childTCs) {
@@ -300,7 +306,10 @@ export class DiscriminatorTypeComposer extends TypeComposer {
   // support field args. Well if one wants to have use args, you setType for resolver as this
   // this = this DiscriminantTypeComposer
   // NOTE, those relations will be propagated to the childTypeComposers and you can use normally.
-  addRelation(fieldName: string, relationOpts: RelationOpts<any, any>): this {
+  addRelation(
+    fieldName: string,
+    relationOpts: RelationOpts<any, any>
+  ): DiscriminatorTypeComposer<TContext> {
     super.addRelation(fieldName, relationOpts);
 
     for (const childTC of this.childTCs) {
@@ -310,7 +319,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
     return this;
   }
 
-  setRecordIdFn(fn: GetRecordIdFn<any, any>): this {
+  setRecordIdFn(fn: GetRecordIdFn<any, any>): DiscriminatorTypeComposer<TContext> {
     super.setRecordIdFn(fn);
 
     for (const childTC of this.childTCs) {
@@ -321,7 +330,7 @@ export class DiscriminatorTypeComposer extends TypeComposer {
   }
 
   /* eslint no-use-before-define: 0 */
-  discriminator(childModel: Model, opts?: TypeConverterOpts): TypeComposer {
+  discriminator(childModel: Model, opts?: TypeConverterOpts): TypeComposerClass<TContext> {
     const customizationOpts = mergeCustomizationOptions(
       (this.opts: any).customizationOptions,
       opts

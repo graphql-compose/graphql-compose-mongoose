@@ -1,7 +1,7 @@
 /* @flow */
 
 import type { ResolveParams } from 'graphql-compose';
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { ResolverClass, TypeComposerClass } from 'graphql-compose';
 import { type Options, DiscriminatorTypeComposer } from '../DiscriminatorTypeComposer';
 import { EMCResolvers } from '../../resolvers';
 
@@ -9,8 +9,8 @@ import { EMCResolvers } from '../../resolvers';
 // Also look at it like setting for filters, makes sure to limit
 // query to child type
 function setQueryDKey<TSource, TContext>(
-  resolver: Resolver,
-  childTC: TypeComposer,
+  resolver: ResolverClass<any, TContext>,
+  childTC: TypeComposerClass<TContext>,
   DKey: string,
   fromField: string
 ) {
@@ -38,9 +38,9 @@ function setQueryDKey<TSource, TContext>(
 }
 
 // hide the DKey on the filter or record
-function hideDKey(
-  resolver: Resolver,
-  childTC: TypeComposer,
+function hideDKey<TContext>(
+  resolver: ResolverClass<any, TContext>,
+  childTC: TypeComposerClass<TContext>,
   DKey: string,
   fromField: string[] | string
 ) {
@@ -62,9 +62,9 @@ function hideDKey(
 // makes sure that all input fields are same as that on Interface,
 // that is all should be same as base typeComposer types
 // only changes for common properties, executed only once, on discriminator creation
-function setBaseInputTypesOnChildInputTypes(
-  resolver: Resolver,
-  baseDTC: DiscriminatorTypeComposer,
+function setBaseInputTypesOnChildInputTypes<TContext>(
+  resolver: ResolverClass<any, TContext>,
+  baseDTC: DiscriminatorTypeComposer<TContext>,
   fromField: string[] | string
 ) {
   // set sharedField types on input types
@@ -90,9 +90,9 @@ function setBaseInputTypesOnChildInputTypes(
 }
 
 // reorder input fields resolvers, based on reorderFields opts
-function reorderFieldsRecordFilter(
-  resolver: Resolver,
-  baseDTC: DiscriminatorTypeComposer,
+function reorderFieldsRecordFilter<TContext>(
+  resolver: ResolverClass<any, TContext>,
+  baseDTC: DiscriminatorTypeComposer<TContext>,
   order: string[] | boolean | void | null,
   fromField: string[] | string
 ) {
@@ -124,9 +124,9 @@ function reorderFieldsRecordFilter(
   }
 }
 
-export function prepareChildResolvers(
-  baseDTC: DiscriminatorTypeComposer,
-  childTC: TypeComposer,
+export function prepareChildResolvers<TContext>(
+  baseDTC: DiscriminatorTypeComposer<TContext>,
+  childTC: TypeComposerClass<TContext>,
   opts: Options
 ) {
   for (const resolverName in EMCResolvers) {

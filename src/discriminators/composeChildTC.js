@@ -27,7 +27,7 @@ function copyBaseTCFieldsToChildTC(baseDTC: TypeComposer, childTC: TypeComposer)
 }
 
 export function composeChildTC(
-  baseDTC: DiscriminatorTypeComposer,
+  baseDTC: DiscriminatorTypeComposer<any>,
   childTC: TypeComposer,
   opts: Options
 ): TypeComposer {
