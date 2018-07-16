@@ -553,7 +553,7 @@ declare module "mongoose" {
     models: { [name: string]: typeof Mongoose$Document },
     createConnection(uri?: string, options?: Object): Mongoose$Connection,
     set: (key: string, value: string | Function | boolean) => void,
-    connect: (uri: string, options?: Object) => void,
+    connect: (uri?: string, options?: Object) => void,
     connection: Mongoose$Connection,
     connections: Mongoose$Connection[],
     Query: typeof Mongoose$Query,

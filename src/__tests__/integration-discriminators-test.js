@@ -1,3 +1,5 @@
+/* @flow */
+
 import { graphql, schemaComposer } from 'graphql-compose/lib/index';
 import { mongoose } from '../__mocks__/mongooseCommon';
 import { getCharacterModels } from '../__mocks__/characterModels';

@@ -16,9 +16,7 @@ import { DiscriminatorTypeComposer } from '../discriminators';
 beforeAll(() => MovieModel.base.connect());
 afterAll(() => MovieModel.base.disconnect());
 
-export const allowedDKeys = ['type', 'kind', 'error'];
-
-const { CharacterModel, PersonModel, DroidModel } = getCharacterModels(allowedDKeys[0]);
+const { CharacterModel, PersonModel, DroidModel } = getCharacterModels('type');
 
 describe('composeWithMongooseDiscriminators ->', () => {
   beforeEach(() => {
@@ -50,14 +48,14 @@ describe('composeWithMongooseDiscriminators ->', () => {
         customizationOptions: {
           inputType: {
             fields: {
-              required: [allowedDKeys[1]],
+              required: ['kind'],
             },
           },
         },
       });
       const filterArgInFindOne: any = typeComposer.getResolver('findOne').getArg('filter');
       const inputComposer = new InputTypeComposer(filterArgInFindOne.type);
-      expect(inputComposer.isRequired(allowedDKeys[1])).toBe(true);
+      expect(inputComposer.isRequired('kind')).toBe(true);
     });
 
     it('should proceed customizationOptions.inputType.fields.required', () => {
@@ -90,7 +88,7 @@ describe('composeWithMongooseDiscriminators ->', () => {
       expect(baseDTC.getFieldNames()).toEqual(Object.keys(baseDTC.getDInterface().getFields()));
 
       beforeAll(() =>
-        baseDTC.addDFields({
+        baseDTC.addFields({
           field1: 'String',
           field2: 'String',
         }));
@@ -177,7 +175,7 @@ describe('composeWithMongooseDiscriminators ->', () => {
       const characterDTC = composeWithMongooseDiscriminators(CharacterModel);
       const personTC = characterDTC.discriminator(PersonModel);
       const droidTC = characterDTC.discriminator(DroidModel);
-      const fieldName = allowedDKeys[1];
+      const fieldName = 'kind';
       const fieldExtension = {
         type: 'String',
         description: 'Hello I am changed',
@@ -190,7 +188,9 @@ describe('composeWithMongooseDiscriminators ->', () => {
       it('should extend field on baseTC', () => {
         expect(characterDTC.getFieldType(fieldName).toString()).toEqual(graphql.GraphQLString.name);
 
-        expect(characterDTC.getField(fieldName).description).toEqual(fieldExtension.description);
+        expect((characterDTC.getField(fieldName): any).description).toEqual(
+          fieldExtension.description
+        );
       });
 
       it('should extend field type on DInterface', () => {
@@ -206,11 +206,11 @@ describe('composeWithMongooseDiscriminators ->', () => {
       it('should extend field on childTC', () => {
         expect(personTC.getFieldType(fieldName).toString()).toEqual(graphql.GraphQLString.name);
 
-        expect(personTC.getField(fieldName).description).toEqual(fieldExtension.description);
+        expect((personTC.getField(fieldName): any).description).toEqual(fieldExtension.description);
 
         expect(droidTC.getFieldType(fieldName).toString()).toEqual(graphql.GraphQLString.name);
 
-        expect(droidTC.getField(fieldName).description).toEqual(fieldExtension.description);
+        expect((droidTC.getField(fieldName): any).description).toEqual(fieldExtension.description);
       });
     });
 

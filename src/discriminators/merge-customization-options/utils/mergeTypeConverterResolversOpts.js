@@ -1,3 +1,5 @@
+/* @flow */
+
 import type { TypeConverterResolversOpts } from '../../../composeWithMongoose';
 import { MergeAbleHelperArgsOpts } from '../../../resolvers/helpers';
 import { mergeStringAndStringArraysFields } from '../index';
@@ -115,11 +117,15 @@ export function mergeMapTypeFields(baseField: any, childField: any, argOptsTypes
 }
 
 export function mergeTypeConverterResolverOpts(
-  baseTypeConverterResolverOpts: TypeConverterResolversOpts,
-  childTypeConverterResolverOpts: TypeConverterResolversOpts
-) {
+  baseTypeConverterResolverOpts?: TypeConverterResolversOpts | false,
+  childTypeConverterResolverOpts?: TypeConverterResolversOpts | false
+): TypeConverterResolversOpts | false | void {
   if (!baseTypeConverterResolverOpts) {
     return childTypeConverterResolverOpts;
+  }
+
+  if (!childTypeConverterResolverOpts) {
+    return baseTypeConverterResolverOpts;
   }
 
   const mergedTypeConverterResolverOpts =

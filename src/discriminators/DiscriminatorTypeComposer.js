@@ -7,15 +7,12 @@ import {
   SchemaComposer,
   TypeComposerClass,
   type InterfaceTypeComposerClass,
+  type ComposeFieldConfig,
+  type RelationOpts,
+  type GetRecordIdFn,
 } from 'graphql-compose';
-import type { GraphQLFieldConfigMap } from 'graphql-compose/lib/graphql';
-import type {
-  ComposePartialFieldConfigAsObject,
-  RelationOpts,
-  ComposeFieldConfig,
-  GetRecordIdFn,
-} from 'graphql-compose/lib/TypeComposer';
-import { Model } from 'mongoose';
+import type { ComposePartialFieldConfigAsObject } from 'graphql-compose/lib/TypeComposer';
+import type { Model } from 'mongoose';
 import { composeWithMongoose, type TypeConverterOpts } from '../composeWithMongoose';
 import { composeChildTC } from './composeChildTC';
 import { mergeCustomizationOptions } from './merge-customization-options';
@@ -95,7 +92,7 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
   }
   */
 
-  static createFromModel(baseModel: Model, opts?: any): DiscriminatorTypeComposer<TContext> {
+  static createFromModel(baseModel: Class<Model>, opts?: any): DiscriminatorTypeComposer<TContext> {
     if (!baseModel || !(baseModel: any).discriminators) {
       throw Error('Discriminator Key not Set, Use composeWithMongoose for Normal Collections');
     }
@@ -168,7 +165,7 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
     return this.DKeyETC;
   }
 
-  getDInterface(): GraphQLInterfaceType {
+  getDInterface(): InterfaceTypeComposerClass<TContext> {
     return this.DInterface;
   }
 
@@ -323,7 +320,7 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
   }
 
   /* eslint no-use-before-define: 0 */
-  discriminator(childModel: Model, opts?: TypeConverterOpts): TypeComposerClass<TContext> {
+  discriminator(childModel: Class<Model>, opts?: TypeConverterOpts): TypeComposerClass<TContext> {
     const customizationOpts = mergeCustomizationOptions(
       (this.opts: any).customizationOptions,
       opts
