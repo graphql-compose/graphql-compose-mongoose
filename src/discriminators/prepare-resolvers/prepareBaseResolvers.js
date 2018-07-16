@@ -33,7 +33,7 @@ function setDKeyEnumOnITCArgs(resolver, baseTC: DiscriminatorTypeComposer<any>) 
 // composeWithMongoose composers
 export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any>) {
   for (const resolverName in EMCResolvers) {
-    if (baseTC.hasResolver(resolverName)) {
+    if (EMCResolvers.hasOwnProperty(resolverName) && baseTC.hasResolver(resolverName)) {
       const resolver = baseTC.getResolver(resolverName);
 
       switch (resolverName) {

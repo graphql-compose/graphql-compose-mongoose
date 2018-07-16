@@ -130,7 +130,7 @@ export function prepareChildResolvers<TContext>(
   opts: DiscriminatorOptions
 ) {
   for (const resolverName in EMCResolvers) {
-    if (childTC.hasResolver(resolverName)) {
+    if (EMCResolvers.hasOwnProperty(resolverName) && childTC.hasResolver(resolverName)) {
       const resolver = childTC.getResolver(resolverName);
 
       switch (resolverName) {
