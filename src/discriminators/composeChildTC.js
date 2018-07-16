@@ -1,7 +1,7 @@
 /* @flow */
 
 import { TypeComposer } from 'graphql-compose';
-import type { DiscriminatorTypeComposer, Options } from './DiscriminatorTypeComposer';
+import type { DiscriminatorTypeComposer, DiscriminatorOptions } from './DiscriminatorTypeComposer';
 import { prepareChildResolvers } from './prepare-resolvers/prepareChildResolvers';
 import { reorderFields } from './utils';
 
@@ -29,7 +29,7 @@ function copyBaseTCFieldsToChildTC(baseDTC: TypeComposer, childTC: TypeComposer)
 export function composeChildTC(
   baseDTC: DiscriminatorTypeComposer<any>,
   childTC: TypeComposer,
-  opts: Options
+  opts: DiscriminatorOptions
 ): TypeComposer {
   const composedChildTC = copyBaseTCFieldsToChildTC(baseDTC, childTC);
 

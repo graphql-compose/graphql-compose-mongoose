@@ -1,11 +1,11 @@
 /* @flow */
 
 import type { Model } from 'mongoose';
-import { type Options, DiscriminatorTypeComposer } from './discriminators';
+import { type DiscriminatorOptions, DiscriminatorTypeComposer } from './discriminators';
 
 export function composeWithMongooseDiscriminators(
   baseModel: Class<Model>,
-  opts?: Options
+  opts?: DiscriminatorOptions
 ): DiscriminatorTypeComposer<any> {
   return DiscriminatorTypeComposer.createFromModel(baseModel, opts);
 }
