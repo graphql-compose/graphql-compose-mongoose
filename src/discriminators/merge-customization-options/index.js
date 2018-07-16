@@ -93,7 +93,7 @@ export function mergeCustomizationOptions(
     mergedOptions.schemaComposer
   ) {
     throw new Error(
-      '[Discriminators] ChildModel should have same schemaComposer as its BaseModels'
+      '[Discriminators] ChildModels should have same schemaComposer as its BaseModel'
     );
   }
 
