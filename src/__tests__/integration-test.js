@@ -89,7 +89,7 @@ describe('integration tests', () => {
     });
   });
 
-  describe('check mixed field', async () => {
+  describe('check mixed field', () => {
     it('should properly return data via graphql query', async () => {
       const UserTC = composeWithMongoose(UserModel, { schemaComposer });
       const user = new UserModel({
@@ -123,7 +123,7 @@ describe('integration tests', () => {
     });
   });
 
-  describe('projection', async () => {
+  describe('projection', () => {
     let schema;
     let UserTC;
     beforeAll(async () => {

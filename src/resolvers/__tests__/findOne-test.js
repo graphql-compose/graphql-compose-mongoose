@@ -10,16 +10,13 @@ beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 let UserTC;
-
-beforeEach(() => {
-  schemaComposer.clear();
-  UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
-});
-
 let user1;
 let user2;
 
 beforeEach(async () => {
+  schemaComposer.clear();
+  UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+
   await UserModel.remove({});
 
   user1 = new UserModel({

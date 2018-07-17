@@ -89,7 +89,7 @@ describe('github issues checks', () => {
     });
   });
 
-  describe('#92 How to verify the fields?', async () => {
+  describe('#92 How to verify the fields?', () => {
     UserTC.wrapResolverResolve('createOne', next => rp => {
       if (rp.args.record.age < 21) throw new Error('You are too young');
       if (rp.args.record.age > 60) throw new Error('You are too old');

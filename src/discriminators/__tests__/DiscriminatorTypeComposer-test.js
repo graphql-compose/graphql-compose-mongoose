@@ -31,11 +31,12 @@ describe('DiscriminatorTypeComposer', () => {
     it('should have field names synced with the baseTC', () => {
       expect(baseDTC.getFieldNames()).toEqual(Object.keys(baseDTC.getDInterface().getFields()));
 
-      beforeAll(() =>
+      beforeAll(() => {
         baseDTC.addFields({
           field1: 'String',
           field2: 'String',
-        }));
+        });
+      });
 
       expect(baseDTC.getFieldNames()).toEqual(Object.keys(baseDTC.getDInterface().getFields()));
     });
@@ -448,10 +449,11 @@ describe('DiscriminatorTypeComposer', () => {
       const relationField = 'movies';
       const relationResolver = composeWithMongoose(MovieModel).getResolver('findMany');
 
-      beforeAll(() =>
+      beforeAll(() => {
         characterDTC.addRelation(relationField, {
           resolver: relationResolver,
-        }));
+        });
+      });
 
       it('should create relation on baseTC', () => {
         expect(characterDTC.getRelations()[relationField].resolver).toEqual(relationResolver);
