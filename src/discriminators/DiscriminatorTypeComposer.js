@@ -174,10 +174,13 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
   }
 
   setFields(fields: ComposeFieldConfigMap<any, any>): DiscriminatorTypeComposer<TContext> {
+    const oldFieldNames = super.getFieldNames();
     super.setFields(fields);
 
     for (const childTC of this.childTCs) {
-      childTC.setFields(fields);
+      childTC.removeField(oldFieldNames);
+      childTC.addFields(fields);
+      reorderFields(childTC, (this.opts: any).reorderFields, this.getDKey(), super.getFieldNames());
     }
 
     return this;
@@ -228,10 +231,18 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
   }
 
   removeOtherFields(fieldNameOrArray: string | Array<string>): DiscriminatorTypeComposer<TContext> {
+    const oldFieldNames = super.getFieldNames();
     super.removeOtherFields(fieldNameOrArray);
 
     for (const childTC of this.childTCs) {
-      childTC.removeOtherFields(fieldNameOrArray);
+      const specificFields = childTC
+        .getFieldNames()
+        .filter(
+          childFieldName =>
+            !oldFieldNames.find(oldBaseFieldName => oldBaseFieldName === childFieldName)
+        );
+      childTC.removeOtherFields(super.getFieldNames().concat(specificFields));
+      reorderFields(childTC, (this.opts: any).reorderFields, this.getDKey(), super.getFieldNames());
     }
 
     return this;

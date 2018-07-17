@@ -9,7 +9,7 @@ import { DiscriminatorTypeComposer } from '../discriminators';
 beforeAll(() => MovieModel.base.connect());
 afterAll(() => MovieModel.base.disconnect());
 
-const { CharacterModel, PersonModel, DroidModel } = getCharacterModels('type');
+const { CharacterModel, PersonModel } = getCharacterModels('type');
 
 describe('composeWithMongooseDiscriminators ->', () => {
   beforeEach(() => {

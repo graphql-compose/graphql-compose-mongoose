@@ -2,19 +2,20 @@
 
 import { schemaComposer, graphql, TypeComposer, InterfaceTypeComposer } from 'graphql-compose';
 import { getCharacterModels } from '../../__mocks__/characterModels';
+import { MovieModel } from '../../__mocks__/movieModel';
+import { composeWithMongoose } from '../../composeWithMongoose';
 import { composeWithMongooseDiscriminators } from '../../composeWithMongooseDiscriminators';
 
 const { CharacterModel, PersonModel, DroidModel } = getCharacterModels('type');
 
 describe('DiscriminatorTypeComposer', () => {
-  beforeEach(() => schemaComposer.clear());
-
   it('should have as interface DInterface', () => {
     const baseDTC = composeWithMongooseDiscriminators(CharacterModel);
     expect(baseDTC.hasInterface(baseDTC.getDInterface())).toBeTruthy();
   });
 
   describe('DInterface', () => {
+    afterAll(() => schemaComposer.clear());
     const baseDTC = composeWithMongooseDiscriminators(CharacterModel);
 
     it('should have same field names as baseModel used to create it', () => {
@@ -40,131 +41,432 @@ describe('DiscriminatorTypeComposer', () => {
     });
   });
 
-  describe('hasChildTC(DName)', () => {
-    const baseDTC = composeWithMongooseDiscriminators(CharacterModel);
-    const personModel = baseDTC.discriminator(PersonModel);
+  describe('class methods', () => {
+    let characterDTC;
+    let personTC;
+    let droidTC;
 
-    it('should check and return true if childTC is available', () => {
-      expect(baseDTC.hasChildTC(personModel.getTypeName())).toBeTruthy();
+    describe('hasChildTC(DName)', () => {
+      beforeAll(() => {
+        schemaComposer.clear();
+
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        personTC = characterDTC.discriminator(PersonModel);
+      });
+
+      it('should check and return true if childTC is available', () => {
+        expect(characterDTC.hasChildTC(personTC.getTypeName())).toBeTruthy();
+      });
+
+      it('should be falsified as childTC not found', () => {
+        expect(characterDTC.hasChildTC('NOT_AVAILABLE')).toBeFalsy();
+      });
     });
 
-    it('should be falsified as childTC not found', () => {
-      expect(baseDTC.hasChildTC('NOT_AVAILABLE')).toBeFalsy();
-    });
-  });
+    describe('setFields(fields)', () => {
+      let personSpecificFields;
+      let droidSpecificFields;
 
-  describe('addFields(newFields)', () => {
-    const characterDTC = composeWithMongooseDiscriminators(CharacterModel);
-    const personTC = characterDTC.discriminator(PersonModel);
-    const droidTC = characterDTC.discriminator(DroidModel);
+      beforeAll(() => {
+        schemaComposer.clear();
 
-    const personFields = personTC.getFieldNames();
-    const droidFields = droidTC.getFieldNames();
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        droidTC = characterDTC.discriminator(DroidModel);
+        personTC = characterDTC.discriminator(PersonModel);
 
-    const newFields = {
-      field1: 'String',
-      field2: 'String',
-    };
+        personSpecificFields = personTC.getFieldNames().filter(v => !characterDTC.hasField(v));
+        droidSpecificFields = droidTC.getFieldNames().filter(v => !characterDTC.hasField(v));
+      });
 
-    beforeAll(() => {
-      characterDTC.addFields(newFields);
-    });
+      const fieldsToSet = {
+        kind: 'String',
+        appearsIn: 'String',
+        field1: 'String',
+        field2: 'String',
+      };
 
-    it('should add fields to baseTC', () => {
-      expect(characterDTC.getFieldNames()).toEqual(expect.arrayContaining(Object.keys(newFields)));
-    });
+      beforeAll(() => {
+        characterDTC.setFields(fieldsToSet);
+      });
 
-    it('should add fields to DInterface', () => {
-      expect(Object.keys(characterDTC.getDInterface().getFields())).toEqual(
-        expect.arrayContaining(Object.keys(newFields))
-      );
-    });
+      afterAll(() => schemaComposer.clear());
 
-    it('should add fields to childTC', () => {
-      expect(personTC.getFieldNames()).toEqual(expect.arrayContaining(Object.keys(newFields)));
-      expect(droidTC.getFieldNames()).toEqual(expect.arrayContaining(Object.keys(newFields)));
-    });
+      it('should set fields to baseTC', () => {
+        expect(characterDTC.getFieldNames()).toEqual(Object.keys(fieldsToSet));
+      });
 
-    it('should have exactly plus two fields added to array', () => {
-      expect(droidTC.getFieldNames()).toEqual(droidFields.concat(Object.keys(newFields)));
-      expect(personTC.getFieldNames()).toEqual(personFields.concat(Object.keys(newFields)));
-    });
-  });
+      it('should sets fields to DInterface', () => {
+        expect(Object.keys(characterDTC.getDInterface().getFields())).toEqual(
+          Object.keys(fieldsToSet)
+        );
+      });
 
-  describe('removeField(fieldName)', () => {
-    const characterDTC = composeWithMongooseDiscriminators(CharacterModel);
-    const personTC = characterDTC.discriminator(PersonModel);
-    const droidTC = characterDTC.discriminator(DroidModel);
-    const fieldCounts = {
-      person: personTC.getFieldNames().length,
-      droid: droidTC.getFieldNames().length,
-    };
+      it('should set fields to childTC', () => {
+        expect(personTC.getFieldNames()).toEqual(expect.arrayContaining(Object.keys(fieldsToSet)));
+        expect(droidTC.getFieldNames()).toEqual(expect.arrayContaining(Object.keys(fieldsToSet)));
+      });
 
-    const field = 'friends';
+      it('should keep child specific fields', () => {
+        expect(droidTC.getFieldNames()).toEqual(expect.arrayContaining(droidSpecificFields));
+        expect(personTC.getFieldNames()).toEqual(expect.arrayContaining(personSpecificFields));
+      });
 
-    beforeAll(() => {
-      characterDTC.removeField(field);
+      it('should contain total of fieldsToSet and child specific fields', () => {
+        expect(droidTC.getFieldNames().length).toBe(droidSpecificFields.length + 4);
+        expect(personTC.getFieldNames().length).toBe(personSpecificFields.length + 4);
+      });
     });
 
-    it('should remove fields from baseTC', () => {
-      expect(characterDTC.hasField(field)).toBeFalsy();
+    describe('setField(fieldName, fieldConfig)', () => {
+      beforeAll(() => {
+        schemaComposer.clear();
+
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        droidTC = characterDTC.discriminator(DroidModel);
+        personTC = characterDTC.discriminator(PersonModel);
+      });
+      const fieldName = 'myField';
+      const fieldConfig = {
+        type: 'String',
+      };
+
+      beforeAll(() => {
+        characterDTC.setField(fieldName, fieldConfig);
+      });
+
+      afterAll(() => schemaComposer.clear());
+
+      it('should set field on baseTC', () => {
+        expect(characterDTC.getFieldType(fieldName)).toEqual(graphql.GraphQLString);
+      });
+
+      it('should set field on DInterface', () => {
+        expect(characterDTC.getDInterface().getFieldType(fieldName)).toEqual(graphql.GraphQLString);
+      });
+
+      it('should set field on childTC', () => {
+        expect(droidTC.getFieldType(fieldName)).toEqual(graphql.GraphQLString);
+        expect(personTC.getFieldType(fieldName)).toEqual(graphql.GraphQLString);
+      });
     });
 
-    it('should remove fields from DInterface', () => {
-      expect(characterDTC.getDInterface().getFields()[field]).toBeFalsy();
+    describe('addFields(newFields)', () => {
+      let personSpecificFields;
+      let droidSpecificFields;
+
+      beforeAll(() => {
+        schemaComposer.clear();
+
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        droidTC = characterDTC.discriminator(DroidModel);
+        personTC = characterDTC.discriminator(PersonModel);
+
+        personSpecificFields = personTC.getFieldNames().filter(v => !characterDTC.hasField(v));
+        droidSpecificFields = droidTC.getFieldNames().filter(v => !characterDTC.hasField(v));
+      });
+
+      const newFields = {
+        field1: 'String',
+        field2: 'String',
+      };
+
+      beforeAll(() => {
+        characterDTC.addFields(newFields);
+      });
+
+      afterAll(() => schemaComposer.clear());
+
+      it('should add fields to baseTC', () => {
+        expect(characterDTC.getFieldNames()).toEqual(
+          expect.arrayContaining(Object.keys(newFields))
+        );
+      });
+
+      it('should add fields to DInterface', () => {
+        expect(Object.keys(characterDTC.getDInterface().getFields())).toEqual(
+          expect.arrayContaining(Object.keys(newFields))
+        );
+      });
+
+      it('should have exactly plus two fields added to childTC fields', () => {
+        expect(droidTC.getFieldNames()).toEqual([
+          ...characterDTC.getFieldNames(),
+          ...droidSpecificFields,
+        ]);
+        expect(personTC.getFieldNames()).toEqual([
+          ...characterDTC.getFieldNames(),
+          ...personSpecificFields,
+        ]);
+      });
     });
 
-    it('should remove fields from childTC', () => {
-      expect(personTC.hasField(field)).toBeFalsy();
-      expect(droidTC.hasField(field)).toBeFalsy();
+    describe('addNestedFields(newFields)', () => {
+      let personFields;
+      let droidFields;
+
+      beforeAll(() => {
+        schemaComposer.clear();
+
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        droidTC = characterDTC.discriminator(DroidModel);
+        personTC = characterDTC.discriminator(PersonModel);
+
+        personFields = personTC.getFieldNames();
+        droidFields = droidTC.getFieldNames();
+      });
+
+      const newFields = {
+        'field1.nested': 'String',
+        'field2.nested': 'String',
+      };
+
+      beforeAll(() => {
+        characterDTC.addNestedFields(newFields);
+      });
+
+      afterAll(() => schemaComposer.clear());
+
+      it('should add field to baseTC', () => {
+        expect(characterDTC.getFieldTC('field1').getFieldType('nested')).toEqual(
+          graphql.GraphQLString
+        );
+      });
+
+      it('should add field to DInterface', () => {
+        expect(
+          characterDTC
+            .getDInterface()
+            .getFieldTC('field1')
+            .getFieldType('nested')
+        ).toEqual(graphql.GraphQLString);
+      });
+
+      it('should have exactly plus two fields added to childTC fields', () => {
+        expect(droidTC.getFieldTC('field1').getFieldType('nested')).toEqual(graphql.GraphQLString);
+        expect(personTC.getFieldTC('field2').getFieldType('nested')).toEqual(graphql.GraphQLString);
+      });
+
+      it('should have plus 2 field length on childTC', () => {
+        expect(droidTC.getFieldNames().length).toBe(droidFields.length + 2);
+        expect(personTC.getFieldNames().length).toBe(personFields.length + 2);
+      });
     });
 
-    it('should remove only specified fields', () => {
-      expect(droidTC.getFieldNames().length - 1).toBe(fieldCounts.droid);
-      expect(personTC.getFieldNames().length - 1).toBe(fieldCounts.person);
+    describe('removeField(fieldName)', () => {
+      let personFields;
+      let droidFields;
+
+      beforeAll(() => {
+        schemaComposer.clear();
+
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        droidTC = characterDTC.discriminator(DroidModel);
+        personTC = characterDTC.discriminator(PersonModel);
+
+        personFields = personTC.getFieldNames().filter(v => v !== 'friends');
+        droidFields = droidTC.getFieldNames().filter(v => v !== 'friends');
+      });
+
+      const field = 'friends';
+
+      beforeAll(() => {
+        characterDTC.removeField(field);
+      });
+
+      afterAll(() => schemaComposer.clear());
+
+      it('should remove fields from baseTC', () => {
+        expect(characterDTC.hasField(field)).toBeFalsy();
+      });
+
+      it('should remove fields from DInterface', () => {
+        expect(characterDTC.getDInterface().hasField(field)).toBeFalsy();
+      });
+
+      it('should remove fields from childTC', () => {
+        expect(personTC.hasField(field)).toBeFalsy();
+        expect(droidTC.hasField(field)).toBeFalsy();
+      });
+
+      it('should remove only DFields fields', () => {
+        expect(droidTC.getFieldNames()).toEqual(droidFields);
+        expect(personTC.getFieldNames()).toEqual(personFields);
+      });
     });
-  });
 
-  describe('extendFields(fieldName, extensionField)', () => {
-    const characterDTC = composeWithMongooseDiscriminators(CharacterModel);
-    const personTC = characterDTC.discriminator(PersonModel);
-    const droidTC = characterDTC.discriminator(DroidModel);
-    const fieldName = 'kind';
-    const fieldExtension = {
-      type: 'String',
-      description: 'Hello I am changed',
-    };
+    describe('removeOtherFields(fieldNames)', () => {
+      let personSpecificFields;
+      let droidSpecificFields;
 
-    beforeAll(() => {
-      characterDTC.extendField(fieldName, fieldExtension);
+      beforeAll(() => {
+        schemaComposer.clear();
+
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        droidTC = characterDTC.discriminator(DroidModel);
+        personTC = characterDTC.discriminator(PersonModel);
+
+        personSpecificFields = personTC.getFieldNames().filter(v => !characterDTC.hasField(v));
+        droidSpecificFields = droidTC.getFieldNames().filter(v => !characterDTC.hasField(v));
+      });
+      const fields = ['type', 'friends'];
+
+      beforeAll(() => {
+        characterDTC.removeOtherFields(fields);
+      });
+
+      afterAll(() => schemaComposer.clear());
+
+      it('should remove fields from baseTC', () => {
+        expect(characterDTC.getFieldNames()).toEqual(fields);
+      });
+
+      it('should remove fields from DInterface', () => {
+        expect(characterDTC.getDInterface().getFieldNames()).toEqual(fields);
+      });
+
+      it('should remove only DFields from childTC', () => {
+        expect(personTC.getFieldNames()).toEqual([...fields, ...personSpecificFields]);
+        expect(droidTC.getFieldNames()).toEqual([...fields, ...droidSpecificFields]);
+      });
     });
 
-    it('should extend field on baseTC', () => {
-      expect(characterDTC.getFieldType(fieldName).toString()).toEqual(graphql.GraphQLString.name);
+    describe('extendFields(fieldName, extensionField)', () => {
+      let personFields;
+      let droidFields;
 
-      expect((characterDTC.getField(fieldName): any).description).toEqual(
-        fieldExtension.description
-      );
+      beforeAll(() => {
+        schemaComposer.clear();
+
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        droidTC = characterDTC.discriminator(DroidModel);
+        personTC = characterDTC.discriminator(PersonModel);
+
+        personFields = personTC.getFieldNames();
+        droidFields = droidTC.getFieldNames();
+      });
+
+      const fieldName = 'kind';
+      const fieldExtension = {
+        type: 'String',
+        description: 'Hello I am changed',
+      };
+
+      beforeAll(() => {
+        characterDTC.extendField(fieldName, fieldExtension);
+      });
+
+      it('should extend field on baseTC', () => {
+        expect(characterDTC.getFieldType(fieldName).toString()).toEqual(graphql.GraphQLString.name);
+
+        expect((characterDTC.getField(fieldName): any).description).toEqual(
+          fieldExtension.description
+        );
+      });
+
+      it('should extend field type on DInterface', () => {
+        expect(characterDTC.getDInterface().getFields()[fieldName]).toBeTruthy();
+        expect(
+          characterDTC
+            .getDInterface()
+            .getFieldType(fieldName)
+            .toString()
+        ).toEqual(fieldExtension.type);
+      });
+
+      it('should extend field on childTC', () => {
+        expect(personTC.getFieldType(fieldName)).toEqual(graphql.GraphQLString);
+
+        expect((personTC.getField(fieldName): any).description).toEqual(fieldExtension.description);
+
+        expect(droidTC.getFieldType(fieldName)).toEqual(graphql.GraphQLString);
+
+        expect((droidTC.getField(fieldName): any).description).toEqual(fieldExtension.description);
+      });
+
+      it('should have same field length on childTC an others', () => {
+        expect(droidTC.getFieldNames().length).toBe(droidFields.length);
+        expect(personTC.getFieldNames().length).toBe(personFields.length);
+      });
     });
 
-    it('should extend field type on DInterface', () => {
-      expect(characterDTC.getDInterface().getFields()[fieldName]).toBeTruthy();
-      expect(
-        characterDTC
-          .getDInterface()
-          .getFieldType(fieldName)
-          .toString()
-      ).toEqual(fieldExtension.type);
+    describe('makeFieldNonNull(fieldName), makeFieldNullable(fieldName), deprecateFields(fieldName)', () => {
+      beforeAll(() => {
+        schemaComposer.clear();
+
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        droidTC = characterDTC.discriminator(DroidModel);
+        personTC = characterDTC.discriminator(PersonModel);
+      });
+
+      const fieldNonNull = 'type';
+      const fieldNullable = 'friends';
+      const fieldDeprecated = 'kind';
+      const deprecateMessage = 'Property was to be use for tests only';
+
+      beforeAll(() => {
+        characterDTC.makeFieldNonNull(fieldNonNull);
+        characterDTC.makeFieldNonNull(fieldNullable);
+        characterDTC.makeFieldNullable(fieldNullable);
+        characterDTC.deprecateFields({ [fieldDeprecated]: deprecateMessage });
+      });
+
+      it('should effect fields on baseTC', () => {
+        expect(characterDTC.isFieldNonNull(fieldNonNull)).toBeTruthy();
+        expect(characterDTC.isFieldNonNull(fieldNullable)).toBeFalsy();
+        expect(characterDTC.getFieldConfig(fieldDeprecated).deprecationReason).toBe(
+          deprecateMessage
+        );
+      });
+
+      it('should effect fields on DInterface', () => {
+        const dInterface = characterDTC.getDInterface();
+
+        expect(dInterface.isFieldNonNull(fieldNonNull)).toBeTruthy();
+        expect(dInterface.isFieldNonNull(fieldNullable)).toBeFalsy();
+        expect(dInterface.getFieldConfig(fieldDeprecated).deprecationReason).toBe(deprecateMessage);
+      });
+
+      it('should effect fields on childTC', () => {
+        expect(personTC.isFieldNonNull(fieldNonNull)).toBeTruthy();
+        expect(personTC.isFieldNonNull(fieldNullable)).toBeFalsy();
+        expect(personTC.getFieldConfig(fieldDeprecated).deprecationReason).toBe(deprecateMessage);
+        expect(droidTC.isFieldNonNull(fieldNonNull)).toBeTruthy();
+        expect(droidTC.isFieldNonNull(fieldNullable)).toBeFalsy();
+        expect(droidTC.getFieldConfig(fieldDeprecated).deprecationReason).toBe(deprecateMessage);
+      });
     });
 
-    it('should extend field on childTC', () => {
-      expect(personTC.getFieldType(fieldName).toString()).toEqual(graphql.GraphQLString.name);
+    describe('addRelation(fieldName, relationOpts)', () => {
+      beforeAll(() => {
+        schemaComposer.clear();
 
-      expect((personTC.getField(fieldName): any).description).toEqual(fieldExtension.description);
+        characterDTC = composeWithMongooseDiscriminators(CharacterModel);
+        droidTC = characterDTC.discriminator(DroidModel);
+        personTC = characterDTC.discriminator(PersonModel);
+      });
 
-      expect(droidTC.getFieldType(fieldName).toString()).toEqual(graphql.GraphQLString.name);
+      const relationField = 'movies';
+      const relationResolver = composeWithMongoose(MovieModel).getResolver('findMany');
 
-      expect((droidTC.getField(fieldName): any).description).toEqual(fieldExtension.description);
+      beforeAll(() =>
+        characterDTC.addRelation(relationField, {
+          resolver: relationResolver,
+        }));
+
+      it('should create relation on baseTC', () => {
+        expect(characterDTC.getRelations()[relationField].resolver).toEqual(relationResolver);
+      });
+
+      it('should create field with type Movie on DInterface', () => {
+        const dInterface = characterDTC.getDInterface();
+
+        expect(dInterface.getFieldType(relationField)).toEqual(relationResolver.getType());
+      });
+
+      it('should create Movie relation on childTC', () => {
+        expect(personTC.getRelations()[relationField].resolver).toEqual(relationResolver);
+        expect(droidTC.getRelations()[relationField].resolver).toEqual(relationResolver);
+      });
     });
   });
 
@@ -172,7 +474,6 @@ describe('DiscriminatorTypeComposer', () => {
     let characterDTC;
 
     beforeEach(() => {
-      schemaComposer.clear();
       characterDTC = composeWithMongooseDiscriminators(CharacterModel);
     });
 
