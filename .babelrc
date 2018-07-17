@@ -33,6 +33,7 @@
       ]
     },
     "es": {
+      "plugins": ["transform-class-properties"],
     },
     "node8": {
       "plugins": [
