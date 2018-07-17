@@ -81,12 +81,12 @@ export function mergeFieldMaps(
 export function mergeCustomizationOptions(
   baseCOptions: TypeConverterOpts,
   childCOptions?: TypeConverterOpts
-): TypeConverterOpts | typeof undefined {
+): TypeConverterOpts | void {
   if (!baseCOptions) {
     return childCOptions;
   }
 
-  const mergedOptions = childCOptions || {};
+  const mergedOptions: TypeConverterOpts = childCOptions || ({}: any);
 
   if (
     baseCOptions.schemaComposer !== mergedOptions.schemaComposer &&

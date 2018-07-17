@@ -33,11 +33,9 @@ describe('composeWithMongooseDiscriminators ->', () => {
   describe('composeWithMongoose customisationOptions', () => {
     it('required input fields, should be passed down to resolvers', () => {
       const typeComposer = composeWithMongooseDiscriminators(CharacterModel, {
-        customizationOptions: {
-          inputType: {
-            fields: {
-              required: ['kind'],
-            },
+        inputType: {
+          fields: {
+            required: ['kind'],
           },
         },
       });
@@ -48,11 +46,9 @@ describe('composeWithMongooseDiscriminators ->', () => {
 
     it('should proceed customizationOptions.inputType.fields.required', () => {
       const itc = composeWithMongooseDiscriminators(CharacterModel, {
-        customizationOptions: {
-          inputType: {
-            fields: {
-              required: ['name', 'friends'],
-            },
+        inputType: {
+          fields: {
+            required: ['name', 'friends'],
           },
         },
       }).getInputTypeComposer();

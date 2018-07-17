@@ -19,10 +19,10 @@ import { mergeCustomizationOptions } from './utils/mergeCustomizationOptions';
 import { prepareBaseResolvers } from './prepareBaseResolvers';
 import { reorderFields } from './utils/reorderFields';
 
-export type DiscriminatorOptions = {
+export type DiscriminatorOptions = {|
   reorderFields?: boolean | string[], // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
-  customizationOptions?: TypeConverterOpts,
-};
+  ...TypeConverterOpts,
+|};
 
 type Discriminators = {
   [DName: string]: any,
@@ -99,16 +99,14 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
 
     opts = {  // eslint-disable-line
       reorderFields: true,
-      customizationOptions: {
-        schemaComposer,
-      },
+      schemaComposer,
       ...opts,
     };
 
-    const baseTC = composeWithMongoose(baseModel, opts.customizationOptions);
+    const baseTC = composeWithMongoose(baseModel, opts);
 
     const _DiscriminatorTypeComposer = this._getClassConnectedWithSchemaComposer(
-      opts.customizationOptions && opts.customizationOptions.schemaComposer
+      opts.schemaComposer
     );
     const baseDTC = new _DiscriminatorTypeComposer(baseTC.getType());
 
@@ -332,10 +330,7 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
 
   /* eslint no-use-before-define: 0 */
   discriminator(childModel: Class<Model>, opts?: TypeConverterOpts): TypeComposerClass<TContext> {
-    const customizationOpts = mergeCustomizationOptions(
-      (this.opts: any).customizationOptions,
-      opts
-    );
+    const customizationOpts = mergeCustomizationOptions((this.opts: any), opts);
 
     let childTC = composeWithMongoose(childModel, customizationOpts);
 

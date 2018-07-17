@@ -16,7 +16,7 @@ import MongoID from './types/mongoid';
 import type { PaginationResolverOpts } from './resolvers/pagination';
 import type { ConnectionSortMapOpts } from './resolvers/connection';
 
-export type TypeConverterOpts = {
+export type TypeConverterOpts = {|
   schemaComposer?: SchemaComposer<any>,
   name?: string,
   description?: string,
@@ -27,7 +27,7 @@ export type TypeConverterOpts = {
   },
   inputType?: TypeConverterInputTypeOpts,
   resolvers?: false | TypeConverterResolversOpts,
-};
+|};
 
 export type TypeConverterInputTypeOpts = {
   name?: string,
@@ -112,7 +112,7 @@ export type TypeConverterResolversOpts = {
 
 export function composeWithMongoose(
   model: Object, // MongooseModel, TODO use Model from mongoose_v4.x.x definition when it will be public
-  opts: TypeConverterOpts = {}
+  opts: TypeConverterOpts = ({}: any)
 ): TypeComposer {
   const name: string = (opts && opts.name) || model.modelName;
 

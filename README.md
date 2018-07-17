@@ -92,9 +92,9 @@ const User = mongoose.model('User', UserSchema);
 const customizationOptions = {}; // left it empty for simplicity, described below
 const UserTC = composeWithMongoose(User, customizationOptions);
 
-// STEP 3: CREATE CRAZY GraphQL SCHEMA WITH ALL CRUD USER OPERATIONS
+// STEP 3: Add needed CRUD User operations to the GraphQL Schema
 // via graphql-compose it will be much much easier, with less typing
-schemaComposer.rootQuery().addFields({
+schemaComposer.Query.addFields({
   userById: UserTC.getResolver('findById'),
   userByIds: UserTC.getResolver('findByIds'),
   userOne: UserTC.getResolver('findOne'),
@@ -104,7 +104,7 @@ schemaComposer.rootQuery().addFields({
   userPagination: UserTC.getResolver('pagination'),
 });
 
-schemaComposer.rootMutation().addFields({
+schemaComposer.Mutation.addFields({
   userCreate: UserTC.getResolver('createOne'),
   userUpdateById: UserTC.getResolver('updateById'),
   userUpdateOne: UserTC.getResolver('updateOne'),
@@ -123,71 +123,68 @@ I don't think so, because by default internally was created about 55 graphql typ
 
 
 ### Working with Mongoose Collection Level Discriminators
-Variable Namings 
-* `...DTC` - Suffix for a `DiscriminatorTypeComposer` instance, which is also an instance of `TypeComposer`. All fields and Relations manipulations on this instance affects all registered discriminators and the Discriminator Interface. 
+Variable Namings
+* `...DTC` - Suffix for a `DiscriminatorTypeComposer` instance, which is also an instance of `TypeComposer`. All fields and Relations manipulations on this instance affects all registered discriminators and the Discriminator Interface.
 
 ```js
   import mongoose from 'mongoose';
-  import { schemaComposer } from 'graphql-composer';
+  import { schemaComposer } from 'graphql-compose';
   import { composeWithMongooseDiscriminators } from 'graphql-compose-mongoose';
-  
+
   // pick a discriminatorKey
   const DKey = 'type';
-  
+
   const enumCharacterType = {
     PERSON: 'Person',
     DROID: 'Droid',
   };
-  
+
   // DEFINE BASE SCHEMA
   const CharacterSchema = new mongoose.Schema({
     // _id: field...
-    name: String,
-  
     type: {
       type: String,
       require: true,
       enum: (Object.keys(enumCharacterType): Array<string>),
+      description: 'Character type Droid or Person',
     },
-  
-    friends: [String], // another Character
-    appearsIn: [String], // movie
+
+    name: String,
+    height: Number,
+    mass: Number,
+    films: [String],
   });
-  
+
   // DEFINE DISCRIMINATOR SCHEMAS
-  const DroidSchema = new Schema({
-    makeDate: Date,
-    modelNumber: Number,
+  const DroidSchema = new mongoose.Schema({
+    makeDate: String,
     primaryFunction: [String],
   });
-  
-  const PersonSchema = new Schema({
-    dob: Number,
-    starShips: [String],
-    totalCredits: Number,
+
+  const PersonSchema = new mongoose.Schema({
+    gender: String,
+    hairColor: String,
+    starships: [String],
   });
-  
+
   // set discriminator Key
   CharacterSchema.set('discriminatorKey', DKey);
-  
+
   // create base Model
   const CharacterModel = mongoose.model('Character', CharacterSchema);
-  
+
   // create mongoose discriminator models
   const DroidModel = CharacterModel.discriminator(enumCharacterType.DROID, DroidSchema);
   const PersonModel = CharacterModel.discriminator(enumCharacterType.PERSON, PersonSchema);
-  
+
   // create DiscriminatorTypeComposer
-  // discrimatorOptions
-  const baseOptions = {
-    customizationOptions: {  // regular TypeConverterOptions, passed to composeWithMongoose
-      fields: {
-        remove: ['friends'],
-      }
+  const baseOptions = { // regular TypeConverterOptions, passed to composeWithMongoose
+    fields: {
+      remove: ['friends'],
     }
   }
   const CharacterDTC = composeWithMongooseDiscriminators(CharacterModel, baseOptions);
-  
+
   // create Discriminator Types
   const droidTypeConverterOptions = {  // this options will be merged with baseOptions -> customisationsOptions
     fields: {
@@ -196,16 +193,16 @@ Variable Namings
   };
   const DroidTC = CharacterDTC.discriminator(DroidModel, droidTypeConverterOptions);
   const PersonTC = CharacterDTC.discriminator(PersonModel);  // baseOptions -> customisationsOptions applied
-  
+
   // You may now use CharacterDTC to add fields to all Discriminators
   // Use DroidTC, `PersonTC as any other TypeComposer.
-  schemaComposer.rootMutation().addFields({
+  schemaComposer.Mutation.addFields({
     droidCreate: DroidTC.getResolver('createOne'),
     personCreate: PersonTC.getResolver('createOne'),
   });
-  
+
   const schema = schemaComposer.buildSchema();
-  
+
   describe('createOne', () => {
     it('should create child document without specifying DKey', async () => {
       const res = await graphql.graphql(
@@ -243,7 +240,7 @@ Variable Namings
       });
     });
   });
-``` 
+```
 
 ## FAQ
 
@@ -396,7 +393,7 @@ The typical implementation may be like this:
 // extend resolve params with hook
 rp.beforeRecordMutate = async function(doc, rp) {
   doc.userTouchedAt = new Date();
-  
+
   const canMakeUpdate  = await performAsyncTask( ...provide data from doc... )
   if (!canMakeUpdate) {
     throw new Error('Forbidden!');
@@ -427,7 +424,7 @@ function adminAccess(resolvers) {
 
       // extend resolve params with hook
       rp.beforeRecordMutate = async function(doc, rp) { ... }
-      
+
       return next(rp)
     })
   })
@@ -588,4 +585,3 @@ This plugin adds `pagination` resolver.
 
 ## License
 [MIT](https://github.com/graphql-compose/graphql-compose-mongoose/blob/master/LICENSE.md)
-
