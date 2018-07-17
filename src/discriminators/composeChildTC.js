@@ -2,8 +2,8 @@
 
 import { TypeComposer } from 'graphql-compose';
 import type { DiscriminatorTypeComposer, DiscriminatorOptions } from './DiscriminatorTypeComposer';
-import { prepareChildResolvers } from './prepare-resolvers/prepareChildResolvers';
-import { reorderFields } from './utils';
+import { prepareChildResolvers } from './prepareChildResolvers';
+import { reorderFields } from './utils/reorderFields';
 
 // copy all baseTypeComposer fields to childTC
 // these are the fields before calling discriminator

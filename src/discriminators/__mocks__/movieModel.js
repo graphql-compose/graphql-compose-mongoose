@@ -1,6 +1,6 @@
 /* @flow */
 
-import { mongoose, Schema } from './mongooseCommon';
+import { mongoose, Schema } from '../../__mocks__/mongooseCommon';
 
 const MovieSchema = new Schema({
   _id: String,

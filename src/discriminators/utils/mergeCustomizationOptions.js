@@ -1,7 +1,7 @@
 /* @flow */
 
 import type { TypeConverterOpts } from '../../composeWithMongoose';
-import { mergeTypeConverterResolverOpts } from './utils/mergeTypeConverterResolversOpts';
+import { mergeTypeConverterResolverOpts } from './mergeTypeConverterResolversOpts';
 
 type FieldMap = {
   [fieldName: string]: string[] | typeof undefined,

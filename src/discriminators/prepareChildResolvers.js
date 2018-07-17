@@ -2,8 +2,8 @@
 
 import type { ResolveParams } from 'graphql-compose';
 import { ResolverClass, TypeComposerClass } from 'graphql-compose';
-import { type DiscriminatorOptions, DiscriminatorTypeComposer } from '../DiscriminatorTypeComposer';
-import { EMCResolvers } from '../../resolvers';
+import { type DiscriminatorOptions, DiscriminatorTypeComposer } from './DiscriminatorTypeComposer';
+import { EMCResolvers } from '../resolvers';
 
 // set the DKey as a query on filter, also project it
 // Also look at it like setting for filters, makes sure to limit

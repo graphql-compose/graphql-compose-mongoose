@@ -15,9 +15,9 @@ import type { ComposePartialFieldConfigAsObject } from 'graphql-compose/lib/Type
 import type { Model } from 'mongoose';
 import { composeWithMongoose, type TypeConverterOpts } from '../composeWithMongoose';
 import { composeChildTC } from './composeChildTC';
-import { mergeCustomizationOptions } from './merge-customization-options';
-import { prepareBaseResolvers } from './prepare-resolvers/prepareBaseResolvers';
-import { reorderFields } from './utils';
+import { mergeCustomizationOptions } from './utils/mergeCustomizationOptions';
+import { prepareBaseResolvers } from './prepareBaseResolvers';
+import { reorderFields } from './utils/reorderFields';
 
 export type DiscriminatorOptions = {
   reorderFields?: boolean | string[], // true order: _id, DKey, DInterfaceFields, DiscriminatorFields

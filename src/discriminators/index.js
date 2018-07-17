@@ -1,4 +1,4 @@
 /* @flow */
 
 export { DiscriminatorTypeComposer, DiscriminatorOptions } from './DiscriminatorTypeComposer';
-export { mergeCustomizationOptions } from './merge-customization-options';
+export { mergeCustomizationOptions } from './utils/mergeCustomizationOptions';

@@ -1,6 +1,6 @@
 /* @flow */
 
-import { mongoose, Schema, Types } from './mongooseCommon';
+import { mongoose, Schema, Types } from '../../__mocks__/mongooseCommon';
 import { DroidSchema } from './droidSchema';
 import { PersonSchema } from './personSchema';
 

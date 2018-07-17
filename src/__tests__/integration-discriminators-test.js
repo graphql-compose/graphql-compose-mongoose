@@ -2,7 +2,7 @@
 
 import { graphql, schemaComposer } from 'graphql-compose/lib/index';
 import { mongoose } from '../__mocks__/mongooseCommon';
-import { getCharacterModels } from '../__mocks__/characterModels';
+import { getCharacterModels } from '../discriminators/__mocks__/characterModels';
 import { composeWithMongooseDiscriminators } from '../composeWithMongooseDiscriminators';
 
 const { CharacterModel, PersonModel, DroidModel } = getCharacterModels('type');

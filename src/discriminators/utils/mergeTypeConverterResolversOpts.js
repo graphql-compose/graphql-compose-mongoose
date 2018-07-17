@@ -1,8 +1,8 @@
 /* @flow */
 
-import type { TypeConverterResolversOpts } from '../../../composeWithMongoose';
-import { MergeAbleHelperArgsOpts } from '../../../resolvers/helpers';
-import { mergeStringAndStringArraysFields } from '../index';
+import type { TypeConverterResolversOpts } from '../../composeWithMongoose';
+import { MergeAbleHelperArgsOpts } from '../../resolvers/helpers';
+import { mergeStringAndStringArraysFields } from './mergeCustomizationOptions';
 
 type TypeFieldMap = {
   [fieldName: string]: any,

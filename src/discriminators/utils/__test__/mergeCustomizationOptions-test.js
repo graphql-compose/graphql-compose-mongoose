@@ -6,7 +6,7 @@ import {
   mergeCustomizationOptions,
   mergeFieldMaps,
   mergeStringAndStringArraysFields,
-} from '../index';
+} from '../mergeCustomizationOptions';
 
 const baseFields = {
   remove: ['id', 'friends', 'health', 'appearsIn'],

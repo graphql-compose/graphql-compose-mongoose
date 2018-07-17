@@ -1,8 +1,8 @@
 /* @flow */
 
 import { schemaComposer, graphql, TypeComposer, InterfaceTypeComposer } from 'graphql-compose';
-import { getCharacterModels } from '../../__mocks__/characterModels';
-import { MovieModel } from '../../__mocks__/movieModel';
+import { getCharacterModels } from '../__mocks__/characterModels';
+import { MovieModel } from '../__mocks__/movieModel';
 import { composeWithMongoose } from '../../composeWithMongoose';
 import { composeWithMongooseDiscriminators } from '../../composeWithMongooseDiscriminators';
 

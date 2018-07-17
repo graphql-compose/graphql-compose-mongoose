@@ -1,7 +1,7 @@
 /* @flow */
 
 import { schemaComposer } from 'graphql-compose';
-import { getCharacterModels } from '../../__mocks__/characterModels';
+import { getCharacterModels } from '../__mocks__/characterModels';
 import { composeWithMongooseDiscriminators } from '../../composeWithMongooseDiscriminators';
 
 const { CharacterModel, PersonModel, DroidModel } = getCharacterModels('type');

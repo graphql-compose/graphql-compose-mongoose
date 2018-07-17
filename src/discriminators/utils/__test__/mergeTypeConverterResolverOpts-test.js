@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { TypeConverterResolversOpts } from '../../../../composeWithMongoose';
+import type { TypeConverterResolversOpts } from '../../../composeWithMongoose';
 import {
   mergeTypeConverterResolverOpts,
   mergePrimitiveTypeFields,
