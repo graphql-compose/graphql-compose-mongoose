@@ -226,17 +226,11 @@ describe('mergeCustomizationOptions()', () => {
   });
 
   it('should produce error if using different schema composers', () => {
-    try {
-      const mergedOpts = mergeCustomizationOptions(
+    expect(() => {
+      mergeCustomizationOptions(
         { schemaComposer: new SchemaComposer() },
         { schemaComposer: new SchemaComposer() }
       );
-
-      expect(mergedOpts).toBeFalsy();
-    } catch (error) {
-      expect(error.message).toBe(
-        '[Discriminators] ChildModels should have same schemaComposer as its BaseModel'
-      );
-    }
+    }).toThrow('[Discriminators] ChildModels should have same schemaComposer as its BaseModel');
   });
 });
