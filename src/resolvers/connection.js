@@ -2,25 +2,33 @@
 /* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
 import type { MongooseModel } from 'mongoose';
-import type { ConnectionSortMapOpts } from 'graphql-compose-connection';
-import type { TypeComposer } from 'graphql-compose';
+import type { ConnectionSortMapOpts as _ConnectionSortMapOpts } from 'graphql-compose-connection';
+import type { Resolver, TypeComposer } from 'graphql-compose';
 import {
   getUniqueIndexes,
   extendByReversedIndexes,
   type IndexT,
-} from './utils/getIndexesFromModel';
+} from '../utils/getIndexesFromModel';
 
-export function prepareConnectionResolver(
+export type ConnectionSortMapOpts = _ConnectionSortMapOpts;
+
+export default function connection(
   model: MongooseModel,
   tc: TypeComposer,
-  opts: ConnectionSortMapOpts
-) {
+  opts?: ConnectionSortMapOpts
+): ?Resolver {
   try {
     require.resolve('graphql-compose-connection');
   } catch (e) {
-    return;
+    return undefined;
   }
-  const composeWithConnection = require('graphql-compose-connection').default;
+  const prepareConnectionResolver = require('graphql-compose-connection').prepareConnectionResolver;
+
+  if (!prepareConnectionResolver) {
+    throw new Error(
+      'You should update `graphql-compose-connection` package till 3.2.0 version or above'
+    );
+  }
 
   const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), {
     reversedFirst: true,
@@ -49,7 +57,7 @@ export function prepareConnectionResolver(
     };
   });
 
-  composeWithConnection(tc, {
+  return prepareConnectionResolver(tc, {
     findResolverName: 'findMany',
     countResolverName: 'count',
     sort: {

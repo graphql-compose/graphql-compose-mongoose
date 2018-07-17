@@ -21,6 +21,16 @@ export type FilterHelperArgsOpts = {
   removeFields?: string | string[],
 };
 
+// for merging, discriminators merge-able only
+export const getFilterHelperArgOptsMap = () => ({
+  // filterTypeName? : 'string'
+  isRequired: 'boolean',
+  onlyIndexed: 'boolean',
+  requiredFields: ['string', 'string[]'],
+  operators: ['FilterOperatorsOptsMap', 'boolean'],
+  removeFields: ['string', 'string[]'],
+});
+
 export const filterHelperArgs = (
   typeComposer: TypeComposer,
   model: MongooseModel,
