@@ -142,6 +142,11 @@ describe('mergeCustomizationOptions()', () => {
       fields: baseInputTypeFields,
     },
     resolvers: {
+      createOne: {
+        record: {
+          removeFields: ['parent', 'child'],
+        },
+      },
       findMany: {
         limit: { defaultValue: 20 },
         // sort: false,
@@ -167,6 +172,11 @@ describe('mergeCustomizationOptions()', () => {
       fields: childInputTypeFields,
     },
     resolvers: {
+      createOne: {
+        record: {
+          removeFields: ['fun', 'child'],
+        },
+      },
       findMany: {
         limit: { defaultValue: 50 },
         sort: false,
@@ -197,6 +207,11 @@ describe('mergeCustomizationOptions()', () => {
       fields: expectedInputTypes,
     },
     resolvers: {
+      createOne: {
+        record: {
+          removeFields: ['parent', 'child', 'fun'],
+        },
+      },
       findMany: {
         limit: { defaultValue: 50 },
         sort: false,
