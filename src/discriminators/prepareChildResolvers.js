@@ -59,30 +59,32 @@ function hideDKey<TContext>(
   }
 }
 
-// makes sure that all input fields are same as that on Interface,
-// that is all should be same as base typeComposer types
-// only changes for common properties, executed only once, on discriminator creation
-function setBaseInputTypesOnChildInputTypes<TContext>(
+// Set baseDTC resolver argTypes on childTC fields shared with DInterface
+function copyResolverArgTypes<TContext>(
   resolver: ResolverClass<any, TContext>,
   baseDTC: DiscriminatorTypeComposer<TContext>,
-  fromField: string[] | string
+  fromArg: string[] | string
 ) {
-  // set sharedField types on input types
   if (resolver && baseDTC.hasInputTypeComposer()) {
-    if (Array.isArray(fromField)) {
-      for (const field of fromField) {
-        setBaseInputTypesOnChildInputTypes(resolver, baseDTC, field);
+    if (Array.isArray(fromArg)) {
+      for (const field of fromArg) {
+        copyResolverArgTypes(resolver, baseDTC, field);
       }
-    } else if (fromField && resolver.hasArg(fromField)) {
-      const argTc = resolver.getArgTC(fromField);
+    } else if (fromArg && resolver.hasArg(fromArg)) {
+      if (
+        baseDTC.hasResolver(resolver.name) &&
+        baseDTC.getResolver(resolver.name).hasArg(fromArg)
+      ) {
+        const childResolverArgTc = resolver.getArgTC(fromArg);
+        const baseResolverArgTC = baseDTC.getResolver(resolver.name).getArgTC(fromArg);
+        const baseResolverArgTCFields = baseResolverArgTC.getFieldNames();
 
-      const baseITCFields = baseDTC.getInputTypeComposer().getFieldNames();
-
-      for (const baseField of baseITCFields) {
-        if (argTc.hasField(baseField) && baseField !== '_id') {
-          argTc.extendField(baseField, {
-            type: baseDTC.getInputTypeComposer().getFieldType(baseField),
-          });
+        for (const baseArgField of baseResolverArgTCFields) {
+          if (childResolverArgTc.hasField(baseArgField) && baseArgField !== '_id') {
+            childResolverArgTc.extendField(baseArgField, {
+              type: baseResolverArgTC.getFieldType(baseArgField),
+            });
+          }
         }
       }
     }
@@ -167,7 +169,7 @@ export function prepareChildResolvers<TContext>(
         default:
       }
 
-      setBaseInputTypesOnChildInputTypes(resolver, baseDTC, ['filter', 'record']);
+      copyResolverArgTypes(resolver, baseDTC, ['filter', 'record']);
       reorderFieldsRecordFilter(resolver, baseDTC, opts.reorderFields, ['filter', 'record']);
     }
   }

@@ -56,5 +56,21 @@ describe('composeWithMongooseDiscriminators ->', () => {
       expect(itc.isRequired('name')).toBe(true);
       expect(itc.isRequired('friends')).toBe(true);
     });
+
+    it('should be passed down record opts to resolvers', () => {
+      const typeComposer = composeWithMongooseDiscriminators(CharacterModel, {
+        resolvers: {
+          createOne: {
+            record: {
+              removeFields: ['friends'],
+              requiredFields: ['name'],
+            },
+          },
+        },
+      });
+      const createOneRecordArgTC = typeComposer.getResolver('createOne').getArgTC('record');
+      expect(createOneRecordArgTC.isRequired('name')).toBe(true);
+      expect(createOneRecordArgTC.hasField('friends')).toBe(false);
+    });
   });
 });

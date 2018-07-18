@@ -147,6 +147,12 @@ describe('mergeCustomizationOptions()', () => {
           removeFields: ['parent', 'child'],
         },
       },
+      updateById: {
+        record: {
+          removeFields: ['one', 'two'],
+          requiredFields: ['eight'],
+        },
+      },
       findMany: {
         limit: { defaultValue: 20 },
         // sort: false,
@@ -191,9 +197,9 @@ describe('mergeCustomizationOptions()', () => {
         },
       },
       updateById: {
-        input: {
-          removeFields: ['one', 'two', 'five'],
-          requiredFields: ['eight', 'two', 'five'],
+        record: {
+          removeFields: ['five'],
+          requiredFields: ['two', 'five'],
         },
       },
     },
@@ -228,13 +234,23 @@ describe('mergeCustomizationOptions()', () => {
       },
       findById: false,
       updateById: {
-        input: {
+        record: {
           removeFields: ['one', 'two', 'five'],
           requiredFields: ['eight', 'two', 'five'],
         },
       },
     },
   };
+
+  it('should return most base options if no child', () => {
+    expect((mergeCustomizationOptions(baseCustomOptions): any).resolvers).toEqual(
+      baseCustomOptions.resolvers
+    );
+  });
+
+  it('should return child if no base is found', () => {
+    expect(mergeCustomizationOptions({}, childCustomOptions)).toEqual(childCustomOptions);
+  });
 
   it('should merge customisation Options', () => {
     expect(mergeCustomizationOptions(baseCustomOptions, childCustomOptions)).toEqual(expected);
