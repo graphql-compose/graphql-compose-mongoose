@@ -16,5 +16,5 @@ export const MergeAbleHelperArgsOpts = {
   skip: 'boolean',
   limit: getLimitHelperArgsOptsMap(),
   filter: getFilterHelperArgOptsMap(),
-  input: getRecordHelperArgsOptsMap(),
+  record: getRecordHelperArgsOptsMap(),
 };

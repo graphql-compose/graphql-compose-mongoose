@@ -65,7 +65,7 @@ export type TypeConverterResolversOpts = {
   updateById?:
     | false
     | {
-        input?: RecordHelperArgsOpts | false,
+        record?: RecordHelperArgsOpts | false,
       },
   updateOne?:
     | false
@@ -78,7 +78,7 @@ export type TypeConverterResolversOpts = {
   updateMany?:
     | false
     | {
-        input?: RecordHelperArgsOpts | false,
+        record?: RecordHelperArgsOpts | false,
         filter?: FilterHelperArgsOpts | false,
         sort?: SortHelperArgsOpts | false,
         limit?: LimitHelperArgsOpts | false,
@@ -99,7 +99,7 @@ export type TypeConverterResolversOpts = {
   createOne?:
     | false
     | {
-        input?: RecordHelperArgsOpts | false,
+        record?: RecordHelperArgsOpts | false,
       },
   count?:
     | false
