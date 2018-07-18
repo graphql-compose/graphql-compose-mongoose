@@ -1,6 +1,12 @@
 /* @flow */
 
-import { schemaComposer, graphql, TypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import {
+  SchemaComposer,
+  schemaComposer,
+  graphql,
+  TypeComposer,
+  InterfaceTypeComposer,
+} from 'graphql-compose';
 import { getCharacterModels } from '../__mocks__/characterModels';
 import { MovieModel } from '../__mocks__/movieModel';
 import { composeWithMongoose } from '../../composeWithMongoose';
@@ -497,6 +503,32 @@ describe('DiscriminatorTypeComposer', () => {
       });
 
       expect(tc.getFieldNames()).not.toEqual(expect.arrayContaining(['dob', 'starShips']));
+    });
+
+    it('should pass down baseTypeComposerResolverOptions', () => {
+      const personTC = composeWithMongooseDiscriminators(CharacterModel, {
+        schemaComposer: new SchemaComposer(),
+        resolvers: {
+          createOne: {
+            record: {
+              removeFields: ['friends'],
+              requiredFields: ['name'],
+            },
+          },
+        },
+      }).discriminator(PersonModel, {
+        resolvers: {
+          createOne: {
+            record: {
+              requiredFields: ['dob'],
+            },
+          },
+        },
+      });
+      const createOneRecordArgTC = personTC.getResolver('createOne').getArgTC('record');
+      expect(createOneRecordArgTC.isRequired('name')).toBe(true);
+      expect(createOneRecordArgTC.isRequired('dob')).toBe(true);
+      expect(createOneRecordArgTC.hasField('friends')).toBe(false);
     });
   });
 });
