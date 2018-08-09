@@ -10,6 +10,7 @@
   ],
   "main": "lib/index.js",
   "module": "mjs/index.mjs",
+  "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/graphql-compose/graphql-compose-mongoose.git"
@@ -39,6 +40,8 @@
     "mongoose": ">=4.0.0 || >=5.0.0"
   },
   "devDependencies": {
+    "@types/graphql": "^0.13.4",
+    "@types/mongoose": "^5.2.4",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
@@ -66,7 +69,9 @@
     "prettier": "^1.14.2",
     "request": "^2.87.0",
     "rimraf": "^2.6.2",
-    "semantic-release": "^15.9.6"
+    "semantic-release": "^15.9.6",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.1"
   },
   "config": {
     "commitizen": {
@@ -86,11 +91,15 @@
     "build-mjs": "rimraf mjs && BABEL_ENV=mjs babel src --ignore __tests__,__mocks__ -d mjs && yarn build-mjs-rename && COPY_TO_FOLDER=mjs npm run build-flow",
     "build-mjs-rename": "find ./mjs -name \"*.js\" -exec bash -c 'mv \"$1\" \"${1%.js}\".mjs' - '{}' \\;",
     "build-flow": "echo `$1` && find ./src -name '*.js' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`.flow; done",
+    "build-ts": "find ./src -name '*.d.ts' -not -path '*/__*' | while read filepath; do cp $filepath `echo ./${COPY_TO_FOLDER:-lib}$filepath | sed 's/.\\/src\\//\\//g'`; done",
     "watch": "jest --watch",
     "coverage": "jest --coverage --maxWorkers 2",
-    "lint": "eslint --ext .js ./src",
+    "lint": "npm run eslint && npm run tslint",
+    "eslint": "eslint --ext .js ./src",
+    "tslint": "tslint -p . \"src/**/*.d.ts\"",
+    "tscheck": "tsc",
     "flow": "./node_modules/.bin/flow",
-    "test": "npm run coverage && npm run lint && npm run flow",
+    "test": "npm run coverage && npm run lint && npm run flow && npm run tscheck",
     "link": "yarn build && yarn link graphql-compose && yarn link graphql-compose-connection && yarn link mongoose && yarn link",
     "unlink": "yarn unlink graphql-compose && yarn unlink graphql-compose-connection && yarn unlink mongoose && yarn add graphql-compose graphql-compose-connection mongoose --dev",
     "semantic-release": "semantic-release"
