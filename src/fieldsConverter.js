@@ -226,8 +226,10 @@ export function deriveComplexType(field: MongooseFieldT): $Keys<typeof ComplexTy
   }
 
   const fieldType = _getFieldType(field);
-
-  if (field instanceof mongoose.Schema.Types.DocumentArray) {
+  if (
+    field instanceof mongoose.Schema.Types.DocumentArray ||
+    (fieldType === 'Array' && objectPath.has(field, 'schema.paths'))
+  ) {
     return ComplexTypes.DOCUMENT_ARRAY;
   } else if (field instanceof mongoose.Schema.Types.Embedded || fieldType === 'Embedded') {
     return ComplexTypes.EMBEDDED;
@@ -346,7 +348,10 @@ export function documentArrayToGraphQL(
   prefix?: string = '',
   schemaComposer: SchemaComposer<any>
 ): [TypeComposer] {
-  if (!(field instanceof mongoose.Schema.Types.DocumentArray)) {
+  if (
+    !(field instanceof mongoose.Schema.Types.DocumentArray) &&
+    !objectPath.has(field, 'schema.paths')
+  ) {
     throw new Error(
       'You provide incorrect mongoose field to `documentArrayToGraphQL()`. ' +
         'Correct field should be instance of `mongoose.Schema.Types.DocumentArray`'
@@ -355,7 +360,7 @@ export function documentArrayToGraphQL(
 
   const typeName = `${prefix}${upperFirst(_getFieldName(field))}`;
 
-  const tc = convertModelToGraphQL(field, typeName, schemaComposer);
+  const tc = convertModelToGraphQL((field: any), typeName, schemaComposer);
 
   return [tc];
 }

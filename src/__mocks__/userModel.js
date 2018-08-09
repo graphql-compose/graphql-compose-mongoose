@@ -85,6 +85,10 @@ const UserSchema = new Schema(
 
     periods: [{ from: Number, to: Number }],
 
+    someDeep: {
+      periods: [{ from: Number, to: Number }],
+    },
+
     // createdAt, created via option `timastamp: true` (see bottom)
     // updatedAt, created via option `timastamp: true` (see bottom)
   },

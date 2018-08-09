@@ -195,6 +195,16 @@ describe('fieldConverter', () => {
       expect(embeddedFields.locationId).toBeTruthy();
       expect(embeddedFields._id).toBeTruthy();
     });
+
+    it('test object with field as array', () => {
+      const someDeepTC = embeddedToGraphQL(fields.someDeep, '', schemaComposer);
+      expect(someDeepTC.getTypeName()).toBe('SomeDeep');
+      const periodsType = (someDeepTC.getField('periods'): any).type;
+      expect(Array.isArray(periodsType)).toBeTruthy();
+      expect(periodsType[0].getTypeName()).toBe('SomeDeepPeriods');
+      expect(periodsType[0].hasField('from')).toBeTruthy();
+      expect(periodsType[0].hasField('to')).toBeTruthy();
+    });
   });
 
   describe('documentArrayToGraphQL()', () => {
