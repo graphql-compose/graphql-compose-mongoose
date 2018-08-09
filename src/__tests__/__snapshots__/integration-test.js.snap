@@ -12,6 +12,7 @@ Array [
   "gender",
   "relocation",
   "languages",
+  "periods",
   "createdAt",
   "updatedAt",
   "__v",

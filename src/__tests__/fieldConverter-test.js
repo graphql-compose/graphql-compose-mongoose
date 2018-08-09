@@ -69,6 +69,7 @@ describe('fieldConverter', () => {
 
     it('should derive DOCUMENT_ARRAY', () => {
       expect(deriveComplexType(fields.languages)).toBe(ComplexTypes.DOCUMENT_ARRAY);
+      expect(deriveComplexType(fields.periods)).toBe(ComplexTypes.DOCUMENT_ARRAY);
     });
 
     it('should derive EMBEDDED', () => {
@@ -197,21 +198,24 @@ describe('fieldConverter', () => {
   });
 
   describe('documentArrayToGraphQL()', () => {
-    const languagesTypeAsList = documentArrayToGraphQL(fields.languages, '', schemaComposer);
-    const languagesType = languagesTypeAsList[0];
-    const languagesFields = languagesType.getFields();
+    it('test schema as array', () => {
+      const languagesTypeAsList = documentArrayToGraphQL(fields.languages, '', schemaComposer);
+      const languagesType = languagesTypeAsList[0];
+      const languagesFields = languagesType.getFields();
 
-    it('should produce GraphQLList', () => {
       expect(Array.isArray(languagesTypeAsList)).toBeTruthy();
-    });
-
-    it('should has Language type in ofType', () => {
-      // see src/__mocks__/languageSchema.js where type name `Language` is defined
-      expect(languagesType.getTypeName()).toBe('Language');
-    });
-
-    it('should include pseudo mongoose _id field in document', () => {
+      expect(languagesType.getTypeName()).toBe('Languages');
       expect(languagesFields._id).toBeTruthy();
+    });
+
+    it('test object as array', () => {
+      const periodsTypeAsList = documentArrayToGraphQL(fields.periods, '', schemaComposer);
+      const periodsType = periodsTypeAsList[0];
+      const periodsFields = periodsType.getFields();
+      expect(Array.isArray(periodsTypeAsList)).toBeTruthy();
+      expect(periodsType.getTypeName()).toBe('Periods');
+      expect(periodsFields.from).toBeTruthy();
+      expect(periodsFields.to).toBeTruthy();
     });
   });
 
