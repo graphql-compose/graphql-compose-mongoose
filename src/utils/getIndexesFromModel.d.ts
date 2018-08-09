@@ -14,7 +14,7 @@ export function getIndexesFromModel(
 export function getUniqueIndexes(mongooseModel: Model<any>): IndexT[];
 
 export type ExtendByReversedIndexesOpts = {
-  reversedFirst?: boolean, // false by default
+  reversedFirst?: boolean,
 };
 
 export function extendByReversedIndexes(indexes: IndexT[], opts?: ExtendByReversedIndexesOpts): IndexT[];

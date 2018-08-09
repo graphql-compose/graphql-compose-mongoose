@@ -2,7 +2,7 @@ import { EnumTypeComposer, SchemaComposer, TypeComposer } from 'graphql-compose'
 import { GraphQLScalarType } from 'graphql-compose/lib/graphql';
 import { Model, Schema } from 'mongoose';
 
-// MongooseSchemaField<any> in the Flow version, MongooseSchemaField isn't there in mongoose's .d.ts
+// @ts-todo MongooseSchemaField<any> in the Flow version, MongooseSchemaField isn't there in mongoose's .d.ts
 type MongooseFieldT = any;
 
 type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };

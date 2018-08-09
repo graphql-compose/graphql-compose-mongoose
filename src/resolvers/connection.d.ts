@@ -3,8 +3,8 @@ import { Resolver, TypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
 import { IndexT } from '../utils';
 
-// The ConnectionSortMapOpts is not available yet since graphql-compose-connection doesn't have types for now,
-// fallback to a simple object.
+// @ts-todo The ConnectionSortMapOpts is not available yet since graphql-compose-connection doesn't have types for now,
+//          fallback to a simple object.
 export type ConnectionSortMapOpts = { [opt: string]: any };
 
 export default function connection(

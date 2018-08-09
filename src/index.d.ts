@@ -5,6 +5,6 @@ import GraphQLMongoID from './types/mongoid';
 export default composeWithMongoose;
 
 export * from './fieldsConverter';
-// export * from './discriminators'; // untyped yet
+// @ts-todo export * from './discriminators'; // untyped yet
 
 export { composeWithMongoose, composeWithMongooseDiscriminators, GraphQLMongoID };
