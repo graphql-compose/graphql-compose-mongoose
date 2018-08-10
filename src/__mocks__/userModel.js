@@ -102,8 +102,8 @@ const UserSchema = new Schema(
 UserSchema.set('autoIndex', false);
 UserSchema.index({ name: 1, age: -1 });
 
+// eslint-disable-next-line
 UserSchema.virtual('nameVirtual').get(function() {
-  // eslint-disable-line
   return `VirtualFieldValue${this._id}`;
 });
 
