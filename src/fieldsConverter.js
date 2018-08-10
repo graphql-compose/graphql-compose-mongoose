@@ -286,7 +286,6 @@ export function arrayToGraphQL(
   }
 
   const unwrappedField = { ...field.caster };
-  objectPath.set(unwrappedField, 'options.ref', objectPath.get(field, 'options.ref', undefined));
 
   const outputType = convertFieldToGraphQL(unwrappedField, prefix, schemaComposer);
   return [outputType];
