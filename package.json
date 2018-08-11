@@ -37,7 +37,7 @@
   },
   "peerDependencies": {
     "graphql-compose": ">=4.7.1",
-    "mongoose": ">=4.0.0 || >=5.0.0"
+    "mongoose": ">=4.4.0 || >=5.0.0"
   },
   "devDependencies": {
     "@types/graphql": "^0.13.4",
