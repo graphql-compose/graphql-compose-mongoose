@@ -1,90 +1,108 @@
 /* @flow */
 
 import { graphql } from 'graphql-compose';
-import { getCharacterModels } from '../__mocks__/characterModels';
 import { composeWithMongooseDiscriminators } from '../../composeWithMongooseDiscriminators';
+import { getCharacterModels } from '../__mocks__/characterModels';
 
 const { CharacterModel } = getCharacterModels('type');
 
 const CharacterDTC = composeWithMongooseDiscriminators(CharacterModel);
+const DKeyFieldName = CharacterDTC.getDKey();
+const DKeyETC = CharacterDTC.getDKeyETC();
+const DInterfaceTC = CharacterDTC.getDInterface();
 
 describe('prepareBaseResolvers()', () => {
   describe('setDKeyEnumOnITCArgs()', () => {
-    const resolversWithFilterAndRecordArgs = [];
-    const resolversWithFilterArgsOnly = [];
-    const resolversWithRecordArgsOnly = [];
-    const resolversWithNoInterestArgs = [];
-    const interestArgs = ['filter', 'record'];
+    const resolversWithFilterArgs = [];
+    const resolversWithRecordArgs = [];
+    const resolversWithRecordsArgs = [];
+    const interestArgs = ['filter', 'record', 'records'];
 
     beforeAll(() => {
       const resolvers = CharacterDTC.getResolvers(); // map
 
       resolvers.forEach(resolver => {
-        if (resolver.hasArg(interestArgs[0]) && resolver.hasArg(interestArgs[1])) {
-          resolversWithFilterAndRecordArgs.push(resolver);
-        } else if (!(resolver.hasArg(interestArgs[0]) && resolver.hasArg(interestArgs[1]))) {
-          resolversWithNoInterestArgs.push(resolver);
-        } else if (resolver.hasArg(interestArgs[0]) && !resolver.hasArg(interestArgs[1])) {
-          resolversWithFilterArgsOnly.push(resolver);
-        } else if (!resolver.hasArg(interestArgs[0]) && resolver.hasArg(interestArgs[1])) {
-          resolversWithRecordArgsOnly.push(resolver);
+        const argNames = resolver.getArgNames();
+
+        for (const argName of argNames) {
+          if (argName === interestArgs[0]) {
+            resolversWithFilterArgs.push(resolver);
+          }
+          if (argName === interestArgs[1]) {
+            resolversWithRecordArgs.push(resolver);
+          }
+          if (argName === interestArgs[2]) {
+            resolversWithRecordsArgs.push(resolver);
+          }
         }
       });
     });
 
-    it('should set type to DKeyEnum on DKey field on filter and record args', () => {
-      for (const resolver of resolversWithFilterAndRecordArgs) {
-        for (const arg of interestArgs) {
-          expect(resolver.getArgTC(arg).getFieldType(CharacterDTC.getDKey())).toEqual(
-            CharacterDTC.getDKeyETC().getType()
+    it('should set DKey field type to DKeyETC on filter args', () => {
+      for (const resolver of resolversWithFilterArgs) {
+        expect(interestArgs[0]).toEqual('filter');
+        expect(resolver.getArgTC(interestArgs[0]).getFieldConfig(DKeyFieldName).type).toEqual(
+          CharacterDTC.getDKeyETC().getType()
+        );
+      }
+    });
+
+    it('should set DKey field type to DKeyETC on record args', () => {
+      for (const resolver of resolversWithRecordArgs) {
+        expect(interestArgs[1]).toEqual('record');
+        if (resolver.name === 'createOne') {
+          expect(resolver.getArgTC(interestArgs[1]).getFieldConfig(DKeyFieldName).type).toEqual(
+            graphql.GraphQLNonNull(DKeyETC.getType())
+          );
+        } else {
+          expect(resolver.getArgTC(interestArgs[1]).getFieldConfig(DKeyFieldName).type).toEqual(
+            DKeyETC.getType()
           );
         }
       }
     });
 
-    it('should set type to DKeyEnum on DKey field only on filter args', () => {
-      for (const resolver of resolversWithFilterArgsOnly) {
-        expect(interestArgs[0]).toEqual('filter');
-        expect(resolver.getArgTC(interestArgs[0]).getFieldType(CharacterDTC.getDKey())).toEqual(
-          CharacterDTC.getDKeyETC().getType()
+    it('should set DKey field type to DKeyETC on records args', () => {
+      for (const resolver of resolversWithRecordsArgs) {
+        expect(interestArgs[2]).toEqual('records');
+        expect(resolver.getArgTC(interestArgs[2]).getFieldConfig(DKeyFieldName).type).toEqual(
+          graphql.GraphQLNonNull(DKeyETC.getType())
         );
-        expect(resolver.getArgTC(interestArgs[1]).getFieldType(CharacterDTC.getDKey())).not.toEqual(
-          CharacterDTC.getDKeyETC().getType()
-        );
-      }
-    });
-
-    it('should set type to DKeyEnum on DKey field only on record args', () => {
-      for (const resolver of resolversWithFilterArgsOnly) {
-        expect(interestArgs[1]).toEqual('record');
-        expect(resolver.getArgTC(interestArgs[1]).getFieldType(CharacterDTC.getDKey())).toEqual(
-          CharacterDTC.getDKeyETC().getType()
-        );
-        expect(resolver.getArgTC(interestArgs[0]).getFieldType(CharacterDTC.getDKey())).not.toEqual(
-          CharacterDTC.getDKeyETC().getType()
-        );
-      }
-    });
-
-    it('should NOT set type to DKeyEnum on DKey as filter and record not found args', () => {
-      for (const resolver of resolversWithFilterArgsOnly) {
-        for (const arg of interestArgs) {
-          expect(resolver.hasArg(arg)).toBeFalsy();
-        }
       }
     });
   });
 
-  it('should set resolver type to DInterface List, findMany', () => {
-    expect(CharacterDTC.getResolver('findMany').getType()).toEqual(
-      graphql.GraphQLList(CharacterDTC.getDInterface().getType())
-    );
+  describe('createOne: Resolver', () => {
+    const resolver = CharacterDTC.getResolver('createOne');
+    it('should set resolver record field type to DInterface', () => {
+      expect(resolver.getTypeComposer().getFieldType('record')).toEqual(DInterfaceTC.getType());
+    });
   });
 
-  it('should set resolver type to DInterface List, findByIds', () => {
-    expect(CharacterDTC.getResolver('findByIds').getType()).toEqual(
-      graphql.GraphQLList(CharacterDTC.getDInterface().getType())
-    );
+  describe('createMany: Resolver', () => {
+    const resolver = CharacterDTC.getResolver('createMany');
+    it('should set resolver records field type to NonNull Plural DInterface', () => {
+      expect(resolver.getTypeComposer().getFieldType('records')).toEqual(
+        new graphql.GraphQLNonNull(graphql.GraphQLList(DInterfaceTC.getType()))
+      );
+    });
+  });
+
+  describe('findById: Resolver', () => {
+    const resolver = CharacterDTC.getResolver('findByIds');
+    it('should set resolver type to DInterface List', () => {
+      expect(resolver.getType()).toEqual(
+        graphql.GraphQLList(CharacterDTC.getDInterface().getType())
+      );
+    });
+  });
+
+  describe('findMany: Resolver', () => {
+    it('should set resolver type to DInterface List', () => {
+      expect(CharacterDTC.getResolver('findMany').getType()).toEqual(
+        graphql.GraphQLList(DInterfaceTC.getType())
+      );
+    });
   });
 
   it('should set resolver type to DInterface, findOne', () => {
@@ -97,14 +115,6 @@ describe('prepareBaseResolvers()', () => {
     expect(CharacterDTC.getResolver('findById').getType()).toEqual(
       CharacterDTC.getDInterface().getType()
     );
-  });
-
-  it('should set resolver record field type to DInterface, createOne', () => {
-    expect(
-      CharacterDTC.getResolver('createOne')
-        .getTypeComposer()
-        .getFieldType('record')
-    ).toEqual(CharacterDTC.getDInterface().getType());
   });
 
   it('should set resolver record field type to DInterface, updateOne', () => {
@@ -131,7 +141,7 @@ describe('prepareBaseResolvers()', () => {
     ).toEqual(CharacterDTC.getDInterface().getType());
   });
 
-  it('should set resolver record arg field, DKey to NonNull DKeyETC type, createOne', () => {
+  it('should set DKey field type to NonNull(DKeyETC) on record arg, createOne', () => {
     expect(
       CharacterDTC.getResolver('createOne')
         .getArgTC('record')
