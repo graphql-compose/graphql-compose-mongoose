@@ -101,6 +101,11 @@ export type TypeConverterResolversOpts = {
     | {
         record?: RecordHelperArgsOpts | false,
       },
+  createMany?:
+    | false
+    | {
+        records?: RecordHelperArgsOpts | false,
+      },
   count?:
     | false
     | {

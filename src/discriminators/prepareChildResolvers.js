@@ -22,7 +22,12 @@ function setQueryDKey<TSource, TContext>(
       resolve.args = resolve.args ? resolve.args : {};
       resolve.projection = resolve.projection ? resolve.projection : {};
 
-      if (fromField) {
+      if (fromField === 'records') {
+        resolve.args[fromField] = resolve.args[fromField] || [];
+        for (const record of resolve.args[fromField]) {
+          record[DKey] = DName;
+        }
+      } else if (fromField) {
         resolve.args[fromField] = resolve.args[fromField] ? resolve.args[fromField] : {};
         resolve.args[fromField][DKey] = DName;
       } else {
@@ -142,6 +147,12 @@ export function prepareChildResolvers<TContext>(
           hideDKey(resolver, childTC, baseDTC.getDKey(), 'record');
           break;
 
+        case EMCResolvers.createMany:
+          setQueryDKey(resolver, childTC, baseDTC.getDKey(), 'records');
+
+          hideDKey(resolver, childTC, baseDTC.getDKey(), 'records');
+          break;
+
         case EMCResolvers.updateById:
           hideDKey(resolver, childTC, baseDTC.getDKey(), 'record');
           break;
@@ -169,8 +180,12 @@ export function prepareChildResolvers<TContext>(
         default:
       }
 
-      copyResolverArgTypes(resolver, baseDTC, ['filter', 'record']);
-      reorderFieldsRecordFilter(resolver, baseDTC, opts.reorderFields, ['filter', 'record']);
+      copyResolverArgTypes(resolver, baseDTC, ['filter', 'record', 'records']);
+      reorderFieldsRecordFilter(resolver, baseDTC, opts.reorderFields, [
+        'filter',
+        'record',
+        'records',
+      ]);
     }
   }
 }
