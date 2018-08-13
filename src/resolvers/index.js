@@ -1,38 +1,40 @@
 /* @flow */
 
-import type { MongooseQuery } from 'mongoose';
 import type { ResolveParams } from 'graphql-compose';
+import type { MongooseQuery } from 'mongoose';
+import connection from './connection';
+import count from './count';
+import createMany from './createMany';
+
+import createOne from './createOne';
 
 import findById from './findById';
 import findByIds from './findByIds';
-import findOne from './findOne';
 import findMany from './findMany';
-
-import updateById from './updateById';
-import updateOne from './updateOne';
-import updateMany from './updateMany';
-
-import removeById from './removeById';
-import removeOne from './removeOne';
-import removeMany from './removeMany';
-
-import createOne from './createOne';
-import count from './count';
-
-import pagination from './pagination';
-import connection from './connection';
+import findOne from './findOne';
 
 import type {
   FilterHelperArgsOpts,
-  SortHelperArgsOpts,
-  RecordHelperArgsOpts,
   LimitHelperArgsOpts,
+  RecordHelperArgsOpts,
+  SortHelperArgsOpts,
 } from './helpers';
+
+import pagination from './pagination';
+
+import removeById from './removeById';
+import removeMany from './removeMany';
+import removeOne from './removeOne';
+
+import updateById from './updateById';
+import updateMany from './updateMany';
+import updateOne from './updateOne';
 
 export type GenResolverOpts = {
   filter?: FilterHelperArgsOpts,
   sort?: SortHelperArgsOpts,
   record?: RecordHelperArgsOpts,
+  records?: RecordHelperArgsOpts,
   limit?: LimitHelperArgsOpts,
 };
 
@@ -55,6 +57,7 @@ export {
   removeOne,
   removeMany,
   createOne,
+  createMany,
   count,
   pagination,
   connection,
@@ -73,6 +76,7 @@ export function getAvailableNames(): string[] {
     'removeOne',
     'removeMany',
     'createOne',
+    'createMany',
     'count',
     'pagination', // should be defined after `findMany` and `count` resolvers
     'connection', // should be defined after `findMany` and `count` resolvers
@@ -92,6 +96,7 @@ export const EMCResolvers = {
   removeOne: 'removeOne',
   removeMany: 'removeMany',
   createOne: 'createOne',
+  createMany: 'createMany',
   count: 'count',
   connection: 'connection',
   pagination: 'pagination',

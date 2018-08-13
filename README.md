@@ -105,7 +105,8 @@ schemaComposer.Query.addFields({
 });
 
 schemaComposer.Mutation.addFields({
-  userCreate: UserTC.getResolver('createOne'),
+  userCreateOne: UserTC.getResolver('createOne'),
+  userCreateMany: UserTC.getResolver('createMany'),
   userUpdateById: UserTC.getResolver('updateById'),
   userUpdateOne: UserTC.getResolver('updateOne'),
   userUpdateMany: UserTC.getResolver('updateMany'),
@@ -374,17 +375,18 @@ fragment fullImageData on EmbeddedImage {
 ```
 
 ### Access and modify mongoose doc before save
-This library provides some amount of ready resolvers for fetch and update data which was mentioned above. And you can [create your own resolver](https://github.com/graphql-compose/graphql-compose) of course. However you can find that add some actions or light modifications of mongoose document directly before save at existing resolvers appears more simple than create new resolver. Some of resolvers accepts *before save hook* wich can be provided in *resolver params* as param named `beforeRecordMutate`. This hook allows to have access and modify mongoose document before save. The resolvers which supports this hook are:
+This library provides some amount of ready resolvers for fetch and update data which was mentioned above. And you can [create your own resolver](https://github.com/graphql-compose/graphql-compose) of course. However you can find that add some actions or light modifications of mongoose document directly before save at existing resolvers appears more simple than create new resolver. Some of resolvers accepts *before save hook* which can be provided in *resolver params* as param named `beforeRecordMutate`. This hook allows to have access and modify mongoose document before save. The resolvers which supports this hook are:
 
 * createOne
+* createMany
 * removeById
 * removeOne
 * updateById
 * updateOne
 
-The protype of before save hook:
+The prototype of before save hook:
 ```js
-(record: mixed, rp: ExtendedResolveParams) => Promise<*>,
+(doc: mixed, rp: ExtendedResolveParams) => Promise<*>,
 ```
 
 The typical implementation may be like this:
@@ -434,6 +436,7 @@ function adminAccess(resolvers) {
 // and wrap the resolvers
 schemaComposer.Mutation.addFields({
   createResource: ResourceTC.getResolver('createOne'),
+  createResources: ResourceTC.getResolver('createMany'),
   ...adminAccess({
     updateResource: ResourceTC.getResolver('updateById'),
     removeResource: ResourceTC.getResolver('removeById'),
@@ -521,6 +524,9 @@ export type typeConverterResolversOpts = {
   },
   createOne?: false | {
     record?: recordHelperArgsOpts | false,
+  },
+  createMany?: false | {
+    records?: recordHelperArgsOpts | false,
   },
   count?: false | {
     filter?: filterHelperArgsOpts | false,

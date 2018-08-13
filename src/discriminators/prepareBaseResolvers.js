@@ -1,8 +1,8 @@
 /* @flow */
 
 import { graphql } from 'graphql-compose';
-import { DiscriminatorTypeComposer } from './DiscriminatorTypeComposer';
 import { EMCResolvers } from '../resolvers';
+import { DiscriminatorTypeComposer } from './DiscriminatorTypeComposer';
 
 const { GraphQLList, GraphQLNonNull } = graphql;
 
@@ -15,7 +15,7 @@ function setDKeyEnumOnITCArgs(resolver, baseTC: DiscriminatorTypeComposer<any>) 
     const argNames = resolver.getArgNames();
 
     for (const argName of argNames) {
-      if (argName === 'filter' || argName === 'record') {
+      if (argName === 'filter' || argName === 'record' || argName === 'records') {
         const filterArgTC = resolver.getArgTC(argName);
 
         if (filterArgTC) {
@@ -57,6 +57,12 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any>) {
           });
           break;
 
+        case EMCResolvers.createMany:
+          resolver.getTypeComposer().extendField('records', {
+            type: new GraphQLNonNull(GraphQLList(baseTC.getDInterface().getType())),
+          });
+          break;
+
         case EMCResolvers.pagination:
           resolver.getTypeComposer().extendField('items', {
             type: new GraphQLList(baseTC.getDInterface().getType()),
@@ -88,9 +94,10 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any>) {
 
       // set DKey as required field to create from base
       // must be done after setting DKeyEnum
-      if (resolverName === EMCResolvers.createOne) {
-        resolver.getArgTC('record').extendField(baseTC.getDKey(), {
-          type: new GraphQLNonNull(baseTC.getDKeyETC().getType()),
+      if (resolverName === EMCResolvers.createOne || resolverName === EMCResolvers.createMany) {
+        const fieldName = resolverName === EMCResolvers.createMany ? 'records' : 'record';
+        resolver.getArgTC(fieldName).extendField(baseTC.getDKey(), {
+          type: baseTC.getDKeyETC().getTypeNonNull(),
         });
       }
     }

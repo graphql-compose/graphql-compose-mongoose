@@ -72,5 +72,21 @@ describe('composeWithMongooseDiscriminators ->', () => {
       expect(createOneRecordArgTC.isRequired('name')).toBe(true);
       expect(createOneRecordArgTC.hasField('friends')).toBe(false);
     });
+
+    it('should pass down records opts to createMany resolver', () => {
+      const typeComposer = composeWithMongooseDiscriminators(CharacterModel, {
+        resolvers: {
+          createMany: {
+            records: {
+              removeFields: ['friends'],
+              requiredFields: ['name'],
+            },
+          },
+        },
+      });
+      const createManyRecordsArgTC = typeComposer.getResolver('createMany').getArgTC('records');
+      expect(createManyRecordsArgTC.isRequired('name')).toBe(true);
+      expect(createManyRecordsArgTC.hasField('friends')).toBe(false);
+    });
   });
 });

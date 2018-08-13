@@ -23,6 +23,16 @@ const baseConverterResolverOpts: TypeConverterResolversOpts = {
     },
   },
   findById: false,
+  createOne: {
+    record: {
+      removeFields: ['one'],
+    },
+  },
+  createMany: {
+    records: {
+      removeFields: ['one', 'two'],
+    },
+  },
 };
 
 const childConverterResolverOpts: TypeConverterResolversOpts = {
@@ -37,6 +47,16 @@ const childConverterResolverOpts: TypeConverterResolversOpts = {
         two: ['gt', 'gte', 'lt', 'lte', 'ne'],
         three: ['gte', 'lt'],
       },
+    },
+  },
+  createOne: {
+    record: {
+      removeFields: ['one'],
+    },
+  },
+  createMany: {
+    records: {
+      requiredFields: ['two'],
     },
   },
 };
@@ -57,6 +77,17 @@ const expectedConverterResolverOpts: TypeConverterResolversOpts = {
     },
   },
   findById: false,
+  createOne: {
+    record: {
+      removeFields: ['one'],
+    },
+  },
+  createMany: {
+    records: {
+      removeFields: ['one', 'two'],
+      requiredFields: ['two'],
+    },
+  },
 };
 
 describe('mergeTypeConverterResolverOpts()', () => {

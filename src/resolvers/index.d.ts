@@ -4,6 +4,7 @@ import connection from './connection';
 import count from './count';
 
 import createOne from './createOne';
+import createMany from './createMany';
 
 import findById from './findById';
 import findByIds from './findByIds';
@@ -26,6 +27,7 @@ export type GenResolverOpts = {
   filter?: FilterHelperArgsOpts,
   sort?: SortHelperArgsOpts,
   record?: RecordHelperArgsOpts,
+  records?: RecordHelperArgsOpts,
   limit?: LimitHelperArgsOpts,
 };
 
@@ -48,6 +50,7 @@ export {
   removeOne,
   removeMany,
   createOne,
+  createMany,
   count,
   pagination,
   connection,
@@ -67,6 +70,7 @@ export const EMCResolvers: {
   removeOne: 'removeOne',
   removeMany: 'removeMany',
   createOne: 'createOne',
+  createMany: 'createMany',
   count: 'count',
   connection: 'connection',
   pagination: 'pagination',
