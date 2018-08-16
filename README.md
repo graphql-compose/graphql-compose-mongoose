@@ -444,7 +444,7 @@ schemaComposer.Mutation.addFields({
 });
 ```
 ### How can I push or add values to arrays?
-The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push a value to an array you can use a custom resolver with a native MongoDB call. NB if you set `unique: true` on the array then using the update $push approach will not check for duplicates, this is due to a MongoDB bug: https://jira.mongodb.org/browse/SERVER-1068. For more usage examples with $push and arrays see the MongoDB docs here https://docs.mongodb.com/manual/reference/operator/update/push/. Also note that $push will preserve order in the array (append to end of array) whereas $addToSet will not.
+The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push a value to an array you can use a custom resolver with a native MongoDB call.
 
 For example:-
 
@@ -466,6 +466,9 @@ schemaComposer.rootMutation().addFields({userPushToArray: UserTC.getResolver('pu
 ```
 
 `User` is the corresponding Mongoose model. If you do not wish to allow duplicates in the array then replace $push with $addToSet. Read the graphql-compose docs on custom resolvers for more info: https://graphql-compose.github.io/docs/en/basics-resolvers.html
+
+NB if you set `unique: true` on the array then using the update $push approach will not check for duplicates, this is due to a MongoDB bug: https://jira.mongodb.org/browse/SERVER-1068. For more usage examples with $push and arrays see the MongoDB docs here https://docs.mongodb.com/manual/reference/operator/update/push/. Also note that $push will preserve order in the array (append to end of array) whereas $addToSet will not.
+
 
 ## Customization options
 
