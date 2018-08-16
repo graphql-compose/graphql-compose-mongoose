@@ -449,6 +449,7 @@ The default resolvers, by design, will replace (overwrite) any supplied array ob
 For example:-
 
 ```javascript
+// Define new resolver 'pushToArray'
 UserTC.addResolver({
 	name: 'pushToArray',
 	type: UserTC,
@@ -459,9 +460,12 @@ UserTC.addResolver({
 		return User.findOne({ _id: args.userId }) // return the record
 	}
 })
+
+// Then add 'pushToArray' as a graphql field e.g.
+schemaComposer.rootMutation().addFields({userPushToArray: UserTC.getResolver('pushToArray')})
 ```
 
-`User` is the corresponding Mongoose model. If you do not wish to allow duplicates in the array then replace $push with $addToSet. Read the grapgqk-compose docs on custom resolvers for more info. https://graphql-compose.github.io/docs/en/basics-resolvers.html
+`User` is the corresponding Mongoose model. If you do not wish to allow duplicates in the array then replace $push with $addToSet. Read the graphql-compose docs on custom resolvers for more info: https://graphql-compose.github.io/docs/en/basics-resolvers.html
 
 ## Customization options
 
