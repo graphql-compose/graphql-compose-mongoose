@@ -443,10 +443,10 @@ schemaComposer.Mutation.addFields({
   }),
 });
 ```
-### How can I push or add values to arrays?
-The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push a value to an array you can use a custom resolver with a native MongoDB call.
+### How can I push/pop or add/remove values to arrays?
+The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push or pop a value in an array you can use a custom resolver with a native MongoDB call.
 
-For example:-
+For example (push):-
 
 ```javascript
 // Define new resolver 'pushToArray'
