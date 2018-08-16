@@ -443,6 +443,25 @@ schemaComposer.Mutation.addFields({
   }),
 });
 ```
+### How can I push or add values to arrays?
+The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push a value to an array you can use a custom resolver with a native MongoDB call.
+
+For example:-
+
+```javascript
+UserTC.addResolver({
+	name: 'pushToArray',
+	type: UserTC,
+	args: { userId: 'MongoID!', valueToPush: 'String' },
+	resolve: async ({ source, args, context, info }) => {
+		const user = await User.update({ _id: args.userId }, { $push: { arrayToPushTo: args.valueToPush } } })
+		if (!user) return null // or gracefully return an error etc...
+		return User.findOne({ _id: args.userId }) // return the record
+	}
+})
+```
+
+`User` is the corresponding Mongoose model. If you do not wish to allow duplicates in the array then replace $push with $addToSet. Read the grapgqk-compose docs on custom resolvers for more info. https://graphql-compose.github.io/docs/en/basics-resolvers.html
 
 ## Customization options
 
