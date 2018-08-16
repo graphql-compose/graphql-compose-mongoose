@@ -444,7 +444,7 @@ schemaComposer.Mutation.addFields({
 });
 ```
 ### How can I push or add values to arrays?
-The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push a value to an array you can use a custom resolver with a native MongoDB call.
+The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push a value to an array you can use a custom resolver with a native MongoDB call. NB if you set `unique: true` on the array then using the update $push approach will not check for duplicates, this is due to a mongoose limitation. For more usage examples with $push and arrays see the MongoDB docs here https://docs.mongodb.com/manual/reference/operator/update/push/
 
 For example:-
 
