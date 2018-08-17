@@ -443,6 +443,32 @@ schemaComposer.Mutation.addFields({
   }),
 });
 ```
+### How can I push/pop or add/remove values to arrays?
+The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push or pop a value in an array you can use a custom resolver with a native MongoDB call.
+
+For example (push):-
+
+```javascript
+// Define new resolver 'pushToArray'
+UserTC.addResolver({
+	name: 'pushToArray',
+	type: UserTC,
+	args: { userId: 'MongoID!', valueToPush: 'String' },
+	resolve: async ({ source, args, context, info }) => {
+		const user = await User.update({ _id: args.userId }, { $push: { arrayToPushTo: args.valueToPush } } })
+		if (!user) return null // or gracefully return an error etc...
+		return User.findOne({ _id: args.userId }) // return the record
+	}
+})
+
+// Then add 'pushToArray' as a graphql field e.g.
+schemaComposer.rootMutation().addFields({userPushToArray: UserTC.getResolver('pushToArray')})
+```
+
+`User` is the corresponding Mongoose model. If you do not wish to allow duplicates in the array then replace `$push` with `$addToSet`. Read the graphql-compose docs on custom resolvers for more info: https://graphql-compose.github.io/docs/en/basics-resolvers.html
+
+NB if you set `unique: true` on the array then using the `update` `$push` approach will not check for duplicates, this is due to a MongoDB bug: https://jira.mongodb.org/browse/SERVER-1068. For more usage examples with `$push` and arrays see the MongoDB docs here https://docs.mongodb.com/manual/reference/operator/update/push/. Also note that `$push` will preserve order in the array (append to end of array) whereas `$addToSet` will not.
+
 
 ## Customization options
 
