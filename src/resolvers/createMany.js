@@ -61,7 +61,7 @@ export default function createMany(
     args: {
       records: {
         type: new graphql.GraphQLNonNull(
-          graphql.GraphQLList(
+          new graphql.GraphQLList(
             (recordHelperArgs(tc, {
               recordTypeName: `CreateMany${tc.getTypeName()}Input`,
               removeFields: ['id', '_id'],
