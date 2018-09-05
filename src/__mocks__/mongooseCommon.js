@@ -1,8 +1,10 @@
 /* @flow */
 /* eslint-disable no-param-reassign, no-console */
 
-import mongoose, { Schema, Types } from 'mongoose';
+import mongoose from 'mongoose';
 import MongodbMemoryServer from 'mongodb-memory-server';
+
+const { Schema, Types } = mongoose;
 
 mongoose.Promise = Promise;
 

@@ -1,6 +1,5 @@
 /* @flow */
 
-import type { ComposeFieldConfigMap } from 'graphql-compose';
 import {
   EnumTypeComposer,
   schemaComposer,
@@ -10,6 +9,7 @@ import {
   type ComposeFieldConfig,
   type RelationOpts,
   type GetRecordIdFn,
+  type ComposeFieldConfigMap,
 } from 'graphql-compose';
 import type { ComposePartialFieldConfigAsObject } from 'graphql-compose/lib/TypeComposer';
 import type { Model } from 'mongoose';
@@ -97,7 +97,8 @@ export class DiscriminatorTypeComposer<TContext> extends TypeComposerClass<TCont
       throw Error('Discriminator Key not Set, Use composeWithMongoose for Normal Collections');
     }
 
-    opts = {  // eslint-disable-line
+    // eslint-disable-next-line
+    opts = {
       reorderFields: true,
       schemaComposer,
       ...opts,

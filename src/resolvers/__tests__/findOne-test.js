@@ -49,21 +49,19 @@ describe('findOne() ->', () => {
     });
 
     it('should have `filter` arg only with indexed fields', async () => {
-      const result: any = findOne(UserModel, UserTC, {
+      const resolver = findOne(UserModel, UserTC, {
         filter: { onlyIndexed: true, operators: false },
       });
-      const filterFields = result.args.filter.type._typeConfig.fields();
-      expect(Object.keys(filterFields)).toEqual(
+      expect(resolver.getArgTC('filter').getFieldNames()).toEqual(
         expect.arrayContaining(['_id', 'name', 'employment'])
       );
     });
 
     it('should have `filter` arg with required `name` field', async () => {
-      const result: any = findOne(UserModel, UserTC, {
+      const resolver = findOne(UserModel, UserTC, {
         filter: { requiredFields: 'name' },
       });
-      const filterFields = result.args.filter.type._typeConfig.fields();
-      expect(filterFields.name.type).toBeInstanceOf(GraphQLNonNull);
+      expect(resolver.getArgTC('filter').getFieldType('name')).toBeInstanceOf(GraphQLNonNull);
     });
 
     it('should have `skip` arg', () => {
