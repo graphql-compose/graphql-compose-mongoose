@@ -5,4 +5,5 @@ import { GenResolverOpts } from './index';
 export default function findByIds(
   model: Model<any>,
   tc: TypeComposer<any>,
-  opts?: GenResolverOpts): Resolver<any, any>;
+  opts?: GenResolverOpts,
+): Resolver<any, any>;

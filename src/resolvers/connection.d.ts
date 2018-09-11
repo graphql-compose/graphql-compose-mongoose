@@ -10,7 +10,8 @@ export type ConnectionSortMapOpts = { [opt: string]: any };
 export default function connection(
   model: Model<any>,
   tc: TypeComposer<any>,
-  opts?: ConnectionSortMapOpts): Resolver<any, any> | undefined;
+  opts?: ConnectionSortMapOpts,
+): Resolver<any, any> | undefined;
 
 export function prepareCursorQuery(
   rawQuery: object,
@@ -18,4 +19,5 @@ export function prepareCursorQuery(
   indexKeys: string[],
   indexData: IndexT,
   nextOper: '$gt' | '$lt',
-  prevOper: '$lt' | '$gt'): void;
+  prevOper: '$lt' | '$gt',
+): void;

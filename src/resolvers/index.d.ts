@@ -11,7 +11,12 @@ import findByIds from './findByIds';
 import findMany from './findMany';
 import findOne from './findOne';
 
-import { FilterHelperArgsOpts, LimitHelperArgsOpts, RecordHelperArgsOpts, SortHelperArgsOpts } from './helpers';
+import {
+  FilterHelperArgsOpts,
+  LimitHelperArgsOpts,
+  RecordHelperArgsOpts,
+  SortHelperArgsOpts,
+} from './helpers';
 
 import pagination from './pagination';
 
@@ -24,18 +29,18 @@ import updateMany from './updateMany';
 import updateOne from './updateOne';
 
 export type GenResolverOpts = {
-  filter?: FilterHelperArgsOpts,
-  sort?: SortHelperArgsOpts,
-  record?: RecordHelperArgsOpts,
-  records?: RecordHelperArgsOpts,
-  limit?: LimitHelperArgsOpts,
+  filter?: FilterHelperArgsOpts;
+  sort?: SortHelperArgsOpts;
+  record?: RecordHelperArgsOpts;
+  records?: RecordHelperArgsOpts;
+  limit?: LimitHelperArgsOpts;
 };
 
 export type ExtendedResolveParams = ResolveParams<any, any> & {
-  query: DocumentQuery<any, any>,
-  rawQuery: { [optName: string]: any },
-  beforeQuery?: (query: any, rp: ExtendedResolveParams) => Promise<any>,
-  beforeRecordMutate?: (record: any, rp: ExtendedResolveParams) => Promise<any>,
+  query: DocumentQuery<any, any>;
+  rawQuery: { [optName: string]: any };
+  beforeQuery?: (query: any, rp: ExtendedResolveParams) => Promise<any>;
+  beforeRecordMutate?: (record: any, rp: ExtendedResolveParams) => Promise<any>;
 };
 
 export {
@@ -59,19 +64,19 @@ export {
 export function getAvailableNames(): string[];
 
 export const EMCResolvers: {
-  findById: 'findById',
-  findByIds: 'findByIds',
-  findOne: 'findOne',
-  findMany: 'findMany',
-  updateById: 'updateById',
-  updateOne: 'updateOne',
-  updateMany: 'updateMany',
-  removeById: 'removeById',
-  removeOne: 'removeOne',
-  removeMany: 'removeMany',
-  createOne: 'createOne',
-  createMany: 'createMany',
-  count: 'count',
-  connection: 'connection',
-  pagination: 'pagination',
+  findById: 'findById';
+  findByIds: 'findByIds';
+  findOne: 'findOne';
+  findMany: 'findMany';
+  updateById: 'updateById';
+  updateOne: 'updateOne';
+  updateMany: 'updateMany';
+  removeById: 'removeById';
+  removeOne: 'removeOne';
+  removeMany: 'removeMany';
+  createOne: 'createOne';
+  createMany: 'createMany';
+  count: 'count';
+  connection: 'connection';
+  pagination: 'pagination';
 };

@@ -7,4 +7,8 @@ export default composeWithMongoose;
 export * from './fieldsConverter';
 // @ts-todo export * from './discriminators'; // untyped yet
 
-export { composeWithMongoose, composeWithMongooseDiscriminators, GraphQLMongoID };
+export {
+  composeWithMongoose,
+  composeWithMongooseDiscriminators,
+  GraphQLMongoID,
+};
