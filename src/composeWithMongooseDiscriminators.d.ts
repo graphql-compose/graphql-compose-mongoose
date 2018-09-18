@@ -1,6 +1,13 @@
-import { TypeComposerClass } from 'graphql-compose';
-import { Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
+import {
+  DiscriminatorOptions,
+  DiscriminatorTypeComposer,
+} from './discriminators';
 
-export function composeWithMongooseDiscriminators(
-  baseModel: Model<any>,
-  opts?: { [opts: string]: any }): TypeComposerClass<any>;
+export function composeWithMongooseDiscriminators<
+  TBaseModel extends Document = any,
+  TContext = any
+>(
+  baseModel: Model<TBaseModel>,
+  opts?: DiscriminatorOptions<TContext>,
+): DiscriminatorTypeComposer<TBaseModel, TContext>;

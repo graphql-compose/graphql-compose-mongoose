@@ -5,7 +5,7 @@ import GraphQLMongoID from './types/mongoid';
 export default composeWithMongoose;
 
 export * from './fieldsConverter';
-// @ts-todo export * from './discriminators'; // untyped yet
+export * from './discriminators';
 
 export {
   composeWithMongoose,

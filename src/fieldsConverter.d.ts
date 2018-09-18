@@ -46,11 +46,11 @@ export function convertModelToGraphQL(
   sc?: SchemaComposer<any>,
 ): TypeComposer<any>;
 
-export function convertSchemaToGraphQL(
+export function convertSchemaToGraphQL<TContext = any>(
   schema: Schema,
   typeName: string,
-  sc?: SchemaComposer<any>,
-): TypeComposer<any>;
+  sc?: SchemaComposer<TContext>,
+): TypeComposer<any, TContext>;
 
 export function convertFieldToGraphQL(
   field: MongooseFieldT,

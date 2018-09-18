@@ -13,8 +13,8 @@ import {
 } from './resolvers/helpers';
 import { PaginationResolverOpts } from './resolvers/pagination';
 
-export type TypeConverterOpts = {
-  schemaComposer?: SchemaComposer<any>;
+export type TypeConverterOpts<TContext = any> = {
+  schemaComposer?: SchemaComposer<TContext>;
   name?: string;
   description?: string;
   fields?: {
@@ -111,10 +111,13 @@ export type TypeConverterResolversOpts = {
   pagination?: PaginationResolverOpts | false;
 };
 
-export function composeWithMongoose(
-  model: Model<any>,
-  opts?: TypeConverterOpts,
-): TypeComposer<any>;
+export function composeWithMongoose<
+  TModel extends Document = any,
+  TContext = any
+>(
+  model: Model<TModel>,
+  opts?: TypeConverterOpts<TContext>,
+): TypeComposer<TModel, TContext>;
 
 export function prepareFields(
   tc: TypeComposer<any>,
