@@ -38,6 +38,9 @@ export class DiscriminatorTypeComposer<
     opts?: DiscriminatorOptions<TCtx>,
   ): DiscriminatorTypeComposer<TBModel, TCtx>;
 
+  // ------------------------------------------------
+  // DiscriminatorTypeComposer Specific methods
+  // ------------------------------------------------
   public getDKey(): string;
 
   public getDKeyETC(): EnumTypeComposer;
@@ -46,11 +49,28 @@ export class DiscriminatorTypeComposer<
 
   public hasChildTC(DName: string): boolean;
 
-  public setFields(fields: ComposeFieldConfigMap<TBaseModel, TContext>): this;
+  public discriminator<TChildModel extends TBaseModel>(
+    childModel: Model<TChildModel>,
+    opts?: TypeConverterOpts<TContext>,
+  ): TypeComposer<TChildModel, TContext>;
 
+  // ------------------------------------------------
+  // TypeComposer Overridden methods
+  // ------------------------------------------------
   public setField(
     fieldName: string,
-    fieldConfig: ComposeFieldConfig<any, any>,
+    fieldConfig: ComposeFieldConfig<TBaseModel, TContext>,
+  ): this;
+
+  public setField<TArgs>(
+    fieldName: string,
+    fieldConfig: ComposeFieldConfig<TBaseModel, TContext, TArgs>,
+  ): this;
+
+  public setFields(fields: ComposeFieldConfigMap<TBaseModel, TContext>): this;
+
+  public setFields<TArgsMap>(
+    fields: ComposeFieldConfigMap<TBaseModel, TContext, TArgsMap>,
   ): this;
 
   // discriminators must have all interface fields
@@ -58,8 +78,16 @@ export class DiscriminatorTypeComposer<
     newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
+  public addFields<TArgsMap>(
+    newFields: ComposeFieldConfigMap<TBaseModel, TContext, TArgsMap>,
+  ): this;
+
   public addNestedFields(
     newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
+  ): this;
+
+  public addNestedFields<TArgsMap>(
+    newFields: ComposeFieldConfigMap<TBaseModel, TContext, TArgsMap>,
   ): this;
 
   public removeField(fieldNameOrArray: string | string[]): this;
@@ -92,9 +120,4 @@ export class DiscriminatorTypeComposer<
   ): this;
 
   public setRecordIdFn(fn: GetRecordIdFn<TBaseModel, TContext>): this;
-
-  public discriminator<TChildModel extends TBaseModel>(
-    childModel: Model<TChildModel>,
-    opts?: TypeConverterOpts,
-  ): TypeComposer<TChildModel, TContext>;
 }
