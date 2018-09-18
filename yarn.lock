@@ -3174,9 +3174,9 @@ graphql-compose-pagination@>=4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/graphql-compose-pagination/-/graphql-compose-pagination-4.0.0.tgz#a48625e3716f929878f9b8093740837ad52a039e"
 
-graphql-compose@^5.0.2:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-5.0.2.tgz#ad0cbdcd31d1648fa9267a3ffe89c0b39df6d222"
+graphql-compose@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-5.1.1.tgz#df2b8633a0d2dd53dfbc92072b4d5a1c854da4d8"
   dependencies:
     graphql-type-json "^0.2.1"
     object-path "^0.11.4"

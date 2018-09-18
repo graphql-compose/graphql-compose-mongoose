@@ -61,7 +61,7 @@
     "eslint-plugin-prettier": "^2.6.2",
     "flow-bin": "^0.80.0",
     "graphql": "14.0.0",
-    "graphql-compose": "^5.0.2",
+    "graphql-compose": "^5.1.1",
     "graphql-compose-connection": ">=4.0.0",
     "graphql-compose-pagination": ">=4.0.0",
     "jest": "^23.5.0",
