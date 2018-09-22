@@ -10,9 +10,9 @@ export * from './skip';
 export * from './sort';
 
 export const MergeAbleHelperArgsOpts: {
-  sort: string,
-  skip: string,
-  limit: ReturnType<typeof getLimitHelperArgsOptsMap>,
-  filter: ReturnType<typeof getFilterHelperArgOptsMap>,
-  record: ReturnType<typeof getRecordHelperArgsOptsMap>
+  sort: string;
+  skip: string;
+  limit: ReturnType<typeof getLimitHelperArgsOptsMap>;
+  filter: ReturnType<typeof getFilterHelperArgOptsMap>;
+  record: ReturnType<typeof getRecordHelperArgsOptsMap>;
 };

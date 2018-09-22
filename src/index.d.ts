@@ -4,7 +4,12 @@ import GraphQLMongoID from './types/mongoid';
 
 export default composeWithMongoose;
 
+export * from './resolvers';
 export * from './fieldsConverter';
-// @ts-todo export * from './discriminators'; // untyped yet
+export * from './discriminators';
 
-export { composeWithMongoose, composeWithMongooseDiscriminators, GraphQLMongoID };
+export {
+  composeWithMongoose,
+  composeWithMongooseDiscriminators,
+  GraphQLMongoID,
+};
