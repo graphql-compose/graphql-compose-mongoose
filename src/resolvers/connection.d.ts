@@ -1,7 +1,9 @@
 import { Resolver, TypeComposer } from 'graphql-compose';
 // import { ConnectionSortMapOpts } from 'graphql-compose-connection';
 import { Model } from 'mongoose';
+import { MongoId } from '../types/mongoid';
 import { IndexT } from '../utils';
+import { FilterHelperArgs, SortHelperArgs } from './helpers';
 
 // @ts-todo The ConnectionSortMapOpts is not available yet since graphql-compose-connection doesn't have types for now,
 //          fallback to a simple object.
@@ -21,3 +23,30 @@ export function prepareCursorQuery(
   nextOper: '$gt' | '$lt',
   prevOper: '$lt' | '$gt',
 ): void;
+
+export type ConnectionArgs<TSource, IndexedFields = { _id: MongoId }> = {
+  first: number;
+  after: string;
+  last: number;
+  before: string;
+  filter: FilterHelperArgs<TSource, IndexedFields>;
+  sort: SortHelperArgs;
+};
+
+export type ConnectionPageInfo = {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string;
+  endCursor: string;
+};
+
+export type ConnectionEdges<TSource> = {
+  node: TSource;
+  cursor: number;
+};
+
+export type ConnectionRSource<TSource> = {
+  count: number;
+  pageInfo: ConnectionPageInfo;
+  edges: ConnectionEdges<TSource>;
+};

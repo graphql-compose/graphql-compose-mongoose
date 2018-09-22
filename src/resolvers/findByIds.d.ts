@@ -1,5 +1,7 @@
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
+import { MongoId } from '../types/mongoid';
+import { LimitHelperArgs, SortHelperArgs } from './helpers';
 import { GenResolverOpts } from './index';
 
 export default function findByIds(
@@ -7,3 +9,11 @@ export default function findByIds(
   tc: TypeComposer<any>,
   opts?: GenResolverOpts,
 ): Resolver<any, any>;
+
+export type FindByIdsArgs = {
+  _ids: [MongoId];
+  limit: LimitHelperArgs;
+  sort: SortHelperArgs;
+};
+
+export type FindByIdsRSource<TSource> = TSource[];

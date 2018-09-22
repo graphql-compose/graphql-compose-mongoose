@@ -99,7 +99,7 @@
     "coverage": "jest --coverage --maxWorkers 4",
     "lint": "npm run eslint && npm run tslint",
     "eslint": "eslint --ext .js ./src",
-    "tslint": "tslint -p . \"src/**/*.d.ts\"",
+    "tslint": "tslint -p .",
     "tscheck": "tsc",
     "flow": "./node_modules/.bin/flow",
     "test": "npm run coverage && npm run lint && npm run flow && npm run tscheck",

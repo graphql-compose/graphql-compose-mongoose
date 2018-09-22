@@ -1,0 +1,15 @@
+export { CountArgs } from './resolvers/count';
+export { ConnectionArgs } from './resolvers/connection';
+export { PaginationArgs } from './resolvers/pagination';
+export { CreateOneArgs } from './resolvers/createOne';
+export { CreateManyArgs } from './resolvers/createMany';
+export { RemoveOneArgs } from './resolvers/removeOne';
+export { RemoveByIdArgs } from './resolvers/removeById';
+export { RemoveManyArgs } from './resolvers/removeMany';
+export { UpdateOneArgs } from './resolvers/updateOne';
+export { UpdateByIdArgs } from './resolvers/updateById';
+export { UpdateManyArgs } from './resolvers/updateMany';
+export { FindByIdArgs } from './resolvers/findById';
+export { FindByIdsArgs } from './resolvers/findByIds';
+export { FindOneArgs } from './resolvers/findOne';
+export { FindManyArgs } from './resolvers/findMany';

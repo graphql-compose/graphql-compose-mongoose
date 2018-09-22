@@ -1,7 +1,8 @@
 import { ComposeFieldConfigArgumentMap, TypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
+import { MongoId } from '../../types/mongoid';
 import { ExtendedResolveParams } from '../index';
-import { FilterOperatorsOpts } from './filterOperators';
+import { FilterOperatorsArgs, FilterOperatorsOpts } from './filterOperators';
 
 export type FilterHelperArgsOpts = {
   filterTypeName?: string;
@@ -11,6 +12,14 @@ export type FilterHelperArgsOpts = {
   operators?: FilterOperatorsOpts | false;
   removeFields?: string | string[];
 };
+
+export type FilterHelperArgs<
+  TSource = any,
+  IndexedFieldsMap = { _id: MongoId }
+> = TSource &
+  FilterOperatorsArgs<TSource, IndexedFieldsMap> & {
+    _ids: MongoId[];
+  };
 
 export function getFilterHelperArgOptsMap(): Partial<
   Record<keyof FilterHelperArgsOpts, string | string[]>

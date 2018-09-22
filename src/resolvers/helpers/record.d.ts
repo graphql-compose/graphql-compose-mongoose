@@ -11,6 +11,9 @@ export function getRecordHelperArgsOptsMap(): Partial<
   Record<keyof RecordHelperArgsOpts, string | string[]>
 >;
 
+export type RecordHelperArgs<TSource> = { record: TSource };
+export type RecordsHelperArgs<TSource> = { records: TSource[] };
+
 export function recordHelperArgs(
   tc: TypeComposer<any>,
   opts?: RecordHelperArgsOpts,

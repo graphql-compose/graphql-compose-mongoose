@@ -4,6 +4,7 @@ import GraphQLMongoID from './types/mongoid';
 
 export default composeWithMongoose;
 
+export * from './resolvers';
 export * from './fieldsConverter';
 export * from './discriminators';
 

@@ -1,5 +1,8 @@
 import { Resolver, TypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
+import { MongoId } from '../types/mongoid';
+import { FindOneArgs } from './findOne';
+import { RecordHelperArgs } from './helpers';
 import { GenResolverOpts } from './index';
 
 export default function updateOne(
@@ -7,3 +10,8 @@ export default function updateOne(
   tc: TypeComposer<any>,
   opts?: GenResolverOpts,
 ): Resolver<any, any>;
+
+export type UpdateOneArgs<
+  TSource,
+  IndexedFields = { _id: MongoId }
+> = RecordHelperArgs<TSource> & FindOneArgs<TSource, IndexedFields>;

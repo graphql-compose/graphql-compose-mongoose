@@ -5,6 +5,8 @@ export type LimitHelperArgsOpts = {
   defaultValue?: number;
 };
 
+export type LimitHelperArgs = number;
+
 export function getLimitHelperArgsOptsMap(): Partial<
   Record<keyof LimitHelperArgsOpts, string | string[]>
 >;

@@ -11,6 +11,8 @@ export type SortHelperArgsOpts = {
   sortTypeName?: string;
 };
 
+export type SortHelperArgs = '_ID_ASC' | '_ID_DESC' | any;
+
 export function sortHelperArgs(
   typeComposer: TypeComposer<any>,
   model: Model<any>,
