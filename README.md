@@ -41,7 +41,7 @@ Live demo: [https://graphql-compose.herokuapp.com/](https://graphql-compose.hero
 
 Source code: https://github.com/graphql-compose/graphql-compose-mongoose-example
 
-Small explanation for varaibles naming:
+Small explanation for variables naming:
 - `UserSchema` - this is a mongoose schema
 - `User` - this is a mongoose model
 - `UserTC` - this is a `TypeComposer` instance for User. `TypeComposer` has `GraphQLObjectType` inside, avaliable via method `UserTC.getType()`.
