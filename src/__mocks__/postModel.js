@@ -1,8 +1,9 @@
 /* @flow */
 
+import type { Schema as SchemaType } from 'mongoose';
 import { mongoose, Schema } from './mongooseCommon';
 
-const PostSchema = new Schema({
+const PostSchema: SchemaType<any> = new Schema({
   _id: {
     type: Number,
   },

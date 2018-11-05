@@ -106,7 +106,7 @@ export function _createOperatorsField(
   // if `opts.resolvers.[resolverName].filter.operators` is empty and not disabled via `false`
   // then fill it up with indexed fields
   const indexedFields = getIndexedFieldNamesForGraphQL(model);
-  if (operatorsOpts !== false && Object.keys(operatorsOpts).length === 0) {
+  if (Object.keys(operatorsOpts).length === 0) {
     indexedFields.forEach(fieldName => {
       operatorsOpts[fieldName] = availableOperators; // eslint-disable-line
     });

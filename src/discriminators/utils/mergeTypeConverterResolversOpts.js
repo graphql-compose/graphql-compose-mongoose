@@ -143,7 +143,7 @@ export function mergeTypeConverterResolverOpts(
       }
 
       // if nothing set for child resolver set base
-      if (baseResolverArgs === false && childResolverArgs === undefined) {
+      if ((baseResolverArgs: any) === false && childResolverArgs === undefined) {
         mergedTypeConverterResolverOpts[baseResolverOpt] = false;
         continue; // eslint-disable-line no-continue
       }

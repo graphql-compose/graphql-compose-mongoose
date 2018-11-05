@@ -36,10 +36,14 @@
 .*/node_modules/uglify.*
 .*/node_modules/yargs.*
 
+# Ignore broken Missing type annotation for V. V is a type parameter declared in function [1] and was implicitly instantiated at call of keyValMap [2].
+.*/node_modules/graphql/utilities/buildASTSchema.js.flow
+
 [include]
 
 [libs]
 
 [options]
 esproposal.class_instance_fields=enable
+esproposal.optional_chaining=enable
 suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe

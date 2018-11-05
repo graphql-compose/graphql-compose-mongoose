@@ -1,5 +1,6 @@
 /* @flow */
 
+import type { MongooseModel } from 'mongoose';
 import { mongoose, Schema, Types } from '../../__mocks__/mongooseCommon';
 import { DroidSchema } from './droidSchema';
 import { PersonSchema } from './personSchema';
@@ -37,15 +38,15 @@ const ACharacterSchema = new Schema(Object.assign({}, CharacterObject));
 export function getCharacterModels(DKey: string) {
   CharacterSchema.set('discriminatorKey', DKey);
 
-  const CharacterModel = mongoose.models.Character
+  const CharacterModel: MongooseModel = mongoose.models.Character
     ? mongoose.models.Character
     : mongoose.model('Character', CharacterSchema);
 
-  const PersonModel = mongoose.models[enumCharacterType.PERSON]
+  const PersonModel: MongooseModel = mongoose.models[enumCharacterType.PERSON]
     ? mongoose.models[enumCharacterType.PERSON]
     : CharacterModel.discriminator(enumCharacterType.PERSON, PersonSchema);
 
-  const DroidModel = mongoose.models[enumCharacterType.DROID]
+  const DroidModel: MongooseModel = mongoose.models[enumCharacterType.DROID]
     ? mongoose.models[enumCharacterType.DROID]
     : CharacterModel.discriminator(enumCharacterType.DROID, DroidSchema);
 

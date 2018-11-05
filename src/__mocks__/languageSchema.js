@@ -1,5 +1,6 @@
 /* @flow */
 
+import type { Schema as SchemaType } from 'mongoose';
 import { schemaComposer } from 'graphql-compose';
 import { Schema } from './mongooseCommon';
 import { convertSchemaToGraphQL } from '../fieldsConverter';
@@ -18,7 +19,7 @@ const enumLanguageSkill = {
   native: { description: 'since birth' },
 };
 
-const LanguageSchema = new Schema({
+const LanguageSchema: SchemaType<any> = new Schema({
   ln: {
     type: String,
     description: 'Language names (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)',

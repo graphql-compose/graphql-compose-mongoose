@@ -1,11 +1,12 @@
 /* @flow */
 
+import type { Schema as SchemaType } from 'mongoose';
 import { mongoose, Schema } from './mongooseCommon';
 import ContactsSchema from './contactsSchema';
 import enumEmployment from './enumEmployment';
 import LanguageSchema from './languageSchema';
 
-const UserSchema = new Schema(
+const UserSchema: SchemaType<any> = new Schema(
   {
     subDoc: {
       field1: String,
