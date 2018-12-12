@@ -90,6 +90,11 @@ const UserSchema: SchemaType<any> = new Schema(
       periods: [{ from: Number, to: Number }],
     },
 
+    requiredField: {
+      type: String,
+      required: true,
+    },
+
     // createdAt, created via option `timastamp: true` (see bottom)
     // updatedAt, created via option `timastamp: true` (see bottom)
   },

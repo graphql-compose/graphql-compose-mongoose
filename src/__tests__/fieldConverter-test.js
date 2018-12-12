@@ -14,6 +14,7 @@ import {
   enumToGraphQL,
   documentArrayToGraphQL,
   referenceToGraphQL,
+  convertModelToGraphQL,
 } from '../fieldsConverter';
 import GraphQLMongoID from '../types/mongoid';
 
@@ -105,6 +106,13 @@ describe('fieldConverter', () => {
 
     it('schould derive MIXED mongoose type', () => {
       expect(deriveComplexType(fields.someDynamic)).toBe(ComplexTypes.MIXED);
+    });
+  });
+
+  describe('convertFieldToGraphQL()', () => {
+    it('should set required field', () => {
+      const tc = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+      expect(tc.isFieldNonNull('requiredField')).toBeTruthy();
     });
   });
 
