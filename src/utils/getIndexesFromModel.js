@@ -20,9 +20,9 @@ function isSpecificIndex(idx) {
 }
 
 /*
-* Get mongoose model, and return array of fields with indexes.
-*  MongooseModel  ->  [ { _id: 1 }, { name: 1, surname: -1 } ]
-*/
+ * Get mongoose model, and return array of fields with indexes.
+ *  MongooseModel  ->  [ { _id: 1 }, { name: 1, surname: -1 } ]
+ */
 export function getIndexesFromModel(
   mongooseModel: MongooseModel,
   opts: getIndexesFromModelOpts = {}

@@ -116,7 +116,7 @@ const UserRequiredSchema: SchemaType<any> = new Schema({
   name: {
     type: String,
     description: 'Person name',
-    required: true
+    required: true,
   },
 });
 
