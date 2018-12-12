@@ -90,11 +90,6 @@ const UserSchema: SchemaType<any> = new Schema(
       periods: [{ from: Number, to: Number }],
     },
 
-    requiredField: {
-      type: String,
-      required: true,
-    },
-
     // createdAt, created via option `timastamp: true` (see bottom)
     // updatedAt, created via option `timastamp: true` (see bottom)
   },
@@ -116,3 +111,15 @@ UserSchema.virtual('nameVirtual').get(function() {
 const UserModel = mongoose.model('User', UserSchema);
 
 export { UserSchema, UserModel };
+
+const UserRequiredSchema: SchemaType<any> = new Schema({
+  name: {
+    type: String,
+    description: 'Person name',
+    required: true
+  },
+});
+
+const UserRequiredModel = mongoose.model('UserRequired', UserRequiredSchema);
+
+export { UserRequiredSchema, UserRequiredModel };

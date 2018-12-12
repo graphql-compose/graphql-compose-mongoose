@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
 import { EnumTypeComposer, schemaComposer } from 'graphql-compose';
-import { UserModel } from '../__mocks__/userModel';
+import { UserModel, UserRequiredModel } from '../__mocks__/userModel';
 import {
   deriveComplexType,
   getFieldsFromModel,
@@ -111,8 +111,8 @@ describe('fieldConverter', () => {
 
   describe('convertFieldToGraphQL()', () => {
     it('should set required field', () => {
-      const tc = convertModelToGraphQL(UserModel, 'User', schemaComposer);
-      expect(tc.isFieldNonNull('requiredField')).toBeTruthy();
+      const tc = convertModelToGraphQL(UserRequiredModel, 'UserRequired', schemaComposer);
+      expect(tc.isFieldNonNull('name')).toBeTruthy();
     });
   });
 
