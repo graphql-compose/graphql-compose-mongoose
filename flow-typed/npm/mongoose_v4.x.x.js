@@ -184,6 +184,7 @@ type Mongoose$SchemaField<Schema> = {
   options?: ?{
     description: ?string
   },
+  isRequired?: boolean,
   enumValues?: ?(string[]),
   schema?: Schema,
   _index?: ?{ [optionName: string]: mixed }

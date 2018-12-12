@@ -111,3 +111,15 @@ UserSchema.virtual('nameVirtual').get(function() {
 const UserModel = mongoose.model('User', UserSchema);
 
 export { UserSchema, UserModel };
+
+const UserRequiredSchema: SchemaType<any> = new Schema({
+  name: {
+    type: String,
+    description: 'Person name',
+    required: true,
+  },
+});
+
+const UserRequiredModel = mongoose.model('UserRequired', UserRequiredSchema);
+
+export { UserRequiredSchema, UserRequiredModel };
