@@ -35,7 +35,7 @@ export default function createMany(
     throw new Error('Second arg for Resolver createMany() should be instance of TypeComposer.');
   }
 
-  const tree = model.schema.tree;
+  const tree = model.schema.obj;
   const requiredFields = [];
   for (const field in tree) {
     if (tree.hasOwnProperty(field)) {

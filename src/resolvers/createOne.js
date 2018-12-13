@@ -19,7 +19,7 @@ export default function createOne(
     throw new Error('Second arg for Resolver createOne() should be instance of TypeComposer.');
   }
 
-  const tree = model.schema.tree;
+  const tree = model.schema.obj;
   const requiredFields = [];
   for (const field in tree) {
     if (tree.hasOwnProperty(field)) {
