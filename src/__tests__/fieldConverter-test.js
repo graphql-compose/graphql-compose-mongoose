@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
 import { EnumTypeComposer, schemaComposer } from 'graphql-compose';
-import { UserModel, UserRequiredModel } from '../__mocks__/userModel';
+import { UserModel } from '../__mocks__/userModel';
 import {
   deriveComplexType,
   getFieldsFromModel,
@@ -14,7 +14,6 @@ import {
   enumToGraphQL,
   documentArrayToGraphQL,
   referenceToGraphQL,
-  convertModelToGraphQL,
 } from '../fieldsConverter';
 import GraphQLMongoID from '../types/mongoid';
 
@@ -106,13 +105,6 @@ describe('fieldConverter', () => {
 
     it('schould derive MIXED mongoose type', () => {
       expect(deriveComplexType(fields.someDynamic)).toBe(ComplexTypes.MIXED);
-    });
-  });
-
-  describe('convertFieldToGraphQL()', () => {
-    it('should set required field', () => {
-      const tc = convertModelToGraphQL(UserRequiredModel, 'UserRequired', schemaComposer);
-      expect(tc.isFieldNonNull('name')).toBeTruthy();
     });
   });
 

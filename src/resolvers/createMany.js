@@ -35,6 +35,17 @@ export default function createMany(
     throw new Error('Second arg for Resolver createMany() should be instance of TypeComposer.');
   }
 
+  const tree = model.schema.obj;
+  const requiredFields = [];
+  for (const field in tree) {
+    if (tree.hasOwnProperty(field)) {
+      const fieldOptions = tree[field];
+      if (fieldOptions.required) {
+        requiredFields.push(field);
+      }
+    }
+  }
+
   const outputTypeName = `CreateMany${tc.getTypeName()}Payload`;
   const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
     t.addFields({
@@ -66,6 +77,7 @@ export default function createMany(
               recordTypeName: `CreateMany${tc.getTypeName()}Input`,
               removeFields: ['id', '_id'],
               isRequired: true,
+              requiredFields,
               ...(opts && opts.records),
             }).record: any).type
           )

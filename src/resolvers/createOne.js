@@ -19,6 +19,17 @@ export default function createOne(
     throw new Error('Second arg for Resolver createOne() should be instance of TypeComposer.');
   }
 
+  const tree = model.schema.obj;
+  const requiredFields = [];
+  for (const field in tree) {
+    if (tree.hasOwnProperty(field)) {
+      const fieldOptions = tree[field];
+      if (fieldOptions.required) {
+        requiredFields.push(field);
+      }
+    }
+  }
+
   const outputTypeName = `CreateOne${tc.getTypeName()}Payload`;
   const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
     t.addFields({
@@ -43,6 +54,7 @@ export default function createOne(
         recordTypeName: `CreateOne${tc.getTypeName()}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
+        requiredFields,
         ...(opts && opts.record),
       }),
     },
