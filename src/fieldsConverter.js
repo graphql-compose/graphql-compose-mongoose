@@ -127,7 +127,6 @@ export function convertModelToGraphQL(
     return schemaComposer.getTC(model.schema);
   }
 
-  const requiredFields = [];
   const typeComposer = schemaComposer.getOrCreateTC(typeName);
   // $FlowFixMe await landing graphql-compose@4.4.2 or above
   schemaComposer.set(model.schema, typeComposer);
@@ -138,10 +137,6 @@ export function convertModelToGraphQL(
 
   Object.keys(mongooseFields).forEach(fieldName => {
     const mongooseField: MongooseFieldT = mongooseFields[fieldName];
-
-    if (mongooseField.isRequired) {
-      requiredFields.push(fieldName);
-    }
 
     graphqlFields[fieldName] = {
       type: convertFieldToGraphQL(mongooseField, typeName, schemaComposer),
@@ -164,7 +159,6 @@ export function convertModelToGraphQL(
   });
 
   typeComposer.addFields(graphqlFields);
-  requiredFields.map(f => typeComposer.makeFieldNonNull(f));
   return typeComposer;
 }
 
