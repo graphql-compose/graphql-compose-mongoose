@@ -39,7 +39,7 @@ import { composeWithMongoose } from 'graphql-compose-mongoose/es';
 
 Live demo: [https://graphql-compose.herokuapp.com/](https://graphql-compose.herokuapp.com/)
 
-Source code: https://github.com/graphql-compose/graphql-compose-mongoose-example
+Source code: https://github.com/graphql-compose/graphql-compose-examples
 
 Small explanation for variables naming:
 - `UserSchema` - this is a mongoose schema
