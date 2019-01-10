@@ -9,6 +9,7 @@ const ObjectId = Types.ObjectId;
  * { a: { b: { c: 1 }}} ->  { 'a.b.c': 1 }
  * { a: { $in: [ 1, 2, 3] }} ->  { 'a': { $in: [ 1, 2, 3] } }
  * { a: { b: { $in: [ 1, 2, 3] }}} ->  { 'a.b': { $in: [ 1, 2, 3] } }
+ * { a: [ { b: 1 }, { c: 2 }]} -> { 'a.b': 1, 'a.c': 2 }
  * Usage:
  *   var dotObject(obj)
  *   or
@@ -37,7 +38,7 @@ export default function toMongoDottedObject(
          };
        }
      } else if (Object(obj[key]) === obj[key] && !(obj[key] instanceof ObjectId)) {
-       toMongoDottedObject(obj[key], target, path.concat(key));
+       toMongoDottedObject(obj[key], target, Array.isArray(obj) ? path : path.concat(key));
      } else {
        target[path.concat(key).join('.')] = obj[key];
      }

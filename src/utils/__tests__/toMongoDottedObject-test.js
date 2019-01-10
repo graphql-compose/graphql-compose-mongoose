@@ -51,4 +51,8 @@ describe('toMongoDottedObject()', () => {
       'a.someField': id,
     });
   });
+
+  it('should dot array without index', () => {
+    expect(toMongoDottedObject({ a: [{ b: 1 }, { c: 2 }] })).toEqual({ 'a.b': 1, 'a.c': 2 });
+  });
 });
