@@ -4,7 +4,7 @@
 import type { TypeComposer, ComposeFieldConfigArgumentMap } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import GraphQLMongoID from '../../types/mongoid';
-import { isObject, toMongoDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
+import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
 import {
   type FilterOperatorsOpts,
@@ -112,7 +112,7 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
     });
     if (Object.keys(clearedFilter).length > 0) {
       // eslint-disable-next-line
-      resolveParams.query = resolveParams.query.where(toMongoDottedObject(clearedFilter));
+      resolveParams.query = resolveParams.query.where(toMongoFilterDottedObject(clearedFilter));
     }
 
     processFilterOperators(filter, resolveParams);
