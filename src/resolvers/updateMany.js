@@ -14,7 +14,7 @@ import {
   sortHelper,
   sortHelperArgs,
 } from './helpers';
-import toMongoDottedObject from '../utils/toMongoDottedObject';
+import { toMongoDottedObject } from '../utils/toMongoDottedObject';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function updateMany(
