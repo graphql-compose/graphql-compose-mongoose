@@ -69,6 +69,8 @@ export const filterHelperArgs = (
   const filterTypeName: string = opts.filterTypeName;
   const itc = typeComposer.getInputTypeComposer().clone(filterTypeName);
 
+  itc.makeOptional('_id');
+
   itc.addFields({
     _ids: [GraphQLMongoID],
   });
