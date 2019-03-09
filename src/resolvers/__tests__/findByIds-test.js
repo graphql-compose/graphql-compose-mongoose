@@ -29,7 +29,7 @@ describe('findByIds() ->', () => {
   let post3;
 
   beforeEach(async () => {
-    await UserModel.remove({});
+    await UserModel.deleteMany({});
 
     user1 = new UserModel({ name: 'nodkz1' });
     user2 = new UserModel({ name: 'nodkz2' });
@@ -37,7 +37,7 @@ describe('findByIds() ->', () => {
 
     await Promise.all([user1.save(), user2.save(), user3.save()]);
 
-    await PostModel.remove({});
+    await PostModel.deleteMany({});
 
     post1 = new PostModel({ _id: 1, title: 'Post 1' });
     post2 = new PostModel({ _id: 2, title: 'Post 2' });

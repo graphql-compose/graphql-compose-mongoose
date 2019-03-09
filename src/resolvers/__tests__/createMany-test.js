@@ -22,7 +22,7 @@ describe('createMany() ->', () => {
   });
 
   beforeEach(async () => {
-    await UserModel.remove({});
+    await UserModel.deleteMany({});
   });
 
   it('should return Resolver object', () => {

@@ -23,7 +23,7 @@ describe('removeMany() ->', () => {
   let user3;
 
   beforeEach(async () => {
-    await UserModel.remove({});
+    await UserModel.deleteMany({});
 
     user1 = new UserModel({
       name: 'userName1',

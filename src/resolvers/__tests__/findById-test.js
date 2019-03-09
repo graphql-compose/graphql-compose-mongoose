@@ -25,12 +25,12 @@ describe('findById() ->', () => {
   let post;
 
   beforeEach(async () => {
-    await UserModel.remove({});
+    await UserModel.deleteMany({});
 
     user = new UserModel({ name: 'nodkz' });
     await user.save();
 
-    await PostModel.remove({});
+    await PostModel.deleteMany({});
 
     post = new PostModel({ _id: 1, title: 'Post 1' });
     await post.save();

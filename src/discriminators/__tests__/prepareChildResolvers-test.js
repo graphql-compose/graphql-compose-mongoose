@@ -19,7 +19,7 @@ describe('prepareChildResolvers()', () => {
     });
 
     beforeEach(async () => {
-      await PersonModel.remove({});
+      await PersonModel.deleteMany({});
     });
 
     it('should set DKey on createOne', async () => {

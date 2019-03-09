@@ -17,7 +17,7 @@ beforeEach(async () => {
   schemaComposer.clear();
   UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
 
-  await UserModel.remove({});
+  await UserModel.deleteMany({});
 
   user1 = new UserModel({
     name: 'userName1',

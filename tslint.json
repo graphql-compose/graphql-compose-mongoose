@@ -4,6 +4,11 @@
     "tslint:recommended",
     "tslint-config-prettier"
   ],
+  "linterOptions": {
+    "exclude": [
+      "src/**/*.js"
+    ]
+  },
   "rulesDirectory": [
     "tslint-plugin-prettier"
   ],

@@ -22,7 +22,7 @@ describe('#78 Mongoose and Discriminators', () => {
   const EventTC = composeWithMongooseDiscriminators(Event);
   const ClickedLinkEventTC = EventTC.discriminator(ClickedLinkEvent);
 
-  afterAll(() => Event.remove({}));
+  afterAll(() => Event.deleteMany({}));
 
   it('creating Types from models', () => {
     expect(EventTC.getFieldNames()).toEqual(['_id', 'kind', 'refId']);

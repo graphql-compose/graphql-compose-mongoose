@@ -24,7 +24,7 @@ describe('updateOne() ->', () => {
   let user2;
 
   beforeEach(async () => {
-    await UserModel.remove({});
+    await UserModel.deleteMany({});
 
     user1 = new UserModel({
       name: 'userName1',
