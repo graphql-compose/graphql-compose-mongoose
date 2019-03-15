@@ -32,7 +32,7 @@ describe('composeChildTC ->', () => {
     }
   });
 
-  it('should operate normally like any other TypeComposer', () => {
+  it('should operate normally like any other ObjectTypeComposer', () => {
     const fields = PersonTC.getFieldNames();
 
     PersonTC.addFields({

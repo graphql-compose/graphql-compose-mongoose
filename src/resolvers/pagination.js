@@ -1,18 +1,18 @@
 /* @flow */
 /* eslint-disable global-require */
 
-import type { Resolver, TypeComposer } from 'graphql-compose';
-import type { MongooseModel } from 'mongoose';
+import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { MongooseDocument } from 'mongoose';
 
 export type PaginationResolverOpts = {
   perPage?: number,
 };
 
-export default function pagination(
-  model: MongooseModel,
-  tc: TypeComposer,
+export default function pagination<TSource: MongooseDocument, TContext>(
+  model: Class<TSource>, // === MongooseModel
+  tc: ObjectTypeComposer<TSource, TContext>,
   opts?: PaginationResolverOpts
-): ?Resolver {
+): ?Resolver<TSource, TContext> {
   try {
     require.resolve('graphql-compose-pagination');
   } catch (e) {

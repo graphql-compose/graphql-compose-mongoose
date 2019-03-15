@@ -1,13 +1,16 @@
 /* @flow */
 
-import { TypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer } from 'graphql-compose';
 import type { DiscriminatorTypeComposer, DiscriminatorOptions } from './DiscriminatorTypeComposer';
 import { prepareChildResolvers } from './prepareChildResolvers';
 import { reorderFields } from './utils/reorderFields';
 
 // copy all baseTypeComposer fields to childTC
 // these are the fields before calling discriminator
-function copyBaseTCFieldsToChildTC(baseDTC: TypeComposer, childTC: TypeComposer) {
+function copyBaseTCFieldsToChildTC(
+  baseDTC: ObjectTypeComposer<any, any>,
+  childTC: ObjectTypeComposer<any, any>
+) {
   const baseFields = baseDTC.getFieldNames();
   const childFields = childTC.getFieldNames();
 
@@ -26,11 +29,11 @@ function copyBaseTCFieldsToChildTC(baseDTC: TypeComposer, childTC: TypeComposer)
   return childTC;
 }
 
-export function composeChildTC(
-  baseDTC: DiscriminatorTypeComposer<any>,
-  childTC: TypeComposer,
+export function composeChildTC<TSource, TContext>(
+  baseDTC: DiscriminatorTypeComposer<any, TContext>,
+  childTC: ObjectTypeComposer<TSource, TContext>,
   opts: DiscriminatorOptions
-): TypeComposer {
+): ObjectTypeComposer<TSource, TContext> {
   const composedChildTC = copyBaseTCFieldsToChildTC(baseDTC, childTC);
 
   composedChildTC.setInterfaces([baseDTC.getDInterface()]);

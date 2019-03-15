@@ -3,7 +3,7 @@
 
 import mongoose from 'mongoose';
 import MongodbMemoryServer from 'mongodb-memory-server';
-import { EnumTypeComposer, graphql } from 'graphql-compose';
+import { schemaComposer, graphql } from 'graphql-compose';
 import { composeWithMongoose } from '../../index';
 
 let mongoServer;
@@ -36,7 +36,7 @@ describe('issue #157 - Optional enum error', () => {
 
     const referredBy: any = VisitTC.getFieldType('referredBy');
     expect(referredBy).toBeInstanceOf(graphql.GraphQLEnumType);
-    const etc = EnumTypeComposer.create(referredBy);
+    const etc = schemaComposer.createEnumTC(referredBy);
     expect(etc.getFieldNames()).toEqual(['WEBSITE', 'NEWSPAPER']);
 
     etc.addFields({

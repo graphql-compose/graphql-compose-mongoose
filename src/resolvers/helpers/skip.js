@@ -3,7 +3,7 @@
 import type { ComposeFieldConfigArgumentMap } from 'graphql-compose';
 import type { ExtendedResolveParams } from '../index';
 
-export const skipHelperArgs = (): ComposeFieldConfigArgumentMap => {
+export const skipHelperArgs = (): ComposeFieldConfigArgumentMap<> => {
   return {
     skip: {
       type: 'Int',

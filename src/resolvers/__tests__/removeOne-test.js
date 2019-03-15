@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { Resolver, TypeComposer, schemaComposer } from 'graphql-compose';
+import { Resolver, schemaComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import removeOne from '../removeOne';
 import GraphQLMongoID from '../../types/mongoid';
@@ -199,19 +199,19 @@ describe('removeOne() ->', () => {
 
     it('should have recordId field', () => {
       const outputType: any = removeOne(UserModel, UserTC).getType();
-      const recordIdField = new TypeComposer(outputType).getFieldConfig('recordId');
+      const recordIdField = schemaComposer.createObjectTC(outputType).getFieldConfig('recordId');
       expect(recordIdField.type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType: any = removeOne(UserModel, UserTC).getType();
-      const recordField = new TypeComposer(outputType).getFieldConfig('record');
+      const recordField = schemaComposer.createObjectTC(outputType).getFieldConfig('record');
       expect(recordField.type).toBe(UserTC.getType());
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `RemoveOne${UserTC.getTypeName()}Payload`;
-      const existedType = TypeComposer.create(outputTypeName);
+      const existedType = schemaComposer.createObjectTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = removeOne(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

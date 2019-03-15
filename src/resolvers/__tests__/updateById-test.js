@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { Resolver, TypeComposer, InputTypeComposer, schemaComposer } from 'graphql-compose';
+import { Resolver, schemaComposer } from 'graphql-compose';
 import {
   GraphQLNonNull,
   GraphQLInputObjectType,
@@ -65,7 +65,9 @@ describe('updateById() ->', () => {
       const argConfig: any = resolver.getArgConfig('record') || {};
       expect(argConfig.type.ofType).toBeInstanceOf(GraphQLInputObjectType);
       if (argConfig.type && argConfig.type.ofType) {
-        const _idFieldType = new InputTypeComposer(argConfig.type.ofType).getFieldType('_id');
+        const _idFieldType = schemaComposer
+          .createInputTC(argConfig.type.ofType)
+          .getFieldType('_id');
         expect(_idFieldType).toBeInstanceOf(GraphQLNonNull);
         expect(getNullableType(_idFieldType)).toBe(GraphQLMongoID);
       }
@@ -194,21 +196,21 @@ describe('updateById() ->', () => {
 
     it('should have recordId field', () => {
       const outputType: any = updateById(UserModel, UserTC).getType();
-      const typeComposer = new TypeComposer(outputType);
+      const typeComposer = schemaComposer.createObjectTC(outputType);
       expect(typeComposer.hasField('recordId')).toBe(true);
       expect(typeComposer.getFieldType('recordId')).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType: any = updateById(UserModel, UserTC).getType();
-      const typeComposer = new TypeComposer(outputType);
+      const typeComposer = schemaComposer.createObjectTC(outputType);
       expect(typeComposer.hasField('record')).toBe(true);
       expect(typeComposer.getFieldType('record')).toBe(UserTC.getType());
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `UpdateById${UserTC.getTypeName()}Payload`;
-      const existedType = TypeComposer.create(outputTypeName);
+      const existedType = schemaComposer.createObjectTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = updateById(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

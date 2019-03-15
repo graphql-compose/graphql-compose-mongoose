@@ -1,7 +1,7 @@
 /* @flow */
 
 import type { ResolveParams } from 'graphql-compose';
-import { ResolverClass, TypeComposerClass } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import { type DiscriminatorOptions, DiscriminatorTypeComposer } from './DiscriminatorTypeComposer';
 import { EMCResolvers } from '../resolvers';
 
@@ -9,8 +9,8 @@ import { EMCResolvers } from '../resolvers';
 // Also look at it like setting for filters, makes sure to limit
 // query to child type
 function setQueryDKey<TSource, TContext>(
-  resolver: ResolverClass<any, TContext>,
-  childTC: TypeComposerClass<TContext>,
+  resolver: Resolver<TSource, TContext>,
+  childTC: ObjectTypeComposer<TSource, TContext>,
   DKey: string,
   fromField: string
 ) {
@@ -43,9 +43,9 @@ function setQueryDKey<TSource, TContext>(
 }
 
 // hide the DKey on the filter or record
-function hideDKey<TContext>(
-  resolver: ResolverClass<any, TContext>,
-  childTC: TypeComposerClass<TContext>,
+function hideDKey<TSource, TContext>(
+  resolver: Resolver<TSource, TContext>,
+  childTC: ObjectTypeComposer<TSource, TContext>,
   DKey: string,
   fromField: string[] | string
 ) {
@@ -65,9 +65,9 @@ function hideDKey<TContext>(
 }
 
 // Set baseDTC resolver argTypes on childTC fields shared with DInterface
-function copyResolverArgTypes<TContext>(
-  resolver: ResolverClass<any, TContext>,
-  baseDTC: DiscriminatorTypeComposer<TContext>,
+function copyResolverArgTypes<TSource, TContext>(
+  resolver: Resolver<TSource, TContext>,
+  baseDTC: DiscriminatorTypeComposer<TSource, TContext>,
   fromArg: string[] | string
 ) {
   if (resolver && baseDTC.hasInputTypeComposer()) {
@@ -97,9 +97,9 @@ function copyResolverArgTypes<TContext>(
 }
 
 // reorder input fields resolvers, based on reorderFields opts
-function reorderFieldsRecordFilter<TContext>(
-  resolver: ResolverClass<any, TContext>,
-  baseDTC: DiscriminatorTypeComposer<TContext>,
+function reorderFieldsRecordFilter<TSource, TContext>(
+  resolver: Resolver<TSource, TContext>,
+  baseDTC: DiscriminatorTypeComposer<TSource, TContext>,
   order: string[] | boolean | void | null,
   fromField: string[] | string
 ) {
@@ -131,9 +131,9 @@ function reorderFieldsRecordFilter<TContext>(
   }
 }
 
-export function prepareChildResolvers<TContext>(
-  baseDTC: DiscriminatorTypeComposer<TContext>,
-  childTC: TypeComposerClass<TContext>,
+export function prepareChildResolvers<TSource, TContext>(
+  baseDTC: DiscriminatorTypeComposer<TSource, TContext>,
+  childTC: ObjectTypeComposer<TSource, TContext>,
   opts: DiscriminatorOptions
 ) {
   for (const resolverName in EMCResolvers) {

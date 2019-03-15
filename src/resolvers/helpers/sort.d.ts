@@ -2,7 +2,7 @@ import {
   ComposeFieldConfigArgumentMap,
   EnumTypeComposer,
   SchemaComposer,
-  TypeComposer,
+  ObjectTypeComposer,
 } from 'graphql-compose';
 import { Model } from 'mongoose';
 import { ExtendedResolveParams } from '../index';
@@ -14,7 +14,7 @@ export type SortHelperArgsOpts = {
 export type SortHelperArgs = '_ID_ASC' | '_ID_DESC' | any;
 
 export function sortHelperArgs(
-  typeComposer: TypeComposer<any>,
+  typeComposer: ObjectTypeComposer<any>,
   model: Model<any>,
   opts?: SortHelperArgsOpts,
 ): ComposeFieldConfigArgumentMap;

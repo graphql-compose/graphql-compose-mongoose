@@ -1,25 +1,25 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import type { Resolver, TypeComposer } from 'graphql-compose';
-import type { MongooseModel } from 'mongoose';
+import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { MongooseDocument } from 'mongoose';
 import { filterHelper, filterHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
-export default function count(
-  model: MongooseModel,
-  tc: TypeComposer,
+export default function count<TSource: MongooseDocument, TContext>(
+  model: Class<TSource>, // === MongooseModel
+  tc: ObjectTypeComposer<TSource, TContext>,
   opts?: GenResolverOpts
-): Resolver {
+): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver count() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'TypeComposer') {
-    throw new Error('Second arg for Resolver count() should be instance of TypeComposer.');
+  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+    throw new Error('Second arg for Resolver count() should be instance of ObjectTypeComposer.');
   }
 
-  return new tc.constructor.schemaComposer.Resolver({
+  return tc.schemaComposer.createResolver({
     type: 'Int',
     name: 'count',
     kind: 'query',

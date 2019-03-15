@@ -1,4 +1,4 @@
-import { ComposeFieldConfigArgumentMap, TypeComposer } from 'graphql-compose';
+import { ComposeFieldConfigArgumentMap, ObjectTypeComposer } from 'graphql-compose';
 
 export type RecordHelperArgsOpts = {
   recordTypeName?: string;
@@ -15,6 +15,6 @@ export type RecordHelperArgs<TSource> = { record: TSource };
 export type RecordsHelperArgs<TSource> = { records: TSource[] };
 
 export function recordHelperArgs(
-  tc: TypeComposer<any>,
+  tc: ObjectTypeComposer<any>,
   opts?: RecordHelperArgsOpts,
 ): ComposeFieldConfigArgumentMap;

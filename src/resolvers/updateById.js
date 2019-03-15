@@ -1,30 +1,32 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import type { Resolver, TypeComposer } from 'graphql-compose';
-import type { MongooseModel } from 'mongoose';
+import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { MongooseDocument } from 'mongoose';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
 
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
-export default function updateById(
-  model: MongooseModel,
-  tc: TypeComposer,
+export default function updateById<TSource: MongooseDocument, TContext>(
+  model: Class<TSource>, // === MongooseModel
+  tc: ObjectTypeComposer<TSource, TContext>,
   opts?: GenResolverOpts
-): Resolver {
+): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateById() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'TypeComposer') {
-    throw new Error('Second arg for Resolver updateById() should be instance of TypeComposer.');
+  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+    throw new Error(
+      'Second arg for Resolver updateById() should be instance of ObjectTypeComposer.'
+    );
   }
 
   const findByIdResolver = findById(model, tc);
 
   const outputTypeName = `UpdateById${tc.getTypeName()}Payload`;
-  const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
     t.addFields({
       recordId: {
         type: 'MongoID',
@@ -37,7 +39,7 @@ export default function updateById(
     });
   });
 
-  const resolver = new tc.constructor.schemaComposer.Resolver({
+  const resolver = tc.schemaComposer.createResolver({
     name: 'updateById',
     kind: 'mutation',
     description:

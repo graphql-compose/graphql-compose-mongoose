@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import type { TypeComposer, ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import type { ObjectTypeComposer, ComposeFieldConfigArgumentMap } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import GraphQLMongoID from '../../types/mongoid';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
@@ -32,12 +32,12 @@ export const getFilterHelperArgOptsMap = () => ({
 });
 
 export const filterHelperArgs = (
-  typeComposer: TypeComposer,
+  typeComposer: ObjectTypeComposer<any, any>,
   model: MongooseModel,
   opts?: FilterHelperArgsOpts
-): ComposeFieldConfigArgumentMap => {
-  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
-    throw new Error('First arg for filterHelperArgs() should be instance of TypeComposer.');
+): ComposeFieldConfigArgumentMap<> => {
+  if (!typeComposer || typeComposer.constructor.name !== 'ObjectTypeComposer') {
+    throw new Error('First arg for filterHelperArgs() should be instance of ObjectTypeComposer.');
   }
 
   if (!model || !model.modelName || !model.schema) {

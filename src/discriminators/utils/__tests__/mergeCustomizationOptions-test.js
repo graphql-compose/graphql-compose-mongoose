@@ -134,7 +134,7 @@ describe('mergeFieldMaps()', () => {
 });
 
 describe('mergeCustomizationOptions()', () => {
-  const baseCustomOptions: TypeConverterOpts = {
+  const baseCustomOptions: TypeConverterOpts<any> = {
     fields: baseFields,
     inputType: {
       name: 'BaseInput',
@@ -170,7 +170,7 @@ describe('mergeCustomizationOptions()', () => {
     },
   };
 
-  const childCustomOptions: TypeConverterOpts = {
+  const childCustomOptions: TypeConverterOpts<any> = {
     fields: childFields,
     inputType: {
       name: 'ChildInputs',
@@ -205,7 +205,7 @@ describe('mergeCustomizationOptions()', () => {
     },
   };
 
-  const expected: TypeConverterOpts = {
+  const expected: TypeConverterOpts<any> = {
     fields: expectedFields,
     inputType: {
       name: 'ChildInputs',

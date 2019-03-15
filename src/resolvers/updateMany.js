@@ -1,8 +1,8 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import type { Resolver, TypeComposer } from 'graphql-compose';
-import type { MongooseModel } from 'mongoose';
+import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { MongooseDocument } from 'mongoose';
 import {
   limitHelper,
   limitHelperArgs,
@@ -17,20 +17,22 @@ import {
 import { toMongoDottedObject } from '../utils/toMongoDottedObject';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
-export default function updateMany(
-  model: MongooseModel,
-  tc: TypeComposer,
+export default function updateMany<TSource: MongooseDocument, TContext>(
+  model: Class<TSource>, // === MongooseModel
+  tc: ObjectTypeComposer<TSource, TContext>,
   opts?: GenResolverOpts
-): Resolver {
+): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateMany() should be instance of Mongoose Model.');
   }
-  if (!tc || tc.constructor.name !== 'TypeComposer') {
-    throw new Error('Second arg for Resolver updateMany() should be instance of TypeComposer.');
+  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+    throw new Error(
+      'Second arg for Resolver updateMany() should be instance of ObjectTypeComposer.'
+    );
   }
 
   const outputTypeName = `UpdateMany${tc.getTypeName()}Payload`;
-  const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
     t.addFields({
       numAffected: {
         type: 'Int',
@@ -39,7 +41,7 @@ export default function updateMany(
     });
   });
 
-  const resolver = new tc.constructor.schemaComposer.Resolver({
+  const resolver = tc.schemaComposer.createResolver({
     name: 'updateMany',
     kind: 'mutation',
     description:
@@ -87,7 +89,13 @@ export default function updateMany(
       limitHelper(resolveParams);
 
       resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
-      resolveParams.query.update({ $set: toMongoDottedObject(recordData) });
+
+      if (resolveParams.query.updateMany) {
+        resolveParams.query.updateMany({ $set: toMongoDottedObject(recordData) });
+      } else {
+        // OLD mongoose
+        resolveParams.query.update({ $set: toMongoDottedObject(recordData) });
+      }
 
       let res;
 

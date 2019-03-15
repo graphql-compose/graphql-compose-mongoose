@@ -37,7 +37,7 @@ describe('#78 Mongoose and Discriminators', () => {
     await ClickedLinkEvent.create({ refId: 'ccc', url: 'url1' });
     await ClickedLinkEvent.create({ refId: 'ddd', url: 'url2' });
 
-    schemaComposer.rootQuery().addFields({
+    schemaComposer.Query.addFields({
       eventFindMany: EventTC.getResolver('findMany'),
     });
 
@@ -78,7 +78,7 @@ describe('depicting other Enhancements to resolvers', () => {
   const DroidCTC = CharacterDTC.discriminator(DroidModel);
   const PersonCTC = CharacterDTC.discriminator(PersonModel);
 
-  schemaComposer.rootQuery().addFields({
+  schemaComposer.Query.addFields({
     characterById: CharacterDTC.getResolver('findById'),
     characterByIds: CharacterDTC.getResolver('findByIds'),
     characterOne: CharacterDTC.getResolver('findOne'),
@@ -88,7 +88,7 @@ describe('depicting other Enhancements to resolvers', () => {
     characterPagination: CharacterDTC.getResolver('pagination'),
   });
 
-  schemaComposer.rootMutation().addFields({
+  schemaComposer.Mutation.addFields({
     characterCreate: CharacterDTC.getResolver('createOne'),
     characterUpdateById: CharacterDTC.getResolver('updateById'),
     characterUpdateOne: CharacterDTC.getResolver('updateOne'),
@@ -98,7 +98,7 @@ describe('depicting other Enhancements to resolvers', () => {
     characterRemoveMany: CharacterDTC.getResolver('removeMany'),
   });
 
-  schemaComposer.rootQuery().addFields({
+  schemaComposer.Query.addFields({
     droidById: DroidCTC.getResolver('findById'),
     droidByIds: DroidCTC.getResolver('findByIds'),
     // droidOne: DroidCTC.getResolver('findOne'),
@@ -108,7 +108,7 @@ describe('depicting other Enhancements to resolvers', () => {
     droidPagination: DroidCTC.getResolver('pagination'),
   });
 
-  schemaComposer.rootMutation().addFields({
+  schemaComposer.Mutation.addFields({
     droidCreate: DroidCTC.getResolver('createOne'),
     droidUpdateById: DroidCTC.getResolver('updateById'),
     droidUpdateOne: DroidCTC.getResolver('updateOne'),
@@ -118,7 +118,7 @@ describe('depicting other Enhancements to resolvers', () => {
     droidRemoveMany: DroidCTC.getResolver('removeMany'),
   });
 
-  schemaComposer.rootQuery().addFields({
+  schemaComposer.Query.addFields({
     personById: PersonCTC.getResolver('findById'),
     personByIds: PersonCTC.getResolver('findByIds'),
     // personOne: PersonCTC.getResolver('findOne'),
@@ -128,7 +128,7 @@ describe('depicting other Enhancements to resolvers', () => {
     personPagination: PersonCTC.getResolver('pagination'),
   });
 
-  schemaComposer.rootMutation().addFields({
+  schemaComposer.Mutation.addFields({
     personCreate: PersonCTC.getResolver('createOne'),
     personUpdateById: PersonCTC.getResolver('updateById'),
     personUpdateOne: PersonCTC.getResolver('updateOne'),

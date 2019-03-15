@@ -1,9 +1,9 @@
 /* @flow */
 /* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
-import type { MongooseModel } from 'mongoose';
+import type { MongooseDocument } from 'mongoose';
 import type { ConnectionSortMapOpts as _ConnectionSortMapOpts } from 'graphql-compose-connection';
-import type { Resolver, TypeComposer } from 'graphql-compose';
+import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import {
   getUniqueIndexes,
   extendByReversedIndexes,
@@ -12,11 +12,11 @@ import {
 
 export type ConnectionSortMapOpts = _ConnectionSortMapOpts;
 
-export default function connection(
-  model: MongooseModel,
-  tc: TypeComposer,
+export default function connection<TSource: MongooseDocument, TContext>(
+  model: Class<TSource>, // === MongooseModel
+  tc: ObjectTypeComposer<TSource, TContext>,
   opts?: ConnectionSortMapOpts
-): ?Resolver {
+): ?Resolver<TSource, TContext> {
   try {
     require.resolve('graphql-compose-connection');
   } catch (e) {

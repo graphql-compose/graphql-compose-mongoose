@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import { Resolver, TypeComposer, schemaComposer } from 'graphql-compose';
+import { Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import createOne from '../createOne';
@@ -120,19 +120,19 @@ describe('createOne() ->', () => {
 
     it('should have recordId field', () => {
       const outputType: any = createOne(UserModel, UserTC).getType();
-      const recordIdField = new TypeComposer(outputType).getFieldConfig('recordId');
+      const recordIdField = schemaComposer.createObjectTC(outputType).getFieldConfig('recordId');
       expect(recordIdField.type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType: any = createOne(UserModel, UserTC).getType();
-      const recordField = new TypeComposer(outputType).getFieldConfig('record');
+      const recordField = schemaComposer.createObjectTC(outputType).getFieldConfig('record');
       expect(recordField.type).toBe(UserTC.getType());
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `CreateOne${UserTC.getTypeName()}Payload`;
-      const existedType = TypeComposer.create(outputTypeName);
+      const existedType = schemaComposer.createObjectTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = createOne(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

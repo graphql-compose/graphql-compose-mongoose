@@ -1,14 +1,14 @@
 /* @flow */
 
-import type { TypeComposer, Resolver } from 'graphql-compose';
+import type { ObjectTypeComposer, Resolver } from 'graphql-compose';
 import { graphql } from 'graphql-compose';
-import type { MongooseModel } from 'mongoose';
+import type { MongooseModel, MongooseDocument } from 'mongoose';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 async function createSingle(
   model: MongooseModel,
-  tc: TypeComposer,
+  tc: ObjectTypeComposer<any, any>,
   recordData: any,
   resolveParams: ExtendedResolveParams
 ) {
@@ -22,17 +22,19 @@ async function createSingle(
   return doc.save();
 }
 
-export default function createMany(
-  model: MongooseModel,
-  tc: TypeComposer,
+export default function createMany<TSource: MongooseDocument, TContext>(
+  model: Class<TSource>, // === MongooseModel
+  tc: ObjectTypeComposer<TSource, TContext>,
   opts?: GenResolverOpts
-): Resolver {
+): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createMany() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'TypeComposer') {
-    throw new Error('Second arg for Resolver createMany() should be instance of TypeComposer.');
+  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+    throw new Error(
+      'Second arg for Resolver createMany() should be instance of ObjectTypeComposer.'
+    );
   }
 
   const tree = model.schema.obj;
@@ -47,7 +49,7 @@ export default function createMany(
   }
 
   const outputTypeName = `CreateMany${tc.getTypeName()}Payload`;
-  const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
     t.addFields({
       recordIds: {
         type: '[MongoID]!',
@@ -64,7 +66,7 @@ export default function createMany(
     });
   });
 
-  const resolver = new tc.constructor.schemaComposer.Resolver({
+  const resolver = tc.schemaComposer.createResolver({
     name: 'createMany',
     kind: 'mutation',
     description: 'Creates Many documents with mongoose defaults, setters, hooks and validation',

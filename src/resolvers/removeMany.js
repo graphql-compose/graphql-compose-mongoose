@@ -1,26 +1,28 @@
 /* @flow */
 /* eslint-disable no-param-reassign */
 
-import type { Resolver, TypeComposer } from 'graphql-compose';
-import type { MongooseModel } from 'mongoose';
+import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { MongooseDocument } from 'mongoose';
 import { filterHelperArgs, filterHelper } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
-export default function removeMany(
-  model: MongooseModel,
-  tc: TypeComposer,
+export default function removeMany<TSource: MongooseDocument, TContext>(
+  model: Class<TSource>, // === MongooseModel
+  tc: ObjectTypeComposer<TSource, TContext>,
   opts?: GenResolverOpts
-): Resolver {
+): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeMany() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'TypeComposer') {
-    throw new Error('Second arg for Resolver removeMany() should be instance of TypeComposer.');
+  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+    throw new Error(
+      'Second arg for Resolver removeMany() should be instance of ObjectTypeComposer.'
+    );
   }
 
   const outputTypeName = `RemoveMany${tc.getTypeName()}Payload`;
-  const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
     t.addFields({
       numAffected: {
         type: 'Int',
@@ -29,7 +31,7 @@ export default function removeMany(
     });
   });
 
-  const resolver = new tc.constructor.schemaComposer.Resolver({
+  const resolver = tc.schemaComposer.createResolver({
     name: 'removeMany',
     kind: 'mutation',
     description:
@@ -56,7 +58,13 @@ export default function removeMany(
 
       resolveParams.query = model.find();
       filterHelper(resolveParams);
-      resolveParams.query = resolveParams.query.remove();
+
+      if (resolveParams.query.deleteMany) {
+        resolveParams.query = resolveParams.query.deleteMany();
+      } else {
+        // old mongoose
+        resolveParams.query = resolveParams.query.remove();
+      }
 
       let res;
 

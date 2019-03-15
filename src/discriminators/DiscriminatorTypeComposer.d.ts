@@ -6,7 +6,7 @@ import {
   InterfaceTypeComposer,
   RelationOpts,
   SchemaComposer,
-  TypeComposer,
+  ObjectTypeComposer,
 } from 'graphql-compose';
 import { Document, Model } from 'mongoose';
 import { TypeConverterOpts } from '../composeWithMongoose';
@@ -20,7 +20,7 @@ export type DiscriminatorOptions<TContext = any> = TypeConverterOpts<
 export class DiscriminatorTypeComposer<
   TBaseModel extends Document,
   TContext
-> extends TypeComposer<TBaseModel, TContext> {
+> extends ObjectTypeComposer<TBaseModel, TContext> {
   public static schemaComposer: SchemaComposer<any>;
 
   private discriminatorKey: string;
@@ -31,7 +31,7 @@ export class DiscriminatorTypeComposer<
 
   private DInterface: InterfaceTypeComposer<any>;
 
-  private childTCs: Array<TypeComposer<any>>;
+  private childTCs: Array<ObjectTypeComposer<any>>;
 
   public static createFromModel<TBModel extends Document, TCtx>(
     baseModel: Model<TBModel>,
@@ -52,10 +52,10 @@ export class DiscriminatorTypeComposer<
   public discriminator<TChildModel extends TBaseModel>(
     childModel: Model<TChildModel>,
     opts?: TypeConverterOpts<TContext>,
-  ): TypeComposer<TChildModel, TContext>;
+  ): ObjectTypeComposer<TChildModel, TContext>;
 
   // ------------------------------------------------
-  // TypeComposer Overridden methods
+  // ObjectTypeComposer Overridden methods
   // ------------------------------------------------
   public setField(
     fieldName: string,
@@ -69,8 +69,8 @@ export class DiscriminatorTypeComposer<
 
   public setFields(fields: ComposeFieldConfigMap<TBaseModel, TContext>): this;
 
-  public setFields<TArgsMap>(
-    fields: ComposeFieldConfigMap<TBaseModel, TContext, TArgsMap>,
+  public setFields(
+    fields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
   // discriminators must have all interface fields
@@ -78,16 +78,16 @@ export class DiscriminatorTypeComposer<
     newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
-  public addFields<TArgsMap>(
-    newFields: ComposeFieldConfigMap<TBaseModel, TContext, TArgsMap>,
+  public addFields(
+    newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
   public addNestedFields(
     newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
-  public addNestedFields<TArgsMap>(
-    newFields: ComposeFieldConfigMap<TBaseModel, TContext, TArgsMap>,
+  public addNestedFields(
+    newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
   public removeField(fieldNameOrArray: string | string[]): this;

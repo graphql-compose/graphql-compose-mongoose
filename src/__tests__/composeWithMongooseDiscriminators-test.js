@@ -1,6 +1,6 @@
 /* @flow */
 
-import { InputTypeComposer, schemaComposer, TypeComposer } from 'graphql-compose';
+import { schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { getCharacterModels } from '../discriminators/__mocks__/characterModels';
 import { MovieModel } from '../discriminators/__mocks__/movieModel';
 import { composeWithMongooseDiscriminators } from '../composeWithMongooseDiscriminators';
@@ -23,10 +23,10 @@ describe('composeWithMongooseDiscriminators ->', () => {
       );
     });
 
-    it('should return a TypeComposer as childTC on discriminator() call', () => {
+    it('should return a ObjectTypeComposer as childTC on discriminator() call', () => {
       expect(
         composeWithMongooseDiscriminators(CharacterModel).discriminator(PersonModel)
-      ).toBeInstanceOf(TypeComposer);
+      ).toBeInstanceOf(ObjectTypeComposer);
     });
   });
 
@@ -40,7 +40,7 @@ describe('composeWithMongooseDiscriminators ->', () => {
         },
       });
       const filterArgInFindOne: any = typeComposer.getResolver('findOne').getArg('filter');
-      const inputComposer = new InputTypeComposer(filterArgInFindOne.type);
+      const inputComposer = schemaComposer.createInputTC(filterArgInFindOne.type);
       expect(inputComposer.isRequired('kind')).toBe(true);
     });
 

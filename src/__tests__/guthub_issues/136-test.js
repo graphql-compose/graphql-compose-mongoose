@@ -42,7 +42,7 @@ describe('issue #136 - Mongoose virtuals', () => {
 
     return updateManyFiltered
       .wrapResolve(next => async rp => {
-        console.log(rp.args);
+        console.log(rp.args); // eslint-disable-line
         return next(rp);
       })
       .debug();

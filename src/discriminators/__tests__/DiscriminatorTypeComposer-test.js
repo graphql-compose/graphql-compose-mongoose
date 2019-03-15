@@ -4,7 +4,7 @@ import {
   SchemaComposer,
   schemaComposer,
   graphql,
-  TypeComposer,
+  ObjectTypeComposer,
   InterfaceTypeComposer,
 } from 'graphql-compose';
 import { getCharacterModels } from '../__mocks__/characterModels';
@@ -485,9 +485,9 @@ describe('DiscriminatorTypeComposer', () => {
       characterDTC = composeWithMongooseDiscriminators(CharacterModel);
     });
 
-    it('should return an instance of TypeComposer as childTC', () => {
-      expect(characterDTC.discriminator(PersonModel)).toBeInstanceOf(TypeComposer);
-      expect(characterDTC.discriminator(DroidModel)).toBeInstanceOf(TypeComposer);
+    it('should return an instance of ObjectTypeComposer as childTC', () => {
+      expect(characterDTC.discriminator(PersonModel)).toBeInstanceOf(ObjectTypeComposer);
+      expect(characterDTC.discriminator(DroidModel)).toBeInstanceOf(ObjectTypeComposer);
     });
 
     it('should register childTC in childTC(childTCs) array', () => {

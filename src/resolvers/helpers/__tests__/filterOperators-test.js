@@ -9,11 +9,11 @@ import {
 } from '../filterOperators';
 import { UserModel } from '../../../__mocks__/userModel';
 
-let itc: InputTypeComposer;
+let itc: InputTypeComposer<any>;
 
 beforeEach(() => {
   schemaComposer.clear();
-  itc = InputTypeComposer.create({
+  itc = schemaComposer.createInputTC({
     name: 'UserFilterInput',
     fields: {
       _id: 'String',
@@ -56,7 +56,7 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should reuse existed operatorsType', () => {
-      const existedITC = itc.constructor.schemaComposer.getOrCreateITC('ExistedType');
+      const existedITC = itc.schemaComposer.getOrCreateITC('ExistedType');
       _createOperatorsField(itc, 'ExistedType', UserModel, {});
       expect(itc.getFieldType(OPERATORS_FIELDNAME)).toBe(existedITC.getType());
     });

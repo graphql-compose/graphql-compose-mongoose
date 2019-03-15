@@ -1,4 +1,4 @@
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import { Document, Model } from 'mongoose';
 import { MongoId } from '../types/mongoid';
 import {
@@ -15,7 +15,7 @@ export default function findMany<
   TArgs = any
 >(
   model: Model<TSource>,
-  tc: TypeComposer<TSource>,
+  tc: ObjectTypeComposer<TSource>,
   opts?: GenResolverOpts,
 ): Resolver<TSource, TContext, TArgs>;
 

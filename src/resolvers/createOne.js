@@ -1,22 +1,24 @@
 /* @flow */
 /* eslint-disable no-param-reassign, new-cap */
 
-import type { Resolver, TypeComposer } from 'graphql-compose';
-import type { MongooseModel } from 'mongoose';
+import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { MongooseDocument } from 'mongoose';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
-export default function createOne(
-  model: MongooseModel,
-  tc: TypeComposer,
+export default function createOne<TSource: MongooseDocument, TContext>(
+  model: Class<TSource>, // === MongooseModel
+  tc: ObjectTypeComposer<TSource, TContext>,
   opts?: GenResolverOpts
-): Resolver {
+): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createOne() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'TypeComposer') {
-    throw new Error('Second arg for Resolver createOne() should be instance of TypeComposer.');
+  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+    throw new Error(
+      'Second arg for Resolver createOne() should be instance of ObjectTypeComposer.'
+    );
   }
 
   const tree = model.schema.obj;
@@ -31,7 +33,7 @@ export default function createOne(
   }
 
   const outputTypeName = `CreateOne${tc.getTypeName()}Payload`;
-  const outputType = tc.constructor.schemaComposer.getOrCreateTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
     t.addFields({
       recordId: {
         type: 'MongoID',
@@ -44,7 +46,7 @@ export default function createOne(
     });
   });
 
-  const resolver = new tc.constructor.schemaComposer.Resolver({
+  const resolver = tc.schemaComposer.createResolver({
     name: 'createOne',
     kind: 'mutation',
     description: 'Create one document with mongoose defaults, setters, hooks and validation',

@@ -1,13 +1,13 @@
 /* @flow */
 
-import { EnumTypeComposer, schemaComposer, type TypeComposer } from 'graphql-compose';
+import { EnumTypeComposer, schemaComposer, type ObjectTypeComposer } from 'graphql-compose';
 import { sortHelperArgs, sortHelper, getSortTypeFromModel } from '../sort';
 import { UserModel } from '../../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../../fieldsConverter';
 import { getIndexesFromModel } from '../../../utils';
 
 describe('Resolver helper `sort` ->', () => {
-  let UserTC: TypeComposer;
+  let UserTC: ObjectTypeComposer<any, any>;
 
   beforeEach(() => {
     schemaComposer.clear();
@@ -52,11 +52,11 @@ describe('Resolver helper `sort` ->', () => {
   });
 
   describe('sortHelperArgs()', () => {
-    it('should throw error if first arg is not TypeComposer', () => {
+    it('should throw error if first arg is not ObjectTypeComposer', () => {
       expect(() => {
         const wrongArgs: any = [{}];
         sortHelperArgs(...wrongArgs);
-      }).toThrowError('should be instance of TypeComposer');
+      }).toThrowError('should be instance of ObjectTypeComposer');
     });
 
     it('should throw error if second arg is not Mongoose model', () => {

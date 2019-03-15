@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-expressions */
 
 import mongoose from 'mongoose';
-import { TypeComposer, InputTypeComposer, schemaComposer } from 'graphql-compose';
+import { ObjectTypeComposer, InputTypeComposer, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../__mocks__/userModel';
 import { composeWithMongoose } from '../composeWithMongoose';
@@ -18,9 +18,9 @@ describe('composeWithMongoose ->', () => {
 
   describe('MongooseModelToTypeComposer()', () => {
     describe('basics', () => {
-      it('should return TypeComposer', () => {
-        expect(composeWithMongoose(UserModel)).toBeInstanceOf(TypeComposer);
-        expect(composeWithMongoose(UserModel, { name: 'Ok' })).toBeInstanceOf(TypeComposer);
+      it('should return ObjectTypeComposer', () => {
+        expect(composeWithMongoose(UserModel)).toBeInstanceOf(ObjectTypeComposer);
+        expect(composeWithMongoose(UserModel, { name: 'Ok' })).toBeInstanceOf(ObjectTypeComposer);
       });
 
       it('should set type name from model or opts.name', () => {
@@ -48,7 +48,7 @@ describe('composeWithMongoose ->', () => {
         expect(tc.getFieldType('_id').ofType).toBe(GraphQLMongoID);
       });
 
-      it('composeWithMongoose should generate new TypeComposer (without cache)', () => {
+      it('composeWithMongoose should generate new ObjectTypeComposer (without cache)', () => {
         const tc1: any = composeWithMongoose(UserModel);
         schemaComposer.clear();
         const tc2: any = composeWithMongoose(UserModel);
@@ -209,8 +209,8 @@ describe('composeWithMongoose ->', () => {
         },
       });
       const filterArgInFindOne: any = typeComposer.getResolver('findOne').getArg('filter');
-      const inputConposer = new InputTypeComposer(filterArgInFindOne.type);
-      expect(inputConposer.isRequired('age')).toBe(true);
+      const itc = schemaComposer.createInputTC(filterArgInFindOne.type);
+      expect(itc.isRequired('age')).toBe(true);
     });
 
     it('should use cached type to avoid maximum call stack size exceeded', () => {

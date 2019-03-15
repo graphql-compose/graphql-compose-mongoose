@@ -1,7 +1,7 @@
 import {
   EnumTypeComposer,
   SchemaComposer,
-  TypeComposer,
+  ObjectTypeComposer,
 } from 'graphql-compose';
 import { GraphQLScalarType } from 'graphql-compose/lib/graphql';
 import { Model, Schema } from 'mongoose';
@@ -13,10 +13,10 @@ type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
 type ComposeScalarType = string | GraphQLScalarType;
 
 type ComposeOutputType =
-  | TypeComposer<any>
+  | ObjectTypeComposer<any>
   | ComposeScalarType
   | EnumTypeComposer
-  | [TypeComposer<any> | ComposeScalarType | EnumTypeComposer];
+  | [ObjectTypeComposer<any> | ComposeScalarType | EnumTypeComposer];
 
 export type MongoosePseudoModelT = {
   schema: Schema;
@@ -43,14 +43,14 @@ export function getFieldsFromModel(
 export function convertModelToGraphQL(
   model: Model<any> | MongoosePseudoModelT,
   typeName: string,
-  sc?: SchemaComposer<any>,
-): TypeComposer<any>;
+  schemaComposer?: SchemaComposer<any>,
+): ObjectTypeComposer<any>;
 
 export function convertSchemaToGraphQL<TContext = any>(
   schema: Schema,
   typeName: string,
-  sc?: SchemaComposer<TContext>,
-): TypeComposer<any, TContext>;
+  schemaComposer?: SchemaComposer<TContext>,
+): ObjectTypeComposer<any, TContext>;
 
 export function convertFieldToGraphQL(
   field: MongooseFieldT,
@@ -74,7 +74,7 @@ export function embeddedToGraphQL(
   field: MongooseFieldT,
   prefix: string | undefined,
   schemaComposer: SchemaComposer<any>,
-): TypeComposer<any>;
+): ObjectTypeComposer<any>;
 
 export function enumToGraphQL(
   field: MongooseFieldT,
@@ -86,6 +86,6 @@ export function documentArrayToGraphQL(
   field: MongooseFieldT,
   prefix: string | undefined,
   schemaComposer: SchemaComposer<any>,
-): [TypeComposer<any>];
+): [ObjectTypeComposer<any>];
 
 export function referenceToGraphQL(field: MongooseFieldT): ComposeScalarType;

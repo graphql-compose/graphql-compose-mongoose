@@ -1,4 +1,4 @@
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
 import { MongoId } from '../types/mongoid';
 import { RecordHelperArgs } from './helpers';
@@ -12,6 +12,6 @@ export type CreateOneRSource<TSource> = {
 
 export default function createOne(
   model: Model<any>,
-  tc: TypeComposer<any>,
+  tc: ObjectTypeComposer<any>,
   opts?: GenResolverOpts,
 ): Resolver<any, any>;

@@ -58,7 +58,7 @@ describe('issue #78 - Mongoose and Discriminators', () => {
     await ClickedLinkEvent.create({ refId: 'ccc', url: 'url1' });
     await ClickedLinkEvent.create({ refId: 'ddd', url: 'url2' });
 
-    schemaComposer.rootQuery().addFields({
+    schemaComposer.Query.addFields({
       eventFindMany: EventTC.getResolver('findMany'),
     });
     const schema = schemaComposer.buildSchema();

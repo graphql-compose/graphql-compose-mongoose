@@ -1,6 +1,6 @@
 /* @flow */
 
-import { InputTypeComposer, schemaComposer, type TypeComposer } from 'graphql-compose';
+import { schemaComposer, type ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLInputObjectType, GraphQLNonNull, GraphQLList } from 'graphql-compose/lib/graphql';
 import { filterHelperArgs, filterHelper } from '../filter';
 import { OPERATORS_FIELDNAME } from '../filterOperators';
@@ -9,7 +9,7 @@ import { UserModel } from '../../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../../fieldsConverter';
 
 describe('Resolver helper `filter` ->', () => {
-  let UserTC: TypeComposer;
+  let UserTC: ObjectTypeComposer<any, any>;
 
   beforeEach(() => {
     schemaComposer.clear();
@@ -17,11 +17,11 @@ describe('Resolver helper `filter` ->', () => {
   });
 
   describe('filterHelperArgs()', () => {
-    it('should throw error if first arg is not TypeComposer', () => {
+    it('should throw error if first arg is not ObjectTypeComposer', () => {
       expect(() => {
         const wrongArgs: any = [{}];
         filterHelperArgs(...wrongArgs);
-      }).toThrowError('should be instance of TypeComposer');
+      }).toThrowError('should be instance of ObjectTypeComposer');
     });
 
     it('should throw error if second arg is not MongooseModel', () => {
@@ -48,7 +48,7 @@ describe('Resolver helper `filter` ->', () => {
       const args: any = filterHelperArgs(UserTC, UserModel, {
         filterTypeName: 'FilterUserType',
       });
-      const itc = new InputTypeComposer(args.filter.type);
+      const itc = schemaComposer.createInputTC(args.filter.type);
       const ft: any = itc.getFieldType('_ids');
       expect(ft).toBeInstanceOf(GraphQLList);
       expect(ft.ofType).toBe(GraphQLMongoID);
@@ -67,7 +67,7 @@ describe('Resolver helper `filter` ->', () => {
         filterTypeName: 'FilterUserType',
         removeFields: ['name', 'age'],
       });
-      const itc = new InputTypeComposer(args.filter.type);
+      const itc = schemaComposer.createInputTC(args.filter.type);
       expect(itc.hasField('name')).toBe(false);
       expect(itc.hasField('age')).toBe(false);
       expect(itc.hasField('gender')).toBe(true);
@@ -78,7 +78,7 @@ describe('Resolver helper `filter` ->', () => {
         filterTypeName: 'FilterUserType',
         requiredFields: ['name', 'age'],
       });
-      const itc = new InputTypeComposer(args.filter.type);
+      const itc = schemaComposer.createInputTC(args.filter.type);
       expect(itc.getFieldType('name')).toBeInstanceOf(GraphQLNonNull);
       expect(itc.getFieldType('age')).toBeInstanceOf(GraphQLNonNull);
       expect(itc.getFieldType('gender')).not.toBeInstanceOf(GraphQLNonNull);
@@ -90,7 +90,7 @@ describe('Resolver helper `filter` ->', () => {
         onlyIndexed: true,
         model: UserModel,
       });
-      const itc = new InputTypeComposer(args.filter.type);
+      const itc = schemaComposer.createInputTC(args.filter.type);
       expect(itc.hasField('_id')).toBe(true);
       expect(itc.hasField('name')).toBe(true);
       expect(itc.hasField('age')).toBe(false);
@@ -104,7 +104,7 @@ describe('Resolver helper `filter` ->', () => {
         model: UserModel,
         removeFields: ['name'],
       });
-      const itc = new InputTypeComposer(args.filter.type);
+      const itc = schemaComposer.createInputTC(args.filter.type);
       expect(itc.hasField('_id')).toBe(true);
       expect(itc.hasField('name')).toBe(false);
       expect(itc.hasField('age')).toBe(false);
