@@ -2,6 +2,7 @@
   "name": "graphql-compose-mongoose",
   "version": "0.0.0-semantically-released",
   "description": "Plugin for `graphql-compose` which derive a graphql types from a mongoose model.",
+  "license": "MIT",
   "files": [
     "lib",
     "node8",
@@ -22,7 +23,6 @@
     "mongoose",
     "mongodb"
   ],
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/graphql-compose/graphql-compose-mongoose/issues"
   },
