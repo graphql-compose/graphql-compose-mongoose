@@ -196,21 +196,21 @@ describe('updateById() ->', () => {
 
     it('should have recordId field', () => {
       const outputType: any = updateById(UserModel, UserTC).getType();
-      const typeComposer = schemaComposer.createOutputTC(outputType);
+      const typeComposer = schemaComposer.createObjectTC(outputType);
       expect(typeComposer.hasField('recordId')).toBe(true);
       expect(typeComposer.getFieldType('recordId')).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType: any = updateById(UserModel, UserTC).getType();
-      const typeComposer = schemaComposer.createOutputTC(outputType);
+      const typeComposer = schemaComposer.createObjectTC(outputType);
       expect(typeComposer.hasField('record')).toBe(true);
       expect(typeComposer.getFieldType('record')).toBe(UserTC.getType());
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `UpdateById${UserTC.getTypeName()}Payload`;
-      const existedType = schemaComposer.createOutputTC(outputTypeName);
+      const existedType = schemaComposer.createObjectTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = updateById(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

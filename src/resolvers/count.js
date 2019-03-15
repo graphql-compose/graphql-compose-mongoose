@@ -19,7 +19,7 @@ export default function count<TSource: MongooseDocument, TContext>(
     throw new Error('Second arg for Resolver count() should be instance of ObjectTypeComposer.');
   }
 
-  return tc.sc.createResolver({
+  return tc.schemaComposer.createResolver({
     type: 'Int',
     name: 'count',
     kind: 'query',

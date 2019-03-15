@@ -43,13 +43,13 @@ export function getFieldsFromModel(
 export function convertModelToGraphQL(
   model: Model<any> | MongoosePseudoModelT,
   typeName: string,
-  sc?: SchemaComposer<any>,
+  schemaComposer?: SchemaComposer<any>,
 ): ObjectTypeComposer<any>;
 
 export function convertSchemaToGraphQL<TContext = any>(
   schema: Schema,
   typeName: string,
-  sc?: SchemaComposer<TContext>,
+  schemaComposer?: SchemaComposer<TContext>,
 ): ObjectTypeComposer<any, TContext>;
 
 export function convertFieldToGraphQL(

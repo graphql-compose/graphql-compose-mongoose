@@ -49,7 +49,7 @@ export default function createMany<TSource: MongooseDocument, TContext>(
   }
 
   const outputTypeName = `CreateMany${tc.getTypeName()}Payload`;
-  const outputType = tc.sc.getOrCreateOTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
     t.addFields({
       recordIds: {
         type: '[MongoID]!',
@@ -66,7 +66,7 @@ export default function createMany<TSource: MongooseDocument, TContext>(
     });
   });
 
-  const resolver = tc.sc.createResolver({
+  const resolver = tc.schemaComposer.createResolver({
     name: 'createMany',
     kind: 'mutation',
     description: 'Creates Many documents with mongoose defaults, setters, hooks and validation',

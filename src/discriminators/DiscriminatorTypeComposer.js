@@ -2,7 +2,7 @@
 
 import {
   EnumTypeComposer,
-  schemaComposer,
+  schemaComposer as globalSchemaComposer,
   SchemaComposer,
   ObjectTypeComposer,
   type InterfaceTypeComposer,
@@ -11,7 +11,7 @@ import {
   type GetRecordIdFn,
   type ComposeFieldConfigMap,
 } from 'graphql-compose';
-import type { ComposePartialFieldConfigAsObject } from 'graphql-compose/lib/ObjectTypeComposer';
+import type { ComposeFieldConfigAsObject } from 'graphql-compose/lib/ObjectTypeComposer';
 import type { Model } from 'mongoose';
 import { composeWithMongoose, type TypeConverterOpts } from '../composeWithMongoose';
 import { composeChildTC } from './composeChildTC';
@@ -49,7 +49,7 @@ function createAndSetDKeyETC(
   dTC: DiscriminatorTypeComposer<any, any>,
   discriminators: Discriminators
 ) {
-  const DKeyETC = dTC.sc.createEnumTC({
+  const DKeyETC = dTC.schemaComposer.createEnumTC({
     name: `EnumDKey${dTC.getTypeName()}${dTC.getDKey()[0].toUpperCase() + dTC.getDKey().substr(1)}`,
     values: setDKeyETCValues(discriminators),
   });
@@ -73,7 +73,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 > {
   discriminatorKey: string;
 
-  DKeyETC: EnumTypeComposer;
+  DKeyETC: EnumTypeComposer<TContext>;
 
   opts: DiscriminatorOptions;
 
@@ -82,32 +82,32 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   childTCs: ObjectTypeComposer<any, TContext>[];
 
   static _getClassConnectedWithSchemaComposer(
-    sc?: SchemaComposer<TContext>
+    schemaComposer?: SchemaComposer<TContext>
   ): Class<DiscriminatorTypeComposer<TSource, TContext>> {
     class _DiscriminatorTypeComposer extends DiscriminatorTypeComposer<TSource, TContext> {
-      static schemaComposer = sc || schemaComposer;
+      static schemaComposer = schemaComposer || globalSchemaComposer;
     }
 
     return _DiscriminatorTypeComposer;
   }
 
   /* ::
-  constructor(gqType: any, sc: SchemaComposer<TContext>): DiscriminatorTypeComposer<TSource, TContext> {
-    super(gqType, sc);
+  constructor(gqType: any, schemaComposer: SchemaComposer<TContext>): DiscriminatorTypeComposer<TSource, TContext> {
+    super(gqType, schemaComposer);
     return this;
   }
   */
 
   static createFromModel(
     baseModel: Class<Model>,
-    sc: SchemaComposer<TContext>,
+    schemaComposer: SchemaComposer<TContext>,
     opts?: any
   ): DiscriminatorTypeComposer<TSource, TContext> {
     if (!baseModel || !(baseModel: any).discriminators) {
       throw Error('Discriminator Key not Set, Use composeWithMongoose for Normal Collections');
     }
 
-    if (!(sc instanceof SchemaComposer)) {
+    if (!(schemaComposer instanceof SchemaComposer)) {
       throw Error(
         'DiscriminatorTC.createFromModel() should recieve SchemaComposer in second argument'
       );
@@ -116,7 +116,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     // eslint-disable-next-line
     opts = {
       reorderFields: true,
-      schemaComposer: sc,
+      schemaComposer,
       ...opts,
     };
 
@@ -125,7 +125,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     const _DiscriminatorTypeComposer = this._getClassConnectedWithSchemaComposer(
       opts.schemaComposer
     );
-    const baseDTC = new _DiscriminatorTypeComposer(baseTC.getType(), sc);
+    const baseDTC = new _DiscriminatorTypeComposer(baseTC.getType(), schemaComposer);
 
     baseDTC.opts = opts;
     baseDTC.childTCs = [];
@@ -139,7 +139,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     baseDTC.DInterface = baseDTC._createDInterface(baseDTC);
     baseDTC.setInterfaces([baseDTC.DInterface]);
 
-    baseDTC.sc.addSchemaMustHaveType(baseDTC);
+    baseDTC.schemaComposer.addSchemaMustHaveType(baseDTC);
 
     // prepare Base Resolvers
     prepareBaseResolvers(baseDTC);
@@ -150,18 +150,18 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   _createDInterface(
     baseTC: DiscriminatorTypeComposer<any, any>
   ): InterfaceTypeComposer<TSource, TContext> {
-    return this.sc.createInterfaceTC({
+    return this.schemaComposer.createInterfaceTC({
       name: `${baseTC.getTypeName()}Interface`,
 
       resolveType: (value: any) => {
         const childDName = value[baseTC.getDKey()];
 
         if (childDName) {
-          return baseTC.sc.getOTC(childDName).getType();
+          return baseTC.schemaComposer.getOTC(childDName).getType();
         }
 
         // as fallback return BaseModelTC
-        return baseTC.sc.getOTC(baseTC.getTypeName()).getType();
+        return baseTC.schemaComposer.getOTC(baseTC.getTypeName()).getType();
       },
       fields: (): ComposeFieldConfigMap<any, TContext> => {
         const baseFields = baseTC.getFieldNames();
@@ -178,7 +178,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     return this.discriminatorKey;
   }
 
-  getDKeyETC(): EnumTypeComposer {
+  getDKeyETC(): EnumTypeComposer<TContext> {
     return this.DKeyETC;
   }
 
@@ -275,7 +275,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 
   extendField(
     fieldName: string,
-    partialFieldConfig: ComposePartialFieldConfigAsObject<any, TContext>
+    partialFieldConfig: $Shape<ComposeFieldConfigAsObject<any, TContext>>
   ): this {
     super.extendField(fieldName, partialFieldConfig);
 
@@ -338,7 +338,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   // NOTE, those relations will be propagated to the childTypeComposers and you can use normally.
   addRelation(
     fieldName: string,
-    relationOpts: RelationOpts<any, any>
+    relationOpts: RelationOpts<any, any, any>
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.addRelation(fieldName, relationOpts);
 
@@ -370,7 +370,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 
     childTC = composeChildTC(this, childTC, this.opts);
 
-    this.sc.addSchemaMustHaveType(childTC);
+    this.schemaComposer.addSchemaMustHaveType(childTC);
     this.childTCs.push(childTC);
 
     return childTC;

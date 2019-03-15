@@ -32,7 +32,7 @@ export const sortHelperArgs = (
     throw new Error('You should provide non-empty `sortTypeName` in options for sortHelperArgs().');
   }
 
-  const gqSortType = getSortTypeFromModel(opts.sortTypeName, model, tc.sc);
+  const gqSortType = getSortTypeFromModel(opts.sortTypeName, model, tc.schemaComposer);
 
   return {
     sort: {
@@ -48,11 +48,11 @@ export function sortHelper(resolveParams: ExtendedResolveParams): void {
   }
 }
 
-export function getSortTypeFromModel(
+export function getSortTypeFromModel<TContext>(
   typeName: string,
   model: MongooseModel,
-  schemaComposer: SchemaComposer<any>
-): EnumTypeComposer {
+  schemaComposer: SchemaComposer<TContext>
+): EnumTypeComposer<TContext> {
   return schemaComposer.getOrCreateETC(typeName, etc => {
     const indexes = extendByReversedIndexes(getIndexesFromModel(model));
     const fields = {};

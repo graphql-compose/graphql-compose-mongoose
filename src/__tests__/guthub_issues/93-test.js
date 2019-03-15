@@ -11,13 +11,13 @@ beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 const UserTC = composeWithMongoose(UserModel);
-schemaComposer.rootQuery().addFields({
+schemaComposer.Query.addFields({
   users: UserTC.getResolver('findMany'),
 });
 
 describe('issue #93', () => {
   it('$or, $and operator for filtering', async () => {
-    schemaComposer.rootQuery().addFields({
+    schemaComposer.Query.addFields({
       users: UserTC.getResolver('findMany'),
     });
     const schema = schemaComposer.buildSchema();

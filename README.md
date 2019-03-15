@@ -485,7 +485,7 @@ UserTC.addResolver({
 })
 
 // Then add 'pushToArray' as a graphql field e.g.
-schemaComposer.rootMutation().addFields({userPushToArray: UserTC.getResolver('pushToArray')})
+schemaComposer.Mutation.addFields({userPushToArray: UserTC.getResolver('pushToArray')})
 ```
 
 `User` is the corresponding Mongoose model. If you do not wish to allow duplicates in the array then replace `$push` with `$addToSet`. Read the graphql-compose docs on custom resolvers for more info: https://graphql-compose.github.io/docs/en/basics-resolvers.html

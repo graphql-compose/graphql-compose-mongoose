@@ -11,7 +11,7 @@ beforeAll(() => UserModel.base.connect());
 afterAll(() => UserModel.base.disconnect());
 
 const UserTC = composeWithMongoose(UserModel);
-schemaComposer.rootQuery().addFields({
+schemaComposer.Query.addFields({
   users: UserTC.getResolver('findMany'),
 });
 
@@ -22,7 +22,7 @@ describe('issue #92 - How to verify the fields?', () => {
     return next(rp);
   });
 
-  schemaComposer.rootMutation().addFields({
+  schemaComposer.Mutation.addFields({
     addUser: UserTC.getResolver('createOne'),
   });
   const schema = schemaComposer.buildSchema();

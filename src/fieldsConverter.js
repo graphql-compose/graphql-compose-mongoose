@@ -116,22 +116,22 @@ export function getFieldsFromModel(model: MongooseModel | MongoosePseudoModelT):
 export function convertModelToGraphQL<TSource, TContext>(
   model: MongooseModel | MongoosePseudoModelT,
   typeName: string,
-  sc?: SchemaComposer<TContext>
+  schemaComposer?: SchemaComposer<TContext>
 ): ObjectTypeComposer<TSource, TContext> {
-  const schemaComposer = sc || globalSchemaComposer;
+  const sc = schemaComposer || globalSchemaComposer;
 
   if (!typeName) {
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
   }
 
   // if model already has generated ObjectTypeComposer early, then return it
-  if (schemaComposer.has(model.schema)) {
-    return schemaComposer.getOTC(model.schema);
+  if (sc.has(model.schema)) {
+    return sc.getOTC(model.schema);
   }
 
-  const typeComposer = schemaComposer.getOrCreateOTC(typeName);
-  schemaComposer.set(model.schema, typeComposer);
-  schemaComposer.set(typeName, typeComposer);
+  const typeComposer = sc.getOrCreateOTC(typeName);
+  sc.set(model.schema, typeComposer);
+  sc.set(typeName, typeComposer);
 
   const mongooseFields = getFieldsFromModel(model);
   const graphqlFields = {};
@@ -140,7 +140,7 @@ export function convertModelToGraphQL<TSource, TContext>(
     const mongooseField: MongooseFieldT = mongooseFields[fieldName];
 
     graphqlFields[fieldName] = {
-      type: convertFieldToGraphQL(mongooseField, typeName, schemaComposer),
+      type: convertFieldToGraphQL(mongooseField, typeName, sc),
       description: _getFieldDescription(mongooseField),
     };
 
@@ -166,23 +166,23 @@ export function convertModelToGraphQL<TSource, TContext>(
 export function convertSchemaToGraphQL(
   schema: Schema<any>,
   typeName: string,
-  sc?: SchemaComposer<any>
+  schemaComposer?: SchemaComposer<any>
 ): ObjectTypeComposer<any, any> {
-  const schemaComposer = sc || globalSchemaComposer;
+  const sc = schemaComposer || globalSchemaComposer;
 
   if (!typeName) {
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
   }
 
-  if (schemaComposer.has(schema)) {
-    return schemaComposer.getOTC(schema);
+  if (sc.has(schema)) {
+    return sc.getOTC(schema);
   }
 
-  const tc = convertModelToGraphQL({ schema }, typeName, schemaComposer);
+  const tc = convertModelToGraphQL({ schema }, typeName, sc);
   // also generate InputType
   tc.getInputTypeComposer();
 
-  schemaComposer.set(schema, tc);
+  sc.set(schema, tc);
   return tc;
 }
 
@@ -318,7 +318,7 @@ export function enumToGraphQL(
   field: MongooseFieldT,
   prefix?: string = '',
   schemaComposer: SchemaComposer<any>
-): EnumTypeComposer {
+): EnumTypeComposer<any> {
   const valueList = _getFieldEnums(field);
   if (!valueList) {
     throw new Error(

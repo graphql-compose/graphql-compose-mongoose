@@ -129,14 +129,14 @@ describe('removeMany() ->', () => {
     it('should have numAffected field', () => {
       const outputType: any = removeMany(UserModel, UserTC).getType();
       const numAffectedField = schemaComposer
-        .createOutputTC(outputType)
+        .createObjectTC(outputType)
         .getFieldConfig('numAffected');
       expect(numAffectedField.type).toBe(GraphQLInt);
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `RemoveMany${UserTC.getTypeName()}Payload`;
-      const existedType = schemaComposer.createOutputTC('outputTypeName');
+      const existedType = schemaComposer.createObjectTC('outputTypeName');
       schemaComposer.set(outputTypeName, existedType);
       const outputType = removeMany(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

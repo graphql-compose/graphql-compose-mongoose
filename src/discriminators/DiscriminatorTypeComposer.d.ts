@@ -69,8 +69,8 @@ export class DiscriminatorTypeComposer<
 
   public setFields(fields: ComposeFieldConfigMap<TBaseModel, TContext>): this;
 
-  public setFields<TArgsMap>(
-    fields: ComposeFieldConfigMap<TBaseModel, TContext, TArgsMap>,
+  public setFields(
+    fields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
   // discriminators must have all interface fields
@@ -78,16 +78,16 @@ export class DiscriminatorTypeComposer<
     newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
-  public addFields<TArgsMap>(
-    newFields: ComposeFieldConfigMap<TBaseModel, TContext, TArgsMap>,
+  public addFields(
+    newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
   public addNestedFields(
     newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
-  public addNestedFields<TArgsMap>(
-    newFields: ComposeFieldConfigMap<TBaseModel, TContext, TArgsMap>,
+  public addNestedFields(
+    newFields: ComposeFieldConfigMap<TBaseModel, TContext>,
   ): this;
 
   public removeField(fieldNameOrArray: string | string[]): this;

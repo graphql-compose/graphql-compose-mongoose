@@ -33,7 +33,7 @@ export default function createOne<TSource: MongooseDocument, TContext>(
   }
 
   const outputTypeName = `CreateOne${tc.getTypeName()}Payload`;
-  const outputType = tc.sc.getOrCreateOTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
     t.addFields({
       recordId: {
         type: 'MongoID',
@@ -46,7 +46,7 @@ export default function createOne<TSource: MongooseDocument, TContext>(
     });
   });
 
-  const resolver = tc.sc.createResolver({
+  const resolver = tc.schemaComposer.createResolver({
     name: 'createOne',
     kind: 'mutation',
     description: 'Create one document with mongoose defaults, setters, hooks and validation',

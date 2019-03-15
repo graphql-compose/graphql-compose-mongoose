@@ -27,7 +27,7 @@ export default function findOne<TSource: MongooseDocument, TContext>(
     throw new Error('Second arg for Resolver findOne() should be instance of ObjectTypeComposer.');
   }
 
-  return tc.sc.createResolver({
+  return tc.schemaComposer.createResolver({
     type: tc.getType(),
     name: 'findOne',
     kind: 'query',

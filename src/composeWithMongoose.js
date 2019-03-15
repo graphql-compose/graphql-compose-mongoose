@@ -2,7 +2,7 @@
 /* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
 import type { ObjectTypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
-import { schemaComposer } from 'graphql-compose';
+import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
@@ -122,7 +122,7 @@ export function composeWithMongoose<TSource, TContext>(
   const m: MongooseModel = (model: any);
   const name: string = (opts && opts.name) || m.modelName;
 
-  const sc = opts.schemaComposer || schemaComposer;
+  const sc = opts.schemaComposer || globalSchemaComposer;
   sc.set('MongoID', MongoID);
   const tc = convertModelToGraphQL((m: any), name, sc);
 
@@ -167,7 +167,7 @@ export function prepareFields(
 }
 
 export function prepareInputFields(
-  inputTypeComposer: InputTypeComposer,
+  inputTypeComposer: InputTypeComposer<any>,
   inputFieldsOpts: {
     only?: string[],
     remove?: string[],

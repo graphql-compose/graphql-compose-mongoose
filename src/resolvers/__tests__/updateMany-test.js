@@ -137,14 +137,14 @@ describe('updateMany() ->', () => {
     it('should have numAffected field', () => {
       const outputType: any = updateMany(UserModel, UserTC).getType();
       const numAffectedField = schemaComposer
-        .createOutputTC(outputType)
+        .createObjectTC(outputType)
         .getFieldConfig('numAffected');
       expect(numAffectedField.type).toBe(GraphQLInt);
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `UpdateMany${UserTC.getTypeName()}Payload`;
-      const existedType = schemaComposer.createOutputTC(outputTypeName);
+      const existedType = schemaComposer.createObjectTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = updateMany(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

@@ -220,19 +220,19 @@ describe('updateOne() ->', () => {
 
     it('should have recordId field', () => {
       const outputType: any = updateOne(UserModel, UserTC).getType();
-      const recordIdField = schemaComposer.createOutputTC(outputType).getFieldConfig('recordId');
+      const recordIdField = schemaComposer.createObjectTC(outputType).getFieldConfig('recordId');
       expect(recordIdField.type).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType: any = updateOne(UserModel, UserTC).getType();
-      const recordField = schemaComposer.createOutputTC(outputType).getFieldConfig('record');
+      const recordField = schemaComposer.createObjectTC(outputType).getFieldConfig('record');
       expect(recordField.type).toBe(UserTC.getType());
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `UpdateOne${UserTC.getTypeName()}Payload`;
-      const existedType = schemaComposer.createOutputTC(outputTypeName);
+      const existedType = schemaComposer.createObjectTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = updateOne(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

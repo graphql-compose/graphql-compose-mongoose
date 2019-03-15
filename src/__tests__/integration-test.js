@@ -16,7 +16,7 @@ describe('integration tests', () => {
   describe('check subdocuments', () => {
     it('should return null if subdocument is empty', async () => {
       const UserTC = composeWithMongoose(UserModel);
-      schemaComposer.rootQuery().addFields({
+      schemaComposer.Query.addFields({
         user: UserTC.getResolver('findById'),
       });
       const schema = schemaComposer.buildSchema();
@@ -54,7 +54,7 @@ describe('integration tests', () => {
       //     return source.field2;
       //   }
       // })
-      schemaComposer.rootQuery().addFields({
+      schemaComposer.Query.addFields({
         user: UserTC.getResolver('findById'),
       });
       const schema = schemaComposer.buildSchema();
@@ -106,7 +106,7 @@ describe('integration tests', () => {
       });
       await user.save();
 
-      schemaComposer.rootQuery().addFields({
+      schemaComposer.Query.addFields({
         user: UserTC.getResolver('findById'),
       });
       const schema = schemaComposer.buildSchema();
@@ -135,7 +135,7 @@ describe('integration tests', () => {
           projection: { '*': true },
         },
       });
-      schemaComposer.rootQuery().addFields({
+      schemaComposer.Query.addFields({
         user: UserTC.getResolver('findById'),
       });
       schema = schemaComposer.buildSchema();

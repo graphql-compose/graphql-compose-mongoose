@@ -29,7 +29,7 @@ export default function findMany<TSource: MongooseDocument, TContext>(
     throw new Error('Second arg for Resolver findMany() should be instance of ObjectTypeComposer.');
   }
 
-  return tc.sc.createResolver({
+  return tc.schemaComposer.createResolver({
     type: [tc],
     name: 'findMany',
     kind: 'query',

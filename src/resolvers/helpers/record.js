@@ -35,9 +35,9 @@ export const recordHelperArgs = (
   const recordTypeName: string = opts.recordTypeName;
 
   let recordITC;
-  const sc = tc.sc;
-  if (sc.hasInstance(recordTypeName, InputTypeComposer)) {
-    recordITC = sc.getITC(recordTypeName);
+  const schemaComposer = tc.schemaComposer;
+  if (schemaComposer.hasInstance(recordTypeName, InputTypeComposer)) {
+    recordITC = schemaComposer.getITC(recordTypeName);
   } else {
     recordITC = tc.getInputTypeComposer().clone(recordTypeName);
   }

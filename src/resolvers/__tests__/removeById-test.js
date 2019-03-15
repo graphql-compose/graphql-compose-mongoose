@@ -157,21 +157,21 @@ describe('removeById() ->', () => {
 
     it('should have recordId field', () => {
       const outputType: any = removeById(UserModel, UserTC).getType();
-      const typeComposer = schemaComposer.createOutputTC(outputType);
+      const typeComposer = schemaComposer.createObjectTC(outputType);
       expect(typeComposer.hasField('recordId')).toBe(true);
       expect(typeComposer.getFieldType('recordId')).toBe(GraphQLMongoID);
     });
 
     it('should have record field', () => {
       const outputType: any = removeById(UserModel, UserTC).getType();
-      const typeComposer = schemaComposer.createOutputTC(outputType);
+      const typeComposer = schemaComposer.createObjectTC(outputType);
       expect(typeComposer.hasField('record')).toBe(true);
       expect(typeComposer.getFieldType('record')).toBe(UserTC.getType());
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `RemoveById${UserTC.getTypeName()}Payload`;
-      const existedType = schemaComposer.createOutputTC(outputTypeName);
+      const existedType = schemaComposer.createObjectTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = removeById(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

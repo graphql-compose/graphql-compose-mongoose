@@ -18,7 +18,7 @@ export type FilterOperatorsOpts = {
 };
 
 export function addFilterOperators(
-  itc: InputTypeComposer,
+  itc: InputTypeComposer<any>,
   model: MongooseModel,
   opts: FilterHelperArgsOpts
 ) {
@@ -93,13 +93,13 @@ export function _prepareAndOrFilter(filter: Object, resolveParams?: ExtendedReso
   /* eslint-enable no-param-reassign */
 }
 
-export function _createOperatorsField(
-  itc: InputTypeComposer,
+export function _createOperatorsField<TContext>(
+  itc: InputTypeComposer<TContext>,
   typeName: string,
   model: MongooseModel,
   operatorsOpts: FilterOperatorsOpts
-): InputTypeComposer {
-  const operatorsITC = itc.sc.getOrCreateITC(typeName, tc => {
+): InputTypeComposer<TContext> {
+  const operatorsITC = itc.schemaComposer.getOrCreateITC(typeName, tc => {
     tc.setDescription('For performance reason this type contains only *indexed* fields.');
   });
 
@@ -143,7 +143,7 @@ export function _createOperatorsField(
       });
       if (Object.keys(fields).length > 0) {
         const operatorTypeName = `${upperFirst(fieldName)}${typeName}`;
-        const operatorITC = itc.sc.getOrCreateITC(operatorTypeName, tc => {
+        const operatorITC = itc.schemaComposer.getOrCreateITC(operatorTypeName, tc => {
           tc.setFields(fields);
         });
         operatorsITC.setField(fieldName, operatorITC);

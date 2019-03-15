@@ -193,25 +193,25 @@ describe('createMany() ->', () => {
 
     it('should have recordIds field, NonNull List', () => {
       const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordIdField = schemaComposer.createOutputTC(outputType).getFieldConfig('recordIds');
+      const recordIdField = schemaComposer.createObjectTC(outputType).getFieldConfig('recordIds');
       expect(recordIdField.type).toEqual(new GraphQLNonNull(GraphQLList(GraphQLMongoID)));
     });
 
     it('should have records field, NonNull List', () => {
       const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordField = schemaComposer.createOutputTC(outputType).getFieldConfig('records');
+      const recordField = schemaComposer.createObjectTC(outputType).getFieldConfig('records');
       expect(recordField.type).toEqual(new GraphQLNonNull(GraphQLList(UserTC.getType())));
     });
 
     it('should have createCount field, Int', () => {
       const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordField = schemaComposer.createOutputTC(outputType).getFieldConfig('createCount');
+      const recordField = schemaComposer.createObjectTC(outputType).getFieldConfig('createCount');
       expect(recordField.type).toEqual(new GraphQLNonNull(GraphQLInt));
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `CreateMany${UserTC.getTypeName()}Payload`;
-      const existedType = schemaComposer.createOutputTC(outputTypeName);
+      const existedType = schemaComposer.createObjectTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = createMany(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

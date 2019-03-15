@@ -18,7 +18,7 @@ export default function findById<TSource: MongooseDocument, TContext>(
     throw new Error('Second arg for Resolver findById() should be instance of ObjectTypeComposer.');
   }
 
-  return tc.sc.createResolver({
+  return tc.schemaComposer.createResolver({
     type: tc.getType(),
     name: 'findById',
     kind: 'query',

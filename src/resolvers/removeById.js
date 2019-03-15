@@ -24,7 +24,7 @@ export default function removeById<TSource: MongooseDocument, TContext>(
   const findByIdResolver = findById(model, tc);
 
   const outputTypeName = `RemoveById${tc.getTypeName()}Payload`;
-  const outputType = tc.sc.getOrCreateOTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
     t.addFields({
       recordId: {
         type: 'MongoID',
@@ -37,7 +37,7 @@ export default function removeById<TSource: MongooseDocument, TContext>(
     });
   });
 
-  const resolver = tc.sc.createResolver({
+  const resolver = tc.schemaComposer.createResolver({
     name: 'removeById',
     kind: 'mutation',
     description:
