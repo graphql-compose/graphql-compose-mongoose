@@ -2,28 +2,32 @@
 
 [![travis build](https://img.shields.io/travis/graphql-compose/graphql-compose-mongoose.svg)](https://travis-ci.org/graphql-compose/graphql-compose-mongoose)
 [![codecov coverage](https://img.shields.io/codecov/c/github/graphql-compose/graphql-compose-mongoose.svg)](https://codecov.io/github/graphql-compose/graphql-compose-mongoose)
-[![](https://img.shields.io/npm/v/graphql-compose-mongoose.svg)](https://www.npmjs.com/package/graphql-compose-mongoose)
-[![npm](https://img.shields.io/npm/dt/graphql-compose-mongoose.svg)](http://www.npmtrends.com/graphql-compose-mongoose)
+[![npm](https://img.shields.io/npm/v/graphql-compose-mongoose.svg)](https://www.npmjs.com/package/graphql-compose-mongoose)
+[![trends](https://img.shields.io/npm/dt/graphql-compose-mongoose.svg)](http://www.npmtrends.com/graphql-compose-mongoose)
 [![Join the chat at https://gitter.im/graphql-compose/Lobby](https://badges.gitter.im/graphql-compose/graphql-compose.svg)](https://gitter.im/graphql-compose/Lobby)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Greenkeeper badge](https://badges.greenkeeper.io/graphql-compose/graphql-compose-mongoose.svg)](https://greenkeeper.io/)
 
-
 This is a plugin for [graphql-compose](https://github.com/graphql-compose/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internal GraphQL Types. Provide all CRUD resolvers, including `graphql connection`, also provided basic search via operators ($lt, $gt and so on).
 
 ## Installation
-```
+
+```bash
 npm install graphql graphql-compose mongoose graphql-compose-mongoose --save
 ```
+
 Modules `graphql`, `graphql-compose`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
 
 If you want to add additional resolvers [`connection`](https://github.com/graphql-compose/graphql-compose-connection) and/or [`pagination`](https://github.com/graphql-compose/graphql-compose-pagination) - just install following packages and `graphql-compose-mongoose` will add them automatically.
-```
+
+```bash
 npm install graphql-compose-connection graphql-compose-pagination --save
 ```
 
-#### Different builds
+### Different builds
+
 This library contains different builds for any purposes:
+
 ```js
 // Default import for using under node v6 and above
 import { composeWithMongoose } from 'graphql-compose-mongoose';
@@ -42,10 +46,11 @@ Live demo: [https://graphql-compose.herokuapp.com/](https://graphql-compose.hero
 Source code: https://github.com/graphql-compose/graphql-compose-examples
 
 Small explanation for variables naming:
+
 - `UserSchema` - this is a mongoose schema
 - `User` - this is a mongoose model
-- `UserTC` - this is a `TypeComposer` instance for User. `TypeComposer` has `GraphQLObjectType` inside, avaliable via method `UserTC.getType()`.
-- Here and in all other places of code variables suffix `...TC` means that this is `TypeComposer` instance, `...ITC` - `InputTypeComposer`, `...ETC` - `EnumTypeComposer`.
+- `UserTC` - this is a `ObjectTypeComposer` instance for User. `ObjectTypeComposer` has `GraphQLObjectType` inside, avaliable via method `UserTC.getType()`.
+- Here and in all other places of code variables suffix `...TC` means that this is `ObjectTypeComposer` instance, `...ITC` - `InputTypeComposer`, `...ETC` - `EnumTypeComposer`.
 
 ```js
 import mongoose from 'mongoose';
@@ -118,14 +123,16 @@ schemaComposer.Mutation.addFields({
 const graphqlSchema = schemaComposer.buildSchema();
 export default graphqlSchema;
 ```
+
 That's all!
 You think that is to much code?
 I don't think so, because by default internally was created about 55 graphql types (for input, sorting, filtering). So you will need much much more lines of code to implement all these CRUD operations by hands.
 
-
 ### Working with Mongoose Collection Level Discriminators
+
 Variable Namings
-* `...DTC` - Suffix for a `DiscriminatorTypeComposer` instance, which is also an instance of `TypeComposer`. All fields and Relations manipulations on this instance affects all registered discriminators and the Discriminator Interface.
+
+- `...DTC` - Suffix for a `DiscriminatorTypeComposer` instance, which is also an instance of `ObjectTypeComposer`. All fields and Relations manipulations on this instance affects all registered discriminators and the Discriminator Interface.
 
 ```js
   import mongoose from 'mongoose';
@@ -196,7 +203,7 @@ Variable Namings
   const PersonTC = CharacterDTC.discriminator(PersonModel);  // baseOptions -> customisationsOptions applied
 
   // You may now use CharacterDTC to add fields to all Discriminators
-  // Use DroidTC, `PersonTC as any other TypeComposer.
+  // Use DroidTC, `PersonTC as any other ObjectTypeComposer.
   schemaComposer.Mutation.addFields({
     droidCreate: DroidTC.getResolver('createOne'),
     personCreate: PersonTC.getResolver('createOne'),
@@ -246,6 +253,7 @@ Variable Namings
 ## FAQ
 
 ### Can I get generated vanilla GraphQL types?
+
 ```js
 const UserTC = composeWithMongoose(User);
 UserTC.getType(); // returns GraphQLObjectType
@@ -255,9 +263,10 @@ UserTC.get('fieldWithNesting.subNesting').getType(); // get GraphQL type of deep
 ```
 
 ### How to add custom fields?
+
 ```js
 UserTC.addFields({
-  lonLat: TypeComposer.create('type LonLat { lon: Float, lat: Float }'),
+  lonLat: ObjectTypeComposer.create('type LonLat { lon: Float, lat: Float }'),
   notice: 'String', // shorthand definition
   noticeList: { // extended
     type: '[String]', // String, Int, Float, Boolean, ID, Json
@@ -272,7 +281,9 @@ UserTC.addFields({
 ```
 
 ### How to build nesting/relations?
+
 Suppose you `User` model has `friendsIds` field with array of user ids. So let build some relations:
+
 ```js
 UserTC.addRelation(
   'friends',
@@ -305,10 +316,12 @@ UserTC.addRelation(
 ```
 
 ### Reusing the same mongoose Schema in embedded object fields
+
 Suppose you have a common structure you use as embedded object in multiple Schemas.
 Also suppose you want the structure to have the same GraphQL type across all parent types.
 (For instance, to allow reuse of fragments for this type)
 Here are Schemas to demonstrate:
+
 ```js
 import { Schema } from 'mongoose';
 
@@ -330,16 +343,20 @@ const Article = Schema({
   heroImage: ImageDataStructure
 });
 ```
+
 If you want the `ImageDataStructure` to use the same GraphQL type in both `Article` and `UserProfile` you will need create it as a mongoose schema (not a standard javascript object) and to explicitly tell `graphql-compose-mongoose` the name you want it to have. Otherwise, without the name, it would generate the name according to the first parent this type was embedded in.
 
 Do the following:
+
 ```js
 import { schemaComposer } from 'graphql-compose'; // get the default schemaComposer or your created schemaComposer
 import { convertSchemaToGraphQL } from 'graphql-compose-mongoose';
 
 convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage', schemaComposer); // Force this type on this mongoose schema
 ```
+
 Before continuing to convert your models to TypeComposers:
+
 ```js
 import mongoose from 'mongoose';
 import { composeWithMongoose } from 'graphql-compose-mongoose';
@@ -350,7 +367,9 @@ const Article = mongoose.model('Article', Article);
 const UserProfileTC = composeWithMongoose(UserProfile);
 const ArticleTC = composeWithMongoose(Article);
 ```
+
 Then, you can use queries like this:
+
 ```graphql
 query {
   topUser {
@@ -375,16 +394,18 @@ fragment fullImageData on EmbeddedImage {
 ```
 
 ### Access and modify mongoose doc before save
+
 This library provides some amount of ready resolvers for fetch and update data which was mentioned above. And you can [create your own resolver](https://github.com/graphql-compose/graphql-compose) of course. However you can find that add some actions or light modifications of mongoose document directly before save at existing resolvers appears more simple than create new resolver. Some of resolvers accepts *before save hook* which can be provided in *resolver params* as param named `beforeRecordMutate`. This hook allows to have access and modify mongoose document before save. The resolvers which supports this hook are:
 
-* createOne
-* createMany
-* removeById
-* removeOne
-* updateById
-* updateOne
+- createOne
+- createMany
+- removeById
+- removeOne
+- updateById
+- updateOne
 
 The prototype of before save hook:
+
 ```js
 (doc: mixed, rp: ExtendedResolveParams) => Promise<*>,
 ```
@@ -443,22 +464,24 @@ schemaComposer.Mutation.addFields({
   }),
 });
 ```
+
 ### How can I push/pop or add/remove values to arrays?
+
 The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push or pop a value in an array you can use a custom resolver with a native MongoDB call.
 
 For example (push):-
 
-```javascript
+```js
 // Define new resolver 'pushToArray'
 UserTC.addResolver({
-	name: 'pushToArray',
-	type: UserTC,
-	args: { userId: 'MongoID!', valueToPush: 'String' },
-	resolve: async ({ source, args, context, info }) => {
-		const user = await User.update({ _id: args.userId }, { $push: { arrayToPushTo: args.valueToPush } } })
-		if (!user) return null // or gracefully return an error etc...
-		return User.findOne({ _id: args.userId }) // return the record
-	}
+  name: 'pushToArray',
+  type: UserTC,
+  args: { userId: 'MongoID!', valueToPush: 'String' },
+  resolve: async ({ source, args, context, info }) => {
+    const user = await User.update({ _id: args.userId }, { $push: { arrayToPushTo: args.valueToPush } } })
+    if (!user) return null // or gracefully return an error etc...
+    return User.findOne({ _id: args.userId }) // return the record
+  }
 })
 
 // Then add 'pushToArray' as a graphql field e.g.
@@ -469,7 +492,6 @@ schemaComposer.rootMutation().addFields({userPushToArray: UserTC.getResolver('pu
 
 NB if you set `unique: true` on the array then using the `update` `$push` approach will not check for duplicates, this is due to a MongoDB bug: https://jira.mongodb.org/browse/SERVER-1068. For more usage examples with `$push` and arrays see the MongoDB docs here https://docs.mongodb.com/manual/reference/operator/update/push/. Also note that `$push` will preserve order in the array (append to end of array) whereas `$addToSet` will not.
 
-
 ## Customization options
 
 When we convert model `const UserTC = composeWithMongoose(User, customizationOptions);` you may tune every piece of future derived types and resolvers.
@@ -477,6 +499,7 @@ When we convert model `const UserTC = composeWithMongoose(User, customizationOpt
 ### Here is flow typed definition of this options:
 
 The top level of customization options. Here you setup name and description for the main type, remove fields or leave only desired fields.
+
 ```js
 export type typeConverterOpts = {
   name?: string,
@@ -491,6 +514,7 @@ export type typeConverterOpts = {
 ```
 
 This is `opts.inputType` level of options for default InputTypeObject which will be provided to all resolvers for `filter` and `input` args.
+
 ```js
 export type typeConverterInputTypeOpts = {
   name?: string,
@@ -506,6 +530,7 @@ export type typeConverterInputTypeOpts = {
 This is `opts.resolvers` level of options.
 If you set the option to `false` it will disable resolver or some of its input args.
 Every resolver's arg has it own options. They described below.
+
 ```js
 export type typeConverterResolversOpts = {
   findById?: false,
@@ -571,6 +596,7 @@ export type typeConverterResolversOpts = {
 This is `opts.resolvers.[resolverName].[filter|sort|record|limit]` level of options.
 You may tune every resolver's args independently as you wish.
 Here you may setup every argument and override some fields from the default input object type, described above in `opts.inputType`.
+
 ```js
 export type filterHelperArgsOpts = {
   filterTypeName?: string, // type name for `filter`
@@ -604,16 +630,20 @@ export type limitHelperArgsOpts = {
 ## Used plugins
 
 ### [graphql-compose-connection](https://github.com/graphql-compose/graphql-compose-connection)
+
 This plugin adds `connection` resolver. Build in mechanism allows sort by any unique indexes (not only by id). Also supported compound sorting (by several fields).
 
 Besides standard connection arguments `first`, `last`, `before` and `after`, also added great arguments:
-* `filter` arg - for filtering records
-* `sort` arg - for sorting records
+
+- `filter` arg - for filtering records
+- `sort` arg - for sorting records
 
 This plugin completely follows to [Relay Cursor Connections Specification](https://facebook.github.io/relay/graphql/connections.htm).
 
 ### [graphql-compose-pagination](https://github.com/graphql-compose/graphql-compose-pagination)
+
 This plugin adds `pagination` resolver.
 
 ## License
+
 [MIT](https://github.com/graphql-compose/graphql-compose-mongoose/blob/master/LICENSE.md)

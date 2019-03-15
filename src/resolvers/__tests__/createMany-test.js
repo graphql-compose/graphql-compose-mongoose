@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-param-reassign,func-names */
 
-import { Resolver, schemaComposer, TypeComposer } from 'graphql-compose';
+import { Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { mongoose } from '../../__mocks__/mongooseCommon';
 import { UserModel } from '../../__mocks__/userModel';
@@ -193,25 +193,25 @@ describe('createMany() ->', () => {
 
     it('should have recordIds field, NonNull List', () => {
       const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordIdField = new TypeComposer(outputType).getFieldConfig('recordIds');
+      const recordIdField = schemaComposer.createOutputTC(outputType).getFieldConfig('recordIds');
       expect(recordIdField.type).toEqual(new GraphQLNonNull(GraphQLList(GraphQLMongoID)));
     });
 
     it('should have records field, NonNull List', () => {
       const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordField = new TypeComposer(outputType).getFieldConfig('records');
+      const recordField = schemaComposer.createOutputTC(outputType).getFieldConfig('records');
       expect(recordField.type).toEqual(new GraphQLNonNull(GraphQLList(UserTC.getType())));
     });
 
     it('should have createCount field, Int', () => {
       const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordField = new TypeComposer(outputType).getFieldConfig('createCount');
+      const recordField = schemaComposer.createOutputTC(outputType).getFieldConfig('createCount');
       expect(recordField.type).toEqual(new GraphQLNonNull(GraphQLInt));
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `CreateMany${UserTC.getTypeName()}Payload`;
-      const existedType = TypeComposer.create(outputTypeName);
+      const existedType = schemaComposer.createOutputTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = createMany(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

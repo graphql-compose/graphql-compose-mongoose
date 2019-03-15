@@ -1,6 +1,6 @@
 /* @flow */
 
-import { schemaComposer, TypeComposer } from 'graphql-compose';
+import { schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { composeWithMongooseDiscriminators } from '../../composeWithMongooseDiscriminators';
 import { getCharacterModels } from '../__mocks__/characterModels';
 
@@ -12,7 +12,7 @@ afterAll(() => (CharacterModel: any).base.disconnect());
 
 describe('prepareChildResolvers()', () => {
   describe('setQueryDKey()', () => {
-    let PersonTC: TypeComposer;
+    let PersonTC: ObjectTypeComposer<any, any>;
 
     beforeAll(() => {
       PersonTC = composeWithMongooseDiscriminators(CharacterModel).discriminator(PersonModel);

@@ -1,6 +1,10 @@
 /* @flow */
 
-import type { TypeComposer, ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import {
+  type ObjectTypeComposer,
+  type ComposeFieldConfigArgumentMap,
+  InputTypeComposer,
+} from 'graphql-compose';
 
 export type RecordHelperArgsOpts = {
   recordTypeName?: string,
@@ -17,11 +21,11 @@ export const getRecordHelperArgsOptsMap = () => ({
 });
 
 export const recordHelperArgs = (
-  tc: TypeComposer,
+  tc: ObjectTypeComposer<any, any>,
   opts?: RecordHelperArgsOpts
-): ComposeFieldConfigArgumentMap => {
-  if (!tc || tc.constructor.name !== 'TypeComposer') {
-    throw new Error('First arg for recordHelperArgs() should be instance of TypeComposer.');
+): ComposeFieldConfigArgumentMap<> => {
+  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+    throw new Error('First arg for recordHelperArgs() should be instance of ObjectTypeComposer.');
   }
 
   if (!opts || !opts.recordTypeName) {
@@ -31,9 +35,9 @@ export const recordHelperArgs = (
   const recordTypeName: string = opts.recordTypeName;
 
   let recordITC;
-  const schemaComposer = tc.constructor.schemaComposer;
-  if (schemaComposer.hasInstance(recordTypeName, schemaComposer.InputTypeComposer)) {
-    recordITC = schemaComposer.getITC(recordTypeName);
+  const sc = tc.sc;
+  if (sc.hasInstance(recordTypeName, InputTypeComposer)) {
+    recordITC = sc.getITC(recordTypeName);
   } else {
     recordITC = tc.getInputTypeComposer().clone(recordTypeName);
   }

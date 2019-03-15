@@ -4,7 +4,7 @@
 import type { MongooseModel } from 'mongoose';
 import type {
   ComposeFieldConfigArgumentMap,
-  TypeComposer,
+  ObjectTypeComposer,
   SchemaComposer,
   EnumTypeComposer,
 } from 'graphql-compose';
@@ -16,12 +16,12 @@ export type SortHelperArgsOpts = {
 };
 
 export const sortHelperArgs = (
-  typeComposer: TypeComposer,
+  tc: ObjectTypeComposer<any, any>,
   model: MongooseModel,
   opts?: SortHelperArgsOpts
-): ComposeFieldConfigArgumentMap => {
-  if (!typeComposer || typeComposer.constructor.name !== 'TypeComposer') {
-    throw new Error('First arg for sortHelperArgs() should be instance of TypeComposer.');
+): ComposeFieldConfigArgumentMap<> => {
+  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+    throw new Error('First arg for sortHelperArgs() should be instance of ObjectTypeComposer.');
   }
 
   if (!model || !model.modelName || !model.schema) {
@@ -32,8 +32,7 @@ export const sortHelperArgs = (
     throw new Error('You should provide non-empty `sortTypeName` in options for sortHelperArgs().');
   }
 
-  const schemaComposer = typeComposer.constructor.schemaComposer;
-  const gqSortType = getSortTypeFromModel(opts.sortTypeName, model, schemaComposer);
+  const gqSortType = getSortTypeFromModel(opts.sortTypeName, model, tc.sc);
 
   return {
     sort: {

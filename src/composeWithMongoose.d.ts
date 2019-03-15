@@ -1,7 +1,7 @@
 import {
   InputTypeComposer,
   SchemaComposer,
-  TypeComposer,
+  ObjectTypeComposer,
 } from 'graphql-compose';
 import { Document, Model } from 'mongoose';
 import { ConnectionSortMapOpts } from './resolvers/connection';
@@ -117,10 +117,10 @@ export function composeWithMongoose<
 >(
   model: Model<TModel>,
   opts?: TypeConverterOpts<TContext>,
-): TypeComposer<TModel, TContext>;
+): ObjectTypeComposer<TModel, TContext>;
 
 export function prepareFields(
-  tc: TypeComposer<any>,
+  tc: ObjectTypeComposer<any>,
   opts: { only?: string[]; remove?: string[] },
 ): void;
 
@@ -130,12 +130,12 @@ export function prepareInputFields(
 ): void;
 
 export function createInputType(
-  tc: TypeComposer<any>,
+  tc: ObjectTypeComposer<any>,
   inputTypeOpts?: TypeConverterInputTypeOpts,
 ): void;
 
 export function createResolvers<TDocument extends Document>(
   model: Model<TDocument>,
-  tc: TypeComposer<any>,
+  tc: ObjectTypeComposer<any>,
   opts: TypeConverterResolversOpts,
 ): void;

@@ -78,15 +78,15 @@ export function mergeFieldMaps(
   return mergedFieldMap;
 }
 
-export function mergeCustomizationOptions(
-  baseCOptions: TypeConverterOpts,
-  childCOptions?: TypeConverterOpts
-): TypeConverterOpts | void {
+export function mergeCustomizationOptions<TContext>(
+  baseCOptions: TypeConverterOpts<TContext>,
+  childCOptions?: TypeConverterOpts<TContext>
+): TypeConverterOpts<TContext> | void {
   if (!baseCOptions) {
     return childCOptions;
   }
 
-  const mergedOptions: TypeConverterOpts = childCOptions || ({}: any);
+  const mergedOptions: TypeConverterOpts<TContext> = childCOptions || ({}: any);
 
   if (
     baseCOptions.schemaComposer !== mergedOptions.schemaComposer &&

@@ -1,4 +1,4 @@
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
 import { MongoId } from '../types/mongoid';
 import { FilterHelperArgs, SortHelperArgs } from './helpers';
@@ -9,7 +9,7 @@ export type PaginationResolverOpts = {
 
 export default function pagination(
   model: Model<any>,
-  tc: TypeComposer<any>,
+  tc: ObjectTypeComposer<any>,
   opts?: PaginationResolverOpts,
 ): Resolver<any, any> | undefined;
 

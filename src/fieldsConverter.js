@@ -4,7 +4,12 @@
 import mongoose from 'mongoose';
 import type { Schema, MongooseModel, MongooseSchemaField } from 'mongoose';
 import objectPath from 'object-path';
-import type { SchemaComposer, TypeComposer, EnumTypeComposer } from 'graphql-compose';
+import type {
+  SchemaComposer,
+  ObjectTypeComposer,
+  EnumTypeComposer,
+  ComposeOutputType,
+} from 'graphql-compose';
 import { upperFirst, schemaComposer as globalSchemaComposer } from 'graphql-compose';
 import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
 import GraphQLMongoID from './types/mongoid';
@@ -12,7 +17,6 @@ import GraphQLMongoID from './types/mongoid';
 type MongooseFieldT = MongooseSchemaField<any>;
 type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
 type ComposeScalarType = string | GraphQLScalarType;
-type ComposeOutputType = TypeComposer | ComposeScalarType | EnumTypeComposer | [ComposeOutputType];
 
 export type MongoosePseudoModelT = {
   schema: Schema<any>,
@@ -109,26 +113,23 @@ export function getFieldsFromModel(model: MongooseModel | MongoosePseudoModelT):
   return fields;
 }
 
-export function convertModelToGraphQL(
+export function convertModelToGraphQL<TSource, TContext>(
   model: MongooseModel | MongoosePseudoModelT,
   typeName: string,
-  sc?: SchemaComposer<any>
-): TypeComposer {
+  sc?: SchemaComposer<TContext>
+): ObjectTypeComposer<TSource, TContext> {
   const schemaComposer = sc || globalSchemaComposer;
 
   if (!typeName) {
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
   }
 
-  // if model already has generated TypeComposer early, then return it
-  // $FlowFixMe await landing graphql-compose@4.4.2 or above
+  // if model already has generated ObjectTypeComposer early, then return it
   if (schemaComposer.has(model.schema)) {
-    // $FlowFixMe await landing graphql-compose@4.4.2 or above
-    return schemaComposer.getTC(model.schema);
+    return schemaComposer.getOTC(model.schema);
   }
 
-  const typeComposer = schemaComposer.getOrCreateTC(typeName);
-  // $FlowFixMe await landing graphql-compose@4.4.2 or above
+  const typeComposer = schemaComposer.getOrCreateOTC(typeName);
   schemaComposer.set(model.schema, typeComposer);
   schemaComposer.set(typeName, typeComposer);
 
@@ -166,24 +167,21 @@ export function convertSchemaToGraphQL(
   schema: Schema<any>,
   typeName: string,
   sc?: SchemaComposer<any>
-): TypeComposer {
+): ObjectTypeComposer<any, any> {
   const schemaComposer = sc || globalSchemaComposer;
 
   if (!typeName) {
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
   }
 
-  // $FlowFixMe await landing graphql-compose@4.4.2 or above
   if (schemaComposer.has(schema)) {
-    // $FlowFixMe await landing graphql-compose@4.4.2 or above
-    return schemaComposer.getTC(schema);
+    return schemaComposer.getOTC(schema);
   }
 
   const tc = convertModelToGraphQL({ schema }, typeName, schemaComposer);
   // also generate InputType
   tc.getInputTypeComposer();
 
-  // $FlowFixMe await landing graphql-compose@4.4.2 or above
   schemaComposer.set(schema, tc);
   return tc;
 }
@@ -192,7 +190,7 @@ export function convertFieldToGraphQL(
   field: MongooseFieldT,
   prefix?: string = '',
   schemaComposer: SchemaComposer<any>
-): ComposeOutputType {
+): ComposeOutputType<any, any> {
   if (!schemaComposer.has('MongoID')) {
     schemaComposer.set('MongoID', GraphQLMongoID);
   }
@@ -278,7 +276,7 @@ export function arrayToGraphQL(
   field: MongooseFieldT,
   prefix?: string = '',
   schemaComposer: SchemaComposer<any>
-): ComposeOutputType {
+): ComposeOutputType<any, any> {
   if (!field || !field.caster) {
     throw new Error(
       'You provide incorrect mongoose field to `arrayToGraphQL()`. ' +
@@ -296,7 +294,7 @@ export function embeddedToGraphQL(
   field: MongooseFieldT,
   prefix?: string = '',
   schemaComposer: SchemaComposer<any>
-): TypeComposer {
+): ObjectTypeComposer<any, any> {
   const fieldName = _getFieldName(field);
   const fieldType = _getFieldType(field);
 
@@ -347,7 +345,7 @@ export function documentArrayToGraphQL(
   field: MongooseFieldT,
   prefix?: string = '',
   schemaComposer: SchemaComposer<any>
-): [TypeComposer] {
+): [ObjectTypeComposer<any, any>] {
   if (
     !(field instanceof mongoose.Schema.Types.DocumentArray) &&
     !objectPath.has(field, 'schema.paths')

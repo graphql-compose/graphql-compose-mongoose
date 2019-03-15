@@ -1,7 +1,7 @@
 /* @flow */
 
 import { Query } from 'mongoose';
-import { Resolver, TypeComposer, schemaComposer } from 'graphql-compose';
+import { Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLInt, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import updateMany from '../updateMany';
@@ -136,13 +136,15 @@ describe('updateMany() ->', () => {
 
     it('should have numAffected field', () => {
       const outputType: any = updateMany(UserModel, UserTC).getType();
-      const numAffectedField = new TypeComposer(outputType).getFieldConfig('numAffected');
+      const numAffectedField = schemaComposer
+        .createOutputTC(outputType)
+        .getFieldConfig('numAffected');
       expect(numAffectedField.type).toBe(GraphQLInt);
     });
 
     it('should reuse existed outputType', () => {
       const outputTypeName = `UpdateMany${UserTC.getTypeName()}Payload`;
-      const existedType = TypeComposer.create(outputTypeName);
+      const existedType = schemaComposer.createOutputTC(outputTypeName);
       schemaComposer.set(outputTypeName, existedType);
       const outputType = updateMany(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());

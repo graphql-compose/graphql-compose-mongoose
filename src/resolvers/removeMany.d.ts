@@ -1,11 +1,11 @@
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
 import { FilterHelperArgs } from './helpers';
 import { GenResolverOpts } from './index';
 
 export default function removeById(
   model: Model<any>,
-  tc: TypeComposer<any>,
+  tc: ObjectTypeComposer<any>,
   opts?: GenResolverOpts,
 ): Resolver<any, any>;
 

@@ -31,11 +31,11 @@
     "object-path": "^0.11.4"
   },
   "optionalDependencies": {
-    "graphql-compose-connection": ">=4.0.0",
-    "graphql-compose-pagination": ">=4.0.0"
+    "graphql-compose-connection": ">=5.0.0",
+    "graphql-compose-pagination": ">=5.0.0"
   },
   "peerDependencies": {
-    "graphql-compose": ">=5.0.2 || >=4.7.1",
+    "graphql-compose": ">=6.0.0",
     "mongoose": ">=5.0.0 || >=4.4.0"
   },
   "devDependencies": {
@@ -51,7 +51,7 @@
     "@types/mongoose": "5.2.10",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
-    "babel-jest": "^24.3.1",
+    "babel-jest": "^24.5.0",
     "cz-conventional-changelog": "^2.1.0",
     "eslint": "^5.15.1",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -61,17 +61,17 @@
     "eslint-plugin-prettier": "^3.0.1",
     "flow-bin": "^0.94.0",
     "graphql": "14.1.1",
-    "graphql-compose": "^5.11.0",
-    "graphql-compose-connection": ">=4.0.0",
-    "graphql-compose-pagination": ">=4.0.0",
-    "jest": "^24.3.1",
-    "mongodb-memory-server": "^4.0.1",
-    "mongoose": "^5.4.18",
+    "graphql-compose": "^5.12.0",
+    "graphql-compose-connection": ">=5.0.0",
+    "graphql-compose-pagination": ">=5.0.0",
+    "jest": "^24.5.0",
+    "mongodb-memory-server": "^4.2.1",
+    "mongoose": "^5.4.19",
     "prettier": "^1.16.4",
     "request": "^2.88.0",
     "rimraf": "^2.6.3",
     "semantic-release": "^15.13.3",
-    "tslint": "^5.13.1",
+    "tslint": "^5.14.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.3.3333"
@@ -98,8 +98,8 @@
     "tscheck": "tsc --noEmit",
     "flow": "./node_modules/.bin/flow",
     "test": "npm run coverage && npm run lint && npm run flow && npm run tscheck",
-    "link": "yarn build && yarn link graphql-compose && yarn link graphql-compose-connection && yarn link mongoose && yarn link",
-    "unlink": "yarn unlink graphql-compose && yarn unlink graphql-compose-connection && yarn unlink mongoose && yarn add graphql-compose graphql-compose-connection mongoose --dev",
+    "link": "yarn build && yarn link graphql-compose && yarn link graphql-compose-connection && yarn link graphql-compose-pagination && yarn link mongoose && yarn link",
+    "unlink": "rimraf node_modules && yarn install",
     "semantic-release": "semantic-release"
   }
 }

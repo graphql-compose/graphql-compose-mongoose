@@ -13,7 +13,7 @@ let itc: InputTypeComposer;
 
 beforeEach(() => {
   schemaComposer.clear();
-  itc = InputTypeComposer.create({
+  itc = schemaComposer.createInputTC({
     name: 'UserFilterInput',
     fields: {
       _id: 'String',
@@ -56,7 +56,7 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should reuse existed operatorsType', () => {
-      const existedITC = itc.constructor.schemaComposer.getOrCreateITC('ExistedType');
+      const existedITC = itc.sc.getOrCreateITC('ExistedType');
       _createOperatorsField(itc, 'ExistedType', UserModel, {});
       expect(itc.getFieldType(OPERATORS_FIELDNAME)).toBe(existedITC.getType());
     });

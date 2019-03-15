@@ -1,4 +1,4 @@
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
 import { MongoId } from '../types/mongoid';
 import { LimitHelperArgs, SortHelperArgs } from './helpers';
@@ -6,7 +6,7 @@ import { GenResolverOpts } from './index';
 
 export default function findByIds(
   model: Model<any>,
-  tc: TypeComposer<any>,
+  tc: ObjectTypeComposer<any>,
   opts?: GenResolverOpts,
 ): Resolver<any, any>;
 

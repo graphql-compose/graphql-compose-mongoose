@@ -1,4 +1,4 @@
-import { Resolver, TypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 // import { ConnectionSortMapOpts } from 'graphql-compose-connection';
 import { Model } from 'mongoose';
 import { MongoId } from '../types/mongoid';
@@ -11,7 +11,7 @@ export type ConnectionSortMapOpts = { [opt: string]: any };
 
 export default function connection(
   model: Model<any>,
-  tc: TypeComposer<any>,
+  tc: ObjectTypeComposer<any>,
   opts?: ConnectionSortMapOpts,
 ): Resolver<any, any> | undefined;
 

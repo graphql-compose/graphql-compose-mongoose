@@ -99,7 +99,7 @@ export function _createOperatorsField(
   model: MongooseModel,
   operatorsOpts: FilterOperatorsOpts
 ): InputTypeComposer {
-  const operatorsITC = itc.constructor.schemaComposer.getOrCreateITC(typeName, tc => {
+  const operatorsITC = itc.sc.getOrCreateITC(typeName, tc => {
     tc.setDescription('For performance reason this type contains only *indexed* fields.');
   });
 
@@ -143,7 +143,7 @@ export function _createOperatorsField(
       });
       if (Object.keys(fields).length > 0) {
         const operatorTypeName = `${upperFirst(fieldName)}${typeName}`;
-        const operatorITC = itc.constructor.schemaComposer.getOrCreateITC(operatorTypeName, tc => {
+        const operatorITC = itc.sc.getOrCreateITC(operatorTypeName, tc => {
           tc.setFields(fields);
         });
         operatorsITC.setField(fieldName, operatorITC);

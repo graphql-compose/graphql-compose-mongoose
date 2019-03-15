@@ -1,10 +1,10 @@
 /* @flow */
 
-import { TypeComposerClass } from 'graphql-compose';
+import { ObjectTypeComposer } from 'graphql-compose';
 import { DiscriminatorTypeComposer } from '../DiscriminatorTypeComposer';
 
 export function reorderFields<TContext>(
-  modelTC: DiscriminatorTypeComposer<TContext> | TypeComposerClass<TContext>,
+  modelTC: DiscriminatorTypeComposer<any, TContext> | ObjectTypeComposer<any, TContext>,
   order: string[] | boolean,
   DKey: string,
   commonFieldKeys?: string[]
@@ -16,7 +16,7 @@ export function reorderFields<TContext>(
       const newOrder = [];
 
       // is child discriminator
-      if (modelTC instanceof TypeComposerClass && commonFieldKeys) {
+      if (modelTC instanceof ObjectTypeComposer && commonFieldKeys) {
         newOrder.push(...commonFieldKeys);
 
         newOrder.filter(value => value === '_id' || value === DKey);

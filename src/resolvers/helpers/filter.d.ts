@@ -1,4 +1,4 @@
-import { ComposeFieldConfigArgumentMap, TypeComposer } from 'graphql-compose';
+import { ComposeFieldConfigArgumentMap, ObjectTypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
 import { MongoId } from '../../types/mongoid';
 import { ExtendedResolveParams } from '../index';
@@ -26,7 +26,7 @@ export function getFilterHelperArgOptsMap(): Partial<
 >;
 
 export function filterHelperArgs(
-  typeComposer: TypeComposer<any>,
+  typeComposer: ObjectTypeComposer<any>,
   model: Model<any>,
   opts?: FilterHelperArgsOpts,
 ): ComposeFieldConfigArgumentMap;

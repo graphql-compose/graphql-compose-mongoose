@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
-import type { TypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
+import type { ObjectTypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
 import { schemaComposer } from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
@@ -16,8 +16,8 @@ import MongoID from './types/mongoid';
 import type { PaginationResolverOpts } from './resolvers/pagination';
 import type { ConnectionSortMapOpts } from './resolvers/connection';
 
-export type TypeConverterOpts = {|
-  schemaComposer?: SchemaComposer<any>,
+export type TypeConverterOpts<TContext> = {|
+  schemaComposer?: SchemaComposer<TContext>,
   name?: string,
   description?: string,
   fields?: {
@@ -115,15 +115,16 @@ export type TypeConverterResolversOpts = {
   pagination?: PaginationResolverOpts | false,
 };
 
-export function composeWithMongoose(
-  model: Object, // MongooseModel, TODO use Model from mongoose_v4.x.x definition when it will be public
-  opts: TypeConverterOpts = ({}: any)
-): TypeComposer {
-  const name: string = (opts && opts.name) || model.modelName;
+export function composeWithMongoose<TSource, TContext>(
+  model: Class<TSource>, // === MongooseModel,
+  opts: TypeConverterOpts<TContext> = ({}: any)
+): ObjectTypeComposer<TSource, TContext> {
+  const m: MongooseModel = (model: any);
+  const name: string = (opts && opts.name) || m.modelName;
 
   const sc = opts.schemaComposer || schemaComposer;
   sc.set('MongoID', MongoID);
-  const tc = convertModelToGraphQL(model, name, sc);
+  const tc = convertModelToGraphQL((m: any), name, sc);
 
   if (opts.description) {
     tc.setDescription(opts.description);
@@ -133,12 +134,12 @@ export function composeWithMongoose(
     prepareFields(tc, opts.fields);
   }
 
-  tc.setRecordIdFn(source => (source ? `${source._id}` : ''));
+  tc.setRecordIdFn(source => (source ? `${(source: any)._id}` : ''));
 
   createInputType(tc, opts.inputType);
 
   if (!{}.hasOwnProperty.call(opts, 'resolvers') || opts.resolvers !== false) {
-    createResolvers(model, tc, opts.resolvers || {});
+    createResolvers(m, tc, opts.resolvers || {});
   }
 
   tc.makeFieldNonNull('_id');
@@ -147,7 +148,7 @@ export function composeWithMongoose(
 }
 
 export function prepareFields(
-  tc: TypeComposer,
+  tc: ObjectTypeComposer<any, any>,
   opts: {
     only?: string[],
     remove?: string[],
@@ -189,7 +190,7 @@ export function prepareInputFields(
 }
 
 export function createInputType(
-  tc: TypeComposer,
+  tc: ObjectTypeComposer<any, any>,
   inputTypeOpts?: TypeConverterInputTypeOpts = {}
 ): void {
   const inputTypeComposer = tc.getInputTypeComposer();
@@ -209,7 +210,7 @@ export function createInputType(
 
 export function createResolvers(
   model: MongooseModel,
-  tc: TypeComposer,
+  tc: ObjectTypeComposer<any, any>,
   opts: TypeConverterResolversOpts
 ): void {
   const names = resolvers.getAvailableNames();
