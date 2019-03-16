@@ -32,7 +32,7 @@ function copyBaseTCFieldsToChildTC(
 export function composeChildTC<TSource, TContext>(
   baseDTC: DiscriminatorTypeComposer<any, TContext>,
   childTC: ObjectTypeComposer<TSource, TContext>,
-  opts: DiscriminatorOptions
+  opts: DiscriminatorOptions<TContext>
 ): ObjectTypeComposer<TSource, TContext> {
   const composedChildTC = copyBaseTCFieldsToChildTC(baseDTC, childTC);
 

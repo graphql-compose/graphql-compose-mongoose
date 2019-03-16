@@ -19,9 +19,9 @@ import { mergeCustomizationOptions } from './utils/mergeCustomizationOptions';
 import { prepareBaseResolvers } from './prepareBaseResolvers';
 import { reorderFields } from './utils/reorderFields';
 
-export type DiscriminatorOptions = {|
+export type DiscriminatorOptions<TContext> = {|
   reorderFields?: boolean | string[], // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
-  ...TypeConverterOpts<any>,
+  ...TypeConverterOpts<TContext>,
 |};
 
 type Discriminators = {
@@ -75,7 +75,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 
   DKeyETC: EnumTypeComposer<TContext>;
 
-  opts: DiscriminatorOptions;
+  opts: DiscriminatorOptions<TContext>;
 
   DInterface: InterfaceTypeComposer<TSource, TContext>;
 

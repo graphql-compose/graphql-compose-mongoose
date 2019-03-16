@@ -134,7 +134,7 @@ function reorderFieldsRecordFilter<TSource, TContext>(
 export function prepareChildResolvers<TSource, TContext>(
   baseDTC: DiscriminatorTypeComposer<TSource, TContext>,
   childTC: ObjectTypeComposer<TSource, TContext>,
-  opts: DiscriminatorOptions
+  opts: DiscriminatorOptions<TContext>
 ) {
   for (const resolverName in EMCResolvers) {
     if (EMCResolvers.hasOwnProperty(resolverName) && childTC.hasResolver(resolverName)) {

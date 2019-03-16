@@ -1,13 +1,14 @@
 /* @flow */
 
 import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
-import type { Model } from 'mongoose';
+import type { MongooseModel } from 'mongoose';
 import { type DiscriminatorOptions, DiscriminatorTypeComposer } from './discriminators';
 
-export function composeWithMongooseDiscriminators(
-  baseModel: Class<Model>,
-  opts?: DiscriminatorOptions
-): DiscriminatorTypeComposer<any, any> {
+export function composeWithMongooseDiscriminators<TSource, TContext>(
+  baseModel: Class<TSource>, // === MongooseModel,
+  opts?: DiscriminatorOptions<TContext>
+): DiscriminatorTypeComposer<TSource, TContext> {
+  const m: MongooseModel = (baseModel: any);
   const sc = (opts ? opts.schemaComposer : null) || globalSchemaComposer;
-  return DiscriminatorTypeComposer.createFromModel(baseModel, sc, opts);
+  return DiscriminatorTypeComposer.createFromModel(m, sc, opts);
 }
