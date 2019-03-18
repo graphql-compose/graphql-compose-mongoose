@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { TypeConverterOpts } from '../../composeWithMongoose';
+import type { ComposeWithMongooseOpts } from '../../composeWithMongoose';
 import { mergeTypeConverterResolverOpts } from './mergeTypeConverterResolversOpts';
 
 type FieldMap = {
@@ -10,7 +10,7 @@ type FieldMap = {
 export function mergeStringAndStringArraysFields(
   baseField?: string[] | string,
   childField?: string[] | string,
-  argOptsTypes: string[] | string
+  argOptsTypes?: string[] | string
 ): string[] | typeof undefined {
   if (Array.isArray(argOptsTypes)) {
     if (argOptsTypes.find(v => v === 'string' || v === 'string[]')) {
@@ -79,14 +79,14 @@ export function mergeFieldMaps(
 }
 
 export function mergeCustomizationOptions<TContext>(
-  baseCOptions: TypeConverterOpts<TContext>,
-  childCOptions?: TypeConverterOpts<TContext>
-): TypeConverterOpts<TContext> | void {
+  baseCOptions: ComposeWithMongooseOpts<TContext>,
+  childCOptions?: ComposeWithMongooseOpts<TContext>
+): ComposeWithMongooseOpts<TContext> | void {
   if (!baseCOptions) {
     return childCOptions;
   }
 
-  const mergedOptions: TypeConverterOpts<TContext> = childCOptions || ({}: any);
+  const mergedOptions: ComposeWithMongooseOpts<TContext> = childCOptions || ({}: any);
 
   if (
     baseCOptions.schemaComposer !== mergedOptions.schemaComposer &&

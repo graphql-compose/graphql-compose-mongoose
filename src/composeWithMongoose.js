@@ -16,7 +16,7 @@ import MongoID from './types/mongoid';
 import type { PaginationResolverOpts } from './resolvers/pagination';
 import type { ConnectionSortMapOpts } from './resolvers/connection';
 
-export type TypeConverterOpts<TContext> = {|
+export type ComposeWithMongooseOpts<TContext> = {|
   schemaComposer?: SchemaComposer<TContext>,
   name?: string,
   description?: string,
@@ -117,7 +117,7 @@ export type TypeConverterResolversOpts = {
 
 export function composeWithMongoose<TSource, TContext>(
   model: Class<TSource>, // === MongooseModel,
-  opts: TypeConverterOpts<TContext> = ({}: any)
+  opts: ComposeWithMongooseOpts<TContext> = ({}: any)
 ): ObjectTypeComposer<TSource, TContext> {
   const m: MongooseModel = (model: any);
   const name: string = (opts && opts.name) || m.modelName;

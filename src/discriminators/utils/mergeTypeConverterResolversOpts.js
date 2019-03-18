@@ -11,7 +11,7 @@ type TypeFieldMap = {
 export function mergePrimitiveTypeFields(
   baseField?: any,
   childField?: any,
-  argOptsTypes: string[] | string
+  argOptsTypes?: string[] | string
 ) {
   if (Array.isArray(argOptsTypes)) {
     if (argOptsTypes.find(v => v === 'boolean' || v === 'number')) {

@@ -2,7 +2,10 @@
 
 import type { ResolveParams } from 'graphql-compose';
 import { Resolver, ObjectTypeComposer } from 'graphql-compose';
-import { type DiscriminatorOptions, DiscriminatorTypeComposer } from './DiscriminatorTypeComposer';
+import {
+  type ComposeWithMongooseDiscriminatorsOpts,
+  DiscriminatorTypeComposer,
+} from './DiscriminatorTypeComposer';
 import { EMCResolvers } from '../resolvers';
 
 // set the DKey as a query on filter, also project it
@@ -134,7 +137,7 @@ function reorderFieldsRecordFilter<TSource, TContext>(
 export function prepareChildResolvers<TSource, TContext>(
   baseDTC: DiscriminatorTypeComposer<TSource, TContext>,
   childTC: ObjectTypeComposer<TSource, TContext>,
-  opts: DiscriminatorOptions<TContext>
+  opts: ComposeWithMongooseDiscriminatorsOpts<TContext>
 ) {
   for (const resolverName in EMCResolvers) {
     if (EMCResolvers.hasOwnProperty(resolverName) && childTC.hasResolver(resolverName)) {

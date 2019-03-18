@@ -13,15 +13,15 @@ import {
 } from 'graphql-compose';
 import type { ComposeFieldConfigAsObject } from 'graphql-compose/lib/ObjectTypeComposer';
 import type { Model } from 'mongoose';
-import { composeWithMongoose, type TypeConverterOpts } from '../composeWithMongoose';
+import { composeWithMongoose, type ComposeWithMongooseOpts } from '../composeWithMongoose';
 import { composeChildTC } from './composeChildTC';
 import { mergeCustomizationOptions } from './utils/mergeCustomizationOptions';
 import { prepareBaseResolvers } from './prepareBaseResolvers';
 import { reorderFields } from './utils/reorderFields';
 
-export type DiscriminatorOptions<TContext> = {|
+export type ComposeWithMongooseDiscriminatorsOpts<TContext> = {|
   reorderFields?: boolean | string[], // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
-  ...TypeConverterOpts<TContext>,
+  ...ComposeWithMongooseOpts<TContext>,
 |};
 
 type Discriminators = {
@@ -75,7 +75,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 
   DKeyETC: EnumTypeComposer<TContext>;
 
-  opts: DiscriminatorOptions<TContext>;
+  opts: ComposeWithMongooseDiscriminatorsOpts<TContext>;
 
   DInterface: InterfaceTypeComposer<TSource, TContext>;
 
@@ -188,6 +188,23 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 
   hasChildTC(DName: string): boolean {
     return !!this.childTCs.find(ch => ch.getTypeName() === DName);
+  }
+
+  /* eslint no-use-before-define: 0 */
+  discriminator<TSrc: Model>(
+    childModel: Class<TSrc>,
+    opts?: ComposeWithMongooseOpts<TContext>
+  ): ObjectTypeComposer<TSrc, TContext> {
+    const customizationOpts = mergeCustomizationOptions((this.opts: any), opts);
+
+    let childTC = composeWithMongoose(childModel, customizationOpts);
+
+    childTC = composeChildTC(this, childTC, this.opts);
+
+    this.schemaComposer.addSchemaMustHaveType(childTC);
+    this.childTCs.push(childTC);
+
+    return childTC;
   }
 
   setFields(fields: ComposeFieldConfigMap<any, any>): DiscriminatorTypeComposer<TSource, TContext> {
@@ -357,22 +374,5 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     }
 
     return this;
-  }
-
-  /* eslint no-use-before-define: 0 */
-  discriminator<TSrc: Model>(
-    childModel: Class<TSrc>,
-    opts?: TypeConverterOpts<TContext>
-  ): ObjectTypeComposer<TSrc, TContext> {
-    const customizationOpts = mergeCustomizationOptions((this.opts: any), opts);
-
-    let childTC = composeWithMongoose(childModel, customizationOpts);
-
-    childTC = composeChildTC(this, childTC, this.opts);
-
-    this.schemaComposer.addSchemaMustHaveType(childTC);
-    this.childTCs.push(childTC);
-
-    return childTC;
   }
 }

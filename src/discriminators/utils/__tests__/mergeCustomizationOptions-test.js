@@ -1,7 +1,7 @@
 /* @flow */
 
 import { SchemaComposer } from 'graphql-compose';
-import type { TypeConverterOpts } from '../../../composeWithMongoose';
+import type { ComposeWithMongooseOpts } from '../../../composeWithMongoose';
 import {
   mergeCustomizationOptions,
   mergeFieldMaps,
@@ -134,7 +134,7 @@ describe('mergeFieldMaps()', () => {
 });
 
 describe('mergeCustomizationOptions()', () => {
-  const baseCustomOptions: TypeConverterOpts<any> = {
+  const baseCustomOptions: ComposeWithMongooseOpts<any> = {
     fields: baseFields,
     inputType: {
       name: 'BaseInput',
@@ -170,7 +170,7 @@ describe('mergeCustomizationOptions()', () => {
     },
   };
 
-  const childCustomOptions: TypeConverterOpts<any> = {
+  const childCustomOptions: ComposeWithMongooseOpts<any> = {
     fields: childFields,
     inputType: {
       name: 'ChildInputs',
@@ -205,7 +205,7 @@ describe('mergeCustomizationOptions()', () => {
     },
   };
 
-  const expected: TypeConverterOpts<any> = {
+  const expected: ComposeWithMongooseOpts<any> = {
     fields: expectedFields,
     inputType: {
       name: 'ChildInputs',

@@ -1,4 +1,6 @@
 /* @flow */
 
-export { DiscriminatorTypeComposer, DiscriminatorOptions } from './DiscriminatorTypeComposer';
+export { DiscriminatorTypeComposer } from './DiscriminatorTypeComposer';
+export type { ComposeWithMongooseDiscriminatorsOpts } from './DiscriminatorTypeComposer';
+
 export { mergeCustomizationOptions } from './utils/mergeCustomizationOptions';

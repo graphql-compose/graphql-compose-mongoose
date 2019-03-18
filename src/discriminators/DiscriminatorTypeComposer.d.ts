@@ -9,11 +9,11 @@ import {
   ObjectTypeComposer,
 } from 'graphql-compose';
 import { Document, Model } from 'mongoose';
-import { TypeConverterOpts } from '../composeWithMongoose';
+import { ComposeWithMongooseOpts } from '../composeWithMongoose';
 
-export type DiscriminatorOptions<TContext = any> = TypeConverterOpts<
-  TContext
-> & {
+export type ComposeWithMongooseDiscriminatorsOpts<
+  TContext = any
+> = ComposeWithMongooseOpts<TContext> & {
   reorderFields?: boolean | string[]; // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
 };
 
@@ -27,7 +27,7 @@ export class DiscriminatorTypeComposer<
 
   private DKeyETC: EnumTypeComposer;
 
-  private opts: DiscriminatorOptions<TContext>;
+  private opts: ComposeWithMongooseDiscriminatorsOpts<TContext>;
 
   private DInterface: InterfaceTypeComposer<any>;
 
@@ -35,7 +35,7 @@ export class DiscriminatorTypeComposer<
 
   public static createFromModel<TBModel extends Document, TCtx>(
     baseModel: Model<TBModel>,
-    opts?: DiscriminatorOptions<TCtx>,
+    opts?: ComposeWithMongooseDiscriminatorsOpts<TCtx>,
   ): DiscriminatorTypeComposer<TBModel, TCtx>;
 
   // ------------------------------------------------
@@ -51,7 +51,7 @@ export class DiscriminatorTypeComposer<
 
   public discriminator<TChildModel extends TBaseModel>(
     childModel: Model<TChildModel>,
-    opts?: TypeConverterOpts<TContext>,
+    opts?: ComposeWithMongooseOpts<TContext>,
   ): ObjectTypeComposer<TChildModel, TContext>;
 
   // ------------------------------------------------
@@ -69,9 +69,7 @@ export class DiscriminatorTypeComposer<
 
   public setFields(fields: ComposeFieldConfigMap<TBaseModel, TContext>): this;
 
-  public setFields(
-    fields: ComposeFieldConfigMap<TBaseModel, TContext>,
-  ): this;
+  public setFields(fields: ComposeFieldConfigMap<TBaseModel, TContext>): this;
 
   // discriminators must have all interface fields
   public addFields(

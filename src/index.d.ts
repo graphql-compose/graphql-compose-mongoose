@@ -1,15 +1,10 @@
 import { composeWithMongoose } from './composeWithMongoose';
-import { composeWithMongooseDiscriminators } from './composeWithMongooseDiscriminators';
 import GraphQLMongoID from './types/mongoid';
 
 export default composeWithMongoose;
 
-export * from './resolvers';
+export * from './composeWithMongoose';
+export * from './composeWithMongooseDiscriminators';
 export * from './fieldsConverter';
-export * from './discriminators';
-
-export {
-  composeWithMongoose,
-  composeWithMongooseDiscriminators,
-  GraphQLMongoID,
-};
+export * from './resolvers';
+export { GraphQLMongoID };

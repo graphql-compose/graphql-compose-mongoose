@@ -13,7 +13,7 @@ import {
 } from './resolvers/helpers';
 import { PaginationResolverOpts } from './resolvers/pagination';
 
-export type TypeConverterOpts<TContext = any> = {
+export type ComposeWithMongooseOpts<TContext = any> = {
   schemaComposer?: SchemaComposer<TContext>;
   name?: string;
   description?: string;
@@ -116,7 +116,7 @@ export function composeWithMongoose<
   TContext = any
 >(
   model: Model<TModel>,
-  opts?: TypeConverterOpts<TContext>,
+  opts?: ComposeWithMongooseOpts<TContext>,
 ): ObjectTypeComposer<TModel, TContext>;
 
 export function prepareFields(

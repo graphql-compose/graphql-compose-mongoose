@@ -1,11 +1,6 @@
-import { TypeConverterOpts } from '../composeWithMongoose';
-
 export {
   DiscriminatorTypeComposer,
-  DiscriminatorOptions,
+  ComposeWithMongooseDiscriminatorsOpts,
 } from './DiscriminatorTypeComposer';
 
-export function mergeCustomizationOptions(
-  baseCOptions: TypeConverterOpts,
-  childCOptions?: TypeConverterOpts,
-): TypeConverterOpts | void;
+export { mergeCustomizationOptions } from './utils/mergeCustomizationOptions';
