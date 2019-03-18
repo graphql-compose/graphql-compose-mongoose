@@ -1,7 +1,6 @@
 /* @flow */
 
-import type { ResolveParams } from 'graphql-compose';
-import { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { ResolveParams, Resolver, ObjectTypeComposer } from 'graphql-compose';
 import {
   type ComposeWithMongooseDiscriminatorsOpts,
   DiscriminatorTypeComposer,

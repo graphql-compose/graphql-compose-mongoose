@@ -10,7 +10,7 @@ import type {
   EnumTypeComposer,
   ComposeOutputType,
 } from 'graphql-compose';
-import { upperFirst, schemaComposer as globalSchemaComposer } from 'graphql-compose';
+import { upperFirst } from 'graphql-compose';
 import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
 import GraphQLMongoID from './types/mongoid';
 
@@ -116,9 +116,9 @@ export function getFieldsFromModel(model: MongooseModel | MongoosePseudoModelT):
 export function convertModelToGraphQL<TSource, TContext>(
   model: MongooseModel | MongoosePseudoModelT,
   typeName: string,
-  schemaComposer?: SchemaComposer<TContext>
+  schemaComposer: SchemaComposer<TContext>
 ): ObjectTypeComposer<TSource, TContext> {
-  const sc = schemaComposer || globalSchemaComposer;
+  const sc = schemaComposer;
 
   if (!typeName) {
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
@@ -166,9 +166,9 @@ export function convertModelToGraphQL<TSource, TContext>(
 export function convertSchemaToGraphQL(
   schema: Schema<any>,
   typeName: string,
-  schemaComposer?: SchemaComposer<any>
+  schemaComposer: SchemaComposer<any>
 ): ObjectTypeComposer<any, any> {
-  const sc = schemaComposer || globalSchemaComposer;
+  const sc = schemaComposer;
 
   if (!typeName) {
     throw new Error('You provide empty name for type. `name` argument should be non-empty string.');
