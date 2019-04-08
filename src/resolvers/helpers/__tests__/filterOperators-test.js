@@ -35,7 +35,7 @@ describe('Resolver helper `filter` ->', () => {
 
     it('should by default have only indexed fields', () => {
       _createOperatorsField(itc, 'OperatorsTypeName', UserModel, {});
-      const operatorsTC = itc.getFieldTC(OPERATORS_FIELDNAME);
+      const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
       expect(operatorsTC.getFieldNames()).toEqual(
         expect.arrayContaining(['name', '_id', 'employment'])
       );
@@ -44,14 +44,14 @@ describe('Resolver helper `filter` ->', () => {
 
     it('should have only provided fields via options', () => {
       _createOperatorsField(itc, 'OperatorsTypeName', UserModel, { age: ['lt'] });
-      const operatorsTC = itc.getFieldTC(OPERATORS_FIELDNAME);
+      const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
       expect(operatorsTC.hasField('age')).toBe(true);
     });
 
     it('should have only provided operators via options for field', () => {
       _createOperatorsField(itc, 'OperatorsTypeName', UserModel, { age: ['lt', 'gte'] });
-      const operatorsTC = itc.getFieldTC(OPERATORS_FIELDNAME);
-      const ageTC = operatorsTC.getFieldTC('age');
+      const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
+      const ageTC = operatorsTC.getFieldITC('age');
       expect(ageTC.getFieldNames()).toEqual(expect.arrayContaining(['lt', 'gte']));
     });
 

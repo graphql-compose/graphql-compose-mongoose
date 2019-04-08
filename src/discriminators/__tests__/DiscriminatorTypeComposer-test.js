@@ -234,7 +234,7 @@ describe('DiscriminatorTypeComposer', () => {
       afterAll(() => schemaComposer.clear());
 
       it('should add field to baseTC', () => {
-        expect(characterDTC.getFieldTC('field1').getFieldType('nested')).toEqual(
+        expect(characterDTC.getFieldOTC('field1').getFieldType('nested')).toEqual(
           graphql.GraphQLString
         );
       });
@@ -243,14 +243,16 @@ describe('DiscriminatorTypeComposer', () => {
         expect(
           characterDTC
             .getDInterface()
-            .getFieldTC('field1')
+            .getFieldOTC('field1')
             .getFieldType('nested')
         ).toEqual(graphql.GraphQLString);
       });
 
       it('should have exactly plus two fields added to childTC fields', () => {
-        expect(droidTC.getFieldTC('field1').getFieldType('nested')).toEqual(graphql.GraphQLString);
-        expect(personTC.getFieldTC('field2').getFieldType('nested')).toEqual(graphql.GraphQLString);
+        expect(droidTC.getFieldOTC('field1').getFieldType('nested')).toEqual(graphql.GraphQLString);
+        expect(personTC.getFieldOTC('field2').getFieldType('nested')).toEqual(
+          graphql.GraphQLString
+        );
       });
 
       it('should have plus 2 field length on childTC', () => {
