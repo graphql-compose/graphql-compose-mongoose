@@ -1,4 +1,7 @@
-import { ComposeFieldConfigArgumentMap, ObjectTypeComposer } from 'graphql-compose';
+import {
+  ObjectTypeComposerArgumentConfigMapDefinition,
+  ObjectTypeComposer,
+} from 'graphql-compose';
 import { Model } from 'mongoose';
 import { MongoId } from '../../types/mongoid';
 import { ExtendedResolveParams } from '../index';
@@ -29,6 +32,6 @@ export function filterHelperArgs(
   typeComposer: ObjectTypeComposer<any>,
   model: Model<any>,
   opts?: FilterHelperArgsOpts,
-): ComposeFieldConfigArgumentMap;
+): ObjectTypeComposerArgumentConfigMapDefinition;
 
 export function filterHelper(resolveParams: ExtendedResolveParams): void;

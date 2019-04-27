@@ -28,7 +28,7 @@ export default function findOne<TSource: MongooseDocument, TContext>(
   }
 
   return tc.schemaComposer.createResolver({
-    type: tc.getType(),
+    type: tc,
     name: 'findOne',
     kind: 'query',
     args: {

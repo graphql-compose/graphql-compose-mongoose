@@ -1,7 +1,6 @@
 /* @flow */
 
 import type { ObjectTypeComposer, Resolver } from 'graphql-compose';
-import { graphql } from 'graphql-compose';
 import type { MongooseModel, MongooseDocument } from 'mongoose';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
@@ -56,7 +55,7 @@ export default function createMany<TSource: MongooseDocument, TContext>(
         description: 'Created document ID',
       },
       records: {
-        type: new graphql.GraphQLNonNull(tc.getTypePlural()),
+        type: tc.getTypePlural().getTypeNonNull(),
         description: 'Created documents',
       },
       createCount: {
@@ -73,17 +72,15 @@ export default function createMany<TSource: MongooseDocument, TContext>(
     type: outputType,
     args: {
       records: {
-        type: new graphql.GraphQLNonNull(
-          new graphql.GraphQLList(
-            (recordHelperArgs(tc, {
-              recordTypeName: `CreateMany${tc.getTypeName()}Input`,
-              removeFields: ['id', '_id'],
-              isRequired: true,
-              requiredFields,
-              ...(opts && opts.records),
-            }).record: any).type
-          )
-        ),
+        type: (recordHelperArgs(tc, {
+          recordTypeName: `CreateMany${tc.getTypeName()}Input`,
+          removeFields: ['id', '_id'],
+          isRequired: true,
+          requiredFields,
+          ...(opts && opts.records),
+        }).record: any).type
+          .getTypePlural()
+          .getTypeNonNull(),
       },
     },
     resolve: async (resolveParams: ExtendedResolveParams) => {

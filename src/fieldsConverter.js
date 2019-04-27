@@ -8,7 +8,7 @@ import type {
   SchemaComposer,
   ObjectTypeComposer,
   EnumTypeComposer,
-  ComposeOutputType,
+  ComposeOutputTypeDefinition,
 } from 'graphql-compose';
 import { upperFirst } from 'graphql-compose';
 import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
@@ -190,9 +190,9 @@ export function convertFieldToGraphQL(
   field: MongooseFieldT,
   prefix?: string = '',
   schemaComposer: SchemaComposer<any>
-): ComposeOutputType<any, any> {
+): ComposeOutputTypeDefinition<any> {
   if (!schemaComposer.has('MongoID')) {
-    schemaComposer.set('MongoID', GraphQLMongoID);
+    schemaComposer.add(GraphQLMongoID);
   }
 
   const complexType = deriveComplexType(field);
@@ -276,7 +276,7 @@ export function arrayToGraphQL(
   field: MongooseFieldT,
   prefix?: string = '',
   schemaComposer: SchemaComposer<any>
-): ComposeOutputType<any, any> {
+): ComposeOutputTypeDefinition<any> {
   if (!field || !field.caster) {
     throw new Error(
       'You provide incorrect mongoose field to `arrayToGraphQL()`. ' +
@@ -286,7 +286,7 @@ export function arrayToGraphQL(
 
   const unwrappedField = { ...field.caster };
 
-  const outputType = convertFieldToGraphQL(unwrappedField, prefix, schemaComposer);
+  const outputType: any = convertFieldToGraphQL(unwrappedField, prefix, schemaComposer);
   return [outputType];
 }
 

@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { ResolveParams } from 'graphql-compose';
+import type { ResolverResolveParams } from 'graphql-compose';
 import type { MongooseQuery } from 'mongoose';
 import connection from './connection';
 import count from './count';
@@ -38,7 +38,7 @@ export type GenResolverOpts = {
   limit?: LimitHelperArgsOpts,
 };
 
-export type ExtendedResolveParams = $Shape<ResolveParams<*, *>> & {
+export type ExtendedResolveParams = $Shape<ResolverResolveParams<any, any>> & {
   query: MongooseQuery<*, *>,
   rawQuery: { [optName: string]: any },
   beforeQuery?: (query: mixed, rp: ExtendedResolveParams) => Promise<*>,

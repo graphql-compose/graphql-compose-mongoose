@@ -1,4 +1,4 @@
-import { ResolveParams } from 'graphql-compose';
+import { ResolverResolveParams } from 'graphql-compose';
 import { DocumentQuery } from 'mongoose';
 import connection from './connection';
 import count from './count';
@@ -36,7 +36,7 @@ export type GenResolverOpts = {
   limit?: LimitHelperArgsOpts;
 };
 
-export type ExtendedResolveParams = ResolveParams<any, any> & {
+export type ExtendedResolveParams = ResolverResolveParams<any, any> & {
   query: DocumentQuery<any, any>;
   rawQuery: { [optName: string]: any };
   beforeQuery?: (query: any, rp: ExtendedResolveParams) => Promise<any>;
