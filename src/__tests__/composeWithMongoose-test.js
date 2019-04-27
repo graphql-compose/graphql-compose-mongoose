@@ -138,9 +138,9 @@ describe('composeWithMongoose ->', () => {
           },
         }).getInputTypeComposer();
 
-        expect(itc.isRequired('name')).toBe(true);
-        expect(itc.isRequired('gender')).toBe(true);
-        expect(itc.isRequired('age')).toBe(false);
+        expect(itc.isFieldNonNull('name')).toBe(true);
+        expect(itc.isFieldNonNull('gender')).toBe(true);
+        expect(itc.isFieldNonNull('age')).toBe(false);
       });
     });
 
@@ -208,9 +208,8 @@ describe('composeWithMongoose ->', () => {
           },
         },
       });
-      const filterArgInFindOne: any = typeComposer.getResolver('findOne').getArg('filter');
-      const itc = schemaComposer.createInputTC(filterArgInFindOne.type);
-      expect(itc.isRequired('age')).toBe(true);
+      const filterArgInFindOne = typeComposer.getResolver('findOne').getArgITC('filter');
+      expect(filterArgInFindOne.isFieldNonNull('age')).toBe(true);
     });
 
     it('should use cached type to avoid maximum call stack size exceeded', () => {

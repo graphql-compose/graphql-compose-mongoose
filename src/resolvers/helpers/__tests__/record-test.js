@@ -1,7 +1,11 @@
 /* @flow */
 
-import { schemaComposer, type ObjectTypeComposer } from 'graphql-compose';
-import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql-compose/lib/graphql';
+import {
+  schemaComposer,
+  NonNullComposer,
+  InputTypeComposer,
+  type ObjectTypeComposer,
+} from 'graphql-compose';
 import { recordHelperArgs } from '../record';
 import { UserModel } from '../../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../../fieldsConverter';
@@ -23,7 +27,7 @@ describe('Resolver helper `record` ->', () => {
       const args: any = recordHelperArgs(UserTC, {
         recordTypeName: 'RecordUserType',
       });
-      expect(args.record.type).toBeInstanceOf(GraphQLInputObjectType);
+      expect(args.record.type).toBeInstanceOf(InputTypeComposer);
     });
 
     it('should reuse existed inputType', () => {
@@ -35,15 +39,15 @@ describe('Resolver helper `record` ->', () => {
       const args: any = recordHelperArgs(UserTC, {
         recordTypeName: 'RecordUserType',
       });
-      expect(args.record.type).toBe(existedType.getType());
+      expect(args.record.type).toBe(existedType);
     });
 
-    it('should for opts.isRequired=true return GraphQLNonNull', () => {
+    it('should for opts.isRequired=true return NonNullComposer', () => {
       const args: any = recordHelperArgs(UserTC, {
         recordTypeName: 'RecordUserType',
         isRequired: true,
       });
-      expect(args.record.type).toBeInstanceOf(GraphQLNonNull);
+      expect(args.record.type).toBeInstanceOf(NonNullComposer);
     });
 
     it('should remove fields via opts.removeFields', () => {
@@ -51,7 +55,7 @@ describe('Resolver helper `record` ->', () => {
         recordTypeName: 'RecordUserType',
         removeFields: ['name', 'age'],
       });
-      const inputTypeComposer = schemaComposer.createInputTC(args.record.type);
+      const inputTypeComposer = args.record.type;
       expect(inputTypeComposer.hasField('name')).toBe(false);
       expect(inputTypeComposer.hasField('age')).toBe(false);
       expect(inputTypeComposer.hasField('gender')).toBe(true);
@@ -62,10 +66,10 @@ describe('Resolver helper `record` ->', () => {
         recordTypeName: 'RecordUserType',
         requiredFields: ['name', 'age'],
       });
-      const inputTypeComposer = schemaComposer.createInputTC(args.record.type);
-      expect(inputTypeComposer.getFieldType('name')).toBeInstanceOf(GraphQLNonNull);
-      expect(inputTypeComposer.getFieldType('age')).toBeInstanceOf(GraphQLNonNull);
-      expect(inputTypeComposer.getFieldType('gender')).not.toBeInstanceOf(GraphQLNonNull);
+      const inputTypeComposer = args.record.type;
+      expect(inputTypeComposer.getField('name').type).toBeInstanceOf(NonNullComposer);
+      expect(inputTypeComposer.getField('age').type).toBeInstanceOf(NonNullComposer);
+      expect(inputTypeComposer.getField('gender').type).not.toBeInstanceOf(NonNullComposer);
     });
   });
 });

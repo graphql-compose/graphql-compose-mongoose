@@ -35,7 +35,7 @@ describe('issue #136 - Mongoose virtuals', () => {
   const CommentTC = composeWithMongoose(Comment);
 
   CommentTC.wrapResolverAs('createManyFiltered', 'createMany', updateManyFiltered => {
-    const recordsTC = CommentTC.getResolver('createMany').getArgTC('records');
+    const recordsTC = CommentTC.getResolver('createMany').getArgITC('records');
     const clonedRecordTC = recordsTC.clone('createManyFilteredInput');
     clonedRecordTC.removeField('links').addFields({ hi: 'String' });
     updateManyFiltered.extendArg('records', { type: clonedRecordTC.getTypePlural() });

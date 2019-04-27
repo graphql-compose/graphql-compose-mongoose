@@ -33,7 +33,8 @@ beforeEach(async () => {
     relocation: false,
   });
 
-  await Promise.all([user1.save(), user2.save()]);
+  await user1.save();
+  await user2.save();
 });
 
 describe('findOne() ->', () => {
@@ -52,7 +53,7 @@ describe('findOne() ->', () => {
       const resolver = findOne(UserModel, UserTC, {
         filter: { onlyIndexed: true, operators: false },
       });
-      expect(resolver.getArgTC('filter').getFieldNames()).toEqual(
+      expect(resolver.getArgITC('filter').getFieldNames()).toEqual(
         expect.arrayContaining(['_id', 'name', 'employment'])
       );
     });
@@ -61,7 +62,7 @@ describe('findOne() ->', () => {
       const resolver = findOne(UserModel, UserTC, {
         filter: { requiredFields: 'name' },
       });
-      expect(resolver.getArgTC('filter').getFieldType('name')).toBeInstanceOf(GraphQLNonNull);
+      expect(resolver.getArgITC('filter').getFieldType('name')).toBeInstanceOf(GraphQLNonNull);
     });
 
     it('should have `skip` arg', () => {

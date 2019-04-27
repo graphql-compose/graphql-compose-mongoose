@@ -65,7 +65,6 @@ describe('issue #135 - Mongoose virtuals', () => {
       schema,
       source: 'query { findMany { id title virtualField123 } }',
     });
-
     expect(res).toEqual({
       data: {
         findMany: [
