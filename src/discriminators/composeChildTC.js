@@ -18,11 +18,11 @@ function copyBaseTCFieldsToChildTC(
   const childFields = childTC.getFieldNames();
 
   for (const field of baseFields) {
-    const childFieldName = childFields.find(fld => fld === field);
+    const isFieldExists = childFields.find(fld => fld === field);
 
-    if (childFieldName) {
+    if (isFieldExists) {
       childTC.extendField(field, {
-        type: baseDTC.getFieldType(field),
+        type: baseDTC.getField(field).type,
       });
     } else {
       childTC.setField(field, baseDTC.getField(field));
@@ -39,7 +39,7 @@ export function composeChildTC<TSource, TContext>(
 ): ObjectTypeComposer<TSource, TContext> {
   const composedChildTC = copyBaseTCFieldsToChildTC(baseDTC, childTC);
 
-  composedChildTC.setInterfaces([baseDTC.getDInterface()]);
+  composedChildTC.addInterface(baseDTC.getDInterface());
 
   prepareChildResolvers(baseDTC, composedChildTC, opts);
 

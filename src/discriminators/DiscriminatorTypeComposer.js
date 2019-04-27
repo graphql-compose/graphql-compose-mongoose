@@ -2,16 +2,16 @@
 
 import {
   EnumTypeComposer,
-  schemaComposer as globalSchemaComposer,
   SchemaComposer,
   ObjectTypeComposer,
   type InterfaceTypeComposer,
-  type ComposeFieldConfig,
-  type RelationOpts,
-  type GetRecordIdFn,
-  type ComposeFieldConfigMap,
+  type ObjectTypeComposerRelationOpts,
+  type ObjectTypeComposerGetRecordIdFn,
+  type ObjectTypeComposerFieldConfigDefinition,
+  type ObjectTypeComposerFieldConfigMapDefinition,
+  type ObjectTypeComposerFieldConfigAsObjectDefinition,
+  type Thunk,
 } from 'graphql-compose';
-import type { ComposeFieldConfigAsObject } from 'graphql-compose/lib/ObjectTypeComposer';
 import type { Model } from 'mongoose';
 import { composeWithMongoose, type ComposeWithMongooseOpts } from '../composeWithMongoose';
 import { composeChildTC } from './composeChildTC';
@@ -71,6 +71,8 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   TSource,
   TContext
 > {
+  schemaComposer: SchemaComposer<TContext>;
+
   discriminatorKey: string;
 
   DKeyETC: EnumTypeComposer<TContext>;
@@ -80,16 +82,6 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   DInterface: InterfaceTypeComposer<TSource, TContext>;
 
   childTCs: ObjectTypeComposer<any, TContext>[];
-
-  static _getClassConnectedWithSchemaComposer(
-    schemaComposer?: SchemaComposer<TContext>
-  ): Class<DiscriminatorTypeComposer<TSource, TContext>> {
-    class _DiscriminatorTypeComposer extends DiscriminatorTypeComposer<TSource, TContext> {
-      static schemaComposer = schemaComposer || globalSchemaComposer;
-    }
-
-    return _DiscriminatorTypeComposer;
-  }
 
   /* ::
   constructor(gqType: any, schemaComposer: SchemaComposer<TContext>): DiscriminatorTypeComposer<TSource, TContext> {
@@ -121,24 +113,22 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     };
 
     const baseTC = composeWithMongoose(baseModel, opts);
+    const baseDTC = new DiscriminatorTypeComposer(baseTC.getType(), schemaComposer);
 
-    const _DiscriminatorTypeComposer = this._getClassConnectedWithSchemaComposer(
-      opts.schemaComposer
-    );
-    const baseDTC = new _DiscriminatorTypeComposer(baseTC.getType(), schemaComposer);
+    // copy data from baseTC to baseDTC
+    baseTC.clone(baseDTC);
+    baseDTC._gqcInputTypeComposer = baseTC._gqcInputTypeComposer;
 
     baseDTC.opts = opts;
     baseDTC.childTCs = [];
     baseDTC.discriminatorKey = (baseModel: any).schema.get('discriminatorKey') || '__t';
+    baseDTC.DInterface = baseDTC._createDInterface(baseDTC);
+    baseDTC.setInterfaces([baseDTC.DInterface]);
 
     // discriminators an object containing all discriminators with key being DNames
     baseDTC.DKeyETC = createAndSetDKeyETC(baseDTC, (baseModel: any).discriminators);
 
     reorderFields(baseDTC, (baseDTC.opts: any).reorderFields, baseDTC.discriminatorKey);
-
-    baseDTC.DInterface = baseDTC._createDInterface(baseDTC);
-    baseDTC.setInterfaces([baseDTC.DInterface]);
-
     baseDTC.schemaComposer.addSchemaMustHaveType(baseDTC);
 
     // prepare Base Resolvers
@@ -150,6 +140,12 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   _createDInterface(
     baseTC: DiscriminatorTypeComposer<any, any>
   ): InterfaceTypeComposer<TSource, TContext> {
+    const baseFields = baseTC.getFieldNames();
+    const interfaceFields = {};
+    for (const field of baseFields) {
+      interfaceFields[field] = baseTC.getFieldConfig(field);
+    }
+
     return this.schemaComposer.createInterfaceTC({
       name: `${baseTC.getTypeName()}Interface`,
 
@@ -163,14 +159,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
         // as fallback return BaseModelTC
         return baseTC.schemaComposer.getOTC(baseTC.getTypeName()).getType();
       },
-      fields: (): ComposeFieldConfigMap<any, TContext> => {
-        const baseFields = baseTC.getFieldNames();
-        const interfaceFields = {};
-        for (const field of baseFields) {
-          interfaceFields[field] = baseTC.getFieldConfig(field);
-        }
-        return interfaceFields;
-      },
+      fields: interfaceFields,
     });
   }
 
@@ -207,9 +196,12 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     return childTC;
   }
 
-  setFields(fields: ComposeFieldConfigMap<any, any>): DiscriminatorTypeComposer<TSource, TContext> {
+  setFields(
+    fields: ObjectTypeComposerFieldConfigMapDefinition<any, any>
+  ): DiscriminatorTypeComposer<TSource, TContext> {
     const oldFieldNames = super.getFieldNames();
     super.setFields(fields);
+    this.getDInterface().setFields(fields);
 
     for (const childTC of this.childTCs) {
       childTC.removeField(oldFieldNames);
@@ -222,9 +214,10 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 
   setField(
     fieldName: string,
-    fieldConfig: ComposeFieldConfig<any, any>
+    fieldConfig: Thunk<ObjectTypeComposerFieldConfigDefinition<any, any>>
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.setField(fieldName, fieldConfig);
+    this.getDInterface().setField(fieldName, (fieldConfig: any));
 
     for (const childTC of this.childTCs) {
       childTC.setField(fieldName, fieldConfig);
@@ -235,9 +228,10 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 
   // discriminators must have all interface fields
   addFields(
-    newFields: ComposeFieldConfigMap<any, any>
+    newFields: ObjectTypeComposerFieldConfigMapDefinition<any, any>
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.addFields(newFields);
+    this.getDInterface().addFields(newFields);
 
     for (const childTC of this.childTCs) {
       childTC.addFields(newFields);
@@ -247,9 +241,10 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   }
 
   addNestedFields(
-    newFields: ComposeFieldConfigMap<any, any>
+    newFields: ObjectTypeComposerFieldConfigMapDefinition<any, any>
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.addNestedFields(newFields);
+    this.getDInterface().setFields(this.getFields());
 
     for (const childTC of this.childTCs) {
       childTC.addNestedFields(newFields);
@@ -262,6 +257,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     fieldNameOrArray: string | Array<string>
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.removeField(fieldNameOrArray);
+    this.getDInterface().removeField(fieldNameOrArray);
 
     for (const childTC of this.childTCs) {
       childTC.removeField(fieldNameOrArray);
@@ -275,6 +271,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   ): DiscriminatorTypeComposer<TSource, TContext> {
     const oldFieldNames = super.getFieldNames();
     super.removeOtherFields(fieldNameOrArray);
+    this.getDInterface().removeOtherFields(fieldNameOrArray);
 
     for (const childTC of this.childTCs) {
       const specificFields = childTC
@@ -290,24 +287,26 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     return this;
   }
 
-  extendField(
-    fieldName: string,
-    partialFieldConfig: $Shape<ComposeFieldConfigAsObject<any, TContext>>
-  ): this {
-    super.extendField(fieldName, partialFieldConfig);
+  reorderFields(names: string[]): DiscriminatorTypeComposer<TSource, TContext> {
+    super.reorderFields(names);
+    this.getDInterface().reorderFields(names);
 
     for (const childTC of this.childTCs) {
-      childTC.extendField(fieldName, partialFieldConfig);
+      childTC.reorderFields(names);
     }
 
     return this;
   }
 
-  reorderFields(names: string[]): DiscriminatorTypeComposer<TSource, TContext> {
-    super.reorderFields(names);
+  extendField(
+    fieldName: string,
+    partialFieldConfig: $Shape<ObjectTypeComposerFieldConfigAsObjectDefinition<any, TContext>>
+  ): this {
+    super.extendField(fieldName, partialFieldConfig);
+    this.getDInterface().extendField(fieldName, partialFieldConfig);
 
     for (const childTC of this.childTCs) {
-      childTC.reorderFields(names);
+      childTC.extendField(fieldName, partialFieldConfig);
     }
 
     return this;
@@ -317,6 +316,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     fieldNameOrArray: string | Array<string>
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.makeFieldNonNull(fieldNameOrArray);
+    this.getDInterface().makeFieldNonNull(fieldNameOrArray);
 
     for (const childTC of this.childTCs) {
       childTC.makeFieldNonNull(fieldNameOrArray);
@@ -329,9 +329,36 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     fieldNameOrArray: string | Array<string>
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.makeFieldNullable(fieldNameOrArray);
+    this.getDInterface().makeFieldNullable(fieldNameOrArray);
 
     for (const childTC of this.childTCs) {
       childTC.makeFieldNullable(fieldNameOrArray);
+    }
+
+    return this;
+  }
+
+  makeFieldPlural(
+    fieldNameOrArray: string | Array<string>
+  ): DiscriminatorTypeComposer<TSource, TContext> {
+    super.makeFieldPlural(fieldNameOrArray);
+    this.getDInterface().makeFieldPlural(fieldNameOrArray);
+
+    for (const childTC of this.childTCs) {
+      childTC.makeFieldPlural(fieldNameOrArray);
+    }
+
+    return this;
+  }
+
+  makeFieldNonPlural(
+    fieldNameOrArray: string | Array<string>
+  ): DiscriminatorTypeComposer<TSource, TContext> {
+    super.makeFieldNonPlural(fieldNameOrArray);
+    this.getDInterface().makeFieldNonPlural(fieldNameOrArray);
+
+    for (const childTC of this.childTCs) {
+      childTC.makeFieldNonPlural(fieldNameOrArray);
     }
 
     return this;
@@ -341,6 +368,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     fields: { [fieldName: string]: string } | string[] | string
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.deprecateFields(fields);
+    this.getDInterface().deprecateFields(fields);
 
     for (const childTC of this.childTCs) {
       childTC.deprecateFields(fields);
@@ -355,9 +383,10 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   // NOTE, those relations will be propagated to the childTypeComposers and you can use normally.
   addRelation(
     fieldName: string,
-    relationOpts: RelationOpts<any, any, any>
+    relationOpts: ObjectTypeComposerRelationOpts<any, any, any>
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.addRelation(fieldName, relationOpts);
+    this.getDInterface().setField(fieldName, this.getField(fieldName));
 
     for (const childTC of this.childTCs) {
       childTC.addRelation(fieldName, relationOpts);
@@ -366,7 +395,9 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     return this;
   }
 
-  setRecordIdFn(fn: GetRecordIdFn<any, any>): DiscriminatorTypeComposer<TSource, TContext> {
+  setRecordIdFn(
+    fn: ObjectTypeComposerGetRecordIdFn<any, any>
+  ): DiscriminatorTypeComposer<TSource, TContext> {
     super.setRecordIdFn(fn);
 
     for (const childTC of this.childTCs) {

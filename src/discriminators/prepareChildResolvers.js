@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { ResolveParams, Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { ResolverResolveParams, Resolver, ObjectTypeComposer } from 'graphql-compose';
 import {
   type ComposeWithMongooseDiscriminatorsOpts,
   DiscriminatorTypeComposer,
@@ -17,7 +17,7 @@ function setQueryDKey<TSource, TContext>(
   fromField: string
 ) {
   if (resolver) {
-    resolver.wrapResolve(next => (resolve: ResolveParams<TSource, TContext>) => {
+    resolver.wrapResolve(next => (resolve: ResolverResolveParams<TSource, TContext>) => {
       const DName = childTC.getTypeName();
 
       /* eslint no-param-reassign: 0 */
@@ -56,7 +56,7 @@ function hideDKey<TSource, TContext>(
       hideDKey(resolver, childTC, DKey, field);
     }
   } else if (fromField && resolver.hasArg(fromField)) {
-    const fieldTC = resolver.getArgTC(fromField);
+    const fieldTC = resolver.getArgITC(fromField);
 
     if (fieldTC) {
       fieldTC.removeField(DKey);
@@ -82,14 +82,14 @@ function copyResolverArgTypes<TSource, TContext>(
         baseDTC.hasResolver(resolver.name) &&
         baseDTC.getResolver(resolver.name).hasArg(fromArg)
       ) {
-        const childResolverArgTc = resolver.getArgTC(fromArg);
-        const baseResolverArgTC = baseDTC.getResolver(resolver.name).getArgTC(fromArg);
+        const childResolverArgTC = resolver.getArgITC(fromArg);
+        const baseResolverArgTC = baseDTC.getResolver(resolver.name).getArgITC(fromArg);
         const baseResolverArgTCFields = baseResolverArgTC.getFieldNames();
 
         for (const baseArgField of baseResolverArgTCFields) {
-          if (childResolverArgTc.hasField(baseArgField) && baseArgField !== '_id') {
-            childResolverArgTc.extendField(baseArgField, {
-              type: baseResolverArgTC.getFieldType(baseArgField),
+          if (childResolverArgTC.hasField(baseArgField) && baseArgField !== '_id') {
+            childResolverArgTC.extendField(baseArgField, {
+              type: baseResolverArgTC.getField(baseArgField).type,
             });
           }
         }
@@ -111,7 +111,7 @@ function reorderFieldsRecordFilter<TSource, TContext>(
         reorderFieldsRecordFilter(resolver, baseDTC, order, field);
       }
     } else if (fromField && resolver.hasArg(fromField)) {
-      const argTC = resolver.getArgTC(fromField);
+      const argTC = resolver.getArgITC(fromField);
 
       if (Array.isArray(order)) {
         argTC.reorderFields(order);

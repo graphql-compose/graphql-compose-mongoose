@@ -41,7 +41,7 @@ describe('composeWithMongooseDiscriminators ->', () => {
       });
       const filterArgInFindOne: any = typeComposer.getResolver('findOne').getArg('filter');
       const inputComposer = schemaComposer.createInputTC(filterArgInFindOne.type);
-      expect(inputComposer.isRequired('kind')).toBe(true);
+      expect(inputComposer.isFieldNonNull('kind')).toBe(true);
     });
 
     it('should proceed customizationOptions.inputType.fields.required', () => {
@@ -53,8 +53,8 @@ describe('composeWithMongooseDiscriminators ->', () => {
         },
       }).getInputTypeComposer();
 
-      expect(itc.isRequired('name')).toBe(true);
-      expect(itc.isRequired('friends')).toBe(true);
+      expect(itc.isFieldNonNull('name')).toBe(true);
+      expect(itc.isFieldNonNull('friends')).toBe(true);
     });
 
     it('should be passed down record opts to resolvers', () => {
@@ -68,8 +68,8 @@ describe('composeWithMongooseDiscriminators ->', () => {
           },
         },
       });
-      const createOneRecordArgTC = typeComposer.getResolver('createOne').getArgTC('record');
-      expect(createOneRecordArgTC.isRequired('name')).toBe(true);
+      const createOneRecordArgTC = typeComposer.getResolver('createOne').getArgITC('record');
+      expect(createOneRecordArgTC.isFieldNonNull('name')).toBe(true);
       expect(createOneRecordArgTC.hasField('friends')).toBe(false);
     });
 
@@ -84,8 +84,8 @@ describe('composeWithMongooseDiscriminators ->', () => {
           },
         },
       });
-      const createManyRecordsArgTC = typeComposer.getResolver('createMany').getArgTC('records');
-      expect(createManyRecordsArgTC.isRequired('name')).toBe(true);
+      const createManyRecordsArgTC = typeComposer.getResolver('createMany').getArgITC('records');
+      expect(createManyRecordsArgTC.isFieldNonNull('name')).toBe(true);
       expect(createManyRecordsArgTC.hasField('friends')).toBe(false);
     });
   });
