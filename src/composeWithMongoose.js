@@ -123,7 +123,7 @@ export function composeWithMongoose<TSource, TContext>(
   const name: string = (opts && opts.name) || m.modelName;
 
   const sc = opts.schemaComposer || globalSchemaComposer;
-  sc.set('MongoID', MongoID);
+  sc.add(MongoID);
   const tc = convertModelToGraphQL((m: any), name, sc);
 
   if (opts.description) {
@@ -185,7 +185,7 @@ export function prepareInputFields(
     inputTypeComposer.removeField(inputFieldsOpts.remove);
   }
   if (inputFieldsOpts.required) {
-    inputTypeComposer.makeRequired(inputFieldsOpts.required);
+    inputTypeComposer.makeFieldNonNull(inputFieldsOpts.required);
   }
 }
 

@@ -3,7 +3,7 @@
 
 import type { MongooseModel } from 'mongoose';
 import type {
-  ComposeFieldConfigArgumentMap,
+  ObjectTypeComposerArgumentConfigMapDefinition,
   ObjectTypeComposer,
   SchemaComposer,
   EnumTypeComposer,
@@ -19,7 +19,7 @@ export const sortHelperArgs = (
   tc: ObjectTypeComposer<any, any>,
   model: MongooseModel,
   opts?: SortHelperArgsOpts
-): ComposeFieldConfigArgumentMap<> => {
+): ObjectTypeComposerArgumentConfigMapDefinition<> => {
   if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
     throw new Error('First arg for sortHelperArgs() should be instance of ObjectTypeComposer.');
   }

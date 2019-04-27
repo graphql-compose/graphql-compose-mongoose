@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import type { ObjectTypeComposerArgumentConfigMapDefinition } from 'graphql-compose';
 import type { ExtendedResolveParams } from '../index';
 
 export type LimitHelperArgsOpts = {
@@ -10,7 +10,9 @@ export type LimitHelperArgsOpts = {
 // for merging, discriminators merge-able only
 export const getLimitHelperArgsOptsMap = () => ({ defaultValue: 'number' });
 
-export const limitHelperArgs = (opts?: LimitHelperArgsOpts): ComposeFieldConfigArgumentMap<> => {
+export const limitHelperArgs = (
+  opts?: LimitHelperArgsOpts
+): ObjectTypeComposerArgumentConfigMapDefinition<> => {
   return {
     limit: {
       type: 'Int',

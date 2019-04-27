@@ -1,4 +1,4 @@
-import { ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import { ObjectTypeComposerArgumentConfigMapDefinition } from 'graphql-compose';
 import { ExtendedResolveParams } from '../index';
 
 export type LimitHelperArgsOpts = {
@@ -13,6 +13,6 @@ export function getLimitHelperArgsOptsMap(): Partial<
 
 export function limitHelperArgs(
   opts?: LimitHelperArgsOpts,
-): ComposeFieldConfigArgumentMap;
+): ObjectTypeComposerArgumentConfigMapDefinition;
 
 export function limitHelper(resolveParams: ExtendedResolveParams): void;

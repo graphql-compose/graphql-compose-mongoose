@@ -1,5 +1,5 @@
 import {
-  ComposeFieldConfigArgumentMap,
+  ObjectTypeComposerArgumentConfigMapDefinition,
   EnumTypeComposer,
   SchemaComposer,
   ObjectTypeComposer,
@@ -17,7 +17,7 @@ export function sortHelperArgs(
   typeComposer: ObjectTypeComposer<any>,
   model: Model<any>,
   opts?: SortHelperArgsOpts,
-): ComposeFieldConfigArgumentMap;
+): ObjectTypeComposerArgumentConfigMapDefinition;
 
 export function sortHelper(resolveParams: ExtendedResolveParams): void;
 

@@ -2,7 +2,7 @@
 
 import {
   type ObjectTypeComposer,
-  type ComposeFieldConfigArgumentMap,
+  type ObjectTypeComposerArgumentConfigMapDefinition,
   InputTypeComposer,
 } from 'graphql-compose';
 
@@ -23,7 +23,7 @@ export const getRecordHelperArgsOptsMap = () => ({
 export const recordHelperArgs = (
   tc: ObjectTypeComposer<any, any>,
   opts?: RecordHelperArgsOpts
-): ComposeFieldConfigArgumentMap<> => {
+): ObjectTypeComposerArgumentConfigMapDefinition<> => {
   if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
     throw new Error('First arg for recordHelperArgs() should be instance of ObjectTypeComposer.');
   }
@@ -52,7 +52,7 @@ export const recordHelperArgs = (
 
   return {
     record: {
-      type: opts.isRequired ? recordITC.getTypeNonNull() : recordITC.getType(),
+      type: opts.isRequired ? recordITC.getTypeNonNull() : recordITC,
     },
   };
 };

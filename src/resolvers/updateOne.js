@@ -31,7 +31,7 @@ export default function updateOne<TSource: MongooseDocument, TContext>(
         description: 'Updated document ID',
       },
       record: {
-        type: tc.getType(),
+        type: tc,
         description: 'Updated document',
       },
     });

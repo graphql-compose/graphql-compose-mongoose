@@ -1,9 +1,9 @@
 /* @flow */
 
-import type { ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import type { ObjectTypeComposerArgumentConfigMapDefinition } from 'graphql-compose';
 import type { ExtendedResolveParams } from '../index';
 
-export const skipHelperArgs = (): ComposeFieldConfigArgumentMap<> => {
+export const skipHelperArgs = (): ObjectTypeComposerArgumentConfigMapDefinition<> => {
   return {
     skip: {
       type: 'Int',

@@ -1,7 +1,10 @@
 /* @flow */
 /* eslint-disable no-use-before-define */
 
-import type { ObjectTypeComposer, ComposeFieldConfigArgumentMap } from 'graphql-compose';
+import {
+  ObjectTypeComposer,
+  type ObjectTypeComposerArgumentConfigMapDefinition,
+} from 'graphql-compose';
 import type { MongooseModel } from 'mongoose';
 import GraphQLMongoID from '../../types/mongoid';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
@@ -35,8 +38,8 @@ export const filterHelperArgs = (
   typeComposer: ObjectTypeComposer<any, any>,
   model: MongooseModel,
   opts?: FilterHelperArgsOpts
-): ComposeFieldConfigArgumentMap<> => {
-  if (!typeComposer || typeComposer.constructor.name !== 'ObjectTypeComposer') {
+): ObjectTypeComposerArgumentConfigMapDefinition<> => {
+  if (!(typeComposer instanceof ObjectTypeComposer)) {
     throw new Error('First arg for filterHelperArgs() should be instance of ObjectTypeComposer.');
   }
 
@@ -69,7 +72,7 @@ export const filterHelperArgs = (
   const filterTypeName: string = opts.filterTypeName;
   const itc = typeComposer.getInputTypeComposer().clone(filterTypeName);
 
-  itc.makeOptional('_id');
+  itc.makeFieldNullable('_id');
 
   itc.addFields({
     _ids: [GraphQLMongoID],
@@ -78,7 +81,7 @@ export const filterHelperArgs = (
   itc.removeField(removeFields);
 
   if (opts.requiredFields) {
-    itc.makeRequired(opts.requiredFields);
+    itc.makeFieldNonNull(opts.requiredFields);
   }
 
   if (itc.getFieldNames().length === 0) {
@@ -89,7 +92,7 @@ export const filterHelperArgs = (
 
   return {
     filter: {
-      type: opts.isRequired ? itc.getTypeNonNull() : itc.getType(),
+      type: opts.isRequired ? itc.getTypeNonNull() : itc,
       description: opts.onlyIndexed ? 'Filter only by indexed fields' : 'Filter by fields',
     },
   };

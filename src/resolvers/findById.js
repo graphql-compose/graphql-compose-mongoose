@@ -19,7 +19,7 @@ export default function findById<TSource: MongooseDocument, TContext>(
   }
 
   return tc.schemaComposer.createResolver({
-    type: tc.getType(),
+    type: tc,
     name: 'findById',
     kind: 'query',
     args: {

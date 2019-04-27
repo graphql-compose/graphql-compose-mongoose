@@ -2,7 +2,7 @@ import {
   EnumTypeComposer,
   SchemaComposer,
   ObjectTypeComposer,
-  ComposeOutputType,
+  ComposeOutputTypeDefinition,
 } from 'graphql-compose';
 import { GraphQLScalarType } from 'graphql-compose/lib/graphql';
 import { Model, Schema } from 'mongoose';
@@ -51,7 +51,7 @@ export function convertFieldToGraphQL(
   field: MongooseFieldT,
   prefix: string | undefined,
   schemaComposer: SchemaComposer<any>,
-): ComposeOutputType<any, any>;
+): ComposeOutputTypeDefinition<any>;
 
 export function deriveComplexType(
   field: MongooseFieldT,
@@ -63,7 +63,7 @@ export function arrayToGraphQL(
   field: MongooseFieldT,
   prefix: string | undefined,
   schemaComposer: SchemaComposer<any>,
-): ComposeOutputType<any, any>;
+): ComposeOutputTypeDefinition<any>;
 
 export function embeddedToGraphQL(
   field: MongooseFieldT,
