@@ -29,7 +29,6 @@ describe('issue #117', () => {
       surname: {
         type: String,
         required: true,
-        default: [],
       },
       sex: {
         type: String,

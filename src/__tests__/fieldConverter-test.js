@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
-import { EnumTypeComposer, schemaComposer } from 'graphql-compose';
+import { EnumTypeComposer, schemaComposer, ListComposer } from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel';
 import {
   deriveComplexType,
@@ -125,19 +125,20 @@ describe('fieldConverter', () => {
         instance: 'ObjectID',
       };
       expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('MongoID');
-      expect(schemaComposer.get('MongoID')).toBe(GraphQLMongoID);
+      expect(schemaComposer.get('MongoID').getType()).toBe(GraphQLMongoID);
     });
 
     it('should use existed GraphQLMongoID in schemaComposer', () => {
       schemaComposer.clear();
       expect(schemaComposer.has('MongoID')).toBeFalsy();
-      schemaComposer.set('MongoID', ('MockGraphQLType': any));
+      const customType = schemaComposer.createScalarTC('MyMongoId');
+      schemaComposer.set('MongoID', customType);
       const mongooseField = {
         path: 'strFieldName',
         instance: 'ObjectID',
       };
       expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('MongoID');
-      expect(schemaComposer.get('MongoID')).toBe('MockGraphQLType');
+      expect(schemaComposer.get('MongoID')).toBe(customType);
       schemaComposer.delete('MongoID');
     });
   });
@@ -199,11 +200,11 @@ describe('fieldConverter', () => {
     it('test object with field as array', () => {
       const someDeepTC = embeddedToGraphQL(fields.someDeep, '', schemaComposer);
       expect(someDeepTC.getTypeName()).toBe('SomeDeep');
-      const periodsType = (someDeepTC.getField('periods'): any).type;
-      expect(Array.isArray(periodsType)).toBeTruthy();
-      expect(periodsType[0].getTypeName()).toBe('SomeDeepPeriods');
-      expect(periodsType[0].hasField('from')).toBeTruthy();
-      expect(periodsType[0].hasField('to')).toBeTruthy();
+      expect(someDeepTC.getField('periods').type).toBeInstanceOf(ListComposer);
+      const tc = someDeepTC.getFieldOTC('periods');
+      expect(tc.getTypeName()).toBe('SomeDeepPeriods');
+      expect(tc.hasField('from')).toBeTruthy();
+      expect(tc.hasField('to')).toBeTruthy();
     });
   });
 

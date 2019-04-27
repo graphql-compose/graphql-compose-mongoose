@@ -36,7 +36,8 @@ describe('findMany() ->', () => {
       relocation: false,
     });
 
-    await Promise.all([user1.save(), user2.save()]);
+    await user1.save();
+    await user2.save();
   });
 
   it('should return Resolver object', () => {
