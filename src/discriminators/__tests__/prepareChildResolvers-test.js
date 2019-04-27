@@ -75,21 +75,21 @@ describe('prepareChildResolvers()', () => {
     it('should hide DKey field on filter args', () => {
       for (const resolver of resolversWithFilterArgs) {
         expect(interestArgs[0]).toEqual('filter');
-        expect(resolver.getArgTC(interestArgs[0]).hasField(DKeyFieldName)).toBeFalsy();
+        expect(resolver.getArgITC(interestArgs[0]).hasField(DKeyFieldName)).toBeFalsy();
       }
     });
 
     it('should hide DKey field on record args', () => {
       for (const resolver of resolversWithRecordArgs) {
         expect(interestArgs[1]).toEqual('record');
-        expect(resolver.getArgTC(interestArgs[1]).hasField(DKeyFieldName)).toBeFalsy();
+        expect(resolver.getArgITC(interestArgs[1]).hasField(DKeyFieldName)).toBeFalsy();
       }
     });
 
     it('should hide DKey field on records args', () => {
       for (const resolver of resolversWithRecordsArgs) {
         expect(interestArgs[2]).toEqual('records');
-        expect(resolver.getArgTC(interestArgs[2]).hasField(DKeyFieldName)).toBeFalsy();
+        expect(resolver.getArgITC(interestArgs[2]).hasField(DKeyFieldName)).toBeFalsy();
       }
     });
   });
@@ -112,11 +112,11 @@ describe('prepareChildResolvers()', () => {
       expect(
         baseDTC
           .getResolver('createOne')
-          .getArgTC('record')
+          .getArgITC('record')
           .getFieldType('kind')
       ).toEqual(
         PersonTC.getResolver('createOne')
-          .getArgTC('record')
+          .getArgITC('record')
           .getFieldType('kind')
       );
     });

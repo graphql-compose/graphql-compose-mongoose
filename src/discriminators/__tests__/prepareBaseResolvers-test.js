@@ -1,6 +1,5 @@
 /* @flow */
 
-import { graphql } from 'graphql-compose';
 import { composeWithMongooseDiscriminators } from '../../composeWithMongooseDiscriminators';
 import { getCharacterModels } from '../__mocks__/characterModels';
 
@@ -41,8 +40,8 @@ describe('prepareBaseResolvers()', () => {
     it('should set DKey field type to DKeyETC on filter args', () => {
       for (const resolver of resolversWithFilterArgs) {
         expect(interestArgs[0]).toEqual('filter');
-        expect(resolver.getArgTC(interestArgs[0]).getFieldConfig(DKeyFieldName).type).toEqual(
-          CharacterDTC.getDKeyETC().getType()
+        expect(resolver.getArgITC(interestArgs[0]).getFieldTC(DKeyFieldName)).toEqual(
+          CharacterDTC.getDKeyETC()
         );
       }
     });
@@ -51,13 +50,10 @@ describe('prepareBaseResolvers()', () => {
       for (const resolver of resolversWithRecordArgs) {
         expect(interestArgs[1]).toEqual('record');
         if (resolver.name === 'createOne') {
-          expect(resolver.getArgTC(interestArgs[1]).getFieldConfig(DKeyFieldName).type).toEqual(
-            graphql.GraphQLNonNull(DKeyETC.getType())
-          );
+          expect(resolver.getArgITC(interestArgs[1]).isFieldNonNull(DKeyFieldName)).toBeTruthy();
+          expect(resolver.getArgITC(interestArgs[1]).getFieldTC(DKeyFieldName)).toEqual(DKeyETC);
         } else {
-          expect(resolver.getArgTC(interestArgs[1]).getFieldConfig(DKeyFieldName).type).toEqual(
-            DKeyETC.getType()
-          );
+          expect(resolver.getArgITC(interestArgs[1]).getFieldTC(DKeyFieldName)).toEqual(DKeyETC);
         }
       }
     });
@@ -65,9 +61,8 @@ describe('prepareBaseResolvers()', () => {
     it('should set DKey field type to DKeyETC on records args', () => {
       for (const resolver of resolversWithRecordsArgs) {
         expect(interestArgs[2]).toEqual('records');
-        expect(resolver.getArgTC(interestArgs[2]).getFieldConfig(DKeyFieldName).type).toEqual(
-          graphql.GraphQLNonNull(DKeyETC.getType())
-        );
+        expect(resolver.getArgITC(interestArgs[2]).isFieldNonNull(DKeyFieldName)).toBeTruthy();
+        expect(resolver.getArgITC(interestArgs[2]).getFieldTC(DKeyFieldName)).toEqual(DKeyETC);
       }
     });
   });
@@ -75,33 +70,30 @@ describe('prepareBaseResolvers()', () => {
   describe('createOne: Resolver', () => {
     const resolver = CharacterDTC.getResolver('createOne');
     it('should set resolver record field type to DInterface', () => {
-      expect(resolver.getTypeComposer().getFieldType('record')).toEqual(DInterfaceTC.getType());
+      expect(resolver.getOTC().getFieldType('record')).toEqual(DInterfaceTC.getType());
     });
   });
 
   describe('createMany: Resolver', () => {
     const resolver = CharacterDTC.getResolver('createMany');
     it('should set resolver records field type to NonNull Plural DInterface', () => {
-      expect(resolver.getTypeComposer().getFieldType('records')).toEqual(
-        new graphql.GraphQLNonNull(graphql.GraphQLList(DInterfaceTC.getType()))
-      );
+      expect(resolver.getOTC().getFieldTC('records')).toBe(DInterfaceTC);
+      expect(resolver.getOTC().getFieldTypeName('records')).toBe('[CharacterInterface]!');
     });
   });
 
   describe('findById: Resolver', () => {
     const resolver = CharacterDTC.getResolver('findByIds');
     it('should set resolver type to DInterface List', () => {
-      expect(resolver.getType()).toEqual(
-        graphql.GraphQLList(CharacterDTC.getDInterface().getType())
-      );
+      expect(resolver.getTypeComposer()).toEqual(CharacterDTC.getDInterface());
+      expect(resolver.getTypeName()).toEqual('[CharacterInterface]');
     });
   });
 
   describe('findMany: Resolver', () => {
     it('should set resolver type to DInterface List', () => {
-      expect(CharacterDTC.getResolver('findMany').getType()).toEqual(
-        graphql.GraphQLList(DInterfaceTC.getType())
-      );
+      expect(CharacterDTC.getResolver('findMany').getTypeComposer()).toEqual(DInterfaceTC);
+      expect(CharacterDTC.getResolver('findMany').getTypeName()).toBe('[CharacterInterface]');
     });
   });
 
@@ -120,7 +112,7 @@ describe('prepareBaseResolvers()', () => {
   it('should set resolver record field type to DInterface, updateOne', () => {
     expect(
       CharacterDTC.getResolver('updateOne')
-        .getTypeComposer()
+        .getOTC()
         .getFieldType('record')
     ).toEqual(CharacterDTC.getDInterface().getType());
   });
@@ -128,7 +120,7 @@ describe('prepareBaseResolvers()', () => {
   it('should set resolver record field type to DInterface, updateById', () => {
     expect(
       CharacterDTC.getResolver('updateById')
-        .getTypeComposer()
+        .getOTC()
         .getFieldType('record')
     ).toEqual(CharacterDTC.getDInterface().getType());
   });
@@ -136,7 +128,7 @@ describe('prepareBaseResolvers()', () => {
   it('should set resolver record field type to DInterface, ', () => {
     expect(
       CharacterDTC.getResolver('removeById')
-        .getTypeComposer()
+        .getOTC()
         .getFieldType('record')
     ).toEqual(CharacterDTC.getDInterface().getType());
   });
@@ -144,17 +136,27 @@ describe('prepareBaseResolvers()', () => {
   it('should set DKey field type to NonNull(DKeyETC) on record arg, createOne', () => {
     expect(
       CharacterDTC.getResolver('createOne')
-        .getArgTC('record')
-        .getFieldType(CharacterDTC.getDKey())
-    ).toEqual(graphql.GraphQLNonNull(CharacterDTC.getDKeyETC().getType()));
+        .getArgITC('record')
+        .getFieldTC(CharacterDTC.getDKey())
+    ).toEqual(CharacterDTC.getDKeyETC());
+    expect(
+      CharacterDTC.getResolver('createOne')
+        .getArgITC('record')
+        .getFieldTypeName(CharacterDTC.getDKey())
+    ).toBe('EnumDKeyCharacterType!');
   });
 
   it('should set type on items in pagination resolver to DInterface List, pagination', () => {
     expect(
       CharacterDTC.getResolver('pagination')
-        .getTypeComposer()
-        .getFieldType('items')
-    ).toEqual(graphql.GraphQLList(CharacterDTC.getDInterface().getType()));
+        .getOTC()
+        .getFieldTC('items')
+    ).toEqual(CharacterDTC.getDInterface());
+    expect(
+      CharacterDTC.getResolver('pagination')
+        .getOTC()
+        .getFieldTypeName('items')
+    ).toBe('[CharacterInterface]');
   });
 
   it('should clone, rename edges field on connection resolver, connection', () => {
@@ -163,7 +165,7 @@ describe('prepareBaseResolvers()', () => {
 
     expect(
       connectionRS
-        .getTypeComposer()
+        .getOTC()
         .getFieldTC('edges')
         .getTypeName()
     ).toEqual(newName);

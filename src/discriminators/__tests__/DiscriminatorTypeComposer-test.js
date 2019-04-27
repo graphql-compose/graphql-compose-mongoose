@@ -73,6 +73,7 @@ describe('DiscriminatorTypeComposer', () => {
     describe('setFields(fields)', () => {
       let personSpecificFields;
       let droidSpecificFields;
+      let fieldsToSet;
 
       beforeAll(() => {
         schemaComposer.clear();
@@ -83,16 +84,14 @@ describe('DiscriminatorTypeComposer', () => {
 
         personSpecificFields = personTC.getFieldNames().filter(v => !characterDTC.hasField(v));
         droidSpecificFields = droidTC.getFieldNames().filter(v => !characterDTC.hasField(v));
-      });
 
-      const fieldsToSet = {
-        kind: 'String',
-        appearsIn: 'String',
-        field1: 'String',
-        field2: 'String',
-      };
+        fieldsToSet = {
+          kind: 'String',
+          appearsIn: 'String',
+          field1: 'String',
+          field2: 'String',
+        };
 
-      beforeAll(() => {
         characterDTC.setFields(fieldsToSet);
       });
 
@@ -196,14 +195,12 @@ describe('DiscriminatorTypeComposer', () => {
       });
 
       it('should have exactly plus two fields added to childTC fields', () => {
-        expect(droidTC.getFieldNames()).toEqual([
-          ...characterDTC.getFieldNames(),
-          ...droidSpecificFields,
-        ]);
-        expect(personTC.getFieldNames()).toEqual([
-          ...characterDTC.getFieldNames(),
-          ...personSpecificFields,
-        ]);
+        expect(droidTC.getFieldNames().sort()).toEqual(
+          [...characterDTC.getFieldNames(), ...droidSpecificFields].sort()
+        );
+        expect(personTC.getFieldNames().sort()).toEqual(
+          [...characterDTC.getFieldNames(), ...personSpecificFields].sort()
+        );
       });
     });
 
@@ -527,7 +524,7 @@ describe('DiscriminatorTypeComposer', () => {
           },
         },
       });
-      const createOneRecordArgTC = personTC.getResolver('createOne').getArgTC('record');
+      const createOneRecordArgTC = personTC.getResolver('createOne').getArgITC('record');
       expect(createOneRecordArgTC.isRequired('name')).toBe(true);
       expect(createOneRecordArgTC.isRequired('dob')).toBe(true);
       expect(createOneRecordArgTC.hasField('friends')).toBe(false);
