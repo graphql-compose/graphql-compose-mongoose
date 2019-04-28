@@ -31,8 +31,8 @@
     "object-path": "^0.11.4"
   },
   "optionalDependencies": {
-    "graphql-compose-connection": ">=5.0.0",
-    "graphql-compose-pagination": ">=5.0.0"
+    "graphql-compose-connection": ">=6.0.0",
+    "graphql-compose-pagination": ">=6.0.0"
   },
   "peerDependencies": {
     "graphql-compose": ">=7.0.0",
@@ -60,7 +60,7 @@
     "eslint-plugin-prettier": "^3.0.1",
     "flow-bin": "^0.98.0",
     "graphql": "14.2.1",
-    "graphql-compose": "^6.3.2",
+    "graphql-compose": "^7.0.0",
     "graphql-compose-connection": ">=5.0.0",
     "graphql-compose-pagination": ">=5.0.0",
     "jest": "^24.7.1",
