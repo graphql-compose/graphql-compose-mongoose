@@ -3400,20 +3400,20 @@ graceful-fs@^4.1.10, graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
   integrity sha1-TK+tdrxi8C+gObL5Tpo906ORpyU=
 
-graphql-compose-connection@>=6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-6.0.0.tgz#8a9d7bd45810463aab95f9bb3b8262c25a545d7e"
-  integrity sha512-wDgBwfzyGlz3szuv+0CmVjMqKawcd2bUpPNPwZYcL637OOdNQTiAQ8lgyisDo1Xvjc2syRJNPQlx0Rm9l4K/BA==
+graphql-compose-connection@>=6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-6.0.2.tgz#79847a11ee72153dfc3c1c2afcb74fd0433446e6"
+  integrity sha512-Dg3euVFglPtN8BkfbnkvYMU8vzLVvfRwcNyoM+pmxd+EJlsh7DxDdytojjvd9APE4FtB/l3HsyDOh/0SC+ouMw==
 
-graphql-compose-pagination@>=6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/graphql-compose-pagination/-/graphql-compose-pagination-6.0.1.tgz#8cf061581d8721e84c658a70ed1eea2aff1f599f"
-  integrity sha512-jy0d06y4dkNDfbkhleQjfdaL8gCw5pLetmZEaTsH0GH2VcSeuTz3gxD9LsBc1WC26Cl55R6eQpHhEpD28SxoIQ==
+graphql-compose-pagination@>=6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/graphql-compose-pagination/-/graphql-compose-pagination-6.0.2.tgz#bd7fed8f8726cac8da9675e3ad7d1d91a717ee6d"
+  integrity sha512-PVjlYEPlAMdsxIac80UWde70j6EGwqE3H048KUZ2GGha2XejPG89tTCJIqOPw0P5tJAIrUqW/X6slC8yJm+0Pw==
 
-graphql-compose@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-7.0.0.tgz#0bf6425262d207ca649fe49b798342a602a33d30"
-  integrity sha512-mkplljcPf/b/HkpeMDrYNDy56uJRbnCkY4d/yvAFzSiYzIrTCcuLCvpYmiqBqzwHdmyeIfOVuf5BXX8eKqZIFw==
+graphql-compose@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/graphql-compose/-/graphql-compose-7.0.1.tgz#de5ba35cf6c71dedb4c16fb6038fbe10c633c02c"
+  integrity sha512-u8vdbWlDzC8KyQqmLKOxzLoBGKIOhnvrFYJ0biAX8SuA9MWCmkIJL15pwuOb7uRSTY4B/jKU8GOhCD66MFR3kQ==
   dependencies:
     graphql-type-json "^0.3.0"
     object-path "^0.11.4"
