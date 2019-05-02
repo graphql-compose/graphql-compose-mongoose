@@ -31,12 +31,12 @@
     "object-path": "^0.11.4"
   },
   "optionalDependencies": {
-    "graphql-compose-connection": ">=6.0.2",
-    "graphql-compose-pagination": ">=6.0.2"
+    "graphql-compose-connection": "^6.0.2",
+    "graphql-compose-pagination": "^6.0.2"
   },
   "peerDependencies": {
-    "graphql-compose": ">=7.0.1",
-    "mongoose": ">=5.0.0 || >=4.4.0"
+    "graphql-compose": "^7.0.1",
+    "mongoose": "^5.0.0 || ^4.4.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
@@ -61,8 +61,8 @@
     "flow-bin": "^0.98.0",
     "graphql": "14.2.1",
     "graphql-compose": "^7.0.1",
-    "graphql-compose-connection": ">=6.0.2",
-    "graphql-compose-pagination": ">=6.0.2",
+    "graphql-compose-connection": "^6.0.2",
+    "graphql-compose-pagination": "^6.0.2",
     "jest": "^24.7.1",
     "mongodb-memory-server": "^5.1.0",
     "mongoose": "^5.5.4",
