@@ -37,11 +37,13 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
         case EMCResolvers.findMany:
         case EMCResolvers.findByIds:
           resolver.setType(baseTC.getDInterface().getTypePlural());
+          resolver.projection[baseTC.getDKey()] = 1;
           break;
 
         case EMCResolvers.findById:
         case EMCResolvers.findOne:
           resolver.setType(baseTC.getDInterface());
+          resolver.projection[baseTC.getDKey()] = 1;
           break;
 
         case EMCResolvers.createOne:
@@ -51,6 +53,9 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
         case EMCResolvers.removeById:
           resolver.getOTC().extendField('record', {
             type: baseTC.getDInterface(),
+            projection: {
+              [baseTC.getDKey()]: 1,
+            },
           });
           break;
 
@@ -60,12 +65,18 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
               .getDInterface()
               .getTypePlural()
               .getTypeNonNull(),
+            projection: {
+              [baseTC.getDKey()]: 1,
+            },
           });
           break;
 
         case EMCResolvers.pagination:
           resolver.getOTC().extendField('items', {
             type: baseTC.getDInterface().getTypePlural(),
+            projection: {
+              [baseTC.getDKey()]: 1,
+            },
           });
           break;
 
@@ -77,6 +88,9 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
 
           edgesTC.extendField('node', {
             type: baseTC.getDInterface().getTypeNonNull(),
+            projection: {
+              [baseTC.getDKey()]: 1,
+            },
           });
 
           resolver.getOTC().setField(
