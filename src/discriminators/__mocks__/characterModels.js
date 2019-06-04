@@ -38,16 +38,16 @@ const ACharacterSchema = new Schema(Object.assign({}, CharacterObject));
 export function getCharacterModels(DKey: string) {
   CharacterSchema.set('discriminatorKey', DKey);
 
-  const CharacterModel: MongooseModel = mongoose.models.Character
-    ? mongoose.models.Character
+  const CharacterModel: MongooseModel = (mongoose: any).models.Character
+    ? (mongoose: any).models.Character
     : mongoose.model('Character', CharacterSchema);
 
-  const PersonModel: MongooseModel = mongoose.models[enumCharacterType.PERSON]
-    ? mongoose.models[enumCharacterType.PERSON]
+  const PersonModel: MongooseModel = (mongoose: any).models[enumCharacterType.PERSON]
+    ? (mongoose: any).models[enumCharacterType.PERSON]
     : CharacterModel.discriminator(enumCharacterType.PERSON, PersonSchema);
 
-  const DroidModel: MongooseModel = mongoose.models[enumCharacterType.DROID]
-    ? mongoose.models[enumCharacterType.DROID]
+  const DroidModel: MongooseModel = (mongoose: any).models[enumCharacterType.DROID]
+    ? (mongoose: any).models[enumCharacterType.DROID]
     : CharacterModel.discriminator(enumCharacterType.DROID, DroidSchema);
 
   return { CharacterModel, PersonModel, DroidModel };

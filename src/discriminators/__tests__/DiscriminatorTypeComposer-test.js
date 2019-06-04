@@ -461,7 +461,9 @@ describe('DiscriminatorTypeComposer', () => {
       });
 
       it('should create relation on baseTC', () => {
-        expect(characterDTC.getRelations()[relationField].resolver).toEqual(relationResolver);
+        expect((characterDTC.getRelations()[relationField]: any).resolver).toEqual(
+          relationResolver
+        );
       });
 
       it('should create field with type Movie on DInterface', () => {
@@ -471,8 +473,8 @@ describe('DiscriminatorTypeComposer', () => {
       });
 
       it('should create Movie relation on childTC', () => {
-        expect(personTC.getRelations()[relationField].resolver).toEqual(relationResolver);
-        expect(droidTC.getRelations()[relationField].resolver).toEqual(relationResolver);
+        expect((personTC.getRelations()[relationField]: any).resolver).toEqual(relationResolver);
+        expect((droidTC.getRelations()[relationField]: any).resolver).toEqual(relationResolver);
       });
     });
   });
