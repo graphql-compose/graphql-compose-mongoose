@@ -12,7 +12,8 @@ export type FilterOperatorNames =
   | 'lte'
   | 'ne'
   | 'in[]'
-  | 'nin[]';
+  | 'nin[]'
+  | 'regex';
 
 type PlainOperatorNames = Exclude<FilterOperatorNames, 'in[]' | 'nin[]'>;
 type ArrayOperatorNames = 'in' | 'nin';

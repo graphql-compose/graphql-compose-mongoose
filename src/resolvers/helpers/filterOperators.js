@@ -8,8 +8,17 @@ import type { ExtendedResolveParams } from '../index';
 import { upperFirst, getIndexedFieldNamesForGraphQL, toMongoDottedObject } from '../../utils';
 import type { FilterHelperArgsOpts } from './filter';
 
-export type FilterOperatorNames = 'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
-const availableOperators: FilterOperatorNames[] = ['gt', 'gte', 'lt', 'lte', 'ne', 'in[]', 'nin[]'];
+export type FilterOperatorNames = 'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]' | 'regex';
+const availableOperators: FilterOperatorNames[] = [
+  'gt',
+  'gte',
+  'lt',
+  'lte',
+  'ne',
+  'in[]',
+  'nin[]',
+  'regex',
+];
 
 export const OPERATORS_FIELDNAME = '_operators';
 
