@@ -3591,12 +3591,12 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@~4.1.11
   resolved "https://registry.yarnpkg.com/graceful-readlink/-/graceful-readlink-1.0.1.tgz#4cafad76bc62f02fa039b2f94e9a3dd3a391a725"
   integrity sha1-TK+tdrxi8C+gObL5Tpo906ORpyU=
 
-graphql-compose-connection@>=5.0.0:
+graphql-compose-connection@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-5.0.0.tgz#3360bcc2b7532228db2082ded3662f017b89ad8f"
   integrity sha512-KXnGeG+gQSWVR+oU6fFD810pd9/ZICBpAZxun70wgD6/QNtSsA+gRzBgRRqicvMa6UVSBvfmCpxzwTQMBvwqQA==
 
-graphql-compose-pagination@>=5.0.0:
+graphql-compose-pagination@^5.0.0:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/graphql-compose-pagination/-/graphql-compose-pagination-5.1.0.tgz#19750ca63047afc94459e6a315f034960420ce04"
   integrity sha512-l89G0PBWYnyi0bTTzwnJCU6vVz/TyxK+FRn9A0LKHhFCdXSJQUz9jL5FvJvFmYOEYHUhnHxFGdzwEE1fAw8now==

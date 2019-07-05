@@ -1,6 +1,6 @@
 {
   "name": "graphql-compose-mongoose",
-  "version": "0.0.0-semantically-released",
+  "version": "6.1.1",
   "description": "Plugin for `graphql-compose` which derive a graphql types from a mongoose model.",
   "license": "MIT",
   "files": [
@@ -31,12 +31,12 @@
     "object-path": "^0.11.4"
   },
   "optionalDependencies": {
-    "graphql-compose-connection": ">=5.0.0",
-    "graphql-compose-pagination": ">=5.0.0"
+    "graphql-compose-connection": "^5.0.0",
+    "graphql-compose-pagination": "^5.0.0"
   },
   "peerDependencies": {
-    "graphql-compose": ">=6.2.0",
-    "mongoose": ">=5.0.0 || >=4.4.0"
+    "graphql-compose": "^6.2.0",
+    "mongoose": "^5.0.0 || ^4.4.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",
