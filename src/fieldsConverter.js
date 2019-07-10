@@ -13,6 +13,7 @@ import type {
 import { upperFirst } from 'graphql-compose';
 import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
 import GraphQLMongoID from './types/mongoid';
+import GraphQLBSONDecimal from './types/bsonDecimal';
 
 type MongooseFieldT = MongooseSchemaField<any>;
 type MongooseFieldMapT = { [fieldName: string]: MongooseFieldT };
@@ -30,6 +31,7 @@ export const ComplexTypes = {
   REFERENCE: 'REFERENCE',
   SCALAR: 'SCALAR',
   MIXED: 'MIXED',
+  DECIMAL: 'DECIMAL',
 };
 
 function _getFieldName(field: MongooseFieldT): string {
@@ -211,6 +213,11 @@ export function convertFieldToGraphQL(
       return (documentArrayToGraphQL(field, prefix, schemaComposer): any);
     case ComplexTypes.MIXED:
       return 'JSON';
+    case ComplexTypes.DECIMAL:
+      if (!schemaComposer.has('BSONDecimal')) {
+        schemaComposer.add(GraphQLBSONDecimal);
+      }
+      return 'BSONDecimal';
     default:
       return scalarToGraphQL(field);
   }
@@ -241,6 +248,8 @@ export function deriveComplexType(field: MongooseFieldT): $Keys<typeof ComplexTy
     return ComplexTypes.MIXED;
   } else if (fieldType === 'ObjectID') {
     return ComplexTypes.REFERENCE;
+  } else if (fieldType === 'Decimal128') {
+    return ComplexTypes.DECIMAL;
   }
 
   const enums = _getFieldEnums(field);

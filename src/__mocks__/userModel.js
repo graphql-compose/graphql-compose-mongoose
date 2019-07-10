@@ -86,6 +86,10 @@ const UserSchema: SchemaType<any> = new Schema(
 
     periods: [{ from: Number, to: Number }],
 
+    salary: {
+      type: Schema.Types.Decimal128,
+    },
+
     someDeep: {
       periods: [{ from: Number, to: Number }],
     },

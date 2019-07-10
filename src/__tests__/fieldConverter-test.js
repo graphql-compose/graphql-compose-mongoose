@@ -16,6 +16,7 @@ import {
   referenceToGraphQL,
 } from '../fieldsConverter';
 import GraphQLMongoID from '../types/mongoid';
+import GraphQLBSONDecimal from '../types/bsonDecimal';
 
 describe('fieldConverter', () => {
   const fields: { [key: string]: any } = getFieldsFromModel(UserModel);
@@ -67,7 +68,11 @@ describe('fieldConverter', () => {
       }).not.toThrowError(err);
     });
 
-    it('should derive DOCUMENT_ARRAY', () => {
+    it('should derive DECIMAL', () => {
+      expect(deriveComplexType(fields.salary)).toBe(ComplexTypes.DECIMAL);
+    });
+
+    it('should derive ARRAY', () => {
       expect(deriveComplexType(fields.languages)).toBe(ComplexTypes.DOCUMENT_ARRAY);
       expect(deriveComplexType(fields.periods)).toBe(ComplexTypes.DOCUMENT_ARRAY);
     });
@@ -77,23 +82,23 @@ describe('fieldConverter', () => {
       expect(deriveComplexType(fields.subDoc)).toBe(ComplexTypes.EMBEDDED);
     });
 
-    it('schould derive ARRAY', () => {
+    it('should derive ARRAY', () => {
       expect(deriveComplexType(fields.users)).toBe(ComplexTypes.ARRAY);
       expect(deriveComplexType(fields.skills)).toBe(ComplexTypes.ARRAY);
       expect(deriveComplexType(fields.employment)).toBe(ComplexTypes.ARRAY);
     });
 
-    it('schould derive ENUM', () => {
+    it('should derive ENUM', () => {
       expect(deriveComplexType(fields.gender)).toBe(ComplexTypes.ENUM);
       expect(deriveComplexType(fields.languages.schema.paths.ln)).toBe(ComplexTypes.ENUM);
       expect(deriveComplexType(fields.languages.schema.paths.sk)).toBe(ComplexTypes.ENUM);
     });
 
-    it('schould derive REFERENCE', () => {
+    it('should derive REFERENCE', () => {
       expect(deriveComplexType(fields.user)).toBe(ComplexTypes.REFERENCE);
     });
 
-    it('schould derive SCALAR', () => {
+    it('should derive SCALAR', () => {
       expect(deriveComplexType(fields.name)).toBe(ComplexTypes.SCALAR);
       expect(deriveComplexType(fields.relocation)).toBe(ComplexTypes.SCALAR);
       expect(deriveComplexType(fields.age)).toBe(ComplexTypes.SCALAR);
@@ -103,7 +108,7 @@ describe('fieldConverter', () => {
       expect(deriveComplexType(fields.subDoc)).not.toBe(ComplexTypes.SCALAR);
     });
 
-    it('schould derive MIXED mongoose type', () => {
+    it('should derive MIXED mongoose type', () => {
       expect(deriveComplexType(fields.someDynamic)).toBe(ComplexTypes.MIXED);
     });
   });
@@ -139,6 +144,18 @@ describe('fieldConverter', () => {
       expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('MongoID');
       expect(schemaComposer.get('MongoID')).toBe('MockGraphQLType');
       schemaComposer.delete('MongoID');
+    });
+
+    it('should convert any mongoose field to graphQL type', () => {
+      schemaComposer.clear();
+      expect(schemaComposer.has('BSONDecimal')).toBeFalsy();
+      const mongooseField = {
+        path: 'salary',
+        instance: 'Decimal128',
+      };
+      expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('BSONDecimal');
+      expect(schemaComposer.has('BSONDecimal')).toBeTruthy();
+      expect(schemaComposer.get('BSONDecimal')).toBe(GraphQLBSONDecimal);
     });
   });
 

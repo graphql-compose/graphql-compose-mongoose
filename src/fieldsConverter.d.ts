@@ -25,6 +25,7 @@ export const ComplexTypes: {
   REFERENCE: 'REFERENCE';
   SCALAR: 'SCALAR';
   MIXED: 'MIXED';
+  DECIMAL: 'DECIMAL';
 };
 
 export function dotPathsToEmbedded(
