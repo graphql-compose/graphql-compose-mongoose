@@ -90,6 +90,10 @@ const UserSchema: SchemaType<any> = new Schema(
       periods: [{ from: Number, to: Number }],
     },
 
+    salary: {
+      type: Schema.Types.Decimal128,
+    },
+
     // createdAt, created via option `timastamp: true` (see bottom)
     // updatedAt, created via option `timastamp: true` (see bottom)
   },
