@@ -66,7 +66,7 @@ export type TypeConverterResolversOpts = {
   updateOne?:
     | false
     | {
-        input?: RecordHelperArgsOpts | false;
+        record?: RecordHelperArgsOpts | false;
         filter?: FilterHelperArgsOpts | false;
         sort?: SortHelperArgsOpts | false;
         skip?: false;
