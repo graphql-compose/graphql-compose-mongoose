@@ -21,7 +21,7 @@ afterAll(() => {
 // May require additional time for downloading MongoDB binaries
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
-describe.only('issue #128 - OR/AND filter args not working with some other filter args', () => {
+describe('issue #128 - OR/AND filter args not working with some other filter args', () => {
   const RecordSchema = new mongoose.Schema({
     id: String,
     name: String,
@@ -54,7 +54,6 @@ describe.only('issue #128 - OR/AND filter args not working with some other filte
         },
       },
     });
-    // Mongoose: records.find({ '$or': [ { '_operators.pets.in.0': 'Pet 2' }, { '_operators.friends.in.0': 'Friend 4' } ] }, { projection: {} })
 
     expect(res1.map(({ pets, friends }) => ({ pets: [...pets], friends: [...friends] }))).toEqual([
       {
@@ -72,11 +71,10 @@ describe.only('issue #128 - OR/AND filter args not working with some other filte
     const res1 = await resolver.resolve({
       args: {
         filter: {
-          AND: [{ _operators: { pets: { in: ['Pet 2'] } } }, { name: 'Name 4' }],
+          OR: [{ _operators: { pets: { in: ['Pet 2'] } } }, { name: 'Name 4' }],
         },
       },
     });
-    // Mongoose: records.find({ '$and': [ { '_operators.pets.in.0': 'Pet 2' }, { name: 'Name 4' } ] }, { projection: {} })
 
     expect(res1.map(({ pets, friends }) => ({ pets: [...pets], friends: [...friends] }))).toEqual([
       {
@@ -98,7 +96,6 @@ describe.only('issue #128 - OR/AND filter args not working with some other filte
         },
       },
     });
-    // Mongoose: records.find({ pets: { '$in': [ 'Pet 2' ] } }, { projection: {} })
 
     expect(res1.map(res => ({ pets: [...res.pets], friends: [...res.friends] }))).toEqual([
       {

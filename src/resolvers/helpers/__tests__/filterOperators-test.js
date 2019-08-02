@@ -7,6 +7,7 @@ import {
   processFilterOperators,
   OPERATORS_FIELDNAME,
 } from '../filterOperators';
+import { toMongoFilterDottedObject } from '../../../utils/toMongoDottedObject';
 import { UserModel } from '../../../__mocks__/userModel';
 
 let itc: InputTypeComposer<any>;
@@ -89,10 +90,7 @@ describe('Resolver helper `filter` ->', () => {
       const filter = {
         [OPERATORS_FIELDNAME]: { age: { gt: 10, lt: 20 } },
       };
-      const spyWhereFn = jest.fn();
-      const resolveParams: any = { query: { where: spyWhereFn } };
-      processFilterOperators(filter, resolveParams);
-      expect(spyWhereFn).toBeCalledWith({ age: { $gt: 10, $lt: 20 } });
+      expect(processFilterOperators(filter)).toEqual({ age: { $gt: 10, $lt: 20 } });
     });
 
     it('should convert OR query', () => {
@@ -109,10 +107,7 @@ describe('Resolver helper `filter` ->', () => {
           },
         ],
       };
-      const spyWhereFn = jest.fn();
-      const resolveParams: any = { query: { where: spyWhereFn } };
-      processFilterOperators(filter, resolveParams);
-      expect(spyWhereFn).toBeCalledWith({
+      expect(toMongoFilterDottedObject(processFilterOperators(filter))).toEqual({
         $or: [
           { age: 30, 'name.first': 'Pavel' },
           {
@@ -135,10 +130,7 @@ describe('Resolver helper `filter` ->', () => {
           },
         ],
       };
-      const spyWhereFn = jest.fn();
-      const resolveParams: any = { query: { where: spyWhereFn } };
-      processFilterOperators(filter, resolveParams);
-      expect(spyWhereFn).toBeCalledWith({
+      expect(toMongoFilterDottedObject(processFilterOperators(filter))).toEqual({
         $and: [
           { 'name.first': 'Pavel' },
           {
@@ -164,10 +156,7 @@ describe('Resolver helper `filter` ->', () => {
           },
         ],
       };
-      const spyWhereFn = jest.fn();
-      const resolveParams: any = { query: { where: spyWhereFn } };
-      processFilterOperators(filter, resolveParams);
-      expect(spyWhereFn).toBeCalledWith({
+      expect(toMongoFilterDottedObject(processFilterOperators(filter))).toEqual({
         $or: [
           {
             $and: [
