@@ -108,10 +108,10 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
       // eslint-disable-next-line
       resolveParams.query = resolveParams.query.where({ _id: { $in: _ids } });
     }
-
+    processFilterOperators(filterFields);
     const clearedFilter = {};
     Object.keys(filterFields).forEach(key => {
-      if (modelFields[key]) {
+      if (modelFields[key] || key.indexOf('$') === 0) {
         clearedFilter[key] = filterFields[key];
       }
     });
@@ -119,8 +119,6 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
       // eslint-disable-next-line
       resolveParams.query = resolveParams.query.where(toMongoFilterDottedObject(clearedFilter));
     }
-
-    processFilterOperators(filter, resolveParams);
   }
 
   if (isObject(resolveParams.rawQuery)) {

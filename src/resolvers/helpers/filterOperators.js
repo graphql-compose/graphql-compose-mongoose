@@ -4,8 +4,7 @@
 import { getNamedType, type GraphQLInputType } from 'graphql-compose/lib/graphql';
 import type { MongooseModel } from 'mongoose';
 import type { InputTypeComposer } from 'graphql-compose';
-import type { ExtendedResolveParams } from '../index';
-import { upperFirst, getIndexedFieldNamesForGraphQL, toMongoDottedObject } from '../../utils';
+import { upperFirst, getIndexedFieldNamesForGraphQL } from '../../utils';
 import type { FilterHelperArgsOpts } from './filter';
 
 export type FilterOperatorNames = 'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
@@ -37,58 +36,54 @@ export function addFilterOperators(
   });
 }
 
-export function processFilterOperators(filter: Object, resolveParams: ExtendedResolveParams) {
-  _prepareAndOrFilter(filter, resolveParams);
-
+export function processFilterOperators(filter: Object) {
+  _prepareAndOrFilter(filter);
   if (filter[OPERATORS_FIELDNAME]) {
     const operatorFields = filter[OPERATORS_FIELDNAME];
     Object.keys(operatorFields).forEach(fieldName => {
       const fieldOperators = { ...operatorFields[fieldName] };
       const criteria = {};
       Object.keys(fieldOperators).forEach(operatorName => {
-        criteria[`$${operatorName}`] = fieldOperators[operatorName];
+        if (Array.isArray(fieldOperators[operatorName])) {
+          criteria[`$${operatorName}`] = fieldOperators[operatorName].map(v =>
+            processFilterOperators(v)
+          );
+        } else {
+          criteria[`$${operatorName}`] = processFilterOperators(fieldOperators[operatorName]);
+        }
       });
       if (Object.keys(criteria).length > 0) {
         // eslint-disable-next-line
-        resolveParams.query = resolveParams.query.where({
-          [fieldName]: criteria,
-        });
+        filter[fieldName] = criteria;
       }
     });
+    // eslint-disable-next-line no-param-reassign
+    delete filter[OPERATORS_FIELDNAME];
   }
+  return filter;
 }
 
-export function _prepareAndOrFilter(filter: Object, resolveParams?: ExtendedResolveParams) {
+export function _prepareAndOrFilter(filter: Object) {
   /* eslint-disable no-param-reassign */
   if (!filter.OR && !filter.AND) return;
 
   const { OR, AND } = filter;
   if (OR) {
     const $or = OR.map(d => {
-      _prepareAndOrFilter(d);
-      return toMongoDottedObject(d);
+      processFilterOperators(d);
+      return d;
     });
-
-    if (resolveParams) {
-      resolveParams.query.where({ $or });
-    } else {
-      filter.$or = $or;
-      delete filter.OR;
-    }
+    filter.$or = $or;
+    delete filter.OR;
   }
 
   if (AND) {
     const $and = AND.map(d => {
-      _prepareAndOrFilter(d);
-      return toMongoDottedObject(d);
+      processFilterOperators(d);
+      return d;
     });
-
-    if (resolveParams) {
-      resolveParams.query.where({ $and });
-    } else {
-      filter.$and = $and;
-      delete filter.AND;
-    }
+    filter.$and = $and;
+    delete filter.AND;
   }
   /* eslint-enable no-param-reassign */
 }

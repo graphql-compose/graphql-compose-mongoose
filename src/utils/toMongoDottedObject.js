@@ -1,36 +1,46 @@
 /* @flow */
 
 import { Types } from 'mongoose';
+import { isObject } from 'graphql-compose';
 
 const ObjectId = Types.ObjectId;
 
 function _toMongoDottedObject(obj, target = {}, path = [], filter = false) {
+  if (!isObject(obj) && !Array.isArray(obj)) return obj;
   const objKeys = Object.keys(obj);
 
   /* eslint-disable */
   objKeys.forEach(key => {
-     if (key.startsWith('$')) {
-       if (path.length === 0) {
-         target[key] = obj[key];
-       } else {
-         target[path.join('.')] = {
-           ...target[path.join('.')],
-           [key]: obj[key],
-         };
-       }
-     } else if (Object(obj[key]) === obj[key] && !(obj[key] instanceof ObjectId)) {
-       _toMongoDottedObject(obj[key], target, Array.isArray(obj) && filter ? path : path.concat(key), filter);
-     } else {
-       target[path.concat(key).join('.')] = obj[key];
-     }
-   });
+    if (key.startsWith('$')) {
+      const val = Array.isArray(obj[key])
+        ? obj[key].map(v => _toMongoDottedObject(v, {}, [], filter))
+        : _toMongoDottedObject(obj[key], {}, [], filter);
+      if (path.length === 0) {
+        target[key] = val;
+      } else {
+        target[path.join('.')] = {
+          ...target[path.join('.')],
+          [key]: val,
+        };
+      }
+    } else if (Object(obj[key]) === obj[key] && !(obj[key] instanceof ObjectId)) {
+      _toMongoDottedObject(
+        obj[key],
+        target,
+        Array.isArray(obj) && filter ? path : path.concat(key),
+        filter
+      );
+    } else {
+      target[path.concat(key).join('.')] = obj[key];
+    }
+  });
 
-   if (objKeys.length === 0) {
-     target[path.join('.')] = obj;
-   }
+  if (objKeys.length === 0) {
+    target[path.join('.')] = obj;
+  }
 
-   return target;
-   /* eslint-enable */
+  return target;
+  /* eslint-enable */
 }
 
 /**
