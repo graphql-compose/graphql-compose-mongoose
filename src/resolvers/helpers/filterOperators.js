@@ -37,6 +37,7 @@ export function addFilterOperators(
 }
 
 export function processFilterOperators(filter: Object) {
+  if (!filter) return filter;
   _prepareAndOrFilter(filter);
   if (filter[OPERATORS_FIELDNAME]) {
     const operatorFields = filter[OPERATORS_FIELDNAME];
