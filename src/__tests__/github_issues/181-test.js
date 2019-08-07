@@ -1,16 +1,14 @@
 /* @flow */
 
-import { schemaComposer, InputTypeComposer } from 'graphql-compose';
+import { schemaComposer } from 'graphql-compose';
 import {
   processFilterOperators,
   OPERATORS_FIELDNAME,
 } from '../../resolvers/helpers/filterOperators';
 
-let itc: InputTypeComposer<any>;
-
 beforeEach(() => {
   schemaComposer.clear();
-  itc = schemaComposer.createInputTC({
+  schemaComposer.createInputTC({
     name: 'UserFilterInput',
     fields: {
       _id: 'String',
