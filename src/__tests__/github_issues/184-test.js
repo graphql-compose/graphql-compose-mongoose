@@ -1,7 +1,6 @@
 /* @flow */
 
-import { Types } from 'mongoose';
-import { toMongoDottedObject, toMongoFilterDottedObject } from '../../utils/toMongoDottedObject';
+import { toMongoDottedObject } from '../../utils/toMongoDottedObject';
 
 describe('toMongoDottedObject()', () => {
   it('should handle operators using date object values when nested', () => {
