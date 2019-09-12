@@ -3,10 +3,15 @@
 import { Types } from 'mongoose';
 import { isObject } from 'graphql-compose';
 
-const ObjectId = Types.ObjectId;
+const primitives = [Types.ObjectId, Date, String, Number, Boolean, Types.Decimal128];
+
+function isPrimitive(value: any) {
+  return primitives.some(p => value instanceof p);
+}
 
 function _toMongoDottedObject(obj, target = {}, path = [], filter = false) {
   if (!isObject(obj) && !Array.isArray(obj)) return obj;
+  if (isPrimitive(obj)) return obj;
   const objKeys = Object.keys(obj);
 
   /* eslint-disable */
@@ -23,7 +28,7 @@ function _toMongoDottedObject(obj, target = {}, path = [], filter = false) {
           [key]: val,
         };
       }
-    } else if (Object(obj[key]) === obj[key] && !(obj[key] instanceof ObjectId)) {
+    } else if (Object(obj[key]) === obj[key] && !isPrimitive(obj[key])) {
       _toMongoDottedObject(
         obj[key],
         target,
