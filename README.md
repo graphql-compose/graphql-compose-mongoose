@@ -492,6 +492,20 @@ schemaComposer.Mutation.addFields({userPushToArray: UserTC.getResolver('pushToAr
 
 NB if you set `unique: true` on the array then using the `update` `$push` approach will not check for duplicates, this is due to a MongoDB bug: https://jira.mongodb.org/browse/SERVER-1068. For more usage examples with `$push` and arrays see the MongoDB docs here https://docs.mongodb.com/manual/reference/operator/update/push/. Also note that `$push` will preserve order in the array (append to end of array) whereas `$addToSet` will not.
 
+### Is it possible to use several schemas?
+
+By default `composeWithMongoose` uses global `schemaComposer` for generated types. If you need to create different GraphQL schemas you need create own `schemaComposer`s and provide them to `customizationOptions`:
+
+```js
+import { SchemaComposer } from 'graphql-compose';
+
+const schema1 = new SchemaComposer();
+const schema2 = new SchemaComposer();
+
+const UserTCForSchema1 = composeWithMongoose(User, { schemaComposer: schema1 });
+const UserTCForSchema2 = composeWithMongoose(User, { schemaComposer: schema2 });
+```
+
 ## Customization options
 
 When we convert model `const UserTC = composeWithMongoose(User, customizationOptions);` you may tune every piece of future derived types and resolvers.
@@ -501,7 +515,8 @@ When we convert model `const UserTC = composeWithMongoose(User, customizationOpt
 The top level of customization options. Here you setup name and description for the main type, remove fields or leave only desired fields.
 
 ```js
-export type typeConverterOpts = {
+export type customizationOptions = {
+  schemaComposer?: SchemaComposer<TContext>, // will be used global schema if not provided specific instance
   name?: string,
   description?: string,
   fields?: {
