@@ -70,6 +70,50 @@ describe('count() ->', () => {
       });
       expect(result).toBe(1);
     });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      const mongooseActions = [];
+
+      UserModel.base.set('debug', function debugMongoose(...args) {
+        mongooseActions.push(args);
+      });
+
+      const result = await count(UserModel, UserTC).resolve({
+        args: {},
+        beforeQuery: (query, rp) => {
+          expect(query).toHaveProperty('exec');
+          expect(rp.model).toBe(UserModel);
+
+          // modify query before execution
+          return query.limit(1);
+        },
+      });
+
+      expect(mongooseActions).toEqual([
+        [
+          'users',
+          'countDocuments',
+          {},
+          {
+            limit: 1,
+          },
+        ],
+      ]);
+
+      expect(result).toBe(1);
+    });
+
+    it('should override result with `beforeQuery`', async () => {
+      const result = await count(UserModel, UserTC).resolve({
+        args: {},
+        beforeQuery: (query, rp) => {
+          expect(query).toHaveProperty('exec');
+          expect(rp.model).toBe(UserModel);
+          return 1989;
+        },
+      });
+      expect(result).toBe(1989);
+    });
   });
 
   describe('Resolver.getType()', () => {

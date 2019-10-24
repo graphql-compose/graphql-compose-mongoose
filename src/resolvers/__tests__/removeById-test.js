@@ -147,6 +147,32 @@ describe('removeById() ->', () => {
       const exist = await UserModel.collection.findOne({ _id: user._id });
       expect(exist.name).toBe(user.name);
     });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      const mongooseActions = [];
+
+      UserModel.base.set('debug', function debugMongoose(...args) {
+        mongooseActions.push(args);
+      });
+
+      const resolveParams = {
+        args: { _id: 'INVALID_ID' },
+        context: { ip: '1.1.1.1' },
+        beforeQuery(query, rp) {
+          expect(rp.model).toBe(UserModel);
+          expect(rp.query).toHaveProperty('exec');
+          return query.where({ _id: user._id, canDelete: false });
+        },
+      };
+
+      const result = await removeById(UserModel, UserTC).resolve(resolveParams);
+
+      expect(mongooseActions).toEqual([
+        ['users', 'findOne', { _id: user._id, canDelete: false }, { projection: {} }],
+      ]);
+
+      expect(result).toBeNull();
+    });
   });
 
   describe('Resolver.getType()', () => {

@@ -117,8 +117,9 @@ describe('updateMany() ->', () => {
         args: {
           record: { gender: 'female' },
         },
-        beforeQuery: query => {
+        beforeQuery: (query, rp) => {
           expect(query).toBeInstanceOf(Query);
+          expect(rp.model).toBe(UserModel);
           beforeQueryCalled = true;
           // modify query before execution
           return query.where({ _id: user1.id });

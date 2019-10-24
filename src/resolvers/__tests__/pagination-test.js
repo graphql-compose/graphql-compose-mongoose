@@ -144,5 +144,21 @@ describe('pagination() ->', () => {
       expect(result.items[0]).toBeInstanceOf(UserModel);
       expect(result.items[1]).toBeInstanceOf(UserModel);
     });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      const resolver = pagination(UserModel, UserTC);
+      if (!resolver) throw new Error('Pagination resolver is undefined');
+
+      const result = await resolver.resolve({
+        args: { page: 1, perPage: 20 },
+        beforeQuery(query, rp) {
+          expect(rp.model).toBe(UserModel);
+          expect(rp.query).toHaveProperty('exec');
+          return [{ overrides: true }];
+        },
+      });
+
+      expect(result.items).toEqual([{ overrides: true }]);
+    });
   });
 });

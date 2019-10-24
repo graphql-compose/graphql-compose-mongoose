@@ -10,6 +10,7 @@ import {
   projectionHelper,
 } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
 export default function findByIds<TSource: MongooseDocument, TContext>(
   model: Class<TSource>, // === MongooseModel
@@ -52,10 +53,11 @@ export default function findByIds<TSource: MongooseDocument, TContext>(
       };
 
       resolveParams.query = model.find(selector); // eslint-disable-line
+      resolveParams.model = model; // eslint-disable-line
       projectionHelper(resolveParams);
       limitHelper(resolveParams);
       sortHelper(resolveParams);
-      return resolveParams.query.exec();
+      return beforeQueryHelper(resolveParams);
     },
   });
 }

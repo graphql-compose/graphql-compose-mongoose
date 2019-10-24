@@ -13,6 +13,7 @@ import {
   projectionHelper,
 } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
 export default function findOne<TSource: MongooseDocument, TContext>(
   model: Class<TSource>, // === MongooseModel
@@ -45,12 +46,12 @@ export default function findOne<TSource: MongooseDocument, TContext>(
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
       resolveParams.query = model.findOne({}); // eslint-disable-line
+      resolveParams.model = model;
       filterHelper(resolveParams);
       skipHelper(resolveParams);
       sortHelper(resolveParams);
       projectionHelper(resolveParams);
-
-      return resolveParams.query.exec();
+      return beforeQueryHelper(resolveParams);
     },
   });
 }

@@ -189,6 +189,25 @@ describe('removeOne() ->', () => {
       const exist = await UserModel.collection.findOne({ _id: user1._id });
       expect(exist.name).toBe(user1.name);
     });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      let beforeQueryCalled = false;
+
+      const result = await removeOne(UserModel, UserTC).resolve({
+        args: { filter: { _id: 'INVALID_ID' } },
+        beforeQuery: (query, rp) => {
+          expect(query).toHaveProperty('exec');
+          expect(rp.model).toBe(UserModel);
+
+          beforeQueryCalled = true;
+          // modify query before execution
+          return query.where({ _id: user1.id });
+        },
+      });
+
+      expect(result).toHaveProperty('record._id', user1._id);
+      expect(beforeQueryCalled).toBe(true);
+    });
   });
 
   describe('Resolver.getType()', () => {
