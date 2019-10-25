@@ -118,6 +118,19 @@ describe('findOne() ->', () => {
       });
       expect(result).toBeInstanceOf(UserModel);
     });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      const result = await findOne(UserModel, UserTC).resolve({
+        args: { _id: user1._id },
+        beforeQuery(query, rp) {
+          expect(rp.model).toBe(UserModel);
+          expect(rp.query).toHaveProperty('exec');
+          return query.where({ _id: user2._id });
+        },
+      });
+
+      expect(result._id).toEqual(user2._id);
+    });
   });
 
   describe('Resolver.getType()', () => {

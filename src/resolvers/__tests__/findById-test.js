@@ -87,5 +87,22 @@ describe('findById() ->', () => {
       });
       expect(result).toBeInstanceOf(PostModel);
     });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      let beforeQueryCalled = false;
+
+      const result = await findById(PostModel, PostTypeComposer).resolve({
+        args: { _id: 1 },
+        beforeQuery: (query, rp) => {
+          expect(query).toHaveProperty('exec');
+          expect(rp.model).toBe(PostModel);
+          beforeQueryCalled = true;
+          return { overrides: true };
+        },
+      });
+
+      expect(beforeQueryCalled).toBe(true);
+      expect(result).toEqual({ overrides: true });
+    });
   });
 });

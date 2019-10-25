@@ -1,6 +1,7 @@
 /* @flow */
 
 import { Resolver, schemaComposer } from 'graphql-compose';
+import { Query } from 'mongoose';
 import { UserModel } from '../../__mocks__/userModel';
 import connection, { prepareCursorQuery } from '../connection';
 import findMany from '../findMany';
@@ -216,6 +217,63 @@ describe('connection() resolver', () => {
         const result = await resolver.resolve({ args: { first: 20 } });
         expect(result.edges[0].node).toBeInstanceOf(UserModel);
         expect(result.edges[1].node).toBeInstanceOf(UserModel);
+      });
+
+      it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+        const mongooseActions = [];
+
+        UserModel.base.set('debug', function debugMongoose(...args) {
+          mongooseActions.push(args);
+        });
+
+        const resolver = connection(UserModel, UserTC);
+
+        if (!resolver) {
+          throw new Error('resolver is undefined');
+        }
+
+        const result = await resolver.resolve({
+          args: {},
+          beforeQuery: (query, rp) => {
+            expect(query).toBeInstanceOf(Query);
+            expect(rp.model).toBe(UserModel);
+            // modify query before execution
+            return query.where({ _id: user1.id }).limit(1989);
+          },
+        });
+
+        expect(mongooseActions).toEqual([
+          [
+            'users',
+            'find',
+            { _id: user1._id },
+            {
+              limit: 1989,
+              projection: {},
+            },
+          ],
+        ]);
+
+        expect(result.edges).toHaveLength(1);
+      });
+
+      it('should override result with `beforeQuery`', async () => {
+        const resolver = connection(UserModel, UserTC);
+
+        if (!resolver) {
+          throw new Error('resolver is undefined');
+        }
+
+        const result = await resolver.resolve({
+          args: {},
+          beforeQuery: (query, rp) => {
+            expect(query).toBeInstanceOf(Query);
+            expect(rp.model).toBe(UserModel);
+            return [{ overrides: true }];
+          },
+        });
+
+        expect(result).toHaveProperty('edges.0.node', { overrides: true });
       });
     });
   });

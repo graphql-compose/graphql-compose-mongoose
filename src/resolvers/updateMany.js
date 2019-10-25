@@ -16,6 +16,7 @@ import {
 } from './helpers';
 import { toMongoDottedObject } from '../utils/toMongoDottedObject';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
 export default function updateMany<TSource: MongooseDocument, TContext>(
   model: Class<TSource>, // === MongooseModel
@@ -83,6 +84,7 @@ export default function updateMany<TSource: MongooseDocument, TContext>(
       }
 
       resolveParams.query = model.find();
+      resolveParams.model = model;
       filterHelper(resolveParams);
       skipHelper(resolveParams);
       sortHelper(resolveParams);
@@ -97,17 +99,7 @@ export default function updateMany<TSource: MongooseDocument, TContext>(
         resolveParams.query.update({ $set: toMongoDottedObject(recordData) });
       }
 
-      let res;
-
-      // `beforeQuery` is experemental feature, if you want to use it
-      // please open an issue with your use case, cause I suppose that
-      // this option is excessive
-
-      if (resolveParams.beforeQuery) {
-        res = await resolveParams.beforeQuery(resolveParams.query, resolveParams);
-      } else {
-        res = await resolveParams.query.exec();
-      }
+      const res = await beforeQueryHelper(resolveParams);
 
       if (res.ok) {
         return {

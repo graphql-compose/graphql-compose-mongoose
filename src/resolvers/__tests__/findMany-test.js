@@ -110,5 +110,18 @@ describe('findMany() ->', () => {
       expect(result[0]).toBeInstanceOf(UserModel);
       expect(result[1]).toBeInstanceOf(UserModel);
     });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      const result = await findMany(UserModel, UserTC).resolve({
+        args: { limit: 2 },
+        beforeQuery(query, rp) {
+          expect(rp.model).toBe(UserModel);
+          expect(rp.query).toHaveProperty('exec');
+          return [{ overridden: true }];
+        },
+      });
+
+      expect(result).toEqual([{ overridden: true }]);
+    });
   });
 });

@@ -121,5 +121,18 @@ describe('findByIds() ->', () => {
       expect(result[0]).toBeInstanceOf(UserModel);
       expect(result[1]).toBeInstanceOf(UserModel);
     });
+
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+      const result = await findByIds(UserModel, UserTC).resolve({
+        args: { _ids: [user1._id, user2._id] },
+        beforeQuery(query, rp) {
+          expect(rp.model).toBe(UserModel);
+          expect(rp.query).toHaveProperty('exec');
+          return query.where({ _id: user1._id });
+        },
+      });
+
+      expect(result).toHaveLength(1);
+    });
   });
 });

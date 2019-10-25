@@ -5,6 +5,7 @@ import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { MongooseDocument } from 'mongoose';
 import { filterHelper, filterHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
 export default function count<TSource: MongooseDocument, TContext>(
   model: Class<TSource>, // === MongooseModel
@@ -32,13 +33,16 @@ export default function count<TSource: MongooseDocument, TContext>(
     },
     resolve: (resolveParams: ExtendedResolveParams) => {
       resolveParams.query = model.find();
+      resolveParams.model = model;
       filterHelper(resolveParams);
       if (resolveParams.query.countDocuments) {
         // mongoose 5.2.0 and above
-        return resolveParams.query.countDocuments().exec();
+        resolveParams.query.countDocuments();
+        return beforeQueryHelper(resolveParams);
       } else {
         // mongoose 5 and below
-        return resolveParams.query.count().exec();
+        resolveParams.query.count();
+        return beforeQueryHelper(resolveParams);
       }
     },
   });

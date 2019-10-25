@@ -4,6 +4,7 @@ import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { MongooseDocument } from 'mongoose';
 import { projectionHelper } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
 export default function findById<TSource: MongooseDocument, TContext>(
   model: Class<TSource>, // === MongooseModel
@@ -30,8 +31,9 @@ export default function findById<TSource: MongooseDocument, TContext>(
 
       if (args._id) {
         resolveParams.query = model.findById(args._id); // eslint-disable-line
+        resolveParams.model = model; // eslint-disable-line
         projectionHelper(resolveParams);
-        return resolveParams.query.exec();
+        return beforeQueryHelper(resolveParams);
       }
       return Promise.resolve(null);
     },
