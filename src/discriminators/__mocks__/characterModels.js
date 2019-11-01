@@ -33,7 +33,7 @@ export const CharacterObject = {
 };
 
 const CharacterSchema = new Schema(CharacterObject);
-const ACharacterSchema = new Schema(Object.assign({}, CharacterObject));
+const ACharacterSchema = new Schema({ ...CharacterObject });
 
 export function getCharacterModels(DKey: string) {
   CharacterSchema.set('discriminatorKey', DKey);

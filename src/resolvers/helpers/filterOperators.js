@@ -140,7 +140,7 @@ export function _createOperatorsField<TContext>(
       if (Object.keys(fields).length > 0) {
         const operatorTypeName = `${upperFirst(fieldName)}${typeName}`;
         const operatorITC = itc.schemaComposer.getOrCreateITC(operatorTypeName, tc => {
-          tc.setFields(fields);
+          tc.setFields((fields: any));
         });
         operatorsITC.setField(fieldName, operatorITC);
       }
