@@ -69,6 +69,9 @@ export function dotPathsToEmbedded(fields: MongooseFieldMapT): MongooseFieldMapT
     const dotIdx = fieldName.indexOf('.');
     if (dotIdx === -1) {
       result[fieldName] = fields[fieldName];
+    } else if (fieldName.substr(dotIdx, 3) === '.$*') {
+      // skip { type: Map of: String }
+      // do not add this field to result
     } else {
       // create pseudo sub-model
       const name = fieldName.substr(0, dotIdx);

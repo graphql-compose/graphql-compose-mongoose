@@ -94,6 +94,18 @@ const UserSchema: SchemaType<any> = new Schema(
       type: Schema.Types.Decimal128,
     },
 
+    mapField: {
+      type: Map,
+      of: String,
+    },
+
+    mapFieldDeep: {
+      subField: {
+        type: Map,
+        of: String,
+      },
+    },
+
     // createdAt, created via option `timastamp: true` (see bottom)
     // updatedAt, created via option `timastamp: true` (see bottom)
   },

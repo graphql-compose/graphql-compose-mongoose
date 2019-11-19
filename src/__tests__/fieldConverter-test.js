@@ -310,5 +310,11 @@ describe('fieldConverter', () => {
     it('should work with Decimal128', () => {
       expect(tc.getFieldTypeName('salary')).toBe('BSONDecimal');
     });
+
+    it('should work with Map', () => {
+      expect(tc.getFieldTypeName('mapField')).toBe('JSON');
+      expect(tc.getFieldTypeName('mapFieldDeep')).toBe('UserMapFieldDeep');
+      expect(tc.getFieldOTC('mapFieldDeep').getFieldTypeName('subField')).toBe('JSON');
+    });
   });
 });
