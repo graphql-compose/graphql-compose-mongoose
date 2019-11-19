@@ -35,7 +35,10 @@ describe('prepareChildResolvers()', () => {
     it('should set DKey on createMany', async () => {
       const res = await PersonTC.getResolver('createMany').resolve({
         args: {
-          records: [{ name: 'Agent 007', dob: 124343 }, { name: 'Agent 007', dob: 124343 }],
+          records: [
+            { name: 'Agent 007', dob: 124343 },
+            { name: 'Agent 007', dob: 124343 },
+          ],
         },
       });
 
