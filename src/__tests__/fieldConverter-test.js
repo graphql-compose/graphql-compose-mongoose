@@ -1,7 +1,7 @@
 /* @flow */
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
-import { EnumTypeComposer, schemaComposer, ListComposer } from 'graphql-compose';
+import { EnumTypeComposer, schemaComposer, ListComposer, SchemaComposer } from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel';
 import {
   deriveComplexType,
@@ -14,6 +14,7 @@ import {
   enumToGraphQL,
   documentArrayToGraphQL,
   referenceToGraphQL,
+  convertModelToGraphQL,
 } from '../fieldsConverter';
 import GraphQLMongoID from '../types/mongoid';
 import GraphQLBSONDecimal from '../types/bsonDecimal';
@@ -250,6 +251,64 @@ describe('fieldConverter', () => {
   describe('referenceToGraphQL()', () => {
     it('should return type of field', () => {
       expect(referenceToGraphQL(fields.user)).toBe('MongoID');
+    });
+  });
+
+  describe('convertModelToGraphQL()', () => {
+    const sc = new SchemaComposer();
+    const tc = convertModelToGraphQL(UserModel, 'User', sc);
+
+    it('should work with String', () => {
+      expect(tc.getFieldTypeName('name')).toBe('String');
+      expect(tc.getFieldTypeName('skills')).toBe('[String]');
+    });
+
+    it('should work with Number', () => {
+      expect(tc.getFieldTypeName('age')).toBe('Float');
+    });
+
+    it('should work with ObjectId', () => {
+      expect(tc.getFieldTypeName('user')).toBe('MongoID');
+    });
+
+    it('should work with Enum', () => {
+      expect((tc: any).getFieldTC('gender').getFieldNames()).toEqual(['male', 'female', 'ladyboy']);
+
+      expect((tc: any).getFieldTC('employment').getFieldNames()).toEqual([
+        'full',
+        'partial',
+        'remote',
+      ]);
+    });
+
+    it('should work with Boolean', () => {
+      expect(tc.getFieldTypeName('relocation')).toBe('Boolean');
+    });
+
+    it('should extract sub schemas', () => {
+      const contactsTC = tc.getFieldOTC('contacts');
+      expect(contactsTC.getFieldNames()).toEqual(['phones', 'email', 'skype', 'locationId', '_id']);
+    });
+
+    it('should skip __secretField', () => {
+      expect(tc.hasField('__secretField')).toBeFalsy();
+    });
+
+    it('should work with Mixed', () => {
+      expect(tc.getFieldTypeName('someDynamic')).toBe('JSON');
+    });
+
+    it('should work with Array', () => {
+      expect(tc.getFieldTypeName('periods')).toBe('[UserPeriods]');
+      expect(sc.getOTC('UserPeriods').getFieldNames()).toEqual(['from', 'to', '_id']);
+
+      expect(tc.getFieldTypeName('someDeep')).toBe('UserSomeDeep');
+      expect(tc.getFieldOTC('someDeep').getFieldTypeName('periods')).toBe('[UserSomeDeepPeriods]');
+      expect(sc.getOTC('UserSomeDeepPeriods').getFieldNames()).toEqual(['from', 'to', '_id']);
+    });
+
+    it('should work with Decimal128', () => {
+      expect(tc.getFieldTypeName('salary')).toBe('BSONDecimal');
     });
   });
 });
