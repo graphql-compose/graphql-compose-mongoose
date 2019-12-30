@@ -153,7 +153,7 @@ describe('composeWithMongoose ->', () => {
       it('should be called if opts.resolvers not exists or has value', () => {
         const tc = composeWithMongoose(UserModel);
         expect(Array.from(tc.getResolvers().keys())).not.toHaveLength(0);
-        const tc2 = composeWithMongoose(UserModel, { resolvers: {} });
+        const tc2 = composeWithMongoose(UserModel, { resolvers: {}, name: 'User2' });
         expect(Array.from(tc2.getResolvers().keys())).not.toHaveLength(0);
       });
 

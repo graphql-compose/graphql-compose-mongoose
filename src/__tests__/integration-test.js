@@ -127,6 +127,7 @@ describe('integration tests', () => {
     let schema;
     let UserTC;
     beforeAll(async () => {
+      schemaComposer.clear();
       UserTC = composeWithMongoose(UserModel);
       UserTC.addFields({
         rawData: {

@@ -16,6 +16,7 @@ const { CharacterModel, PersonModel, DroidModel } = getCharacterModels('type');
 
 describe('DiscriminatorTypeComposer', () => {
   it('should have as interface DInterface', () => {
+    schemaComposer.clear();
     const baseDTC = composeWithMongooseDiscriminators(CharacterModel);
     expect(baseDTC.hasInterface(baseDTC.getDInterface())).toBeTruthy();
   });
@@ -483,6 +484,7 @@ describe('DiscriminatorTypeComposer', () => {
     let characterDTC;
 
     beforeEach(() => {
+      schemaComposer.clear();
       characterDTC = composeWithMongooseDiscriminators(CharacterModel);
     });
 

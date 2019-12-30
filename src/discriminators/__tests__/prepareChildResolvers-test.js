@@ -15,6 +15,7 @@ describe('prepareChildResolvers()', () => {
     let PersonTC: ObjectTypeComposer<any, any>;
 
     beforeAll(() => {
+      schemaComposer.clear();
       PersonTC = composeWithMongooseDiscriminators(CharacterModel).discriminator(PersonModel);
     });
 
@@ -54,6 +55,7 @@ describe('prepareChildResolvers()', () => {
     const interestArgs = ['filter', 'record', 'records'];
 
     beforeAll(() => {
+      schemaComposer.clear();
       const PersonTC = composeWithMongooseDiscriminators(CharacterModel).discriminator(PersonModel);
 
       const resolvers = PersonTC.getResolvers();
