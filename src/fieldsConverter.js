@@ -130,7 +130,12 @@ export function convertModelToGraphQL<TSource, TContext>(
   }
 
   // if model already has generated ObjectTypeComposer early, then return it
-  if (sc.has(model.schema)) {
+  if (sc.has(model.schema) && sc.has(typeName)) {
+    if (sc.get(model.schema) !== sc.get(typeName)) {
+      throw new Error(
+        `You try to generate GrpahQL Type with name ${typeName} from mongoose model but this type already exists in SchemaComposer. Please choose another type name or remove existed type from schemaComposer.`
+      );
+    }
     return sc.getOTC(model.schema);
   }
 
