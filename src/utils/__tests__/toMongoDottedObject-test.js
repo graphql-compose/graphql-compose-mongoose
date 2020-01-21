@@ -87,6 +87,45 @@ describe('toMongoFilterDottedObject()', () => {
     });
   });
 
+  it('should dottify internals of logical operators: $or $and $not $nor', () => {
+    expect(
+      toMongoFilterDottedObject({
+        $and: [{ a: { b: 1 } }, { c: [1, 2] }],
+        $or: [{ a: { b: 1 } }, { c: [1, 2] }],
+        some: {
+          me: {
+            $nor: [{ a: { b: 1 } }, { c: [1, 2] }],
+            $not: { a: { b: 1 } },
+          },
+        },
+      })
+    ).toEqual({
+      $and: [{ 'a.b': 1 }, { 'c.0': 1, 'c.1': 2 }],
+      $or: [{ 'a.b': 1 }, { 'c.0': 1, 'c.1': 2 }],
+      'some.me': { $nor: [{ 'a.b': 1 }, { 'c.0': 1, 'c.1': 2 }], $not: { 'a.b': 1 } },
+    });
+  });
+
+  it('should keep $geometry as is', () => {
+    expect(
+      toMongoFilterDottedObject({
+        location: {
+          $near: {
+            $geometry: { type: 'Point', coordinates: [10.3222671, 36.88911649999999] },
+            $maxDistance: 50000,
+          },
+        },
+      })
+    ).toEqual({
+      location: {
+        $near: {
+          $geometry: { type: 'Point', coordinates: [10.3222671, 36.88911649999999] },
+          $maxDistance: 50000,
+        },
+      },
+    });
+  });
+
   it('should handle date object values as scalars', () => {
     expect(toMongoFilterDottedObject({ dateField: new Date(100) })).toEqual({
       dateField: new Date(100),

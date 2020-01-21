@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import { isObject } from 'graphql-compose';
 
 const primitives = [Types.ObjectId, Date, String, Number, Boolean, Types.Decimal128];
+const operatorsWithExpression = ['$or', '$and', '$not', '$nor'];
 
 function isPrimitive(value: any) {
   return primitives.some(p => value instanceof p);
@@ -17,9 +18,14 @@ function _toMongoDottedObject(obj, target = {}, path = [], filter = false) {
   /* eslint-disable */
   objKeys.forEach(key => {
     if (key.startsWith('$')) {
-      const val = Array.isArray(obj[key])
-        ? obj[key].map(v => _toMongoDottedObject(v, {}, [], filter))
-        : _toMongoDottedObject(obj[key], {}, [], filter);
+      let val;
+      if (operatorsWithExpression.includes(key)) {
+        val = Array.isArray(obj[key])
+          ? obj[key].map(v => _toMongoDottedObject(v, {}, [], filter))
+          : _toMongoDottedObject(obj[key], {}, [], filter);
+      } else {
+        val = obj[key];
+      }
       if (path.length === 0) {
         target[key] = val;
       } else {
