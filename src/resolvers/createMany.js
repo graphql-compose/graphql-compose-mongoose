@@ -41,7 +41,7 @@ export default function createMany<TSource: MongooseDocument, TContext>(
   for (const field in tree) {
     if (tree.hasOwnProperty(field)) {
       const fieldOptions = tree[field];
-      if (fieldOptions.required) {
+      if (fieldOptions.required && typeof fieldOptions.required !== 'function') {
         requiredFields.push(field);
       }
     }
