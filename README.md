@@ -477,7 +477,7 @@ UserTC.addResolver({
   type: UserTC,
   args: { userId: 'MongoID!', valueToPush: 'String' },
   resolve: async ({ source, args, context, info }) => {
-    const user = await User.update({ _id: args.userId }, { $push: { arrayToPushTo: args.valueToPush } } })
+    const user = await User.update({ _id: args.userId }, { $push: { arrayToPushTo: args.valueToPush } })
     if (!user) return null // or gracefully return an error etc...
     return User.findOne({ _id: args.userId }) // return the record
   }
