@@ -36,7 +36,7 @@ export default function findOne<TSource: MongooseDocument, TContext>(
       ...filterHelperArgs(tc, model, {
         filterTypeName: `FilterFindOne${tc.getTypeName()}Input`,
         model,
-        ...(opts && opts.filter),
+        ...(opts && (opts.filter: any)),
       }),
       ...skipHelperArgs(),
       ...sortHelperArgs(tc, model, {

@@ -29,7 +29,7 @@ export default function pagination<TSource: MongooseDocument, TContext>(
   const resolver = preparePaginationResolver(tc, {
     findResolverName: 'findMany',
     countResolverName: 'count',
-    ...opts,
+    ...(opts: any),
   });
 
   return resolver;

@@ -45,7 +45,7 @@ export default function removeMany<TSource: MongooseDocument, TContext>(
         filterTypeName: `FilterRemoveMany${tc.getTypeName()}Input`,
         isRequired: true,
         model,
-        ...(opts && opts.filter),
+        ...(opts && (opts.filter: any)),
       }),
     },
     resolve: async (resolveParams: ExtendedResolveParams) => {

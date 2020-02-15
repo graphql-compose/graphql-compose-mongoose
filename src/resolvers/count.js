@@ -28,7 +28,7 @@ export default function count<TSource: MongooseDocument, TContext>(
       ...filterHelperArgs(tc, model, {
         filterTypeName: `Filter${tc.getTypeName()}Input`,
         model,
-        ...(opts && opts.filter),
+        ...(opts && (opts.filter: any)),
       }),
     },
     resolve: (resolveParams: ExtendedResolveParams) => {

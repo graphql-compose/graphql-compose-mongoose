@@ -57,7 +57,7 @@ export default function updateOne<TSource: MongooseDocument, TContext>(
       ...filterHelperArgs(tc, model, {
         filterTypeName: `FilterUpdateOne${tc.getTypeName()}Input`,
         model,
-        ...(opts && opts.filter),
+        ...(opts && (opts.filter: any)),
       }),
       ...sortHelperArgs(tc, model, {
         sortTypeName: `SortUpdateOne${tc.getTypeName()}Input`,

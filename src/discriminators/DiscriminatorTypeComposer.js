@@ -10,7 +10,6 @@ import {
   type ObjectTypeComposerFieldConfigDefinition,
   type ObjectTypeComposerFieldConfigMapDefinition,
   type ObjectTypeComposerFieldConfigAsObjectDefinition,
-  type Thunk,
 } from 'graphql-compose';
 import type { Model } from 'mongoose';
 import { composeWithMongoose, type ComposeWithMongooseOpts } from '../composeWithMongoose';
@@ -109,7 +108,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     opts = {
       reorderFields: true,
       schemaComposer,
-      ...opts,
+      ...(opts: any),
     };
 
     const baseTC = composeWithMongoose(baseModel, opts);
@@ -214,7 +213,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 
   setField(
     fieldName: string,
-    fieldConfig: Thunk<ObjectTypeComposerFieldConfigDefinition<any, any>>
+    fieldConfig: ObjectTypeComposerFieldConfigDefinition<any, any>
   ): DiscriminatorTypeComposer<TSource, TContext> {
     super.setField(fieldName, fieldConfig);
     this.getDInterface().setField(fieldName, (fieldConfig: any));

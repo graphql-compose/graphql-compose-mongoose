@@ -50,7 +50,7 @@ export default function removeOne<TSource: MongooseDocument, TContext>(
       ...filterHelperArgs(tc, model, {
         filterTypeName: `FilterRemoveOne${tc.getTypeName()}Input`,
         model,
-        ...(opts && opts.filter),
+        ...(opts && (opts.filter: any)),
       }),
       ...sortHelperArgs(tc, model, {
         sortTypeName: `SortRemoveOne${tc.getTypeName()}Input`,

@@ -60,7 +60,7 @@ export default function updateMany<TSource: MongooseDocument, TContext>(
       ...filterHelperArgs(tc, model, {
         filterTypeName: `FilterUpdateMany${tc.getTypeName()}Input`,
         model,
-        ...(opts && opts.filter),
+        ...(opts && (opts.filter: any)),
       }),
       ...sortHelperArgs(tc, model, {
         sortTypeName: `SortUpdateMany${tc.getTypeName()}Input`,

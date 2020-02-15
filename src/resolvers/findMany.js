@@ -38,7 +38,7 @@ export default function findMany<TSource: MongooseDocument, TContext>(
       ...filterHelperArgs(tc, model, {
         filterTypeName: `FilterFindMany${tc.getTypeName()}Input`,
         model,
-        ...(opts && opts.filter),
+        ...(opts && (opts.filter: any)),
       }),
       ...skipHelperArgs(),
       ...limitHelperArgs({

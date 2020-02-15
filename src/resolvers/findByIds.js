@@ -33,9 +33,9 @@ export default function findByIds<TSource: MongooseDocument, TContext>(
     kind: 'query',
     args: {
       _ids: '[MongoID]!',
-      ...limitHelperArgs({
+      ...(limitHelperArgs({
         ...(opts && opts.limit),
-      }),
+      }): any),
       ...sortHelperArgs(tc, model, {
         sortTypeName: `SortFindByIds${tc.getTypeName()}Input`,
         ...(opts && opts.sort),

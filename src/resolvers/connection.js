@@ -100,8 +100,10 @@ export function prepareCursorQuery(
           criteria[k] = cursorData[k];
         } else if (ii === i) {
           if (indexData[k] === 1) {
+            // $FlowFixMe
             criteria[k] = { [nextOper]: cursorData[k] };
           } else {
+            // $FlowFixMe
             criteria[k] = { [prevOper]: cursorData[k] };
           }
         }
