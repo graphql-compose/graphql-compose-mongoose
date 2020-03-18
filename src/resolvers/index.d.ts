@@ -67,6 +67,22 @@ export {
 
 export function getAvailableNames(): string[];
 
+export { CountArgs } from './count';
+export { ConnectionArgs } from './connection';
+export { PaginationArgs } from './pagination';
+export { CreateOneArgs } from './createOne';
+export { CreateManyArgs } from './createMany';
+export { RemoveOneArgs } from './removeOne';
+export { RemoveByIdArgs } from './removeById';
+export { RemoveManyArgs } from './removeMany';
+export { UpdateOneArgs } from './updateOne';
+export { UpdateByIdArgs } from './updateById';
+export { UpdateManyArgs } from './updateMany';
+export { FindByIdArgs } from './findById';
+export { FindByIdsArgs } from './findByIds';
+export { FindOneArgs } from './findOne';
+export { FindManyArgs } from './findMany';
+
 export const EMCResolvers: {
   findById: 'findById';
   findByIds: 'findByIds';
