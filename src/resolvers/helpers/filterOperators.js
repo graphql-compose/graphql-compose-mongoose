@@ -41,12 +41,12 @@ export function processFilterOperators(filter: Object) {
   _prepareAndOrFilter(filter);
   if (filter[OPERATORS_FIELDNAME]) {
     const operatorFields = filter[OPERATORS_FIELDNAME];
-    Object.keys(operatorFields).forEach(fieldName => {
+    Object.keys(operatorFields).forEach((fieldName) => {
       const fieldOperators = { ...operatorFields[fieldName] };
       const criteria = {};
-      Object.keys(fieldOperators).forEach(operatorName => {
+      Object.keys(fieldOperators).forEach((operatorName) => {
         if (Array.isArray(fieldOperators[operatorName])) {
-          criteria[`$${operatorName}`] = fieldOperators[operatorName].map(v =>
+          criteria[`$${operatorName}`] = fieldOperators[operatorName].map((v) =>
             processFilterOperators(v)
           );
         } else {
@@ -70,7 +70,7 @@ export function _prepareAndOrFilter(filter: Object) {
 
   const { OR, AND } = filter;
   if (OR) {
-    const $or = OR.map(d => {
+    const $or = OR.map((d) => {
       processFilterOperators(d);
       return d;
     });
@@ -79,7 +79,7 @@ export function _prepareAndOrFilter(filter: Object) {
   }
 
   if (AND) {
-    const $and = AND.map(d => {
+    const $and = AND.map((d) => {
       processFilterOperators(d);
       return d;
     });
@@ -95,7 +95,7 @@ export function _createOperatorsField<TContext>(
   model: MongooseModel,
   operatorsOpts: FilterOperatorsOpts
 ): InputTypeComposer<TContext> {
-  const operatorsITC = itc.schemaComposer.getOrCreateITC(typeName, tc => {
+  const operatorsITC = itc.schemaComposer.getOrCreateITC(typeName, (tc) => {
     tc.setDescription('For performance reason this type contains only *indexed* fields.');
   });
 
@@ -103,12 +103,12 @@ export function _createOperatorsField<TContext>(
   // then fill it up with indexed fields
   const indexedFields = getIndexedFieldNamesForGraphQL(model);
   if (Object.keys(operatorsOpts).length === 0) {
-    indexedFields.forEach(fieldName => {
+    indexedFields.forEach((fieldName) => {
       operatorsOpts[fieldName] = availableOperators; // eslint-disable-line
     });
   }
 
-  itc.getFieldNames().forEach(fieldName => {
+  itc.getFieldNames().forEach((fieldName) => {
     if (operatorsOpts[fieldName] && operatorsOpts[fieldName] !== false) {
       const fields = {};
       let operators;
@@ -117,7 +117,7 @@ export function _createOperatorsField<TContext>(
       } else {
         operators = availableOperators;
       }
-      operators.forEach(operatorName => {
+      operators.forEach((operatorName) => {
         const fc = itc.getFieldConfig(fieldName);
         // unwrap from GraphQLNonNull and GraphQLList, if present
         const namedType: GraphQLInputType = (getNamedType(fc.type): any);
@@ -139,7 +139,7 @@ export function _createOperatorsField<TContext>(
       });
       if (Object.keys(fields).length > 0) {
         const operatorTypeName = `${upperFirst(fieldName)}${typeName}`;
-        const operatorITC = itc.schemaComposer.getOrCreateITC(operatorTypeName, tc => {
+        const operatorITC = itc.schemaComposer.getOrCreateITC(operatorTypeName, (tc) => {
           tc.setFields((fields: any));
         });
         operatorsITC.setField(fieldName, operatorITC);

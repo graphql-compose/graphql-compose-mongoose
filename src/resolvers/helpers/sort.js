@@ -53,10 +53,10 @@ export function getSortTypeFromModel<TContext>(
   model: MongooseModel,
   schemaComposer: SchemaComposer<TContext>
 ): EnumTypeComposer<TContext> {
-  return schemaComposer.getOrCreateETC(typeName, etc => {
+  return schemaComposer.getOrCreateETC(typeName, (etc) => {
     const indexes = extendByReversedIndexes(getIndexesFromModel(model));
     const fields = {};
-    indexes.forEach(indexData => {
+    indexes.forEach((indexData) => {
       const keys = Object.keys(indexData);
       let name = keys
         .join('__')

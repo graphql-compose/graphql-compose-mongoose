@@ -14,7 +14,7 @@ export function mergePrimitiveTypeFields(
   argOptsTypes?: string[] | string
 ) {
   if (Array.isArray(argOptsTypes)) {
-    if (argOptsTypes.find(v => v === 'boolean' || v === 'number')) {
+    if (argOptsTypes.find((v) => v === 'boolean' || v === 'number')) {
       return mergePrimitiveTypeFields(baseField, childField, 'boolean');
     }
   }

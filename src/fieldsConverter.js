@@ -65,7 +65,7 @@ export function dotPathsToEmbedded(fields: MongooseFieldMapT): MongooseFieldMapT
 
   const result: MongooseFieldMapT = {};
 
-  Object.keys(fields).forEach(fieldName => {
+  Object.keys(fields).forEach((fieldName) => {
     const dotIdx = fieldName.indexOf('.');
     if (dotIdx === -1) {
       result[fieldName] = fields[fieldName];
@@ -110,8 +110,8 @@ export function getFieldsFromModel(model: MongooseModel | MongoosePseudoModelT):
   const paths = dotPathsToEmbedded(model.schema.paths);
 
   Object.keys(paths)
-    .filter(path => !path.startsWith('__')) // skip hidden fields
-    .forEach(path => {
+    .filter((path) => !path.startsWith('__')) // skip hidden fields
+    .forEach((path) => {
       fields[path] = paths[path];
     });
 
@@ -141,7 +141,7 @@ export function convertModelToGraphQL<TSource, TContext>(
   const mongooseFields = getFieldsFromModel(model);
   const graphqlFields = {};
 
-  Object.keys(mongooseFields).forEach(fieldName => {
+  Object.keys(mongooseFields).forEach((fieldName) => {
     const mongooseField: MongooseFieldT = mongooseFields[fieldName];
 
     graphqlFields[fieldName] = {
@@ -151,7 +151,7 @@ export function convertModelToGraphQL<TSource, TContext>(
 
     if (deriveComplexType(mongooseField) === ComplexTypes.EMBEDDED) {
       // https://github.com/nodkz/graphql-compose-mongoose/issues/7
-      graphqlFields[fieldName].resolve = source => {
+      graphqlFields[fieldName].resolve = (source) => {
         if (source) {
           if (source.toObject) {
             const obj = source.toObject();
@@ -341,7 +341,7 @@ export function enumToGraphQL(
 
   const typeName = `Enum${prefix}${upperFirst(_getFieldName(field))}`;
 
-  return schemaComposer.getOrCreateETC(typeName, etc => {
+  return schemaComposer.getOrCreateETC(typeName, (etc) => {
     const desc = _getFieldDescription(field);
     if (desc) etc.setDescription(desc);
 

@@ -175,7 +175,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   }
 
   hasChildTC(DName: string): boolean {
-    return !!this.childTCs.find(ch => ch.getTypeName() === DName);
+    return !!this.childTCs.find((ch) => ch.getTypeName() === DName);
   }
 
   /* eslint no-use-before-define: 0 */
@@ -276,8 +276,8 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
       const specificFields = childTC
         .getFieldNames()
         .filter(
-          childFieldName =>
-            !oldFieldNames.find(oldBaseFieldName => oldBaseFieldName === childFieldName)
+          (childFieldName) =>
+            !oldFieldNames.find((oldBaseFieldName) => oldBaseFieldName === childFieldName)
         );
       childTC.removeOtherFields(super.getFieldNames().concat(specificFields));
       reorderFields(childTC, (this.opts: any).reorderFields, this.getDKey(), super.getFieldNames());

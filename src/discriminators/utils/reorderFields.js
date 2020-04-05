@@ -19,7 +19,7 @@ export function reorderFields<TContext>(
       if (modelTC instanceof ObjectTypeComposer && commonFieldKeys) {
         newOrder.push(...commonFieldKeys);
 
-        newOrder.filter(value => value === '_id' || value === DKey);
+        newOrder.filter((value) => value === '_id' || value === DKey);
 
         newOrder.unshift('_id', DKey);
       } else {

@@ -23,7 +23,7 @@ export default function removeMany<TSource: MongooseDocument, TContext>(
   }
 
   const outputTypeName = `RemoveMany${tc.getTypeName()}Payload`;
-  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
       numAffected: {
         type: 'Int',

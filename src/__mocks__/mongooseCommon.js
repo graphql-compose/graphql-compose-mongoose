@@ -19,7 +19,7 @@ mongoose.connect = (async () => {
   // originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true }); // mongoose 4
   originalConnect.bind(mongoose)(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true }); // mongoose 5
 
-  mongoose.connection.on('error', e => {
+  mongoose.connection.on('error', (e) => {
     if (e.message.code === 'ETIMEDOUT') {
       console.error(e);
     } else {

@@ -11,7 +11,7 @@ export type IndexT = { [fieldName: string]: any };
 
 function isSpecificIndex(idx) {
   let hasSpecialIndex = false;
-  Object.keys(idx).forEach(k => {
+  Object.keys(idx).forEach((k) => {
     if (typeof idx[k] !== 'number' && typeof idx[k] !== 'boolean') {
       hasSpecialIndex = true;
     }
@@ -39,7 +39,7 @@ export function getIndexesFromModel(
   }
 
   // scan all fields on index presence [MONGOOSE FIELDS LEVEL INDEX]
-  Object.keys(mongooseModel.schema.paths).forEach(name => {
+  Object.keys(mongooseModel.schema.paths).forEach((name) => {
     if (mongooseModel.schema.paths[name]._index) {
       indexedFields.push({ [name]: 1 }); // ASC by default
     }
@@ -47,7 +47,7 @@ export function getIndexesFromModel(
 
   // scan compound and special indexes [MONGOOSE SCHEMA LEVEL INDEXES]
   if (Array.isArray(mongooseModel.schema._indexes)) {
-    mongooseModel.schema._indexes.forEach(idxData => {
+    mongooseModel.schema._indexes.forEach((idxData) => {
       const partialIndexes = {};
       const idxFields = idxData[0];
 
@@ -57,7 +57,7 @@ export function getIndexesFromModel(
         } else {
           // extract partial indexes from compound index
           // { name: 1, age: 1, salary: 1} -> [{name:1}, {name:1, age:1}, {name:1, age:1, salary:1}]
-          Object.keys(idxFields).forEach(fieldName => {
+          Object.keys(idxFields).forEach((fieldName) => {
             partialIndexes[fieldName] = idxFields[fieldName];
             indexedFields.push({ ...partialIndexes });
           });
@@ -68,7 +68,7 @@ export function getIndexesFromModel(
 
   // filter duplicates
   const tmp = [];
-  const result = indexedFields.filter(val => {
+  const result = indexedFields.filter((val) => {
     const asString = JSON.stringify(val);
     if (tmp.indexOf(asString) > -1) return false;
     tmp.push(asString);
@@ -87,7 +87,7 @@ export function getUniqueIndexes(mongooseModel: MongooseModel): IndexT[] {
   }
 
   // scan all fields on index presence [MONGOOSE FIELDS LEVEL INDEX]
-  Object.keys(mongooseModel.schema.paths).forEach(name => {
+  Object.keys(mongooseModel.schema.paths).forEach((name) => {
     if (mongooseModel.schema.paths[name]._index && mongooseModel.schema.paths[name]._index.unique) {
       indexedFields.push({ [name]: 1 }); // ASC by default
     }
@@ -95,7 +95,7 @@ export function getUniqueIndexes(mongooseModel: MongooseModel): IndexT[] {
 
   // scan compound and special indexes [MONGOOSE SCHEMA LEVEL INDEXES]
   if (Array.isArray(mongooseModel.schema._indexes)) {
-    mongooseModel.schema._indexes.forEach(idxData => {
+    mongooseModel.schema._indexes.forEach((idxData) => {
       const idxFields = idxData[0];
       const idxCfg = idxData[1];
       if (idxCfg.unique && !isSpecificIndex(idxFields)) {
@@ -116,11 +116,11 @@ export function extendByReversedIndexes(indexes: IndexT[], opts: extendByReverse
 
   const result: IndexT[] = [];
 
-  indexes.forEach(indexObj => {
+  indexes.forEach((indexObj) => {
     let hasSpecificIndex = false;
     // https://docs.mongodb.org/manual/tutorial/sort-results-with-indexes/#sort-on-multiple-fields
     const reversedIndexObj = { ...indexObj };
-    Object.keys(reversedIndexObj).forEach(f => {
+    Object.keys(reversedIndexObj).forEach((f) => {
       if (reversedIndexObj[f] === 1) reversedIndexObj[f] = -1;
       else if (reversedIndexObj[f] === -1) reversedIndexObj[f] = 1;
       else hasSpecificIndex = true;
@@ -146,7 +146,7 @@ export function getIndexedFieldNamesForGraphQL(model: MongooseModel): string[] {
   const indexes = getIndexesFromModel(model);
 
   const fieldNames = [];
-  indexes.forEach(indexData => {
+  indexes.forEach((indexData) => {
     const keys = Object.keys(indexData);
     const clearedName = keys[0].replace(/[^_a-zA-Z0-9]/i, '__');
     fieldNames.push(clearedName);
@@ -154,7 +154,7 @@ export function getIndexedFieldNamesForGraphQL(model: MongooseModel): string[] {
 
   // filter duplicates
   const uniqueNames = [];
-  const result = fieldNames.filter(val => {
+  const result = fieldNames.filter((val) => {
     if (uniqueNames.indexOf(val) > -1) return false;
     uniqueNames.push(val);
     return true;

@@ -18,7 +18,7 @@ function copyBaseTCFieldsToChildTC(
   const childFields = childTC.getFieldNames();
 
   for (const field of baseFields) {
-    const isFieldExists = childFields.find(fld => fld === field);
+    const isFieldExists = childFields.find((fld) => fld === field);
 
     if (isFieldExists) {
       childTC.extendField(field, {

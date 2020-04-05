@@ -62,7 +62,7 @@ export const filterHelperArgs = (
 
   if (opts.onlyIndexed) {
     const indexedFieldNames = getIndexedFieldNamesForGraphQL(model);
-    Object.keys(typeComposer.getFields()).forEach(fieldName => {
+    Object.keys(typeComposer.getFields()).forEach((fieldName) => {
       if (indexedFieldNames.indexOf(fieldName) === -1) {
         removeFields.push(fieldName);
       }
@@ -110,7 +110,7 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
     }
     processFilterOperators(filterFields);
     const clearedFilter = {};
-    Object.keys(filterFields).forEach(key => {
+    Object.keys(filterFields).forEach((key) => {
       if (modelFields[key] || key.indexOf('$') === 0) {
         clearedFilter[key] = filterFields[key];
       }

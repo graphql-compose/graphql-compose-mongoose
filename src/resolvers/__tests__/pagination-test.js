@@ -98,7 +98,7 @@ describe('pagination() ->', () => {
 
       expect(result.items).toBeInstanceOf(Array);
       expect(result.items).toHaveLength(2);
-      expect(result.items.map(d => d.name)).toEqual(
+      expect(result.items.map((d) => d.name)).toEqual(
         expect.arrayContaining([user1.name, user2.name])
       );
     });

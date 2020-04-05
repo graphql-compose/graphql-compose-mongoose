@@ -76,7 +76,7 @@ describe('findMany() ->', () => {
 
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(2);
-      expect(result.map(d => d.name)).toEqual(expect.arrayContaining([user1.name, user2.name]));
+      expect(result.map((d) => d.name)).toEqual(expect.arrayContaining([user1.name, user2.name]));
     });
 
     it('should limit records', async () => {

@@ -10,7 +10,7 @@ export function projectionHelper(resolveParams: ExtendedResolveParams): void { /
       return;
     }
     const flatProjection = {};
-    Object.keys(projection).forEach(key => {
+    Object.keys(projection).forEach((key) => {
       const val = (projection[key]: any);
       if (val && (val.$meta || val.$slice || val.$elemMatch)) {
         // pass MongoDB projection operators https://docs.mongodb.com/v3.2/reference/operator/projection/meta/

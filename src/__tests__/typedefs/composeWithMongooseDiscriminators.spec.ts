@@ -9,38 +9,26 @@ import {
   IPerson,
 } from './mock-typedefs';
 
-const CharacterModel = model<ICharacter, ICharacterModel>(
-  'Character',
-  new Schema({}),
-);
+const CharacterModel = model<ICharacter, ICharacterModel>('Character', new Schema({}));
 
-const PersonModel = CharacterModel.discriminator<IPerson>(
-  EnumCharacterType.Person,
-  new Schema({}),
-);
-const DroidModel = CharacterModel.discriminator<IDroid>(
-  EnumCharacterType.Droid,
-  new Schema({}),
-);
+const PersonModel = CharacterModel.discriminator<IPerson>(EnumCharacterType.Person, new Schema({}));
+const DroidModel = CharacterModel.discriminator<IDroid>(EnumCharacterType.Droid, new Schema({}));
 
-const CharacterTC = composeWithMongooseDiscriminators<ICharacter, Context>(
-  CharacterModel,
-  {
-    reorderFields: true,
-  },
-);
+const CharacterTC = composeWithMongooseDiscriminators<ICharacter, Context>(CharacterModel, {
+  reorderFields: true,
+});
 
 const PersonTC = CharacterTC.discriminator(PersonModel);
 const DroidTC = CharacterTC.discriminator(DroidModel);
 
-CharacterTC.getResolver<ICharacter, { arg1: string; arg2: number }>(
-  'findOne',
-).wrapResolve(next => rp => {
-  if (rp.source && rp.args) {
-    rp.args.arg1 = 'string';
-    rp.args.arg2 = 888;
+CharacterTC.getResolver<ICharacter, { arg1: string; arg2: number }>('findOne').wrapResolve(
+  (next) => (rp) => {
+    if (rp.source && rp.args) {
+      rp.args.arg1 = 'string';
+      rp.args.arg2 = 888;
+    }
   }
-});
+);
 
 CharacterTC.addFields({
   newField: {

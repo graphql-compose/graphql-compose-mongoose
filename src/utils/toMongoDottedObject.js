@@ -7,7 +7,7 @@ const primitives = [Types.ObjectId, Date, String, Number, Boolean, Types.Decimal
 const operatorsWithExpression = ['$or', '$and', '$not', '$nor'];
 
 function isPrimitive(value: any) {
-  return primitives.some(p => value instanceof p);
+  return primitives.some((p) => value instanceof p);
 }
 
 function _toMongoDottedObject(obj, target = {}, path = [], filter = false) {

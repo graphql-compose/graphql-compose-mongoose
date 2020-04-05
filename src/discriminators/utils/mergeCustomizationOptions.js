@@ -13,7 +13,7 @@ export function mergeStringAndStringArraysFields(
   argOptsTypes?: string[] | string
 ): string[] | typeof undefined {
   if (Array.isArray(argOptsTypes)) {
-    if (argOptsTypes.find(v => v === 'string' || v === 'string[]')) {
+    if (argOptsTypes.find((v) => v === 'string' || v === 'string[]')) {
       return mergeStringAndStringArraysFields(baseField, childField, 'string');
     }
   }

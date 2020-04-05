@@ -61,10 +61,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
 
         case EMCResolvers.createMany:
           resolver.getOTC().extendField('records', {
-            type: baseTC
-              .getDInterface()
-              .getTypePlural()
-              .getTypeNonNull(),
+            type: baseTC.getDInterface().getTypePlural().getTypeNonNull(),
             projection: {
               [baseTC.getDKey()]: 1,
             },
@@ -93,13 +90,9 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
             },
           });
 
-          resolver.getOTC().setField(
-            'edges',
-            edgesTC
-              .getTypeNonNull()
-              .getTypePlural()
-              .getTypeNonNull()
-          );
+          resolver
+            .getOTC()
+            .setField('edges', edgesTC.getTypeNonNull().getTypePlural().getTypeNonNull());
           break;
 
         default:

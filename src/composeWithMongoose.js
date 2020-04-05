@@ -146,7 +146,7 @@ export function composeWithMongoose<TSource, TContext>(
     prepareFields(tc, opts.fields);
   }
 
-  tc.setRecordIdFn(source => (source ? `${(source: any)._id}` : ''));
+  tc.setRecordIdFn((source) => (source ? `${(source: any)._id}` : ''));
 
   createInputType(tc, opts.inputType);
 
@@ -169,7 +169,7 @@ export function prepareFields(
   if (Array.isArray(opts.only)) {
     const onlyFieldNames: string[] = opts.only;
     const removeFields = Object.keys(tc.getFields()).filter(
-      fName => onlyFieldNames.indexOf(fName) === -1
+      (fName) => onlyFieldNames.indexOf(fName) === -1
     );
     tc.removeField(removeFields);
   }
@@ -189,7 +189,7 @@ export function prepareInputFields(
   if (Array.isArray(inputFieldsOpts.only)) {
     const onlyFieldNames: string[] = inputFieldsOpts.only;
     const removeFields = Object.keys(inputTypeComposer.getFields()).filter(
-      fName => onlyFieldNames.indexOf(fName) === -1
+      (fName) => onlyFieldNames.indexOf(fName) === -1
     );
     inputTypeComposer.removeField(removeFields);
   }
@@ -226,7 +226,7 @@ export function createResolvers(
   opts: TypeConverterResolversOpts
 ): void {
   const names = resolvers.getAvailableNames();
-  names.forEach(resolverName => {
+  names.forEach((resolverName) => {
     if (!{}.hasOwnProperty.call(opts, resolverName) || opts[resolverName] !== false) {
       const createResolverFn = resolvers[resolverName];
       if (createResolverFn) {

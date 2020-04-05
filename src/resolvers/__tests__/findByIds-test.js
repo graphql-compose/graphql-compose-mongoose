@@ -91,7 +91,7 @@ describe('findByIds() ->', () => {
 
       expect(result).toBeInstanceOf(Array);
       expect(result).toHaveLength(3);
-      expect(result.map(d => d.name)).toEqual(
+      expect(result.map((d) => d.name)).toEqual(
         expect.arrayContaining([user1.name, user2.name, user3.name])
       );
     });

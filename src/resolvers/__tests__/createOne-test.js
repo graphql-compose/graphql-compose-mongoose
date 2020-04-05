@@ -17,7 +17,7 @@ describe('createOne() ->', () => {
   beforeEach(() => {
     schemaComposer.clear();
     UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
-    UserTC.setRecordIdFn(source => (source ? `${source._id}` : ''));
+    UserTC.setRecordIdFn((source) => (source ? `${source._id}` : ''));
   });
 
   beforeEach(async () => {

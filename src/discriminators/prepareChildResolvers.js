@@ -17,7 +17,7 @@ function setQueryDKey<TSource, TContext>(
   fromField: string
 ) {
   if (resolver) {
-    resolver.wrapResolve(next => (resolve: ResolverResolveParams<TSource, TContext>) => {
+    resolver.wrapResolve((next) => (resolve: ResolverResolveParams<TSource, TContext>) => {
       const DName = childTC.getTypeName();
 
       /* eslint no-param-reassign: 0 */
@@ -122,7 +122,7 @@ function reorderFieldsRecordFilter<TSource, TContext>(
         if (baseDTC.hasInputTypeComposer()) {
           newOrder.push(...baseDTC.getInputTypeComposer().getFieldNames());
 
-          newOrder.filter(value => value === '_id' || value === baseDTC.getDKey());
+          newOrder.filter((value) => value === '_id' || value === baseDTC.getDKey());
 
           newOrder.unshift('_id', baseDTC.getDKey());
         }

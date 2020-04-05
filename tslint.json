@@ -14,16 +14,7 @@
   ],
   "jsRules": {},
   "rules": {
-    "prettier": [
-      true,
-      {
-        "semi": true,
-        "singleQuote": true,
-        "trailingComma": "all",
-        "bracketSpacing": true,
-        "parser": "typescript"
-      }
-    ],
+    "prettier": true,
     "trailing-comma": [
       false
     ],

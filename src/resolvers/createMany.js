@@ -48,7 +48,7 @@ export default function createMany<TSource: MongooseDocument, TContext>(
   }
 
   const outputTypeName = `CreateMany${tc.getTypeName()}Payload`;
-  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
       recordIds: {
         type: '[MongoID]!',

@@ -34,14 +34,14 @@ describe('issue #136 - Mongoose virtuals', () => {
   const Comment = mongoose.model('Comment', CommentSchema);
   const CommentTC = composeWithMongoose(Comment);
 
-  CommentTC.wrapResolverAs('createManyFiltered', 'createMany', updateManyFiltered => {
+  CommentTC.wrapResolverAs('createManyFiltered', 'createMany', (updateManyFiltered) => {
     const recordsTC = CommentTC.getResolver('createMany').getArgITC('records');
     const clonedRecordTC = recordsTC.clone('createManyFilteredInput');
     clonedRecordTC.removeField('links').addFields({ hi: 'String' });
     updateManyFiltered.extendArg('records', { type: clonedRecordTC.getTypePlural() });
 
     return updateManyFiltered
-      .wrapResolve(next => async rp => {
+      .wrapResolve((next) => async (rp) => {
         console.log(rp.args); // eslint-disable-line
         return next(rp);
       })

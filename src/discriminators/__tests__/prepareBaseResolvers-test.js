@@ -20,7 +20,7 @@ describe('prepareBaseResolvers()', () => {
     beforeAll(() => {
       const resolvers = CharacterDTC.getResolvers(); // map
 
-      resolvers.forEach(resolver => {
+      resolvers.forEach((resolver) => {
         const argNames = resolver.getArgNames();
 
         for (const argName of argNames) {
@@ -110,34 +110,26 @@ describe('prepareBaseResolvers()', () => {
   });
 
   it('should set resolver record field type to DInterface, updateOne', () => {
-    expect(
-      CharacterDTC.getResolver('updateOne')
-        .getOTC()
-        .getFieldType('record')
-    ).toEqual(CharacterDTC.getDInterface().getType());
+    expect(CharacterDTC.getResolver('updateOne').getOTC().getFieldType('record')).toEqual(
+      CharacterDTC.getDInterface().getType()
+    );
   });
 
   it('should set resolver record field type to DInterface, updateById', () => {
-    expect(
-      CharacterDTC.getResolver('updateById')
-        .getOTC()
-        .getFieldType('record')
-    ).toEqual(CharacterDTC.getDInterface().getType());
+    expect(CharacterDTC.getResolver('updateById').getOTC().getFieldType('record')).toEqual(
+      CharacterDTC.getDInterface().getType()
+    );
   });
 
   it('should set resolver record field type to DInterface, ', () => {
-    expect(
-      CharacterDTC.getResolver('removeById')
-        .getOTC()
-        .getFieldType('record')
-    ).toEqual(CharacterDTC.getDInterface().getType());
+    expect(CharacterDTC.getResolver('removeById').getOTC().getFieldType('record')).toEqual(
+      CharacterDTC.getDInterface().getType()
+    );
   });
 
   it('should set DKey field type to NonNull(DKeyETC) on record arg, createOne', () => {
     expect(
-      CharacterDTC.getResolver('createOne')
-        .getArgITC('record')
-        .getFieldTC(CharacterDTC.getDKey())
+      CharacterDTC.getResolver('createOne').getArgITC('record').getFieldTC(CharacterDTC.getDKey())
     ).toEqual(CharacterDTC.getDKeyETC());
     expect(
       CharacterDTC.getResolver('createOne')
@@ -147,27 +139,18 @@ describe('prepareBaseResolvers()', () => {
   });
 
   it('should set type on items in pagination resolver to DInterface List, pagination', () => {
-    expect(
-      CharacterDTC.getResolver('pagination')
-        .getOTC()
-        .getFieldTC('items')
-    ).toEqual(CharacterDTC.getDInterface());
-    expect(
-      CharacterDTC.getResolver('pagination')
-        .getOTC()
-        .getFieldTypeName('items')
-    ).toBe('[CharacterInterface]');
+    expect(CharacterDTC.getResolver('pagination').getOTC().getFieldTC('items')).toEqual(
+      CharacterDTC.getDInterface()
+    );
+    expect(CharacterDTC.getResolver('pagination').getOTC().getFieldTypeName('items')).toBe(
+      '[CharacterInterface]'
+    );
   });
 
   it('should clone, rename edges field on connection resolver, connection', () => {
     const newName = `${CharacterDTC.getTypeName()}Edge`;
     const connectionRS = CharacterDTC.getResolver('connection');
 
-    expect(
-      connectionRS
-        .getOTC()
-        .getFieldTC('edges')
-        .getTypeName()
-    ).toEqual(newName);
+    expect(connectionRS.getOTC().getFieldTC('edges').getTypeName()).toEqual(newName);
   });
 });

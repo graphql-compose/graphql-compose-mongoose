@@ -132,7 +132,7 @@ describe('integration tests', () => {
       UserTC.addFields({
         rawData: {
           type: 'JSON',
-          resolve: source => source.toJSON(),
+          resolve: (source) => source.toJSON(),
           projection: { '*': true },
         },
       });

@@ -29,7 +29,7 @@ describe('fieldConverter', () => {
     });
 
     it('should skip double undescored fields', () => {
-      const hiddenFields = fieldNames.filter(name => name.startsWith('__'));
+      const hiddenFields = fieldNames.filter((name) => name.startsWith('__'));
       expect(hiddenFields).toHaveLength(0);
     });
 

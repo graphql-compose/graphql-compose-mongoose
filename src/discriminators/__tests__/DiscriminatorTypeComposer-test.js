@@ -83,8 +83,8 @@ describe('DiscriminatorTypeComposer', () => {
         droidTC = characterDTC.discriminator(DroidModel);
         personTC = characterDTC.discriminator(PersonModel);
 
-        personSpecificFields = personTC.getFieldNames().filter(v => !characterDTC.hasField(v));
-        droidSpecificFields = droidTC.getFieldNames().filter(v => !characterDTC.hasField(v));
+        personSpecificFields = personTC.getFieldNames().filter((v) => !characterDTC.hasField(v));
+        droidSpecificFields = droidTC.getFieldNames().filter((v) => !characterDTC.hasField(v));
 
         fieldsToSet = {
           kind: 'String',
@@ -168,8 +168,8 @@ describe('DiscriminatorTypeComposer', () => {
         droidTC = characterDTC.discriminator(DroidModel);
         personTC = characterDTC.discriminator(PersonModel);
 
-        personSpecificFields = personTC.getFieldNames().filter(v => !characterDTC.hasField(v));
-        droidSpecificFields = droidTC.getFieldNames().filter(v => !characterDTC.hasField(v));
+        personSpecificFields = personTC.getFieldNames().filter((v) => !characterDTC.hasField(v));
+        droidSpecificFields = droidTC.getFieldNames().filter((v) => !characterDTC.hasField(v));
       });
 
       const newFields = {
@@ -238,12 +238,9 @@ describe('DiscriminatorTypeComposer', () => {
       });
 
       it('should add field to DInterface', () => {
-        expect(
-          characterDTC
-            .getDInterface()
-            .getFieldOTC('field1')
-            .getFieldType('nested')
-        ).toEqual(graphql.GraphQLString);
+        expect(characterDTC.getDInterface().getFieldOTC('field1').getFieldType('nested')).toEqual(
+          graphql.GraphQLString
+        );
       });
 
       it('should have exactly plus two fields added to childTC fields', () => {
@@ -270,8 +267,8 @@ describe('DiscriminatorTypeComposer', () => {
         droidTC = characterDTC.discriminator(DroidModel);
         personTC = characterDTC.discriminator(PersonModel);
 
-        personFields = personTC.getFieldNames().filter(v => v !== 'friends');
-        droidFields = droidTC.getFieldNames().filter(v => v !== 'friends');
+        personFields = personTC.getFieldNames().filter((v) => v !== 'friends');
+        droidFields = droidTC.getFieldNames().filter((v) => v !== 'friends');
       });
 
       const field = 'friends';
@@ -312,8 +309,8 @@ describe('DiscriminatorTypeComposer', () => {
         droidTC = characterDTC.discriminator(DroidModel);
         personTC = characterDTC.discriminator(PersonModel);
 
-        personSpecificFields = personTC.getFieldNames().filter(v => !characterDTC.hasField(v));
-        droidSpecificFields = droidTC.getFieldNames().filter(v => !characterDTC.hasField(v));
+        personSpecificFields = personTC.getFieldNames().filter((v) => !characterDTC.hasField(v));
+        droidSpecificFields = droidTC.getFieldNames().filter((v) => !characterDTC.hasField(v));
       });
       const fields = ['type', 'friends'];
 
@@ -372,12 +369,9 @@ describe('DiscriminatorTypeComposer', () => {
 
       it('should extend field type on DInterface', () => {
         expect(characterDTC.getDInterface().getFields()[fieldName]).toBeTruthy();
-        expect(
-          characterDTC
-            .getDInterface()
-            .getFieldType(fieldName)
-            .toString()
-        ).toEqual(fieldExtension.type);
+        expect(characterDTC.getDInterface().getFieldType(fieldName).toString()).toEqual(
+          fieldExtension.type
+        );
       });
 
       it('should extend field on childTC', () => {

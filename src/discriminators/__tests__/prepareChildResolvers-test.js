@@ -60,7 +60,7 @@ describe('prepareChildResolvers()', () => {
 
       const resolvers = PersonTC.getResolvers();
 
-      resolvers.forEach(resolver => {
+      resolvers.forEach((resolver) => {
         const argNames = resolver.getArgNames();
 
         for (const argName of argNames) {
@@ -114,15 +114,8 @@ describe('prepareChildResolvers()', () => {
     const PersonTC = baseDTC.discriminator(PersonModel);
 
     it('should copy base common ResolverArgTypes to child', () => {
-      expect(
-        baseDTC
-          .getResolver('createOne')
-          .getArgITC('record')
-          .getFieldType('kind')
-      ).toEqual(
-        PersonTC.getResolver('createOne')
-          .getArgITC('record')
-          .getFieldType('kind')
+      expect(baseDTC.getResolver('createOne').getArgITC('record').getFieldType('kind')).toEqual(
+        PersonTC.getResolver('createOne').getArgITC('record').getFieldType('kind')
       );
     });
   });

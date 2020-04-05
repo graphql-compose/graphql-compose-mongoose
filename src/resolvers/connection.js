@@ -34,7 +34,7 @@ export default function connection<TSource: MongooseDocument, TContext>(
     reversedFirst: true,
   });
   const sortConfigs = {};
-  uniqueIndexes.forEach(indexData => {
+  uniqueIndexes.forEach((indexData) => {
     const keys = Object.keys(indexData);
     let name = keys
       .join('__')

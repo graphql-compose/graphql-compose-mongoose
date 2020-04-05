@@ -41,7 +41,7 @@ describe('issue #78 - Mongoose and Discriminators', () => {
     const EventDescriminatorType = new graphql.GraphQLUnionType({
       name: 'EventDescriminator',
       types: [EventTC.getType(), ClickedLinkEventTC.getType()],
-      resolveType: value => {
+      resolveType: (value) => {
         if (value.kind === 'ClickedLinkEvent') {
           return ClickedLinkEventTC.getType();
         }

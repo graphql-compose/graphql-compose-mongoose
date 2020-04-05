@@ -181,7 +181,7 @@ describe('connection() resolver', () => {
 
         expect(result.edges).toBeInstanceOf(Array);
         expect(result.edges).toHaveLength(2);
-        expect(result.edges.map(d => d.node.name)).toEqual(
+        expect(result.edges.map((d) => d.node.name)).toEqual(
           expect.arrayContaining([user1.name, user2.name])
         );
       });

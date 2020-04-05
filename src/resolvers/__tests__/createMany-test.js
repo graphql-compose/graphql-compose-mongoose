@@ -18,7 +18,7 @@ describe('createMany() ->', () => {
   beforeEach(() => {
     schemaComposer.clear();
     UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
-    UserTC.setRecordIdFn(source => (source ? `${source._id}` : ''));
+    UserTC.setRecordIdFn((source) => (source ? `${source._id}` : ''));
   });
 
   beforeEach(async () => {
@@ -154,7 +154,7 @@ describe('createMany() ->', () => {
       schemaComposer.clear();
       const ClonedUserSchema = UserModel.schema.clone();
 
-      ClonedUserSchema.pre('save', function(next) {
+      ClonedUserSchema.pre('save', function (next) {
         this.name = 'ChangedAgain';
         this.age = 18;
         return next();
@@ -163,7 +163,7 @@ describe('createMany() ->', () => {
       const ClonedUserModel = mongoose.model('UserClone', ClonedUserSchema);
 
       const ClonedUserTC = convertModelToGraphQL(ClonedUserModel, 'UserClone', schemaComposer);
-      ClonedUserTC.setRecordIdFn(source => (source ? `${source._id}` : ''));
+      ClonedUserTC.setRecordIdFn((source) => (source ? `${source._id}` : ''));
 
       const result = await createMany(ClonedUserModel, ClonedUserTC).resolve({
         args: { records: [{ name: 'NewUser0' }, { name: 'NewUser1' }] },

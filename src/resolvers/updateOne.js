@@ -24,7 +24,7 @@ export default function updateOne<TSource: MongooseDocument, TContext>(
   const findOneResolver = findOne(model, tc, opts);
 
   const outputTypeName = `UpdateOne${tc.getTypeName()}Payload`;
-  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, t => {
+  const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
       recordId: {
         type: 'MongoID',

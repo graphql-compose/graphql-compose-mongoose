@@ -39,15 +39,13 @@ PostTC.addFields({
   },
 });
 
-PostTC.getResolver('findMany').wrapResolve<any, FindManyArgs<IPost>>(
-  next => rp => {
-    if (rp.source && rp.args) {
-      rp.args.limit = 50;
-      // fix this to display only Post fields.
-      // Avoid Document fields
-      rp.args.filter.title = 'New Title';
-      // rp.args.filter.title = 5;
-      // rp.args.limit = 'limit';
-    }
-  },
-);
+PostTC.getResolver('findMany').wrapResolve<any, FindManyArgs<IPost>>((next) => (rp) => {
+  if (rp.source && rp.args) {
+    rp.args.limit = 50;
+    // fix this to display only Post fields.
+    // Avoid Document fields
+    rp.args.filter.title = 'New Title';
+    // rp.args.filter.title = 5;
+    // rp.args.limit = 'limit';
+  }
+});

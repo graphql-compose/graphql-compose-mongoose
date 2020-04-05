@@ -97,7 +97,7 @@ describe('issue #128 - OR/AND filter args not working with some other filter arg
       },
     });
 
-    expect(res1.map(res => ({ pets: [...res.pets], friends: [...res.friends] }))).toEqual([
+    expect(res1.map((res) => ({ pets: [...res.pets], friends: [...res.friends] }))).toEqual([
       {
         pets: ['Pet 2'],
         friends: ['Friend 2'],
