@@ -1,4 +1,4 @@
-import { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer, ObjectTypeComposerFieldConfigMap } from 'graphql-compose';
 // import { ConnectionSortMapOpts } from 'graphql-compose-connection';
 import { Model } from 'mongoose';
 import { MongoId } from '../types/mongoid';
@@ -7,12 +7,17 @@ import { FilterHelperArgs, SortHelperArgs } from './helpers';
 
 // @ts-todo The ConnectionSortMapOpts is not available yet since graphql-compose-connection doesn't have types for now,
 //          fallback to a simple object.
-export type ConnectionSortMapOpts = { [opt: string]: any };
+export type ConnectionOpts<TContext> = { [opt: string]: any } & {
+  connectionResolverName?: string,
+  findResolverName?: string;
+  countResolverName?: string;
+  edgeFields?: ObjectTypeComposerFieldConfigMap<any, TContext>;
+};
 
 export default function connection(
   model: Model<any>,
   tc: ObjectTypeComposer<any>,
-  opts?: ConnectionSortMapOpts,
+  opts?: ConnectionOpts<any>,
 ): Resolver<any, any> | undefined;
 
 export function prepareCursorQuery(

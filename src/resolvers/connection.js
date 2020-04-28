@@ -3,19 +3,28 @@
 
 import type { MongooseDocument } from 'mongoose';
 import type { ConnectionSortMapOpts as _ConnectionSortMapOpts } from 'graphql-compose-connection';
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type {
+  Resolver,
+  ObjectTypeComposer,
+  ObjectTypeComposerFieldConfigMap,
+} from 'graphql-compose';
 import {
   getUniqueIndexes,
   extendByReversedIndexes,
   type IndexT,
 } from '../utils/getIndexesFromModel';
 
-export type ConnectionSortMapOpts = _ConnectionSortMapOpts;
+export type ConnectionOpts<TContext> = _ConnectionSortMapOpts & {
+  edgeFields?: ObjectTypeComposerFieldConfigMap<any, TContext>,
+  connectionResolverName?: string,
+  findResolverName?: string,
+  countResolverName?: string,
+};
 
 export default function connection<TSource: MongooseDocument, TContext>(
   model: Class<TSource>, // === MongooseModel
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: ConnectionSortMapOpts
+  opts: ConnectionOpts<TContext> = {}
 ): ?Resolver<TSource, TContext> {
   try {
     require.resolve('graphql-compose-connection');
@@ -56,14 +65,22 @@ export default function connection<TSource: MongooseDocument, TContext>(
       },
     };
   });
-
+  const {
+    connectionResolverName = 'connection',
+    findResolverName = 'findMany',
+    countResolverName = 'count',
+    edgeFields,
+    ...sortOptions
+  } = opts;
   return prepareConnectionResolver(tc, {
-    findResolverName: 'findMany',
-    countResolverName: 'count',
+    connectionResolverName,
+    findResolverName,
+    countResolverName,
     sort: {
       ...sortConfigs,
-      ...opts,
+      ...sortOptions,
     },
+    edgeFields,
   });
 }
 
