@@ -345,8 +345,9 @@ export function enumToGraphQL(
     const desc = _getFieldDescription(field);
     if (desc) etc.setDescription(desc);
 
-    const fields = valueList.reduce((result, val) => {
-      result[val] = { value: val }; // eslint-disable-line no-param-reassign
+    const fields = valueList.reduce((result, value) => {
+      const key = value.replace(/[^_a-zA-Z0-9]/g, '_');
+      result[key] = { value }; // eslint-disable-line no-param-reassign
       return result;
     }, {});
     etc.setFields(fields);

@@ -3,6 +3,7 @@
 
 import { EnumTypeComposer, schemaComposer, ListComposer, SchemaComposer } from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel';
+import { mongoose } from '../__mocks__/mongooseCommon';
 import {
   deriveComplexType,
   getFieldsFromModel,
@@ -198,6 +199,21 @@ describe('fieldConverter', () => {
       const genderEnum = enumToGraphQL(fields.gender, '', schemaComposer);
       expect(genderEnum.getFieldNames().length).toBe(fields.gender.enumValues.length);
       expect(genderEnum.getField('male').value).toBe(fields.gender.enumValues[0]);
+    });
+
+    it('should work for Enums with keys preparation', () => {
+      const model = mongoose.model(
+        'EnumTest',
+        mongoose.Schema({
+          oc: {
+            type: String,
+            enum: ['ocpp1.6', 'ocpp2.0'],
+          },
+        })
+      );
+      const flds: any = getFieldsFromModel(model);
+      const ocEnum = enumToGraphQL(flds.oc, '', schemaComposer);
+      expect(ocEnum.getFieldNames()).toEqual(['ocpp1_6', 'ocpp2_0']);
     });
   });
 
