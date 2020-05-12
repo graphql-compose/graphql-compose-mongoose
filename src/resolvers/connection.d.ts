@@ -7,7 +7,7 @@ import { FilterHelperArgs, SortHelperArgs } from './helpers';
 
 // @ts-todo The ConnectionSortMapOpts is not available yet since graphql-compose-connection doesn't have types for now,
 //          fallback to a simple object.
-export type ConnectionOpts<TContext> = { [opt: string]: any } & {
+export type ConnectionOpts<TContext = any> = { [opt: string]: any } & {
   connectionResolverName?: string,
   findResolverName?: string;
   countResolverName?: string;

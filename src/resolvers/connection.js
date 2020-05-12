@@ -14,7 +14,7 @@ import {
   type IndexT,
 } from '../utils/getIndexesFromModel';
 
-export type ConnectionOpts<TContext> = _ConnectionSortMapOpts & {
+export type ConnectionOpts<TContext = any> = _ConnectionSortMapOpts & {
   edgeFields?: ObjectTypeComposerFieldConfigMap<any, TContext>,
   connectionResolverName?: string,
   findResolverName?: string,
@@ -24,7 +24,7 @@ export type ConnectionOpts<TContext> = _ConnectionSortMapOpts & {
 export default function connection<TSource: MongooseDocument, TContext>(
   model: Class<TSource>, // === MongooseModel
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts: ConnectionOpts<TContext> = {}
+  opts?: ConnectionOpts<TContext>
 ): ?Resolver<TSource, TContext> {
   try {
     require.resolve('graphql-compose-connection');
@@ -71,7 +71,7 @@ export default function connection<TSource: MongooseDocument, TContext>(
     countResolverName = 'count',
     edgeFields,
     ...sortOptions
-  } = opts;
+  } = opts || {};
   return prepareConnectionResolver(tc, {
     connectionResolverName,
     findResolverName,
