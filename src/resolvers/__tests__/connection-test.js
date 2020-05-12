@@ -140,26 +140,38 @@ describe('connection() resolver', () => {
       await user2.save();
     });
 
-    it('should return Resolver object', () => {
+    it('should return Resolver object with default name', () => {
       const resolver = connection(UserModel, UserTC);
+      if (!resolver) throw new Error('Connection resolver is undefined');
       expect(resolver).toBeInstanceOf(Resolver);
+      expect(resolver.getNestedName()).toEqual('connection');
+    });
+
+    it('should return Resolver object with custom name', () => {
+      const resolver = connection(UserModel, UserTC, {
+        // $FlowFixMe
+        connectionResolverName: 'customConnection',
+      });
+      if (!resolver) throw new Error('Connection resolver is undefined');
+      expect(resolver).toBeInstanceOf(Resolver);
+      expect(resolver.getNestedName()).toEqual('customConnection');
     });
 
     it('Resolver object should have `filter` arg', () => {
       const resolver = connection(UserModel, UserTC);
-      if (!resolver) throw new Error('Connection resolveris undefined');
+      if (!resolver) throw new Error('Connection resolver is undefined');
       expect(resolver.hasArg('filter')).toBe(true);
     });
 
     it('Resolver object should have `sort` arg', () => {
       const resolver = connection(UserModel, UserTC);
-      if (!resolver) throw new Error('Connection resolveris undefined');
+      if (!resolver) throw new Error('Connection resolver is undefined');
       expect(resolver.hasArg('sort')).toBe(true);
     });
 
     it('Resolver object should have `connection args', () => {
       const resolver = connection(UserModel, UserTC);
-      if (!resolver) throw new Error('Connection resolveris undefined');
+      if (!resolver) throw new Error('Connection resolver is undefined');
       expect(resolver.hasArg('first')).toBe(true);
       expect(resolver.hasArg('last')).toBe(true);
       expect(resolver.hasArg('before')).toBe(true);
@@ -169,14 +181,14 @@ describe('connection() resolver', () => {
     describe('Resolver.resolve():Promise', () => {
       it('should be fulfilled Promise', async () => {
         const resolver = connection(UserModel, UserTC);
-        if (!resolver) throw new Error('Connection resolveris undefined');
+        if (!resolver) throw new Error('Connection resolver is undefined');
         const result = resolver.resolve({ args: { first: 20 } });
         await expect(result).resolves.toBeDefined();
       });
 
       it('should return array of documents in `edges`', async () => {
         const resolver = connection(UserModel, UserTC);
-        if (!resolver) throw new Error('Connection resolveris undefined');
+        if (!resolver) throw new Error('Connection resolver is undefined');
         const result = await resolver.resolve({ args: { first: 20 } });
 
         expect(result.edges).toBeInstanceOf(Array);
@@ -188,7 +200,7 @@ describe('connection() resolver', () => {
 
       it('should limit records', async () => {
         const resolver = connection(UserModel, UserTC);
-        if (!resolver) throw new Error('Connection resolveris undefined');
+        if (!resolver) throw new Error('Connection resolver is undefined');
         const result = await resolver.resolve({ args: { first: 1 } });
 
         expect(result.edges).toBeInstanceOf(Array);
@@ -197,7 +209,7 @@ describe('connection() resolver', () => {
 
       it('should sort records', async () => {
         const resolver = connection(UserModel, UserTC);
-        if (!resolver) throw new Error('Connection resolveris undefined');
+        if (!resolver) throw new Error('Connection resolver is undefined');
 
         const result1 = await resolver.resolve({
           args: { sort: { _id: 1 }, first: 1 },
@@ -212,7 +224,7 @@ describe('connection() resolver', () => {
 
       it('should return mongoose documents', async () => {
         const resolver = connection(UserModel, UserTC);
-        if (!resolver) throw new Error('Connection resolveris undefined');
+        if (!resolver) throw new Error('Connection resolver is undefined');
 
         const result = await resolver.resolve({ args: { first: 20 } });
         expect(result.edges[0].node).toBeInstanceOf(UserModel);
@@ -274,6 +286,24 @@ describe('connection() resolver', () => {
         });
 
         expect(result).toHaveProperty('edges.0.node', { overrides: true });
+      });
+
+      it('should return mongoose documents for custom resolvers from opts', async () => {
+        schemaComposer.clear();
+        UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+        UserTC.setResolver('customFindMany', findMany(UserModel, UserTC));
+        UserTC.setResolver('customCount', count(UserModel, UserTC));
+        const resolver = connection(UserModel, UserTC, {
+          // $FlowFixMe
+          findResolverName: 'customFindMany',
+          // $FlowFixMe
+          countResolverName: 'customCount',
+        });
+        if (!resolver) throw new Error('Connection resolver is undefined');
+
+        const result = await resolver.resolve({ args: { first: 20 } });
+        expect(result.edges[0].node).toBeInstanceOf(UserModel);
+        expect(result.edges[1].node).toBeInstanceOf(UserModel);
       });
     });
   });
