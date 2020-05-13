@@ -4,7 +4,7 @@ import {
   ObjectTypeComposer,
 } from 'graphql-compose';
 import { Document, Model } from 'mongoose';
-import { ConnectionSortMapOpts } from './resolvers/connection';
+import { ConnectionOpts } from './resolvers/connection';
 import {
   FilterHelperArgsOpts,
   LimitHelperArgsOpts,
@@ -107,7 +107,7 @@ export type TypeConverterResolversOpts = {
     | {
         filter?: FilterHelperArgsOpts | false;
       };
-  connection?: ConnectionSortMapOpts | false;
+  connection?: ConnectionOpts | false;
   pagination?: PaginationResolverOpts | false;
 };
 

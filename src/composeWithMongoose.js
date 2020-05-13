@@ -14,7 +14,7 @@ import type {
 } from './resolvers/helpers';
 import MongoID from './types/mongoid';
 import type { PaginationResolverOpts } from './resolvers/pagination';
-import type { ConnectionSortMapOpts } from './resolvers/connection';
+import type { ConnectionOpts } from './resolvers/connection';
 
 export type ComposeWithMongooseOpts<TContext> = {|
   schemaComposer?: SchemaComposer<TContext>,
@@ -111,7 +111,7 @@ export type TypeConverterResolversOpts = {
     | {
         filter?: FilterHelperArgsOpts | false,
       },
-  connection?: ConnectionSortMapOpts | false,
+  connection?: ConnectionOpts<any> | false,
   pagination?: PaginationResolverOpts | false,
 };
 
