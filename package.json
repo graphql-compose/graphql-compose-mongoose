@@ -31,7 +31,7 @@
     "object-path": "^0.11.4"
   },
   "optionalDependencies": {
-    "graphql-compose-connection": "^6.0.4",
+    "graphql-compose-connection": "6.2.0",
     "graphql-compose-pagination": "^6.0.3"
   },
   "peerDependencies": {
