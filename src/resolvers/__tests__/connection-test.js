@@ -178,6 +178,15 @@ describe('connection() resolver', () => {
       expect(resolver.hasArg('after')).toBe(true);
     });
 
+    it('should create custom edge type', () => {
+      const resolver = connection(UserModel, UserTC, {
+        // $FlowFixMe
+        edgeTypeName: 'CustomEdge',
+      });
+      if (!resolver) throw new Error('Connection resolver is undefined');
+      expect(schemaComposer.has('CustomEdge')).toBe(true);
+    });
+
     describe('Resolver.resolve():Promise', () => {
       it('should be fulfilled Promise', async () => {
         const resolver = connection(UserModel, UserTC);
