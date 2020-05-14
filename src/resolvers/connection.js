@@ -19,6 +19,7 @@ export type ConnectionOpts<TContext = any> = _ConnectionSortMapOpts & {
   connectionResolverName?: string,
   findResolverName?: string,
   countResolverName?: string,
+  edgeTypeName?: string,
 };
 
 export default function connection<TSource: MongooseDocument, TContext>(
@@ -70,6 +71,7 @@ export default function connection<TSource: MongooseDocument, TContext>(
     findResolverName = 'findMany',
     countResolverName = 'count',
     edgeFields,
+    edgeTypeName,
     ...sortOptions
   } = opts || {};
   return prepareConnectionResolver(tc, {
@@ -81,6 +83,7 @@ export default function connection<TSource: MongooseDocument, TContext>(
       ...sortOptions,
     },
     edgeFields,
+    edgeTypeName,
   });
 }
 

@@ -4238,10 +4238,10 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.3.tgz#4a12ff1b60376ef09862c2093edd908328be8423"
   integrity sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
 
-graphql-compose-connection@^6.0.4:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-6.1.0.tgz#58c3ed4d7b90928f11a8ee51cc814117db8efb42"
-  integrity sha512-8vLfm1P7Am2EdGU5trMOOrbVU117WRJCKF3GRg/biYhM/tfrozOFC/k3gSjpCwafXwIINX+g1HJDpgjZ/ywTMg==
+graphql-compose-connection@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-6.2.0.tgz#a251e829f99971a206294bf6b55e4328c2b73419"
+  integrity sha512-oXz0Tq6ttrAsnguLKlxO4TIN14CMMrphwsdAv7kQYDkr6tHzx17sNFgT/w0ovBix8Hnaa9X3Tq1M3O0C+0hydA==
 
 graphql-compose-pagination@^6.0.3:
   version "6.0.3"
