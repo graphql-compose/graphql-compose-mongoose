@@ -151,7 +151,7 @@ Variable Namings
     // _id: field...
     type: {
       type: String,
-      require: true,
+      required: true,
       enum: (Object.keys(enumCharacterType): Array<string>),
       description: 'Character type Droid or Person',
     },
