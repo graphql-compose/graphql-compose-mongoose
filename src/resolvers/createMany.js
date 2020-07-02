@@ -51,11 +51,11 @@ export default function createMany<TSource: MongooseDocument, TContext>(
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
       recordIds: {
-        type: '[MongoID]!',
+        type: '[MongoID!]!',
         description: 'Created document ID',
       },
       records: {
-        type: tc.getTypePlural().getTypeNonNull(),
+        type: tc.getTypeNonNull().getTypePlural().getTypeNonNull(),
         description: 'Created documents',
       },
       createCount: {

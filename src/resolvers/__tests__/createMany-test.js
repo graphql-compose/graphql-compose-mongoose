@@ -194,15 +194,13 @@ describe('createMany() ->', () => {
     });
 
     it('should have recordIds field, NonNull List', () => {
-      const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordIdField = schemaComposer.createObjectTC(outputType).getFieldConfig('recordIds');
-      expect(recordIdField.type).toEqual(new GraphQLNonNull(GraphQLList(GraphQLMongoID)));
+      const resolver = createMany(UserModel, UserTC);
+      expect(resolver.getOTC().getFieldTypeName('recordIds')).toEqual('[MongoID!]!');
     });
 
     it('should have records field, NonNull List', () => {
-      const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordField = schemaComposer.createObjectTC(outputType).getFieldConfig('records');
-      expect(recordField.type).toEqual(new GraphQLNonNull(GraphQLList(UserTC.getType())));
+      const resolver = createMany(UserModel, UserTC);
+      expect(resolver.getOTC().getFieldTypeName('records')).toEqual('[User!]!');
     });
 
     it('should have createCount field, Int', () => {

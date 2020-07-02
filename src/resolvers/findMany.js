@@ -31,7 +31,7 @@ export default function findMany<TSource: MongooseDocument, TContext>(
   }
 
   return tc.schemaComposer.createResolver({
-    type: [tc],
+    type: tc.getTypeNonNull().getTypePlural(),
     name: 'findMany',
     kind: 'query',
     args: {
