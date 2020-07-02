@@ -114,8 +114,10 @@ describe('createOne() ->', () => {
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType: any = createOne(UserModel, UserTC).getType();
-      expect(outputType.name).toBe(`CreateOne${UserTC.getTypeName()}Payload`);
+      const resolver = createOne(UserModel, UserTC);
+      expect(resolver.getTypeName()).toBe(`CreateOne${UserTC.getTypeName()}Payload`);
+      expect(resolver.getArgITC('record').getFieldTypeName('name')).toBe('String!');
+      expect(resolver.getArgITC('record').getFieldTypeName('age')).toBe('Float');
     });
 
     it('should have recordId field', () => {

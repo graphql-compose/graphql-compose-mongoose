@@ -187,8 +187,10 @@ describe('createMany() ->', () => {
 
   describe('Resolver.getType()', () => {
     it('should have correct output type name', () => {
-      const outputType: any = createMany(UserModel, UserTC).getType();
-      expect(outputType.name).toBe(`CreateMany${UserTC.getTypeName()}Payload`);
+      const resolver: any = createMany(UserModel, UserTC);
+      expect(resolver.getTypeName()).toBe(`CreateMany${UserTC.getTypeName()}Payload`);
+      expect(resolver.getArgITC('records').getFieldTypeName('name')).toBe('String!');
+      expect(resolver.getArgITC('records').getFieldTypeName('age')).toBe('Float');
     });
 
     it('should have recordIds field, NonNull List', () => {

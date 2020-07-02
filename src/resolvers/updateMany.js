@@ -55,6 +55,7 @@ export default function updateMany<TSource: MongooseDocument, TContext>(
         recordTypeName: `UpdateMany${tc.getTypeName()}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
+        allFieldsNullable: true,
         ...(opts && opts.record),
       }),
       ...filterHelperArgs(tc, model, {

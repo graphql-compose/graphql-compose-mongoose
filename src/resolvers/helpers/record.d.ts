@@ -5,6 +5,8 @@ export type RecordHelperArgsOpts = {
   isRequired?: boolean;
   removeFields?: string[];
   requiredFields?: string[];
+  /** Make all fields nullable by default. May be overridden by `requiredFields` property */
+  allFieldsNullable?: boolean;
 };
 
 export function getRecordHelperArgsOptsMap(): Partial<
@@ -16,5 +18,5 @@ export type RecordsHelperArgs<TSource> = { records: TSource[] };
 
 export function recordHelperArgs(
   tc: ObjectTypeComposer<any>,
-  opts?: RecordHelperArgsOpts,
+  opts?: RecordHelperArgsOpts
 ): ObjectTypeComposerArgumentConfigMapDefinition;

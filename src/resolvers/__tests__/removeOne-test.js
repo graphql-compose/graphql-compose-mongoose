@@ -235,5 +235,11 @@ describe('removeOne() ->', () => {
       const outputType = removeOne(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());
     });
+
+    it('should have all fields optional in filter', () => {
+      const resolver = removeOne(UserModel, UserTC);
+      expect(resolver.getArgITC('filter').getFieldTypeName('name')).toBe('String');
+      expect(resolver.getArgITC('filter').getFieldTypeName('age')).toBe('Float');
+    });
   });
 });

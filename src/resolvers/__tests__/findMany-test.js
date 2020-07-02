@@ -124,4 +124,12 @@ describe('findMany() ->', () => {
       expect(result).toEqual([{ overridden: true }]);
     });
   });
+
+  describe('Resolver.getType()', () => {
+    it('should have all fields optional in filter', () => {
+      const resolver = findMany(UserModel, UserTC);
+      expect(resolver.getArgITC('filter').getFieldTypeName('name')).toBe('String');
+      expect(resolver.getArgITC('filter').getFieldTypeName('age')).toBe('Float');
+    });
+  });
 });
