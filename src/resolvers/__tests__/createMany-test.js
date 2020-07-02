@@ -6,7 +6,6 @@ import { GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql-compose/lib/gra
 import { mongoose } from '../../__mocks__/mongooseCommon';
 import { UserModel } from '../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../fieldsConverter';
-import GraphQLMongoID from '../../types/mongoid';
 import createMany from '../createMany';
 
 beforeAll(() => UserModel.base.connect());
