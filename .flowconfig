@@ -47,4 +47,3 @@
 [options]
 esproposal.class_instance_fields=enable
 esproposal.optional_chaining=enable
-suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
