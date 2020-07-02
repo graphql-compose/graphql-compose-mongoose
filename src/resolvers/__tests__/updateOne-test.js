@@ -257,5 +257,13 @@ describe('updateOne() ->', () => {
       const outputType = updateOne(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());
     });
+
+    it('should have all fields optional in filter', () => {
+      const resolver = updateOne(UserModel, UserTC);
+      expect(resolver.getArgITC('filter').getFieldTypeName('name')).toBe('String');
+      expect(resolver.getArgITC('filter').getFieldTypeName('age')).toBe('Float');
+      expect(resolver.getArgITC('record').getFieldTypeName('name')).toBe('String');
+      expect(resolver.getArgITC('record').getFieldTypeName('age')).toBe('Float');
+    });
   });
 });

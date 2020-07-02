@@ -142,5 +142,11 @@ describe('removeMany() ->', () => {
       const outputType = removeMany(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());
     });
+
+    it('should have all fields optional in filter', () => {
+      const resolver = removeMany(UserModel, UserTC);
+      expect(resolver.getArgITC('filter').getFieldTypeName('name')).toBe('String');
+      expect(resolver.getArgITC('filter').getFieldTypeName('age')).toBe('Float');
+    });
   });
 });

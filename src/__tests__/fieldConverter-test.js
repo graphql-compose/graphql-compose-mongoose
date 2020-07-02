@@ -275,7 +275,7 @@ describe('fieldConverter', () => {
     const tc = convertModelToGraphQL(UserModel, 'User', sc);
 
     it('should work with String', () => {
-      expect(tc.getFieldTypeName('name')).toBe('String');
+      expect(tc.getFieldTypeName('name')).toBe('String!');
       expect(tc.getFieldTypeName('skills')).toBe('[String]');
     });
 

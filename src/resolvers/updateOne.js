@@ -52,6 +52,7 @@ export default function updateOne<TSource: MongooseDocument, TContext>(
         recordTypeName: `UpdateOne${tc.getTypeName()}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
+        allFieldsNullable: true,
         ...(opts && opts.record),
       }),
       ...filterHelperArgs(tc, model, {

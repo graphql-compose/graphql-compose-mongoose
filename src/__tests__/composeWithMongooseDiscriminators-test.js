@@ -39,9 +39,8 @@ describe('composeWithMongooseDiscriminators ->', () => {
           },
         },
       });
-      const filterArgInFindOne: any = typeComposer.getResolver('findOne').getArg('filter');
-      const inputComposer = schemaComposer.createInputTC(filterArgInFindOne.type);
-      expect(inputComposer.isFieldNonNull('kind')).toBe(true);
+      const ac: any = typeComposer.getResolver('createOne').getArgTC('record');
+      expect(ac.isFieldNonNull('kind')).toBe(true);
     });
 
     it('should proceed customizationOptions.inputType.fields.required', () => {

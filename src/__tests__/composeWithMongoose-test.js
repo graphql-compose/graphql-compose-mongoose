@@ -208,8 +208,13 @@ describe('composeWithMongoose ->', () => {
           },
         },
       });
-      const filterArgInFindOne = typeComposer.getResolver('findOne').getArgITC('filter');
-      expect(filterArgInFindOne.isFieldNonNull('age')).toBe(true);
+
+      const ac = typeComposer.getResolver('createOne').getArgITC('record');
+      expect(ac.isFieldNonNull('age')).toBe(true);
+
+      // but should be nullable in filters
+      const ac2 = typeComposer.getResolver('findOne').getArgITC('filter');
+      expect(ac2.isFieldNonNull('age')).toBe(false);
     });
 
     it('should use cached type to avoid maximum call stack size exceeded', () => {

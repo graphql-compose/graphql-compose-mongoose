@@ -140,9 +140,18 @@ export function convertModelToGraphQL<TSource, TContext>(
 
   const mongooseFields = getFieldsFromModel(model);
   const graphqlFields = {};
+  const requiredFields = [];
 
   Object.keys(mongooseFields).forEach((fieldName) => {
     const mongooseField: MongooseFieldT = mongooseFields[fieldName];
+
+    if (
+      (mongooseField: any).isRequired &&
+      // conditional required field in mongoose cannot be NonNulable in GraphQL
+      typeof (mongooseField: any).originalRequiredValue !== 'function'
+    ) {
+      requiredFields.push(fieldName);
+    }
 
     graphqlFields[fieldName] = {
       type: convertFieldToGraphQL(mongooseField, typeName, sc),
@@ -165,6 +174,7 @@ export function convertModelToGraphQL<TSource, TContext>(
   });
 
   typeComposer.addFields(graphqlFields);
+  typeComposer.makeFieldNonNull(requiredFields);
   return typeComposer;
 }
 

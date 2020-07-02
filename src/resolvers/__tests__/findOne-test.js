@@ -138,5 +138,11 @@ describe('findOne() ->', () => {
       const outputType = findOne(UserModel, UserTC).getType();
       expect(outputType).toBe(UserTC.getType());
     });
+
+    it('should have all fields optional in filter', () => {
+      const resolver = findOne(UserModel, UserTC);
+      expect(resolver.getArgITC('filter').getFieldTypeName('name')).toBe('String');
+      expect(resolver.getArgITC('filter').getFieldTypeName('age')).toBe('Float');
+    });
   });
 });

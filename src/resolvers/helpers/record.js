@@ -11,6 +11,8 @@ export type RecordHelperArgsOpts = {
   isRequired?: boolean,
   removeFields?: string[],
   requiredFields?: string[],
+  /** Make all fields nullable by default. May be overridden by `requiredFields` property */
+  allFieldsNullable?: boolean,
 };
 
 // for merging, discriminators merge-able only
@@ -40,6 +42,10 @@ export const recordHelperArgs = (
     recordITC = schemaComposer.getITC(recordTypeName);
   } else {
     recordITC = tc.getInputTypeComposer().clone(recordTypeName);
+  }
+
+  if (opts && opts.allFieldsNullable) {
+    recordITC.makeFieldNullable(recordITC.getFieldNames());
   }
 
   if (opts && opts.removeFields) {

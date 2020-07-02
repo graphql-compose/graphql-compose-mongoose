@@ -28,12 +28,17 @@ const UserSchema: SchemaType<any> = new Schema(
 
     name: {
       type: String,
+      required: true,
       description: 'Person name',
     },
 
     age: {
       type: Number,
       description: 'Full years',
+      required() {
+        // in graphql this field should be Nullable
+        return this.name === 'Something special';
+      },
     },
 
     gender: {
@@ -120,7 +125,7 @@ UserSchema.set('autoIndex', false);
 UserSchema.index({ name: 1, age: -1 });
 
 // eslint-disable-next-line
-UserSchema.virtual('nameVirtual').get(function() {
+UserSchema.virtual('nameVirtual').get(function () {
   return `VirtualFieldValue${this._id}`;
 });
 
