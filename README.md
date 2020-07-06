@@ -666,4 +666,6 @@ This plugin adds `pagination` resolver.
 
 Viktor Kjartansson created a quite solid intro for graphql-compose-mongoose in comparison with graphql-tools:
 
-<a href="https://www.youtube.com/watch?v=RXcY-OoGnQ8" target="_blank"><img src="https://img.youtube.com/vi/RXcY-OoGnQ8/0.jpg" alt="#2 Mongoose - add GraphQL with graphql-compose" style="width: 380px" />
+<a href="https://www.youtube.com/watch?v=RXcY-OoGnQ8" target="_blank"><img src="https://img.youtube.com/vi/RXcY-OoGnQ8/3.jpg" alt="#2 Mongoose - add GraphQL with graphql-compose" style="width: 380px" />
+
+  <https://www.youtube.com/watch?v=RXcY-OoGnQ8> (23 mins)
