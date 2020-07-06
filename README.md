@@ -661,3 +661,9 @@ This plugin adds `pagination` resolver.
 ## License
 
 [MIT](https://github.com/graphql-compose/graphql-compose-mongoose/blob/master/LICENSE.md)
+
+## Intro video
+
+Viktor Kjartansson created a quite solid intro for graphql-compose-mongoose in comparison with graphql-tools:
+
+<a href="https://www.youtube.com/watch?v=RXcY-OoGnQ8" target="_blank"><img src="https://img.youtube.com/vi/RXcY-OoGnQ8/0.jpg" alt="#2 Mongoose - add GraphQL with graphql-compose" style="width: 380px" />
