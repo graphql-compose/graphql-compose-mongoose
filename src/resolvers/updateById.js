@@ -54,6 +54,7 @@ export default function updateById<TSource: MongooseDocument, TContext>(
         recordTypeName: `UpdateById${tc.getTypeName()}Input`,
         requiredFields: ['_id'],
         isRequired: true,
+        allFieldsNullable: true,
         ...(opts && opts.record),
       }),
     },

@@ -235,5 +235,11 @@ describe('updateById() ->', () => {
       const outputType = updateById(UserModel, UserTC).getType();
       expect(outputType).toBe(existedType.getType());
     });
+
+    it('should have all fields optional in record', () => {
+      const resolver = updateById(UserModel, UserTC);
+      expect(resolver.getArgITC('record').getFieldTypeName('name')).toBe('String');
+      expect(resolver.getArgITC('record').getFieldTypeName('age')).toBe('Float');
+    });
   });
 });

@@ -156,6 +156,10 @@ describe('updateMany() ->', () => {
       const resolver = updateMany(UserModel, UserTC);
       expect(resolver.getArgITC('filter').getFieldTypeName('name')).toBe('String');
       expect(resolver.getArgITC('filter').getFieldTypeName('age')).toBe('Float');
+    });
+
+    it('should have all fields optional in record', () => {
+      const resolver = updateMany(UserModel, UserTC);
       expect(resolver.getArgITC('record').getFieldTypeName('name')).toBe('String');
       expect(resolver.getArgITC('record').getFieldTypeName('age')).toBe('Float');
     });
