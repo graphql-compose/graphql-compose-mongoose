@@ -238,6 +238,7 @@ describe('updateById() ->', () => {
 
     it('should have all fields optional in record', () => {
       const resolver = updateById(UserModel, UserTC);
+      expect(resolver.getArgITC('record').getFieldTypeName('_id')).toBe('MongoID!');
       expect(resolver.getArgITC('record').getFieldTypeName('name')).toBe('String');
       expect(resolver.getArgITC('record').getFieldTypeName('age')).toBe('Float');
     });
