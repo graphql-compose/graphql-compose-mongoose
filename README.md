@@ -513,6 +513,21 @@ const UserTCForSchema1 = composeWithMongoose(User, { schemaComposer: schema1 });
 const UserTCForSchema2 = composeWithMongoose(User, { schemaComposer: schema2 });
 ```
 
+### Embedded documents has `_id` field and you don't need it?
+
+Just turn them off in mongoose:
+
+```js
+const UsersSchema = new Schema({
+  _id: { type: String }
+  emails: [{
+    _id: false, // <-- disable id addition in mongoose
+    address: { type: String },
+    verified: Boolean
+  }]
+});
+```
+
 ## Customization options
 
 When we convert model `const UserTC = composeWithMongoose(User, customizationOptions);` you may tune every piece of future derived types and resolvers.
