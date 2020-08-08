@@ -8,6 +8,7 @@ import {
   sortHelper,
   sortHelperArgs,
   projectionHelper,
+  prepareAliases,
 } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
@@ -26,6 +27,8 @@ export default function findByIds<TSource: MongooseDocument, TContext>(
       'Second arg for Resolver findByIds() should be instance of ObjectTypeComposer.'
     );
   }
+
+  const aliases = prepareAliases(model);
 
   return tc.schemaComposer.createResolver({
     type: tc.getTypeNonNull().getTypePlural(),
@@ -54,7 +57,7 @@ export default function findByIds<TSource: MongooseDocument, TContext>(
 
       resolveParams.query = model.find(selector); // eslint-disable-line
       resolveParams.model = model; // eslint-disable-line
-      projectionHelper(resolveParams);
+      projectionHelper(resolveParams, aliases);
       limitHelper(resolveParams);
       sortHelper(resolveParams);
       return beforeQueryHelper(resolveParams);

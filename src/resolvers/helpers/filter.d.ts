@@ -1,7 +1,4 @@
-import {
-  ObjectTypeComposerArgumentConfigMapDefinition,
-  ObjectTypeComposer,
-} from 'graphql-compose';
+import { ObjectTypeComposerArgumentConfigMapDefinition, ObjectTypeComposer } from 'graphql-compose';
 import { Model } from 'mongoose';
 import { MongoId } from '../../types/mongoid';
 import { ExtendedResolveParams } from '../index';
@@ -16,10 +13,7 @@ export type FilterHelperArgsOpts = {
   removeFields?: string | string[];
 };
 
-export type FilterHelperArgs<
-  TSource = any,
-  IndexedFieldsMap = { _id: MongoId }
-> = TSource &
+export type FilterHelperArgs<TSource = any, IndexedFieldsMap = { _id: MongoId }> = TSource &
   FilterOperatorsArgs<TSource, IndexedFieldsMap> & {
     _ids: MongoId[];
   };
@@ -31,7 +25,11 @@ export function getFilterHelperArgOptsMap(): Partial<
 export function filterHelperArgs(
   typeComposer: ObjectTypeComposer<any>,
   model: Model<any>,
-  opts?: FilterHelperArgsOpts,
+  opts?: FilterHelperArgsOpts
 ): ObjectTypeComposerArgumentConfigMapDefinition;
+import { AliasesMap } from './aliases';
 
-export function filterHelper(resolveParams: ExtendedResolveParams): void;
+export function filterHelper(
+  resolveParams: ExtendedResolveParams,
+  aliases: AliasesMap | false
+): void;

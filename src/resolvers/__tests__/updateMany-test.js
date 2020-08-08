@@ -98,7 +98,7 @@ describe('updateMany() ->', () => {
       });
 
       await expect(UserModel.findOne({ _id: user1._id })).resolves.toEqual(
-        expect.objectContaining({ name: checkedName })
+        expect.objectContaining({ n: checkedName })
       );
     });
 

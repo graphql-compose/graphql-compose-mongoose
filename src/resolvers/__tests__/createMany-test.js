@@ -111,8 +111,8 @@ describe('createMany() ->', () => {
 
       const docs = await UserModel.collection.find({ _id: { $in: res.recordIds } }).toArray();
       expect(docs.length).toBe(2);
-      expect(docs[0].name).toBe(checkedName);
-      expect(docs[1].name).toBe(checkedName);
+      expect(docs[0].n).toBe(checkedName);
+      expect(docs[1].n).toBe(checkedName);
     });
 
     it('should return payload.records', async () => {

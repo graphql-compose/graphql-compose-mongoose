@@ -1,8 +1,13 @@
 /* @flow */
 
 import type { ExtendedResolveParams } from '../index';
+import type { AliasesMap } from './aliases';
 
-export function projectionHelper(resolveParams: ExtendedResolveParams): void { // eslint-disable-line
+export function projectionHelper(
+  resolveParams: ExtendedResolveParams,
+  aliases: AliasesMap | false
+): void {
+  // eslint-disable-line
   const projection = resolveParams.projection;
   if (projection) {
     // if projection has '*' key, then omit field projection (fetch all fields from database)
@@ -20,6 +25,15 @@ export function projectionHelper(resolveParams: ExtendedResolveParams): void { /
         flatProjection[key] = !!val;
       }
     });
+
+    if (aliases) {
+      Object.keys(flatProjection).forEach((k) => {
+        if (aliases[k]) {
+          flatProjection[aliases[k]] = true;
+          delete flatProjection[k];
+        }
+      });
+    }
 
     if (Object.keys(flatProjection).length > 0) {
       resolveParams.query = resolveParams.query.select(flatProjection); // eslint-disable-line

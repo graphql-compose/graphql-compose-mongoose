@@ -26,7 +26,7 @@ describe('fieldConverter', () => {
 
   describe('getFieldsFromModel()', () => {
     it('should get fieldsMap from mongoose model', () => {
-      expect(Object.keys(fields)).toEqual(expect.arrayContaining(['name', 'createdAt', '_id']));
+      expect(Object.keys(fields)).toEqual(expect.arrayContaining(['n', 'createdAt', '_id']));
     });
 
     it('should skip double undescored fields', () => {
@@ -101,7 +101,7 @@ describe('fieldConverter', () => {
     });
 
     it('should derive SCALAR', () => {
-      expect(deriveComplexType(fields.name)).toBe(ComplexTypes.SCALAR);
+      expect(deriveComplexType(fields.n)).toBe(ComplexTypes.SCALAR);
       expect(deriveComplexType(fields.relocation)).toBe(ComplexTypes.SCALAR);
       expect(deriveComplexType(fields.age)).toBe(ComplexTypes.SCALAR);
       expect(deriveComplexType(fields.createdAt)).toBe(ComplexTypes.SCALAR);

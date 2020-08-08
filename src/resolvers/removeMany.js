@@ -3,7 +3,7 @@
 
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { MongooseDocument } from 'mongoose';
-import { filterHelperArgs, filterHelper } from './helpers';
+import { filterHelperArgs, filterHelper, prepareAliases } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
@@ -32,6 +32,8 @@ export default function removeMany<TSource: MongooseDocument, TContext>(
     });
   });
 
+  const aliases = prepareAliases(model);
+
   const resolver = tc.schemaComposer.createResolver({
     name: 'removeMany',
     kind: 'mutation',
@@ -59,7 +61,7 @@ export default function removeMany<TSource: MongooseDocument, TContext>(
 
       resolveParams.query = model.find();
       resolveParams.model = model;
-      filterHelper(resolveParams);
+      filterHelper(resolveParams, aliases);
 
       if (resolveParams.query.deleteMany) {
         resolveParams.query = resolveParams.query.deleteMany();

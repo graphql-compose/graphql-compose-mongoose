@@ -14,6 +14,7 @@ import {
   addFilterOperators,
   processFilterOperators,
 } from './filterOperators';
+import type { AliasesMap } from './aliases';
 
 export type FilterHelperArgsOpts = {
   filterTypeName?: string,
@@ -98,7 +99,10 @@ export const filterHelperArgs = (
   };
 };
 
-export function filterHelper(resolveParams: ExtendedResolveParams): void {
+export function filterHelper(
+  resolveParams: ExtendedResolveParams,
+  aliases: AliasesMap | false
+): void {
   const filter = resolveParams.args && resolveParams.args.filter;
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
     const modelFields = resolveParams.query.schema.paths;
@@ -113,6 +117,8 @@ export function filterHelper(resolveParams: ExtendedResolveParams): void {
     Object.keys(filterFields).forEach((key) => {
       if (modelFields[key] || key.indexOf('$') === 0) {
         clearedFilter[key] = filterFields[key];
+      } else if (aliases && aliases?.[key]) {
+        clearedFilter[aliases[key]] = filterFields[key];
       }
     });
     if (Object.keys(clearedFilter).length > 0) {

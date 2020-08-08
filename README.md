@@ -34,7 +34,7 @@ import { composeWithMongoose } from 'graphql-compose-mongoose';
 // For using node 8 and above (native async/await)
 import { composeWithMongoose } from 'graphql-compose-mongoose/node8';
 
-// Source code without Flowtype declarations
+// Source code without FlowType declarations
 import { composeWithMongoose } from 'graphql-compose-mongoose/es';
 ```
 
@@ -56,7 +56,7 @@ Small explanation for variables naming:
 
 - `UserSchema` - this is a mongoose schema
 - `User` - this is a mongoose model
-- `UserTC` - this is a `ObjectTypeComposer` instance for User. `ObjectTypeComposer` has `GraphQLObjectType` inside, avaliable via method `UserTC.getType()`.
+- `UserTC` - this is a `ObjectTypeComposer` instance for User. `ObjectTypeComposer` has `GraphQLObjectType` inside, available via method `UserTC.getType()`.
 - Here and in all other places of code variables suffix `...TC` means that this is `ObjectTypeComposer` instance, `...ITC` - `InputTypeComposer`, `...ETC` - `EnumTypeComposer`.
 
 ```js
@@ -79,9 +79,10 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     index: true,
   },
-  languages: {
+  ln: {
     type: [LanguagesSchema], // you may include other schemas (here included as array of embedded documents)
     default: [],
+    alias: 'languages', // in schema `ln` will be named as `languages`
   },
   contacts: { // another mongoose way for providing embedded documents
     email: String,
@@ -89,7 +90,7 @@ const UserSchema = new mongoose.Schema({
   },
   gender: { // enum field with values
     type: String,
-    enum: ['male', 'female', 'ladyboy'],
+    enum: ['male', 'female'],
   },
   someMixed: {
     type: mongoose.Schema.Types.Mixed,
@@ -201,7 +202,7 @@ Variable Namings
   const CharacterDTC = composeWithMongooseDiscriminators(CharacterModel, baseOptions);
 
   // create Discriminator Types
-  const droidTypeConverterOptions = {  // this options will be merged with baseOptions -> customisationsOptions
+  const droidTypeConverterOptions = {  // this options will be merged with baseOptions -> customizationsOptions
     fields: {
       remove: ['makeDate'],
     }
@@ -525,6 +526,19 @@ const UsersSchema = new Schema({
     address: { type: String },
     verified: Boolean
   }]
+});
+```
+
+### Can field name in schema have different name in database?
+
+Yes, it can. This package understands mongoose [`alias` option](https://mongoosejs.com/docs/guide.html#aliases) for fields. Just provide `alias: 'country'` for field `c` and you get `country` field name in GraphQL schema and Mongoose model but `c` field in database:
+
+```js
+const childSchema = new Schema({
+  c: {
+    type: String,
+    alias: 'country'
+  }
 });
 ```
 
