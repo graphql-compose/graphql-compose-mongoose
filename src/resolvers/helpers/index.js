@@ -4,6 +4,7 @@ import { getFilterHelperArgOptsMap } from './filter';
 import { getLimitHelperArgsOptsMap } from './limit';
 import { getRecordHelperArgsOptsMap } from './record';
 
+export * from './aliases';
 export * from './filter';
 export * from './limit';
 export * from './projection';

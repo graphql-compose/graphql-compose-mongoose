@@ -13,6 +13,8 @@ import {
   filterHelperArgs,
   sortHelper,
   sortHelperArgs,
+  prepareAliases,
+  replaceAliases,
 } from './helpers';
 import { toMongoDottedObject } from '../utils/toMongoDottedObject';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
@@ -41,6 +43,8 @@ export default function updateMany<TSource: MongooseDocument, TContext>(
       },
     });
   });
+
+  const aliases = prepareAliases(model);
 
   const resolver = tc.schemaComposer.createResolver({
     name: 'updateMany',
@@ -86,7 +90,7 @@ export default function updateMany<TSource: MongooseDocument, TContext>(
 
       resolveParams.query = model.find();
       resolveParams.model = model;
-      filterHelper(resolveParams);
+      filterHelper(resolveParams, aliases);
       skipHelper(resolveParams);
       sortHelper(resolveParams);
       limitHelper(resolveParams);
@@ -94,10 +98,14 @@ export default function updateMany<TSource: MongooseDocument, TContext>(
       resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
 
       if (resolveParams.query.updateMany) {
-        resolveParams.query.updateMany({ $set: toMongoDottedObject(recordData) });
+        resolveParams.query.updateMany({
+          $set: toMongoDottedObject(replaceAliases(recordData, aliases)),
+        });
       } else {
         // OLD mongoose
-        resolveParams.query.update({ $set: toMongoDottedObject(recordData) });
+        resolveParams.query.update({
+          $set: toMongoDottedObject(replaceAliases(recordData, aliases)),
+        });
       }
 
       const res = await beforeQueryHelper(resolveParams);

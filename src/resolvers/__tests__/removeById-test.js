@@ -145,7 +145,7 @@ describe('removeById() ->', () => {
       });
       await expect(result).rejects.toMatchSnapshot();
       const exist = await UserModel.collection.findOne({ _id: user._id });
-      expect(exist.name).toBe(user.name);
+      expect(exist.n).toBe(user.name);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {

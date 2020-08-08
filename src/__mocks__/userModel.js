@@ -26,10 +26,11 @@ const UserSchema: SchemaType<any> = new Schema(
       ref: 'UserModel',
     },
 
-    name: {
+    n: {
       type: String,
       required: true,
       description: 'Person name',
+      alias: 'name',
     },
 
     age: {

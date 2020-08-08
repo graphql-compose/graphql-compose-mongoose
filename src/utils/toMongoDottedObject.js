@@ -16,12 +16,12 @@ function _toMongoDottedObject(obj, target = {}, path = [], filter = false) {
   const objKeys = Object.keys(obj);
 
   /* eslint-disable */
-  objKeys.forEach(key => {
+  objKeys.forEach((key) => {
     if (key.startsWith('$')) {
       let val;
       if (operatorsWithExpression.includes(key)) {
         val = Array.isArray(obj[key])
-          ? obj[key].map(v => _toMongoDottedObject(v, {}, [], filter))
+          ? obj[key].map((v) => _toMongoDottedObject(v, {}, [], filter))
           : _toMongoDottedObject(obj[key], {}, [], filter);
       } else {
         val = obj[key];

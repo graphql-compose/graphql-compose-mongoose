@@ -11,9 +11,11 @@ import { filterHelperArgs, filterHelper } from '../filter';
 import { OPERATORS_FIELDNAME } from '../filterOperators';
 import { UserModel } from '../../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../../fieldsConverter';
+import { prepareAliases } from '../aliases';
 
 describe('Resolver helper `filter` ->', () => {
   let UserTC: ObjectTypeComposer<any, any>;
+  const aliases = prepareAliases(UserModel);
 
   beforeEach(() => {
     schemaComposer.clear();
@@ -137,7 +139,7 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should not call query.where if args.filter is empty', () => {
-      filterHelper(resolveParams);
+      filterHelper(resolveParams, aliases);
       expect(spyWhereFn).not.toBeCalled();
     });
 
@@ -145,8 +147,8 @@ describe('Resolver helper `filter` ->', () => {
       resolveParams.args = {
         filter: { name: 'nodkz' },
       };
-      filterHelper(resolveParams);
-      expect(spyWhereFn).toBeCalledWith({ name: 'nodkz' });
+      filterHelper(resolveParams, aliases);
+      expect(spyWhereFn).toBeCalledWith({ n: 'nodkz' });
     });
 
     it('should call query.where if args.filter provided with _ids', () => {
@@ -156,7 +158,7 @@ describe('Resolver helper `filter` ->', () => {
           _ids: [1, 2, 3],
         },
       };
-      filterHelper(resolveParams);
+      filterHelper(resolveParams, aliases);
       expect(spyWhereFn.mock.calls).toEqual([[{ _id: { $in: [1, 2, 3] } }], [{ age: 30 }]]);
     });
 
@@ -169,9 +171,9 @@ describe('Resolver helper `filter` ->', () => {
           age: 30,
         },
       };
-      filterHelper(resolveParams);
+      filterHelper(resolveParams, aliases);
       expect(spyWhereFn).toBeCalledWith({
-        'name.first': 'Pavel',
+        'n.first': 'Pavel',
         age: 30,
       });
     });
@@ -182,7 +184,7 @@ describe('Resolver helper `filter` ->', () => {
           [OPERATORS_FIELDNAME]: { age: { gt: 10, lt: 20 } },
         },
       };
-      filterHelper(resolveParams);
+      filterHelper(resolveParams, aliases);
       expect(spyWhereFn).toBeCalledWith({ age: { $gt: 10, $lt: 20 } });
     });
 
@@ -197,7 +199,7 @@ describe('Resolver helper `filter` ->', () => {
         active: true,
       };
 
-      filterHelper(resolveParams);
+      filterHelper(resolveParams, aliases);
       expect(spyWhereFn.mock.calls).toEqual([
         [{ age: { $gt: 10, $lt: 20 } }],
         [{ active: true, age: { max: 30 } }],

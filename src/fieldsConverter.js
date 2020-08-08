@@ -142,8 +142,13 @@ export function convertModelToGraphQL<TSource, TContext>(
   const graphqlFields = {};
   const requiredFields = [];
 
-  Object.keys(mongooseFields).forEach((fieldName) => {
-    const mongooseField: MongooseFieldT = mongooseFields[fieldName];
+  Object.keys(mongooseFields).forEach((key) => {
+    const mongooseField: MongooseFieldT = mongooseFields[key];
+
+    let fieldName = key;
+    if (typeof (mongooseField: any)?.options?.alias === 'string') {
+      fieldName = (mongooseField: any)?.options?.alias;
+    }
 
     if (
       (mongooseField: any).isRequired &&

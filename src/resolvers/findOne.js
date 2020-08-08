@@ -11,6 +11,7 @@ import {
   sortHelper,
   sortHelperArgs,
   projectionHelper,
+  prepareAliases,
 } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
@@ -27,6 +28,8 @@ export default function findOne<TSource: MongooseDocument, TContext>(
   if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
     throw new Error('Second arg for Resolver findOne() should be instance of ObjectTypeComposer.');
   }
+
+  const aliases = prepareAliases(model);
 
   return tc.schemaComposer.createResolver({
     type: tc,
@@ -47,10 +50,10 @@ export default function findOne<TSource: MongooseDocument, TContext>(
     resolve: (resolveParams: ExtendedResolveParams) => {
       resolveParams.query = model.findOne({}); // eslint-disable-line
       resolveParams.model = model;
-      filterHelper(resolveParams);
+      filterHelper(resolveParams, aliases);
       skipHelper(resolveParams);
       sortHelper(resolveParams);
-      projectionHelper(resolveParams);
+      projectionHelper(resolveParams, aliases);
       return beforeQueryHelper(resolveParams);
     },
   });

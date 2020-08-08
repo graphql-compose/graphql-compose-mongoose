@@ -2,7 +2,7 @@
 
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { MongooseDocument } from 'mongoose';
-import { projectionHelper } from './helpers';
+import { projectionHelper, prepareAliases } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
@@ -19,6 +19,8 @@ export default function findById<TSource: MongooseDocument, TContext>(
     throw new Error('Second arg for Resolver findById() should be instance of ObjectTypeComposer.');
   }
 
+  const aliases = prepareAliases(model);
+
   return tc.schemaComposer.createResolver({
     type: tc,
     name: 'findById',
@@ -32,7 +34,7 @@ export default function findById<TSource: MongooseDocument, TContext>(
       if (args._id) {
         resolveParams.query = model.findById(args._id); // eslint-disable-line
         resolveParams.model = model; // eslint-disable-line
-        projectionHelper(resolveParams);
+        projectionHelper(resolveParams, aliases);
         return beforeQueryHelper(resolveParams);
       }
       return Promise.resolve(null);

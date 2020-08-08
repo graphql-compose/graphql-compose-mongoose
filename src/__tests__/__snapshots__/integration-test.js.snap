@@ -8,7 +8,7 @@ Array [
   "employment",
   "contacts",
   "_id",
-  "name",
+  "n",
   "age",
   "gender",
   "relocation",
@@ -17,6 +17,7 @@ Array [
   "createdAt",
   "updatedAt",
   "__v",
+  "name",
   "nameVirtual",
   "id",
 ]
