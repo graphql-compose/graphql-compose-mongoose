@@ -12,9 +12,9 @@ import {
 import { Document, Model } from 'mongoose';
 import { ComposeWithMongooseOpts } from '../composeWithMongoose';
 
-export type ComposeWithMongooseDiscriminatorsOpts<
-  TContext = any
-> = ComposeWithMongooseOpts<TContext> & {
+export type ComposeWithMongooseDiscriminatorsOpts<TContext = any> = ComposeWithMongooseOpts<
+  TContext
+> & {
   reorderFields?: boolean | string[]; // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
 };
 
@@ -36,7 +36,7 @@ export class DiscriminatorTypeComposer<
 
   public static createFromModel<TBModel extends Document, TCtx>(
     baseModel: Model<TBModel>,
-    opts?: ComposeWithMongooseDiscriminatorsOpts<TCtx>,
+    opts?: ComposeWithMongooseDiscriminatorsOpts<TCtx>
   ): DiscriminatorTypeComposer<TBModel, TCtx>;
 
   // ------------------------------------------------
@@ -52,7 +52,7 @@ export class DiscriminatorTypeComposer<
 
   public discriminator<TChildModel extends TBaseModel>(
     childModel: Model<TChildModel>,
-    opts?: ComposeWithMongooseOpts<TContext>,
+    opts?: ComposeWithMongooseOpts<TContext>
   ): ObjectTypeComposer<TChildModel, TContext>;
 
   // ------------------------------------------------
@@ -60,41 +60,33 @@ export class DiscriminatorTypeComposer<
   // ------------------------------------------------
   public setField(
     fieldName: string,
-    fieldConfig: ObjectTypeComposerFieldConfigDefinition<TBaseModel, TContext>,
+    fieldConfig: ObjectTypeComposerFieldConfigDefinition<TBaseModel, TContext>
   ): this;
 
   public setField<TArgs>(
     fieldName: string,
-    fieldConfig: ObjectTypeComposerFieldConfigDefinition<
-      TBaseModel,
-      TContext,
-      TArgs
-    >,
+    fieldConfig: ObjectTypeComposerFieldConfigDefinition<TBaseModel, TContext, TArgs>
   ): this;
 
-  public setFields(
-    fields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>,
-  ): this;
+  public setFields(fields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>): this;
 
-  public setFields(
-    fields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>,
-  ): this;
+  public setFields(fields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>): this;
 
   // discriminators must have all interface fields
   public addFields(
-    newFields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>,
+    newFields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>
   ): this;
 
   public addFields(
-    newFields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>,
+    newFields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>
   ): this;
 
   public addNestedFields(
-    newFields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>,
+    newFields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>
   ): this;
 
   public addNestedFields(
-    newFields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>,
+    newFields: ObjectTypeComposerFieldConfigMapDefinition<TBaseModel, TContext>
   ): this;
 
   public removeField(fieldNameOrArray: string | string[]): this;
@@ -105,7 +97,7 @@ export class DiscriminatorTypeComposer<
     fieldName: string,
     partialFieldConfig: Partial<
       ObjectTypeComposerFieldConfigAsObjectDefinition<TBaseModel, TContext>
-    >,
+    >
   ): this;
 
   public reorderFields(names: string[]): this;
@@ -114,18 +106,11 @@ export class DiscriminatorTypeComposer<
 
   public makeFieldNullable(fieldNameOrArray: string | string[]): this;
 
-  public deprecateFields(
-    fields: { [fieldName: string]: string } | string[] | string,
-  ): this;
+  public deprecateFields(fields: { [fieldName: string]: string } | string[] | string): this;
 
   public addRelation(
     fieldName: string,
-    ObjectTypeComposerRelationOpts: ObjectTypeComposerRelationOpts<
-      any,
-      TBaseModel,
-      TContext,
-      any
-    >,
+    ObjectTypeComposerRelationOpts: ObjectTypeComposerRelationOpts<any, TBaseModel, TContext, any>
   ): this;
 
   public addRelation<TRelationSource, TArgs>(
@@ -135,10 +120,8 @@ export class DiscriminatorTypeComposer<
       TBaseModel,
       TContext,
       TArgs
-    >,
+    >
   ): this;
 
-  public setRecordIdFn(
-    fn: ObjectTypeComposerGetRecordIdFn<TBaseModel, TContext>,
-  ): this;
+  public setRecordIdFn(fn: ObjectTypeComposerGetRecordIdFn<TBaseModel, TContext>): this;
 }

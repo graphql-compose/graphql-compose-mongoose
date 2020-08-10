@@ -1,8 +1,4 @@
-import {
-  InputTypeComposer,
-  SchemaComposer,
-  ObjectTypeComposer,
-} from 'graphql-compose';
+import { InputTypeComposer, SchemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { Document, Model } from 'mongoose';
 import { ConnectionOpts } from './resolvers/connection';
 import {
@@ -100,7 +96,7 @@ export type TypeConverterResolversOpts = {
   createMany?:
     | false
     | {
-        record?: RecordHelperArgsOpts | false;
+        records?: RecordHelperArgsOpts | false;
       };
   count?:
     | false
@@ -111,31 +107,28 @@ export type TypeConverterResolversOpts = {
   pagination?: PaginationResolverOpts | false;
 };
 
-export function composeWithMongoose<
-  TModel extends Document = any,
-  TContext = any
->(
+export function composeWithMongoose<TModel extends Document = any, TContext = any>(
   model: Model<TModel>,
-  opts?: ComposeWithMongooseOpts<TContext>,
+  opts?: ComposeWithMongooseOpts<TContext>
 ): ObjectTypeComposer<TModel, TContext>;
 
 export function prepareFields(
   tc: ObjectTypeComposer<any>,
-  opts: { only?: string[]; remove?: string[] },
+  opts: { only?: string[]; remove?: string[] }
 ): void;
 
 export function prepareInputFields(
   inputTypeComposer: InputTypeComposer,
-  inputFieldsOpts: { only?: string[]; remove?: string[]; required?: string[] },
+  inputFieldsOpts: { only?: string[]; remove?: string[]; required?: string[] }
 ): void;
 
 export function createInputType(
   tc: ObjectTypeComposer<any>,
-  inputTypeOpts?: TypeConverterInputTypeOpts,
+  inputTypeOpts?: TypeConverterInputTypeOpts
 ): void;
 
 export function createResolvers<TDocument extends Document>(
   model: Model<TDocument>,
   tc: ObjectTypeComposer<any>,
-  opts: TypeConverterResolversOpts,
+  opts: TypeConverterResolversOpts
 ): void;
