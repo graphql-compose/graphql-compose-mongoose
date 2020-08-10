@@ -24,7 +24,7 @@ export function getFilterHelperArgOptsMap(): Partial<
 
 export function filterHelperArgs(
   typeComposer: ObjectTypeComposer<any>,
-  model: Model<any>,
+  model: Model<any, any>,
   opts?: FilterHelperArgsOpts
 ): ObjectTypeComposerArgumentConfigMapDefinition;
 import { AliasesMap } from './aliases';
