@@ -547,7 +547,7 @@ const childSchema = new Schema({
 
 When we convert model `const UserTC = composeWithMongoose(User, customizationOptions);` you may tune every piece of future derived types and resolvers.
 
-### Here is flow typed definition of this options:
+### Here is typed definition of this options:
 
 The top level of customization options. Here you setup name and description for the main type, remove fields or leave only desired fields.
 

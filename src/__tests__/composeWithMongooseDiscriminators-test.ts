@@ -28,7 +28,7 @@ describe('composeWithMongooseDiscriminators ->', () => {
     });
   });
 
-  describe('composeWithMongoose customisationOptions', () => {
+  describe('composeWithMongoose customizationOptions', () => {
     it('required input fields, should be passed down to resolvers', () => {
       const typeComposer = composeWithMongooseDiscriminators(CharacterModel, {
         inputType: {
