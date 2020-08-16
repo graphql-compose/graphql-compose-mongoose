@@ -1,5 +1,3 @@
-/* @flow */
-
 import type { ResolverResolveParams } from 'graphql-compose';
 import type { Query, Model } from 'mongoose';
 import connection from './connection';

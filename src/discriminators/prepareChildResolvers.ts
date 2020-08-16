@@ -1,8 +1,6 @@
-/* @flow */
-
 import type { ResolverResolveParams, Resolver, ObjectTypeComposer } from 'graphql-compose';
 import {
-  type ComposeWithMongooseDiscriminatorsOpts,
+  ComposeWithMongooseDiscriminatorsOpts,
   DiscriminatorTypeComposer,
 } from './DiscriminatorTypeComposer';
 import { EMCResolvers } from '../resolvers';

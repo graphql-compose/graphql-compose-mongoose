@@ -1,5 +1,3 @@
-/* @flow */
-
 import { ObjectTypeComposer } from 'graphql-compose';
 import type {
   DiscriminatorTypeComposer,

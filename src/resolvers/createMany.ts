@@ -1,5 +1,3 @@
-/* @flow */
-
 import type { ObjectTypeComposer, Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers';
@@ -24,7 +22,7 @@ export default function createMany<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
   opts?: GenResolverOpts
-): Resolver<TSource, TContext> {
+): Resolver<TSource, TContext, any> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createMany() should be instance of Mongoose Model.');
   }

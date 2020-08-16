@@ -1,6 +1,3 @@
-/* @flow */
-/* eslint-disable no-param-reassign */
-
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import findById from './findById';
@@ -9,7 +6,7 @@ import type { ExtendedResolveParams, GenResolverOpts } from './index';
 export default function removeById<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts // eslint-disable-line no-unused-vars
+  _opts?: GenResolverOpts // eslint-disable-line no-unused-vars
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');

@@ -20,7 +20,8 @@
     "baseUrl": ".",
     "paths": {
       "*" : ["types/*"]
-    }
+    },
+    "rootDir": "./src",
   },
   "include": ["src/**/*"],
   "exclude": [

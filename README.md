@@ -24,21 +24,6 @@ If you want to add additional resolvers [`connection`](https://github.com/graphq
 npm install graphql-compose-connection graphql-compose-pagination --save
 ```
 
-### Different builds
-
-This library contains different builds for any purposes:
-
-```js
-// Default import for using under node v6 and above
-import { composeWithMongoose } from 'graphql-compose-mongoose';
-
-// For using node 8 and above (native async/await)
-import { composeWithMongoose } from 'graphql-compose-mongoose/node8';
-
-// Source code without FlowType declarations
-import { composeWithMongoose } from 'graphql-compose-mongoose/es';
-```
-
 ## Intro video
 
 Viktor Kjartansson created a quite solid intro for graphql-compose-mongoose in comparison with graphql-tools:
@@ -209,7 +194,7 @@ Variable Namings
     }
   };
   const DroidTC = CharacterDTC.discriminator(DroidModel, droidTypeConverterOptions);
-  const PersonTC = CharacterDTC.discriminator(PersonModel);  // baseOptions -> customisationsOptions applied
+  const PersonTC = CharacterDTC.discriminator(PersonModel);  // baseOptions -> customizationsOptions applied
 
   // You may now use CharacterDTC to add fields to all Discriminators
   // Use DroidTC, `PersonTC as any other ObjectTypeComposer.

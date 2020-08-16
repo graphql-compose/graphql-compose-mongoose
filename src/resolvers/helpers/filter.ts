@@ -97,7 +97,7 @@ export function filterHelper(
 ): void {
   const filter = resolveParams.args && resolveParams.args.filter;
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
-    const modelFields = resolveParams.query.schema.paths;
+    const modelFields = (resolveParams.query as any)?.schema?.paths;
 
     const { _ids, ...filterFields } = filter;
     if (_ids && Array.isArray(_ids)) {

@@ -1,5 +1,3 @@
-/* @flow */
-
 export { DiscriminatorTypeComposer } from './DiscriminatorTypeComposer';
 export type { ComposeWithMongooseDiscriminatorsOpts } from './DiscriminatorTypeComposer';
 

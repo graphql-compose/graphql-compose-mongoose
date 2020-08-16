@@ -38,15 +38,15 @@ export function getIndexesFromModel(
 
   // scan all fields on index presence [MONGOOSE FIELDS LEVEL INDEX]
   Object.keys(mongooseModel.schema.paths).forEach((name) => {
-    if (mongooseModel.schema.paths[name]._index) {
+    if ((mongooseModel.schema.paths[name] as any)._index) {
       indexedFields.push({ [name]: 1 }); // ASC by default
     }
   });
 
   // scan compound and special indexes [MONGOOSE SCHEMA LEVEL INDEXES]
-  if (Array.isArray(mongooseModel.schema._indexes)) {
-    mongooseModel.schema._indexes.forEach((idxData) => {
-      const partialIndexes = {};
+  if (Array.isArray((mongooseModel.schema as any)._indexes)) {
+    (mongooseModel.schema as any)._indexes.forEach((idxData: any) => {
+      const partialIndexes = {} as Record<string, any>;
       const idxFields = idxData[0];
 
       if (!skipSpecificIndexes || !isSpecificIndex(idxFields)) {
@@ -55,7 +55,7 @@ export function getIndexesFromModel(
         } else {
           // extract partial indexes from compound index
           // { name: 1, age: 1, salary: 1} -> [{name:1}, {name:1, age:1}, {name:1, age:1, salary:1}]
-          Object.keys(idxFields).forEach((fieldName) => {
+          Object.keys(idxFields).forEach((fieldName: any) => {
             partialIndexes[fieldName] = idxFields[fieldName];
             indexedFields.push({ ...partialIndexes });
           });
@@ -86,14 +86,14 @@ export function getUniqueIndexes(mongooseModel: Model<any>): IndexT[] {
 
   // scan all fields on index presence [MONGOOSE FIELDS LEVEL INDEX]
   Object.keys(mongooseModel.schema.paths).forEach((name) => {
-    if (mongooseModel.schema.paths[name]._index && mongooseModel.schema.paths[name]._index.unique) {
+    if ((mongooseModel.schema.paths[name] as any)?._index?.unique) {
       indexedFields.push({ [name]: 1 }); // ASC by default
     }
   });
 
   // scan compound and special indexes [MONGOOSE SCHEMA LEVEL INDEXES]
-  if (Array.isArray(mongooseModel.schema._indexes)) {
-    mongooseModel.schema._indexes.forEach((idxData) => {
+  if (Array.isArray((mongooseModel.schema as any)._indexes)) {
+    (mongooseModel.schema as any)._indexes.forEach((idxData: any) => {
       const idxFields = idxData[0];
       const idxCfg = idxData[1];
       if (idxCfg.unique && !isSpecificIndex(idxFields)) {

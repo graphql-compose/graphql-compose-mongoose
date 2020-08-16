@@ -71,7 +71,7 @@ function _toMongoDottedObject(
  * @param {Array} path path array (internal)
  */
 export function toMongoDottedObject(
-  obj: Object,
+  obj: Record<string, any>,
   target: Record<string, any> = {},
   path: string[] = []
 ): { [dottedPath: string]: any } {
@@ -94,7 +94,7 @@ export function toMongoDottedObject(
  * @param {Array} path path array (internal)
  */
 export function toMongoFilterDottedObject(
-  obj: Object,
+  obj: Record<string, any>,
   target: Record<string, any> = {},
   path: string[] = []
 ): { [dottedPath: string]: any } {

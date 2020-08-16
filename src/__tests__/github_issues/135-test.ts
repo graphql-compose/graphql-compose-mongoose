@@ -37,7 +37,6 @@ describe('issue #135 - Mongoose virtuals', () => {
   const Record = mongoose.model('Record', RecordSchema);
   beforeAll(async () => {
     for (let i = 1; i <= 3; i++) {
-      // $FlowFixMe
       await Record.create({ _id: `10000000000000000000000${i}`, title: `Title ${i}` });
     }
   });

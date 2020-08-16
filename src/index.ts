@@ -1,5 +1,3 @@
-/* @flow */
-
 import { composeWithMongoose } from './composeWithMongoose';
 import GraphQLMongoID from './types/mongoid';
 import GraphQLBSONDecimal from './types/bsonDecimal';

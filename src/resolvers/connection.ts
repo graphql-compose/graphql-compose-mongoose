@@ -1,6 +1,3 @@
-/* @flow */
-/* eslint-disable no-use-before-define, no-param-reassign, global-require */
-
 import type { Document, Model } from 'mongoose';
 import type { ConnectionSortMapOpts as _ConnectionSortMapOpts } from 'graphql-compose-connection';
 import type {
@@ -28,6 +25,7 @@ export default function connection<TSource = Document, TContext = any>(
   } catch (e) {
     return undefined;
   }
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const prepareConnectionResolver = require('graphql-compose-connection').prepareConnectionResolver;
 
   if (!prepareConnectionResolver) {
