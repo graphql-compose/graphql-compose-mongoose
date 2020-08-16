@@ -22,7 +22,7 @@ type MongooseFieldT = {
     description?: string;
     alias?: string;
   };
-  originalRequiredValue?: string | Function;
+  originalRequiredValue?: string | (() => any);
   isRequired?: boolean;
   enumValues?: string[];
   schema?: Schema;

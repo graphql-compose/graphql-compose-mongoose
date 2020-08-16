@@ -10,9 +10,10 @@ notifications:
 node_js:
   - "10"
   - "12"
+  - "14"
 script:
-  - yarn run test
-  - yarn run build
+  - yarn test
+  - yarn build
 after_success:
   - 'curl -Lo travis_after_all.py https://git.io/travis_after_all'
   - python travis_after_all.py

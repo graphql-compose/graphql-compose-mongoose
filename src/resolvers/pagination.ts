@@ -1,6 +1,3 @@
-/* @flow */
-/* eslint-disable global-require */
-
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 
@@ -9,7 +6,7 @@ export type PaginationResolverOpts = {
 };
 
 export default function pagination<TSource = Document, TContext = any>(
-  model: Model<any>,
+  _model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
   opts?: PaginationResolverOpts
 ): Resolver<TSource, TContext> | undefined {
@@ -18,6 +15,7 @@ export default function pagination<TSource = Document, TContext = any>(
   } catch (e) {
     return undefined;
   }
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const preparePaginationResolver = require('graphql-compose-pagination').preparePaginationResolver;
 
   if (!preparePaginationResolver) {

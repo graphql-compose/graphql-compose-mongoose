@@ -148,9 +148,8 @@ describe('connection() resolver', () => {
 
     it('should return Resolver object with custom name', () => {
       const resolver = connection(UserModel, UserTC, {
-        // $FlowFixMe
         connectionResolverName: 'customConnection',
-      });
+      } as any);
       if (!resolver) throw new Error('Connection resolver is undefined');
       expect(resolver).toBeInstanceOf(Resolver);
       expect(resolver.getNestedName()).toEqual('customConnection');
@@ -179,9 +178,8 @@ describe('connection() resolver', () => {
 
     it('should create custom edge type', () => {
       const resolver = connection(UserModel, UserTC, {
-        // $FlowFixMe
         edgeTypeName: 'CustomEdge',
-      });
+      } as any);
       if (!resolver) throw new Error('Connection resolver is undefined');
       expect(schemaComposer.has('CustomEdge')).toBe(true);
     });
@@ -302,11 +300,9 @@ describe('connection() resolver', () => {
         UserTC.setResolver('customFindMany', findMany(UserModel, UserTC));
         UserTC.setResolver('customCount', count(UserModel, UserTC));
         const resolver = connection(UserModel, UserTC, {
-          // $FlowFixMe
           findResolverName: 'customFindMany',
-          // $FlowFixMe
           countResolverName: 'customCount',
-        });
+        } as any);
         if (!resolver) throw new Error('Connection resolver is undefined');
 
         const result = await resolver.resolve({ args: { first: 20 } });
