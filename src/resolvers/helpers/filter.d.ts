@@ -2,21 +2,18 @@ import { ObjectTypeComposerArgumentConfigMapDefinition, ObjectTypeComposer } fro
 import { Model } from 'mongoose';
 import { MongoId } from '../../types/mongoid';
 import { ExtendedResolveParams } from '../index';
-import { FilterOperatorsArgs, FilterOperatorsOpts } from './filterOperators';
+import { FilterOperatorsArgs } from './filterOperators';
+
 
 export type FilterHelperArgsOpts = {
   filterTypeName?: string;
   isRequired?: boolean;
   onlyIndexed?: boolean;
-  requiredFields?: string | string[];
-  operators?: FilterOperatorsOpts | false;
-  removeFields?: string | string[];
+  operators?: any;
 };
 
 export type FilterHelperArgs<TSource = any, IndexedFieldsMap = { _id: MongoId }> = TSource &
-  FilterOperatorsArgs<TSource, IndexedFieldsMap> & {
-    _ids: MongoId[];
-  };
+  FilterOperatorsArgs<TSource, IndexedFieldsMap>
 
 export function getFilterHelperArgOptsMap(): Partial<
   Record<keyof FilterHelperArgsOpts, string | string[]>

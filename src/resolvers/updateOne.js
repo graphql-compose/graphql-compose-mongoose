@@ -4,6 +4,7 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { MongooseDocument } from 'mongoose';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { getOrCreateErrorPayload } from '../utils/getOrCreateErrorPayload';
 import { skipHelperArgs, recordHelperArgs, filterHelperArgs, sortHelperArgs } from './helpers';
 import findOne from './findOne';
 
@@ -23,6 +24,8 @@ export default function updateOne<TSource: MongooseDocument, TContext>(
 
   const findOneResolver = findOne(model, tc, opts);
 
+  getOrCreateErrorPayload(tc);
+
   const outputTypeName = `UpdateOne${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
@@ -33,6 +36,10 @@ export default function updateOne<TSource: MongooseDocument, TContext>(
       record: {
         type: tc,
         description: 'Updated document',
+      },
+      errors: {
+        type: '[ErrorPayload]',
+        description: 'Errors that may occur, typically validations',
       },
     });
   });
@@ -77,7 +84,6 @@ export default function updateOne<TSource: MongooseDocument, TContext>(
           )
         );
       }
-
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
@@ -91,6 +97,24 @@ export default function updateOne<TSource: MongooseDocument, TContext>(
 
       if (doc && recordData) {
         doc.set(recordData);
+
+        const validationErrors = doc.validateSync();
+        let errors = null;
+        if (validationErrors && validationErrors.errors) {
+          errors = [];
+          Object.keys(validationErrors.errors).forEach((key) => {
+            errors.push({
+              path: key,
+              messages: [validationErrors.errors[key].properties.message],
+            });
+          });
+          return {
+            record: null,
+            recordId: null,
+            errors,
+          };
+        }
+
         await doc.save();
       }
 
@@ -98,6 +122,7 @@ export default function updateOne<TSource: MongooseDocument, TContext>(
         return {
           record: doc,
           recordId: tc.getRecordIdFn()(doc),
+          errors: null,
         };
       }
 

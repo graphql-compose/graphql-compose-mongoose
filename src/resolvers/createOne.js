@@ -3,6 +3,7 @@
 
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { MongooseDocument } from 'mongoose';
+import { getOrCreateErrorPayload } from '../utils/getOrCreateErrorPayload';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
@@ -32,6 +33,8 @@ export default function createOne<TSource: MongooseDocument, TContext>(
     }
   }
 
+  getOrCreateErrorPayload(tc);
+
   const outputTypeName = `CreateOne${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
@@ -42,6 +45,10 @@ export default function createOne<TSource: MongooseDocument, TContext>(
       record: {
         type: tc,
         description: 'Created document',
+      },
+      errors: {
+        type: '[ErrorPayload]',
+        description: 'Errors that may occur, typically validations',
       },
     });
   });
@@ -74,12 +81,30 @@ export default function createOne<TSource: MongooseDocument, TContext>(
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
         if (!doc) return null;
       }
-      await doc.save();
 
-      return {
-        record: doc,
-        recordId: tc.getRecordIdFn()(doc),
-      };
+      const validationErrors = doc.validateSync();
+      let errors = null;
+      if (validationErrors && validationErrors.errors) {
+        errors = [];
+        Object.keys(validationErrors.errors).forEach((key) => {
+          errors.push({
+            path: key,
+            messages: [validationErrors.errors[key].properties.message],
+          });
+        });
+        return {
+          record: null,
+          recordId: null,
+          errors,
+        };
+      } else {
+        await doc.save();
+        return {
+          record: doc,
+          recordId: tc.getRecordIdFn()(doc),
+          errors,
+        };
+      }
     },
   });
 

@@ -20,19 +20,18 @@ export type FilterHelperArgsOpts = {
   filterTypeName?: string,
   isRequired?: boolean,
   onlyIndexed?: boolean,
-  requiredFields?: string | string[],
-  operators?: FilterOperatorsOpts | false,
-  removeFields?: string | string[],
+  // a tree of operators, null or false will allow all fields available in the schema (respecting on onlyIndexed)
+  operators?: any,
 };
 
 // for merging, discriminators merge-able only
 export const getFilterHelperArgOptsMap = () => ({
-  // filterTypeName? : 'string'
+  filterTypeName: 'string',
   isRequired: 'boolean',
   onlyIndexed: 'boolean',
-  requiredFields: ['string', 'string[]'],
+  // If operators are a tree `removeFields` won't be needed, as any fields you wouldn't want can just be left out of the..
+  // tree, this could be an allow and/or reject tree
   operators: ['FilterOperatorsOptsMap', 'boolean'],
-  removeFields: ['string', 'string[]'],
 });
 
 export const filterHelperArgs = (
@@ -75,10 +74,6 @@ export const filterHelperArgs = (
 
   itc.makeFieldNullable(itc.getFieldNames());
 
-  itc.addFields({
-    _ids: [GraphQLMongoID],
-  });
-
   itc.removeField(removeFields);
 
   if (opts.requiredFields) {
@@ -113,18 +108,11 @@ export function filterHelper(
       resolveParams.query = resolveParams.query.where({ _id: { $in: _ids } });
     }
     processFilterOperators(filterFields);
-    const clearedFilter = {};
-    Object.keys(filterFields).forEach((key) => {
-      if (modelFields[key] || key.indexOf('$') === 0) {
-        clearedFilter[key] = filterFields[key];
-      } else if (aliases && aliases?.[key]) {
-        clearedFilter[aliases[key]] = filterFields[key];
-      }
-    });
-    if (Object.keys(clearedFilter).length > 0) {
-      // eslint-disable-next-line
-      resolveParams.query = resolveParams.query.where(toMongoFilterDottedObject(clearedFilter));
-    }
+
+    // eslint-disable-next-line
+    resolveParams.query = resolveParams.query.where(
+      toMongoFilterDottedObject(resolveParams.query.model.translateAliases(filterFields))
+    );
   }
 
   if (isObject(resolveParams.rawQuery)) {

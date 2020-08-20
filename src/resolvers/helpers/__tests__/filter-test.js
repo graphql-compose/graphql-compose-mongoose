@@ -50,6 +50,7 @@ describe('Resolver helper `filter` ->', () => {
       expect(args.filter.type).toBeInstanceOf(InputTypeComposer);
     });
 
+    // TODO: use _operators[_id][in] ? why have _ids in root?
     it('should return filter with field _ids', () => {
       const args: any = filterHelperArgs(UserTC, UserModel, {
         filterTypeName: 'FilterUserType',

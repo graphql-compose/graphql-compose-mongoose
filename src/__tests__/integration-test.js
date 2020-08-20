@@ -48,12 +48,7 @@ describe('integration tests', () => {
 
     it('should return subdocument if it is non-empty', async () => {
       const UserTC = composeWithMongoose(UserModel);
-      // UserTC.get('$findById.subDoc').extendField('field2', {
-      //   resolve: (source) => {
-      //     console.log('$findById.subDoc.field2 source:', source)
-      //     return source.field2;
-      //   }
-      // })
+
       schemaComposer.Query.addFields({
         user: UserTC.getResolver('findById'),
       });

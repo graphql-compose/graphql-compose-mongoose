@@ -98,7 +98,7 @@ export function mergeCustomizationOptions<TContext>(
   }
 
   // use base schemaComposer
-  mergedOptions.schemaComposer = baseCOptions.schemaComposer;
+  if (baseCOptions.schemaComposer) mergedOptions.schemaComposer = baseCOptions.schemaComposer;
 
   // merge fields map
   if (baseCOptions.fields) {

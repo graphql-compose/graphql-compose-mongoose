@@ -47,6 +47,23 @@ const UserSchema: SchemaType<any> = new Schema(
       enum: ['male', 'female', 'ladyboy'],
     },
 
+    valid: {
+      type: String,
+      required: false,
+      validate: [
+        () => {
+          return false;
+        },
+        'this is a validate message',
+      ],
+    },
+
+    billingAddress: {
+      street: { type: String, index: true },
+      state: { type: String, index: true, enum: ['FL', 'MA', 'NY'] },
+      country: { type: String, index: true },
+    },
+
     skills: {
       type: [String],
       default: [],
@@ -123,6 +140,7 @@ const UserSchema: SchemaType<any> = new Schema(
 );
 
 UserSchema.set('autoIndex', false);
+UserSchema.index({ name: 1, age: -1 });
 UserSchema.index({ name: 1, age: -1 });
 
 // eslint-disable-next-line

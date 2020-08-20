@@ -40,10 +40,6 @@ export type FilterOperatorsArgs<TSource, IndexedFieldsMap> = {
   AND: FilterHelperArgs<TSource>;
 };
 
-export type FilterOperatorsOpts = {
-  [fieldName: string]: FilterOperatorNames[] | false;
-};
-
 export function addFilterOperators(
   itc: InputTypeComposer,
   model: Model<any>,

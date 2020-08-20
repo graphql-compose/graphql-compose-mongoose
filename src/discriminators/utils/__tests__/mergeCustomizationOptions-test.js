@@ -159,10 +159,12 @@ describe('mergeCustomizationOptions()', () => {
         skip: false,
         filter: {
           isRequired: true,
-          removeFields: ['id', 'dob'],
           operators: {
             one: ['gt', 'gte', 'lt'],
             two: ['gt', 'gte', 'lt', 'in[]', 'nin[]'],
+            four: {
+              foo: ['lte'],
+            },
           },
         },
       },
@@ -188,11 +190,13 @@ describe('mergeCustomizationOptions()', () => {
         sort: false,
         // skip: false,
         filter: {
-          removeFields: ['gender', 'dob', 'age'],
           operators: {
             one: ['gt', 'lte', 'ne', 'in[]', 'nin[]'],
             two: ['gt', 'gte', 'lt', 'lte', 'ne'],
             three: ['gte', 'lt'],
+            four: {
+              foo: ['gte', 'in[]'],
+            },
           },
         },
       },
@@ -224,11 +228,13 @@ describe('mergeCustomizationOptions()', () => {
         skip: false,
         filter: {
           isRequired: true,
-          removeFields: ['id', 'dob', 'gender', 'age'],
           operators: {
             one: ['gt', 'gte', 'lt', 'lte', 'ne', 'in[]', 'nin[]'],
             two: ['gt', 'gte', 'lt', 'in[]', 'nin[]', 'lte', 'ne'],
             three: ['gte', 'lt'],
+            four: {
+              foo: ['gte', 'lte', 'in[]'],
+            },
           },
         },
       },
@@ -252,7 +258,8 @@ describe('mergeCustomizationOptions()', () => {
     expect(mergeCustomizationOptions({}, childCustomOptions)).toEqual(childCustomOptions);
   });
 
-  it('should merge customisation Options', () => {
+  it('should merge customization options', () => {
+    // FIXME: mergeCustomizationOptions does not operate recursivly
     expect(mergeCustomizationOptions(baseCustomOptions, childCustomOptions)).toEqual(expected);
   });
 
