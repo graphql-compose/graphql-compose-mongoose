@@ -65,7 +65,7 @@ describe('Resolver helper `filter` ->', () => {
     it('should add OPERATORS_FIELDNAME via _createOperatorsField()', () => {
       addFilterOperators(itc, UserModel, {});
       expect(itc.hasField(OPERATORS_FIELDNAME)).toBe(true);
-      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('Operators');
+      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('OperatorsUserFilterInput');
     });
 
     it('should add OR field', () => {
