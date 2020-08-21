@@ -41,7 +41,8 @@ export default function removeMany<TSource = Document, TContext = any>(
     type: outputType,
     args: {
       ...filterHelperArgs(tc, model, {
-        filterTypeName: `FilterRemoveMany${tc.getTypeName()}Input`,
+        prefix: 'FilterRemoveMany',
+        suffix: 'Input',
         isRequired: true,
         ...opts?.filter,
       }),

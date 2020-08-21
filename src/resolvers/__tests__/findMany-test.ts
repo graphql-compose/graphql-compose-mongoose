@@ -26,6 +26,7 @@ describe('findMany() ->', () => {
       skills: ['js', 'ruby', 'php', 'python'],
       gender: 'male',
       relocation: true,
+      contacts: { email: 'mail' },
     });
 
     user2 = new UserModel({
@@ -33,6 +34,7 @@ describe('findMany() ->', () => {
       skills: ['go', 'erlang'],
       gender: 'female',
       relocation: false,
+      contacts: { email: 'mail' },
     });
 
     await user1.save();
@@ -44,9 +46,16 @@ describe('findMany() ->', () => {
     expect(resolver).toBeInstanceOf(Resolver);
   });
 
-  it('Resolver object should have `filter` arg', () => {
+  it('should have `filter` optional arg', () => {
     const resolver = findMany(UserModel, UserTC);
-    expect(resolver.hasArg('filter')).toBe(true);
+    expect(resolver.getArgTypeName('filter')).toBe('FilterFindManyUserInput');
+  });
+
+  it('should have user.contacts.mail as optional field', () => {
+    const resolver = findMany(UserModel, UserTC);
+    expect(resolver.getArgITC('filter').getFieldITC('contacts').getFieldTypeName('email')).toBe(
+      'String'
+    );
   });
 
   it('Resolver object should have `limit` arg', () => {

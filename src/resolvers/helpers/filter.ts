@@ -1,15 +1,17 @@
 /* eslint-disable no-use-before-define */
 
-import { ObjectTypeComposer, ObjectTypeComposerArgumentConfigMapDefinition } from 'graphql-compose';
+import { ObjectTypeComposer, ObjectTypeComposerArgumentConfigMap } from 'graphql-compose';
 import type { Model } from 'mongoose';
 import GraphQLMongoID from '../../types/mongoid';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
 import { FilterOperatorsOpts, addFilterOperators, processFilterOperators } from './filterOperators';
 import type { AliasesMap } from './aliases';
+import { makeFieldsRecursiveNullable } from 'src/utils/makeFieldsRecursiveNullable';
 
 export type FilterHelperArgsOpts = {
-  filterTypeName?: string;
+  prefix?: string;
+  suffix?: string;
   isRequired?: boolean;
   onlyIndexed?: boolean;
   requiredFields?: string | string[];
@@ -31,7 +33,7 @@ export const filterHelperArgs = (
   typeComposer: ObjectTypeComposer<any, any>,
   model: Model<any>,
   opts?: FilterHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMapDefinition => {
+): ObjectTypeComposerArgumentConfigMap => {
   if (!(typeComposer instanceof ObjectTypeComposer)) {
     throw new Error('First arg for filterHelperArgs() should be instance of ObjectTypeComposer.');
   }
@@ -40,8 +42,8 @@ export const filterHelperArgs = (
     throw new Error('Second arg for filterHelperArgs() should be instance of MongooseModel.');
   }
 
-  if (!opts || !opts.filterTypeName) {
-    throw new Error('You should provide non-empty `filterTypeName` in options.');
+  if (!opts) {
+    throw new Error('You should provide non-empty options.');
   }
 
   const removeFields = [];
@@ -62,10 +64,11 @@ export const filterHelperArgs = (
     });
   }
 
-  const filterTypeName: string = opts.filterTypeName;
+  const { prefix, suffix } = opts;
+  const filterTypeName: string = `${prefix}${typeComposer.getTypeName()}${suffix}`;
   const itc = typeComposer.getInputTypeComposer().clone(filterTypeName);
 
-  itc.makeFieldNullable(itc.getFieldNames());
+  makeFieldsRecursiveNullable(itc, { prefix, suffix });
 
   itc.addFields({
     _ids: [GraphQLMongoID],

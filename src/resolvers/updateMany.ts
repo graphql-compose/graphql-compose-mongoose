@@ -53,14 +53,16 @@ export default function updateMany<TSource = Document, TContext = any>(
     type: outputType,
     args: {
       ...recordHelperArgs(tc, {
-        recordTypeName: `UpdateMany${tc.getTypeName()}Input`,
+        prefix: 'UpdateMany',
+        suffix: 'Input',
         removeFields: ['id', '_id'],
         isRequired: true,
         allFieldsNullable: true,
         ...opts?.record,
       }),
       ...filterHelperArgs(tc, model, {
-        filterTypeName: `FilterUpdateMany${tc.getTypeName()}Input`,
+        prefix: 'FilterUpdateMany',
+        suffix: 'Input',
         ...opts?.filter,
       }),
       ...sortHelperArgs(tc, model, {

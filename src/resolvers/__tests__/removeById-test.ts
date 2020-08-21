@@ -30,6 +30,7 @@ describe('removeById() ->', () => {
       skills: ['js', 'ruby', 'php', 'python'],
       gender: 'male',
       relocation: true,
+      contacts: { email: 'mail' },
     });
 
     await user.save();

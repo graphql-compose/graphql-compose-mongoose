@@ -27,6 +27,9 @@ describe('count() ->', () => {
       skills: ['js', 'ruby', 'php', 'python'],
       gender: 'male',
       relocation: true,
+      contacts: {
+        email: '`1@1.com',
+      },
     });
 
     user2 = new UserModel({
@@ -34,6 +37,9 @@ describe('count() ->', () => {
       skills: ['go', 'erlang'],
       gender: 'female',
       relocation: false,
+      contacts: {
+        email: '`2@2.com',
+      },
     });
 
     await user1.save();
@@ -49,6 +55,20 @@ describe('count() ->', () => {
     it('should have `filter` arg', () => {
       const resolver = count(UserModel, UserTC);
       expect(resolver.hasArg('filter')).toBe(true);
+    });
+
+    it('required model fields (filter.contacts.email) should be optional in filter arg', () => {
+      const resolver = count(UserModel, UserTC);
+      expect(resolver.getArgITC('filter').getFieldITC('contacts').toSDL({ omitDescriptions: true }))
+        .toMatchInlineSnapshot(`
+        "input FilterUserContactsInput {
+          phones: [String]
+          email: String
+          skype: String
+          locationId: MongoID
+          _id: MongoID
+        }"
+      `);
     });
   });
 

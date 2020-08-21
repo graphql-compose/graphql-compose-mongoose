@@ -70,7 +70,8 @@ export default function createMany<TSource = Document, TContext = any>(
     args: {
       records: {
         type: (recordHelperArgs(tc, {
-          recordTypeName: `CreateMany${tc.getTypeName()}Input`,
+          prefix: 'CreateMany',
+          suffix: 'Input',
           removeFields: ['id', '_id'],
           isRequired: true,
           requiredFields,

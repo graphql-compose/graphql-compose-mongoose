@@ -126,6 +126,7 @@ describe('connection() resolver', () => {
         skills: ['js', 'ruby', 'php', 'python'],
         gender: 'male',
         relocation: true,
+        contacts: { email: 'mail' },
       });
 
       user2 = new UserModel({
@@ -133,6 +134,7 @@ describe('connection() resolver', () => {
         skills: ['go', 'erlang'],
         gender: 'female',
         relocation: false,
+        contacts: { email: 'mail' },
       });
 
       await user1.save();

@@ -30,9 +30,9 @@ describe('findByIds() ->', () => {
   beforeEach(async () => {
     await UserModel.deleteMany({});
 
-    user1 = new UserModel({ name: 'nodkz1' });
-    user2 = new UserModel({ name: 'nodkz2' });
-    user3 = new UserModel({ name: 'nodkz3' });
+    user1 = new UserModel({ name: 'nodkz1', contacts: { email: 'mail' } });
+    user2 = new UserModel({ name: 'nodkz2', contacts: { email: 'mail' } });
+    user3 = new UserModel({ name: 'nodkz3', contacts: { email: 'mail' } });
 
     await Promise.all([user1.save(), user2.save(), user3.save()]);
 

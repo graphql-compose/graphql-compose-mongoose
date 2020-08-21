@@ -37,65 +37,69 @@ describe('Resolver helper `filter` ->', () => {
       }).toThrowError('should be instance of MongooseModel');
     });
 
-    it('should throw error if `filterTypeName` not provided in opts', () => {
-      expect(() => filterHelperArgs(UserTC, UserModel)).toThrowError(
-        'provide non-empty `filterTypeName`'
-      );
+    it('should throw error if `opts` is not provided', () => {
+      expect(() => filterHelperArgs(UserTC, UserModel)).toThrowError('provide non-empty options');
     });
 
     it('should return filter field', () => {
-      const args: any = filterHelperArgs(UserTC, UserModel, {
-        filterTypeName: 'FilterUserType',
+      const args = filterHelperArgs(UserTC, UserModel, {
+        prefix: 'Filter',
+        suffix: 'Type',
       });
       expect(args.filter.type).toBeInstanceOf(InputTypeComposer);
     });
 
     it('should return filter with field _ids', () => {
-      const args: any = filterHelperArgs(UserTC, UserModel, {
-        filterTypeName: 'FilterUserType',
+      const args = filterHelperArgs(UserTC, UserModel, {
+        prefix: 'Filter',
+        suffix: 'Type',
       });
-      const itc = args.filter.type;
-      const ft = itc.getField('_ids').type;
+      const itc = args.filter.type as InputTypeComposer;
+      const ft = itc.getField('_ids').type as ListComposer<any>;
       expect(ft).toBeInstanceOf(ListComposer);
       expect(ft.ofType.getTypeName()).toBe('MongoID');
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
-      const args: any = filterHelperArgs(UserTC, UserModel, {
-        filterTypeName: 'FilterUserType',
+      const args = filterHelperArgs(UserTC, UserModel, {
+        prefix: 'Filter',
+        suffix: 'Type',
         isRequired: true,
       });
       expect(args.filter.type).toBeInstanceOf(NonNullComposer);
     });
 
     it('should remove fields via opts.removeFields', () => {
-      const args: any = filterHelperArgs(UserTC, UserModel, {
-        filterTypeName: 'FilterUserType',
+      const args = filterHelperArgs(UserTC, UserModel, {
+        prefix: 'Filter',
+        suffix: 'Type',
         removeFields: ['name', 'age'],
       });
-      const itc = args.filter.type;
+      const itc = args.filter.type as InputTypeComposer;
       expect(itc.hasField('name')).toBe(false);
       expect(itc.hasField('age')).toBe(false);
       expect(itc.hasField('gender')).toBe(true);
     });
 
     it('should set required fields via opts.requiredFields', () => {
-      const args: any = filterHelperArgs(UserTC, UserModel, {
-        filterTypeName: 'FilterUserType',
+      const args = filterHelperArgs(UserTC, UserModel, {
+        prefix: 'Filter',
+        suffix: 'Type',
         requiredFields: ['name', 'age'],
       });
-      const itc = args.filter.type;
+      const itc = args.filter.type as InputTypeComposer;
       expect(itc.getField('name').type).toBeInstanceOf(NonNullComposer);
       expect(itc.getField('age').type).toBeInstanceOf(NonNullComposer);
       expect(itc.getField('gender').type).not.toBeInstanceOf(NonNullComposer);
     });
 
     it('should leave only indexed fields if opts.onlyIndexed=true', () => {
-      const args: any = filterHelperArgs(UserTC, UserModel, {
-        filterTypeName: 'FilterUserType',
+      const args = filterHelperArgs(UserTC, UserModel, {
+        prefix: 'Filter',
+        suffix: 'Type',
         onlyIndexed: true,
       });
-      const itc = args.filter.type;
+      const itc = args.filter.type as InputTypeComposer;
       expect(itc.hasField('_id')).toBe(true);
       expect(itc.hasField('name')).toBe(true);
       expect(itc.hasField('age')).toBe(false);
@@ -103,16 +107,32 @@ describe('Resolver helper `filter` ->', () => {
     });
 
     it('should opts.onlyIndexed=true and opts.removeFields works together', () => {
-      const args: any = filterHelperArgs(UserTC, UserModel, {
-        filterTypeName: 'FilterUserType',
+      const args = filterHelperArgs(UserTC, UserModel, {
+        prefix: 'Filter',
+        suffix: 'Type',
         onlyIndexed: true,
         removeFields: ['name'],
       });
-      const itc = args.filter.type;
+      const itc = args.filter.type as InputTypeComposer;
       expect(itc.hasField('_id')).toBe(true);
       expect(itc.hasField('name')).toBe(false);
       expect(itc.hasField('age')).toBe(false);
       expect(itc.hasField('gender')).toBe(false);
+    });
+
+    it('should make nullable all nested fields and clone all input object types', () => {
+      // User.contacts.email is required field, so make it nullable with new type generation
+      const args = filterHelperArgs(UserTC, UserModel, {
+        prefix: 'Filter',
+        suffix: 'Input',
+      });
+      const itc = args.filter.type as InputTypeComposer;
+      const contactsITC = itc.getFieldITC('contacts');
+
+      expect(contactsITC.isFieldNonNull('email')).toBe(false);
+
+      // And name of new cloned type should be correct with deduped suffix/prefix
+      expect(contactsITC.getTypeName()).toBe('FilterUserContactsInput');
     });
   });
 

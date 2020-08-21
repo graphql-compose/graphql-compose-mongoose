@@ -9,10 +9,12 @@ beforeAll(async () => {
   await UserModel.create({
     name: 'AAAAA',
     age: 10,
+    contacts: { email: '1@1.com' },
   });
   await UserModel.create({
     name: 'BBBBB',
     age: 20,
+    contacts: { email: '2@2.com' },
   });
 });
 afterAll(() => UserModel.base.disconnect());

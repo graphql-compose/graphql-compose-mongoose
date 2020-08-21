@@ -50,7 +50,8 @@ export default function createOne<TSource = Document, TContext = any>(
     type: outputType,
     args: {
       ...recordHelperArgs(tc, {
-        recordTypeName: `CreateOne${tc.getTypeName()}Input`,
+        prefix: 'CreateOne',
+        suffix: 'Input',
         removeFields: ['id', '_id'],
         isRequired: true,
         requiredFields,

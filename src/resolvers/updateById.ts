@@ -48,7 +48,8 @@ export default function updateById<TSource = Document, TContext = any>(
     type: outputType,
     args: {
       ...recordHelperArgs(tc, {
-        recordTypeName: `UpdateById${tc.getTypeName()}Input`,
+        prefix: 'UpdateById',
+        suffix: 'Input',
         requiredFields: ['_id'],
         isRequired: true,
         allFieldsNullable: true,

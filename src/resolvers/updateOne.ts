@@ -46,14 +46,16 @@ export default function updateOne<TSource = Document, TContext = any>(
     type: outputType,
     args: {
       ...recordHelperArgs(tc, {
-        recordTypeName: `UpdateOne${tc.getTypeName()}Input`,
+        prefix: 'UpdateOne',
+        suffix: 'Input',
         removeFields: ['id', '_id'],
         isRequired: true,
         allFieldsNullable: true,
         ...opts?.record,
       }),
       ...filterHelperArgs(tc, model, {
-        filterTypeName: `FilterUpdateOne${tc.getTypeName()}Input`,
+        prefix: 'FilterUpdateOne',
+        suffix: 'Input',
         ...opts?.filter,
       }),
       ...sortHelperArgs(tc, model, {

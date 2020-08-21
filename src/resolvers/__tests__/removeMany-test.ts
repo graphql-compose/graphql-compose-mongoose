@@ -29,6 +29,7 @@ describe('removeMany() ->', () => {
       gender: 'male',
       relocation: true,
       age: 28,
+      contacts: { email: 'mail' },
     });
 
     user2 = new UserModel({
@@ -36,6 +37,7 @@ describe('removeMany() ->', () => {
       gender: 'female',
       relocation: true,
       age: 29,
+      contacts: { email: 'mail' },
     });
 
     user3 = new UserModel({
@@ -43,6 +45,7 @@ describe('removeMany() ->', () => {
       gender: 'female',
       relocation: true,
       age: 30,
+      contacts: { email: 'mail' },
     });
 
     await Promise.all([user1.save(), user2.save(), user3.save()]);
@@ -54,11 +57,16 @@ describe('removeMany() ->', () => {
   });
 
   describe('Resolver.args', () => {
-    it('should have required `filter` arg', () => {
+    it('should have `filter` required arg', () => {
       const resolver = removeMany(UserModel, UserTC);
-      const filterField = resolver.getArgConfig('filter');
-      expect(filterField).toBeTruthy();
-      expect(filterField.type).toBeInstanceOf(GraphQLNonNull);
+      expect(resolver.getArgTypeName('filter')).toBe('FilterRemoveManyUserInput!');
+    });
+
+    it('should have user.contacts.mail as optional field', () => {
+      const resolver = removeMany(UserModel, UserTC);
+      expect(resolver.getArgITC('filter').getFieldITC('contacts').getFieldTypeName('email')).toBe(
+        'String'
+      );
     });
   });
 

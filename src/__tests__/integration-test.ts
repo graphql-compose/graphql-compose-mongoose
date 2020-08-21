@@ -21,6 +21,7 @@ describe('integration tests', () => {
 
       const user = new UserModel({
         name: 'Test empty subDoc',
+        contacts: { email: 'mail' },
       });
       await user.save();
       const result: any = await graphql(
@@ -59,6 +60,7 @@ describe('integration tests', () => {
 
       const user2 = new UserModel({
         name: 'Test non empty subDoc',
+        contacts: { email: 'mail' },
         subDoc: { field2: { field21: 'ok' } },
       });
       await user2.save();
@@ -92,6 +94,7 @@ describe('integration tests', () => {
       const UserTC = composeWithMongoose(UserModel, { schemaComposer });
       const user = new UserModel({
         name: 'nodkz',
+        contacts: { email: 'mail' },
         someDynamic: {
           a: 123,
           b: [1, 2, true, false, 'ok'],
@@ -145,6 +148,7 @@ describe('integration tests', () => {
         gender: 'male',
         skills: ['a', 'b', 'c'],
         relocation: true,
+        contacts: { email: 'mail' },
       });
     });
 

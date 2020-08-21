@@ -31,6 +31,7 @@ describe('updateOne() ->', () => {
       skills: ['js', 'ruby', 'php', 'python'],
       gender: 'male',
       relocation: true,
+      contacts: { email: 'mail' },
     });
 
     user2 = new UserModel({
@@ -38,6 +39,7 @@ describe('updateOne() ->', () => {
       skills: ['go', 'erlang'],
       gender: 'female',
       relocation: true,
+      contacts: { email: 'mail' },
     });
 
     await user1.save();
@@ -50,9 +52,16 @@ describe('updateOne() ->', () => {
   });
 
   describe('Resolver.args', () => {
-    it('should have `filter` arg', () => {
+    it('should have `filter` optional arg', () => {
       const resolver = updateOne(UserModel, UserTC);
-      expect(resolver.hasArg('filter')).toBe(true);
+      expect(resolver.getArgTypeName('filter')).toBe('FilterUpdateOneUserInput');
+    });
+
+    it('should have user.contacts.mail as optional field', () => {
+      const resolver = updateOne(UserModel, UserTC);
+      expect(resolver.getArgITC('record').getFieldITC('contacts').getFieldTypeName('email')).toBe(
+        'String'
+      );
     });
 
     it('should have `skip` arg', () => {

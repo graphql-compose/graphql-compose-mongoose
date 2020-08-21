@@ -36,7 +36,8 @@ export default function findMany<TSource = Document, TContext = any>(
     kind: 'query',
     args: {
       ...filterHelperArgs(tc, model, {
-        filterTypeName: `FilterFindMany${tc.getTypeName()}Input`,
+        prefix: 'FilterFindMany',
+        suffix: 'Input',
         ...opts?.filter,
       }),
       ...skipHelperArgs(),

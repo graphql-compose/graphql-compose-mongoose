@@ -34,7 +34,8 @@ export default function findOne<TSource = Document, TContext = any>(
     kind: 'query',
     args: {
       ...filterHelperArgs(tc, model, {
-        filterTypeName: `FilterFindOne${tc.getTypeName()}Input`,
+        prefix: 'FilterFindOne',
+        suffix: 'Input',
         ...opts?.filter,
       }),
       ...skipHelperArgs(),

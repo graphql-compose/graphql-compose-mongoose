@@ -30,7 +30,7 @@ describe('issue #92 - How to verify the fields?', () => {
       schema,
       `
           mutation {
-            addUser(record: { name: "User1", age: 30 }) {
+            addUser(record: { name: "User1", age: 30, contacts: { email: "1@1.com" } }) {
               record {
                 name
                 age
@@ -47,7 +47,7 @@ describe('issue #92 - How to verify the fields?', () => {
       schema,
       `
           mutation {
-            addUser(record: { name: "User1", age: 10 }) {
+            addUser(record: { name: "User1", age: 10, contacts: { email: "1@1.com" } }) {
               record {
                 name
                 age

@@ -35,6 +35,7 @@ describe('updateById() ->', () => {
       skills: ['js', 'ruby', 'php', 'python'],
       gender: 'male',
       relocation: true,
+      contacts: { email: 'mail' },
     });
 
     user2 = new UserModel({
@@ -42,6 +43,7 @@ describe('updateById() ->', () => {
       skills: ['go', 'erlang'],
       gender: 'female',
       relocation: true,
+      contacts: { email: 'mail' },
     });
 
     await user1.save();

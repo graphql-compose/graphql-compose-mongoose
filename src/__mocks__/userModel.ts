@@ -136,6 +136,9 @@ export interface IUser extends Document {
   someDynamic?: any;
   skills?: string[];
   relocation?: boolean;
+  contacts: {
+    email: string;
+  };
 }
 
 const UserModel = mongoose.model<IUser>('User', UserSchema);

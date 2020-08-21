@@ -23,6 +23,7 @@ beforeEach(async () => {
     skills: ['js', 'ruby', 'php', 'python'],
     gender: 'male',
     relocation: true,
+    contacts: { email: 'mail' },
   });
 
   user2 = new UserModel({
@@ -30,6 +31,7 @@ beforeEach(async () => {
     skills: ['go', 'erlang'],
     gender: 'female',
     relocation: false,
+    contacts: { email: 'mail' },
   });
 
   await user1.save();
@@ -43,9 +45,16 @@ describe('findOne() ->', () => {
   });
 
   describe('Resolver.args', () => {
-    it('should have `filter` arg', () => {
+    it('should have `filter` optional arg', () => {
       const resolver = findOne(UserModel, UserTC);
-      expect(resolver.hasArg('filter')).toBe(true);
+      expect(resolver.getArgTypeName('filter')).toBe('FilterFindOneUserInput');
+    });
+
+    it('should have user.contacts.mail as optional field', () => {
+      const resolver = findOne(UserModel, UserTC);
+      expect(resolver.getArgITC('filter').getFieldITC('contacts').getFieldTypeName('email')).toBe(
+        'String'
+      );
     });
 
     it('should have `filter` arg only with indexed fields', async () => {

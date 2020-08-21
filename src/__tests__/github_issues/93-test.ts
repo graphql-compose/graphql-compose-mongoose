@@ -23,18 +23,21 @@ describe('issue #93', () => {
       _id: '100000000000000000000301',
       name: 'User301',
       age: 301,
+      contacts: { email: '1@1.com' },
     });
     await UserModel.create({
       _id: '100000000000000000000302',
       name: 'User302',
       age: 302,
       gender: 'male',
+      contacts: { email: '2@2.com' },
     });
     await UserModel.create({
       _id: '100000000000000000000303',
       name: 'User303',
       age: 302,
       gender: 'female',
+      contacts: { email: '3@3.com' },
     });
 
     const res = await graphql.graphql(

@@ -84,7 +84,7 @@ describe('createMany() ->', () => {
     it('should return payload.recordIds', async () => {
       const result = await createMany(UserModel, UserTC).resolve({
         args: {
-          records: [{ name: 'newName' }],
+          records: [{ name: 'newName', contacts: { email: 'mail' } }],
         },
       });
       expect(result.recordIds).toBeTruthy();
@@ -93,7 +93,10 @@ describe('createMany() ->', () => {
     it('should create documents with args.records and match createCount', async () => {
       const result = await createMany(UserModel, UserTC).resolve({
         args: {
-          records: [{ name: 'newName0' }, { name: 'newName1' }],
+          records: [
+            { name: 'newName0', contacts: { email: 'mail' } },
+            { name: 'newName1', contacts: { email: 'mail' } },
+          ],
         },
       });
       expect(result.createCount).toBe(2);
@@ -105,7 +108,10 @@ describe('createMany() ->', () => {
       const checkedName = 'nameForMongoDB';
       const res = await createMany(UserModel, UserTC).resolve({
         args: {
-          records: [{ name: checkedName }, { name: checkedName }],
+          records: [
+            { name: checkedName, contacts: { email: 'mail' } },
+            { name: checkedName, contacts: { email: 'mail' } },
+          ],
         },
       });
 
@@ -118,7 +124,7 @@ describe('createMany() ->', () => {
     it('should return payload.records', async () => {
       const result = await createMany(UserModel, UserTC).resolve({
         args: {
-          records: [{ name: 'NewUser' }],
+          records: [{ name: 'NewUser', contacts: { email: 'mail' } }],
         },
       });
       expect(result.records[0]._id).toBe(result.recordIds[0]);
@@ -126,14 +132,19 @@ describe('createMany() ->', () => {
 
     it('should return mongoose documents', async () => {
       const result = await createMany(UserModel, UserTC).resolve({
-        args: { records: [{ name: 'NewUser' }] },
+        args: { records: [{ name: 'NewUser', contacts: { email: 'mail' } }] },
       });
       expect(result.records[0]).toBeInstanceOf(UserModel);
     });
 
     it('should call `beforeRecordMutate` method with each created `record` and `resolveParams` as args', async () => {
       const result = await createMany(UserModel, UserTC).resolve({
-        args: { records: [{ name: 'NewUser0' }, { name: 'NewUser1' }] },
+        args: {
+          records: [
+            { name: 'NewUser0', contacts: { email: 'mail' } },
+            { name: 'NewUser1', contacts: { email: 'mail' } },
+          ],
+        },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           record.name = 'OverriddenName';
@@ -165,7 +176,12 @@ describe('createMany() ->', () => {
       ClonedUserTC.setRecordIdFn((source: any) => (source ? `${source._id}` : ''));
 
       const result = await createMany(ClonedUserModel, ClonedUserTC).resolve({
-        args: { records: [{ name: 'NewUser0' }, { name: 'NewUser1' }] },
+        args: {
+          records: [
+            { name: 'NewUser0', contacts: { email: 'mail' } },
+            { name: 'NewUser1', contacts: { email: 'mail' } },
+          ],
+        },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           record.name = 'OverriddenName';
@@ -200,6 +216,13 @@ describe('createMany() ->', () => {
     it('should have records field, NonNull List', () => {
       const resolver = createMany(UserModel, UserTC);
       expect(resolver.getOTC().getFieldTypeName('records')).toEqual('[User!]!');
+    });
+
+    it('should have user.contacts.mail required field', () => {
+      const resolver = createMany(UserModel, UserTC);
+      expect(resolver.getArgITC('records').getFieldITC('contacts').getFieldTypeName('email')).toBe(
+        'String!'
+      );
     });
 
     it('should have createCount field, Int', () => {

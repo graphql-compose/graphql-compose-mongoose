@@ -45,7 +45,8 @@ export default function removeOne<TSource = Document, TContext = any>(
     type: outputType,
     args: {
       ...filterHelperArgs(tc, model, {
-        filterTypeName: `FilterRemoveOne${tc.getTypeName()}Input`,
+        prefix: 'FilterRemoveOne',
+        suffix: 'Input',
         ...opts?.filter,
       }),
       ...sortHelperArgs(tc, model, {

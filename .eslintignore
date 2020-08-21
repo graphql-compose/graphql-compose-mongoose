@@ -2,4 +2,4 @@ lib/*
 es/*
 mjs/*
 node8/*
-flow-typed
+jest.config.js

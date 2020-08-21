@@ -32,9 +32,14 @@ describe('createOne() ->', () => {
   describe('Resolver.args', () => {
     it('should have required `record` arg', () => {
       const resolver = createOne(UserModel, UserTC);
-      const argConfig: any = resolver.getArgConfig('record');
-      expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
-      expect(argConfig.type.ofType.name).toBe('CreateOneUserInput');
+      expect(resolver.getArgTypeName('record')).toBe('CreateOneUserInput!');
+    });
+
+    it('should have user.contacts.mail required field', () => {
+      const resolver = createOne(UserModel, UserTC);
+      expect(resolver.getArgITC('record').getFieldITC('contacts').getFieldTypeName('email')).toBe(
+        'String!'
+      );
     });
   });
 
@@ -53,7 +58,7 @@ describe('createOne() ->', () => {
     it('should return payload.recordId', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
         args: {
-          record: { name: 'newName' },
+          record: { name: 'newName', contacts: { email: 'mail' } },
         },
       });
       expect(result.recordId).toBeTruthy();
@@ -62,7 +67,7 @@ describe('createOne() ->', () => {
     it('should create document with args.record', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
         args: {
-          record: { name: 'newName' },
+          record: { name: 'newName', contacts: { email: 'mail' } },
         },
       });
       expect(result.record.name).toBe('newName');
@@ -72,7 +77,7 @@ describe('createOne() ->', () => {
       const checkedName = 'nameForMongoDB';
       const res = await createOne(UserModel, UserTC).resolve({
         args: {
-          record: { name: checkedName },
+          record: { name: checkedName, contacts: { email: 'mail' } },
         },
       });
 
@@ -83,7 +88,7 @@ describe('createOne() ->', () => {
     it('should return payload.record', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
         args: {
-          record: { name: 'NewUser' },
+          record: { name: 'NewUser', contacts: { email: 'mail' } },
         },
       });
       expect(result.record.id).toBe(result.recordId);
@@ -91,14 +96,14 @@ describe('createOne() ->', () => {
 
     it('should return mongoose document', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
-        args: { record: { name: 'NewUser' } },
+        args: { record: { name: 'NewUser', contacts: { email: 'mail' } } },
       });
       expect(result.record).toBeInstanceOf(UserModel);
     });
 
     it('should call `beforeRecordMutate` method with created `record` and `resolveParams` as args', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
-        args: { record: { name: 'NewUser' } },
+        args: { record: { name: 'NewUser', contacts: { email: 'mail' } } },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           record.name = 'OverriddenName';

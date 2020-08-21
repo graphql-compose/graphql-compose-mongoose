@@ -17,32 +17,35 @@ describe('Resolver helper `record` ->', () => {
   });
 
   describe('recordHelperArgs()', () => {
-    it('should throw error if `recordTypeName` not provided in opts', () => {
-      expect(() => recordHelperArgs(UserTC)).toThrowError('provide non-empty `recordTypeName`');
+    it('should throw error if provided empty opts', () => {
+      expect(() => recordHelperArgs(UserTC)).toThrowError('provide non-empty options');
     });
 
     it('should return input field', () => {
       const args: any = recordHelperArgs(UserTC, {
-        recordTypeName: 'RecordUserType',
+        prefix: 'Record',
+        suffix: 'Input',
       });
       expect(args.record.type).toBeInstanceOf(InputTypeComposer);
     });
 
     it('should reuse existed inputType', () => {
       const existedType = schemaComposer.createInputTC({
-        name: 'RecordUserType',
+        name: 'RecordUserInput',
         fields: {},
       });
       schemaComposer.set('RecordUserType', existedType);
       const args: any = recordHelperArgs(UserTC, {
-        recordTypeName: 'RecordUserType',
+        prefix: 'Record',
+        suffix: 'Input',
       });
       expect(args.record.type).toBe(existedType);
     });
 
     it('should for opts.isRequired=true return NonNullComposer', () => {
       const args: any = recordHelperArgs(UserTC, {
-        recordTypeName: 'RecordUserType',
+        prefix: 'Record',
+        suffix: 'Input',
         isRequired: true,
       });
       expect(args.record.type).toBeInstanceOf(NonNullComposer);
@@ -50,7 +53,8 @@ describe('Resolver helper `record` ->', () => {
 
     it('should remove fields via opts.removeFields', () => {
       const args: any = recordHelperArgs(UserTC, {
-        recordTypeName: 'RecordUserType',
+        prefix: 'Record',
+        suffix: 'Input',
         removeFields: ['name', 'age'],
       });
       const inputTypeComposer = args.record.type;
@@ -61,7 +65,8 @@ describe('Resolver helper `record` ->', () => {
 
     it('should set required fields via opts.requiredFields', () => {
       const args: any = recordHelperArgs(UserTC, {
-        recordTypeName: 'RecordUserType',
+        prefix: 'Record',
+        suffix: 'Input',
         requiredFields: ['name', 'age'],
       });
       const inputTypeComposer = args.record.type;

@@ -31,6 +31,7 @@ describe('removeOne() ->', () => {
       gender: 'male',
       relocation: true,
       age: 28,
+      contacts: { email: 'mail' },
     });
 
     user2 = new UserModel({
@@ -38,6 +39,7 @@ describe('removeOne() ->', () => {
       gender: 'female',
       relocation: true,
       age: 29,
+      contacts: { email: 'mail' },
     });
 
     user3 = new UserModel({
@@ -45,6 +47,7 @@ describe('removeOne() ->', () => {
       gender: 'female',
       relocation: true,
       age: 30,
+      contacts: { email: 'mail' },
     });
 
     await Promise.all([user1.save(), user2.save(), user3.save()]);
@@ -56,9 +59,16 @@ describe('removeOne() ->', () => {
   });
 
   describe('Resolver.args', () => {
-    it('should have `filter` arg', () => {
+    it('should have `filter` optional arg', () => {
       const resolver = removeOne(UserModel, UserTC);
-      expect(resolver.hasArg('filter')).toBe(true);
+      expect(resolver.getArgTypeName('filter')).toBe('FilterRemoveOneUserInput');
+    });
+
+    it('should have user.contacts.mail as optional field', () => {
+      const resolver = removeOne(UserModel, UserTC);
+      expect(resolver.getArgITC('filter').getFieldITC('contacts').getFieldTypeName('email')).toBe(
+        'String'
+      );
     });
 
     it(

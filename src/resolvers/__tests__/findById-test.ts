@@ -26,7 +26,7 @@ describe('findById() ->', () => {
   beforeEach(async () => {
     await UserModel.deleteMany({});
 
-    user = new UserModel({ name: 'nodkz' });
+    user = new UserModel({ name: 'nodkz', contacts: { email: 'mail' } });
     await user.save();
 
     await PostModel.deleteMany({});

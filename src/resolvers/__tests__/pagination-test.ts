@@ -30,6 +30,7 @@ describe('pagination() ->', () => {
       skills: ['js', 'ruby', 'php', 'python'],
       gender: 'male',
       relocation: true,
+      contacts: { email: 'mail' },
     });
 
     user2 = new UserModel({
@@ -37,6 +38,7 @@ describe('pagination() ->', () => {
       skills: ['go', 'erlang'],
       gender: 'female',
       relocation: false,
+      contacts: { email: 'mail' },
     });
 
     await user1.save();

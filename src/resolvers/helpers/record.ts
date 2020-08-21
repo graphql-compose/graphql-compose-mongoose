@@ -3,9 +3,11 @@ import {
   ObjectTypeComposerArgumentConfigMapDefinition,
   InputTypeComposer,
 } from 'graphql-compose';
+import { makeFieldsRecursiveNullable } from 'src/utils/makeFieldsRecursiveNullable';
 
 export type RecordHelperArgsOpts = {
-  recordTypeName?: string;
+  prefix?: string;
+  suffix?: string;
   isRequired?: boolean;
   removeFields?: string[];
   requiredFields?: string[];
@@ -28,13 +30,14 @@ export const recordHelperArgs = (
     throw new Error('First arg for recordHelperArgs() should be instance of ObjectTypeComposer.');
   }
 
-  if (!opts || !opts.recordTypeName) {
-    throw new Error('You should provide non-empty `recordTypeName` in options.');
+  if (!opts) {
+    throw new Error('You should provide non-empty options.');
   }
 
-  const recordTypeName: string = opts.recordTypeName;
+  const { prefix, suffix } = opts;
 
   let recordITC;
+  const recordTypeName = `${prefix}${tc.getTypeName()}${suffix}`;
   const schemaComposer = tc.schemaComposer;
   if (schemaComposer.hasInstance(recordTypeName, InputTypeComposer)) {
     recordITC = schemaComposer.getITC(recordTypeName);
@@ -43,7 +46,7 @@ export const recordHelperArgs = (
   }
 
   if (opts && opts.allFieldsNullable) {
-    recordITC.makeFieldNullable(recordITC.getFieldNames());
+    makeFieldsRecursiveNullable(recordITC, { prefix, suffix });
   }
 
   if (opts && opts.removeFields) {

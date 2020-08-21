@@ -3,7 +3,10 @@ import { Schema } from './mongooseCommon';
 
 const ContactsSchema: SchemaType<any> = new Schema({
   phones: [String],
-  email: String,
+  email: {
+    type: String,
+    required: true,
+  },
   skype: String,
   locationId: Schema.Types.ObjectId,
 });
