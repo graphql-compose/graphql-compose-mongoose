@@ -22,14 +22,9 @@ export function addFilterOperators(
   itc: InputTypeComposer<any>,
   model: Model<any>,
   opts: FilterHelperArgsOpts
-) {
+): void {
   if (!{}.hasOwnProperty.call(opts, 'operators') || opts.operators !== false) {
-    _createOperatorsField(
-      itc,
-      `Operators${opts.filterTypeName || ''}`,
-      model,
-      opts.operators || {}
-    );
+    _createOperatorsField(itc, `Operators${itc.getTypeName() || ''}`, model, opts.operators || {});
   }
 
   itc.addFields({
@@ -38,7 +33,7 @@ export function addFilterOperators(
   });
 }
 
-export function processFilterOperators(filter: Record<string, any>) {
+export function processFilterOperators(filter: Record<string, any>): Record<string, any> {
   if (!filter) return filter;
   _prepareAndOrFilter(filter);
   if (filter[OPERATORS_FIELDNAME]) {
@@ -66,7 +61,7 @@ export function processFilterOperators(filter: Record<string, any>) {
   return filter;
 }
 
-export function _prepareAndOrFilter(filter: Record<'OR' | 'AND' | '$or' | '$and', any>) {
+export function _prepareAndOrFilter(filter: Record<'OR' | 'AND' | '$or' | '$and', any>): void {
   /* eslint-disable no-param-reassign */
   if (!filter.OR && !filter.AND) return;
 
