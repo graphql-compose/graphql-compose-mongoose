@@ -3,7 +3,6 @@ import type { Model, Document } from 'mongoose';
 import { getOrCreateErrorPayload } from '../utils/getOrCreateErrorPayload';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
-import { MongoInstance } from 'mongodb-memory-server';
 
 export default function createOne<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -91,7 +90,7 @@ export default function createOne<TSource = Document, TContext = any>(
         Object.keys(validationErrors.errors).forEach((key) => {
           errors.push({
             path: key,
-            messages: [validationErrors.errors[key].properties.message],
+            messages: [validationErrors.errors[key].message],
           });
         });
         return {

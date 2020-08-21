@@ -96,7 +96,7 @@ describe('createOne() ->', () => {
     it('should return payload.errors', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
         args: {
-          record: { valid: 'AlwaysFails' },
+          record: { valid: 'AlwaysFails', contacts: { email: 'mail' } },
         },
       });
       expect(result.errors).toEqual([
@@ -108,7 +108,7 @@ describe('createOne() ->', () => {
     it('should return empty payload.errors', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
         args: {
-          record: { n: 'foo' },
+          record: { n: 'foo', contacts: { email: 'mail' } },
         },
       });
       expect(result.errors).toEqual(null);

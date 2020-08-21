@@ -100,9 +100,9 @@ export default function updateById<TSource = Document, TContext = any>(
         doc.set(recordData);
 
         const validationErrors = doc.validateSync();
-        let errors: { 
-          path: string,
-          messages: string[]
+        let errors: {
+          path: string;
+          messages: string[];
         }[];
         if (validationErrors && validationErrors.errors) {
           errors = [];
