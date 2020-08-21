@@ -97,7 +97,7 @@ export default function updateOne<TSource = Document, TContext = any>(
         doc.set(recordData);
 
         const validationErrors = doc.validateSync();
-        let errors = null;
+        let errors: any[];
         if (validationErrors && validationErrors.errors) {
           errors = [];
           Object.keys(validationErrors.errors).forEach((key) => {
