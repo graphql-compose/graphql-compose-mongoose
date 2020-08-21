@@ -116,8 +116,20 @@ const UserSchema = new Schema(
       country: { type: String, index: true },
     },
 
-    // createdAt, created via option `timastamp: true` (see bottom)
-    // updatedAt, created via option `timastamp: true` (see bottom)
+    // for error payloads tests
+    valid: {
+      type: String,
+      required: false,
+      validate: [
+        () => {
+          return false;
+        },
+        'this is a validate message',
+      ],
+    },
+
+    // createdAt, created via option `timestamp: true` (see bottom)
+    // updatedAt, created via option `timestamp: true` (see bottom)
   },
   {
     timestamps: true, // add createdAt, updatedAt fields
