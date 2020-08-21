@@ -23,8 +23,9 @@ jobs:
         run: yarn test
         env:
           CI: true
-      - name: Build
-        run: yarn build
+      - name: Send codecov.io stats
+        if: matrix.node-version == '12.x'
+        run: bash <(curl -s https://codecov.io/bash) || echo ''
 
   publish:
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/alpha' || github.ref == 'refs/heads/beta'
@@ -45,5 +46,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Send codecov.io stats
-        run: yarn coverage && bash <(curl -s https://codecov.io/bash);
+
