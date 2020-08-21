@@ -1,5 +1,6 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
+import { getOrCreateErrorPayload } from '../utils/getOrCreateErrorPayload';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
 
@@ -22,6 +23,8 @@ export default function updateById<TSource = Document, TContext = any>(
 
   const findByIdResolver = findById(model, tc);
 
+  getOrCreateErrorPayload(tc);
+
   const outputTypeName = `UpdateById${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
@@ -32,6 +35,10 @@ export default function updateById<TSource = Document, TContext = any>(
       record: {
         type: tc,
         description: 'Updated document',
+      },
+      errors: {
+        type: '[ErrorPayload]',
+        description: 'Errors that may occur, typically validations',
       },
     });
   });
@@ -91,12 +98,34 @@ export default function updateById<TSource = Document, TContext = any>(
 
       if (recordData) {
         doc.set(recordData);
+
+        const validationErrors = doc.validateSync();
+        let errors: { 
+          path: string,
+          messages: string[]
+        }[];
+        if (validationErrors && validationErrors.errors) {
+          errors = [];
+          Object.keys(validationErrors.errors).forEach((key) => {
+            errors.push({
+              path: key,
+              messages: [validationErrors.errors[key].properties.message],
+            });
+          });
+          return {
+            record: null,
+            recordId: null,
+            errors,
+          };
+        }
+
         await doc.save();
       }
 
       return {
         record: doc,
         recordId: tc.getRecordIdFn()(doc),
+        errors: null,
       };
     }) as any,
   });

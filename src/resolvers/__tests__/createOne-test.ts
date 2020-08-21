@@ -93,6 +93,27 @@ describe('createOne() ->', () => {
       expect(result.record.id).toBe(result.recordId);
     });
 
+    it('should return payload.errors', async () => {
+      const result = await createOne(UserModel, UserTC).resolve({
+        args: {
+          record: { valid: 'AlwaysFails' },
+        },
+      });
+      expect(result.errors).toEqual([
+        { messages: ['Path `n` is required.'], path: 'n' },
+        { messages: ['this is a validate message'], path: 'valid' },
+      ]);
+    });
+
+    it('should return empty payload.errors', async () => {
+      const result = await createOne(UserModel, UserTC).resolve({
+        args: {
+          record: { n: 'foo' },
+        },
+      });
+      expect(result.errors).toEqual(null);
+    });
+
     it('should return mongoose document', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
         args: { record: { name: 'NewUser', contacts: { email: 'mail' } } },

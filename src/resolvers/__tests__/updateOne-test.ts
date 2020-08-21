@@ -134,6 +134,24 @@ describe('updateOne() ->', () => {
       expect(result.record.id).toBe(user1.id);
     });
 
+    it('should return empty payload.errors', async () => {
+      const result = await updateOne(UserModel, UserTC).resolve({
+        args: { filter: { _id: user1.id } },
+      });
+      expect(result.errors).toEqual(null);
+    });
+
+    it('should return payload.errors', async () => {
+      const result = await updateOne(UserModel, UserTC).resolve({
+        args: {
+          filter: { _id: user1.id },
+          record: { valid: 'AlwaysFails' },
+        },
+      });
+
+      expect(result.errors).toEqual([{ messages: ['this is a validate message'], path: 'valid' }]);
+    });
+
     it('should skip records', async () => {
       const result1 = await updateOne(UserModel, UserTC).resolve({
         args: {

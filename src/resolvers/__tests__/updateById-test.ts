@@ -100,6 +100,24 @@ describe('updateById() ->', () => {
       expect(result.recordId).toBe(user1.id);
     });
 
+    it('should return empty payload.errors', async () => {
+      const result = await updateById(UserModel, UserTC).resolve({
+        args: {
+          record: { _id: user1.id, name: 'some name' },
+        },
+      });
+      expect(result.errors).toEqual(null);
+    });
+
+    it('should return payload.errors', async () => {
+      const result = await updateById(UserModel, UserTC).resolve({
+        args: {
+          record: { _id: user1.id, name: 'some name', valid: 'AlwaysFails' },
+        },
+      });
+      expect(result.errors).toEqual([{ messages: ['this is a validate message'], path: 'valid' }]);
+    });
+
     it('should change data via args.record in model', async () => {
       const result = await updateById(UserModel, UserTC).resolve({
         args: {
