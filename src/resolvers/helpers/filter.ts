@@ -7,7 +7,7 @@ import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } f
 import type { ExtendedResolveParams } from '../index';
 import { FilterOperatorsOpts, addFilterOperators, processFilterOperators } from './filterOperators';
 import type { AliasesMap } from './aliases';
-import { makeFieldsRecursiveNullable } from 'src/utils/makeFieldsRecursiveNullable';
+import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
 
 export type FilterHelperArgsOpts = {
   prefix?: string;

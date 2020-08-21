@@ -8,9 +8,6 @@ module.exports = {
       diagnostics: false,
     },
   },
-  moduleNameMapper: {
-    '^src/(.*)$': '<rootDir>/src/$1',
-  },
   moduleFileExtensions: ['ts', 'js'],
   transform: {
     '^.+\\.ts$': 'ts-jest',

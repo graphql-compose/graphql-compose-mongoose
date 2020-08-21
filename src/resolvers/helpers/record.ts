@@ -3,7 +3,7 @@ import {
   ObjectTypeComposerArgumentConfigMapDefinition,
   InputTypeComposer,
 } from 'graphql-compose';
-import { makeFieldsRecursiveNullable } from 'src/utils/makeFieldsRecursiveNullable';
+import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
 
 export type RecordHelperArgsOpts = {
   prefix?: string;
