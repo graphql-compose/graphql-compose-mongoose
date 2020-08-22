@@ -110,6 +110,12 @@ const UserSchema = new Schema(
       },
     },
 
+    billingAddress: {
+      street: { type: String, index: true },
+      state: { type: String, index: true, enum: ['FL', 'MA', 'NY'] },
+      country: { type: String, index: true },
+    },
+
     // createdAt, created via option `timastamp: true` (see bottom)
     // updatedAt, created via option `timastamp: true` (see bottom)
   },

@@ -49,17 +49,6 @@ describe('Resolver helper `filter` ->', () => {
       expect(args.filter.type).toBeInstanceOf(InputTypeComposer);
     });
 
-    it('should return filter with field _ids', () => {
-      const args = filterHelperArgs(UserTC, UserModel, {
-        prefix: 'Filter',
-        suffix: 'Type',
-      });
-      const itc = args.filter.type as InputTypeComposer;
-      const ft = itc.getField('_ids').type as ListComposer<any>;
-      expect(ft).toBeInstanceOf(ListComposer);
-      expect(ft.ofType.getTypeName()).toBe('MongoID');
-    });
-
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
       const args = filterHelperArgs(UserTC, UserModel, {
         prefix: 'Filter',
@@ -167,17 +156,6 @@ describe('Resolver helper `filter` ->', () => {
       };
       filterHelper(resolveParams, aliases);
       expect(spyWhereFn).toBeCalledWith({ n: 'nodkz' });
-    });
-
-    it('should call query.where if args.filter provided with _ids', () => {
-      resolveParams.args = {
-        filter: {
-          age: 30,
-          _ids: [1, 2, 3],
-        },
-      };
-      filterHelper(resolveParams, aliases);
-      expect(spyWhereFn.mock.calls).toEqual([[{ _id: { $in: [1, 2, 3] } }], [{ age: 30 }]]);
     });
 
     it('should convert deep object in args.filter to dotted object', () => {

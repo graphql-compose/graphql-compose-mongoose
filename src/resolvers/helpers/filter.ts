@@ -70,10 +70,6 @@ export const filterHelperArgs = (
 
   makeFieldsRecursiveNullable(itc, { prefix, suffix });
 
-  itc.addFields({
-    _ids: [GraphQLMongoID],
-  });
-
   itc.removeField(removeFields);
 
   if (opts.requiredFields) {
