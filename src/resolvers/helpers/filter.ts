@@ -2,7 +2,6 @@
 
 import { ObjectTypeComposer, ObjectTypeComposerArgumentConfigMap } from 'graphql-compose';
 import type { Model } from 'mongoose';
-import GraphQLMongoID from '../../types/mongoid';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
 import { FilterOperatorsOpts, addFilterOperators, processFilterOperators } from './filterOperators';

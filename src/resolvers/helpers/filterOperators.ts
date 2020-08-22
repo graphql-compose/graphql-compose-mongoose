@@ -145,7 +145,7 @@ export function _recurseSchema(
 ): void {
   const { schemaComposer } = sourceITC;
 
-  Object.keys(sourceITC.getFields()).forEach((fieldName) => {
+  Object.keys(sourceITC.getFields()).forEach((fieldName: string) => {
     const fieldTC = sourceITC.getFieldTC(fieldName);
     const fieldType = sourceITC.getFieldTC(fieldName).getType();
 
@@ -178,7 +178,7 @@ export function _recurseSchema(
         Object.keys(operatorsOpts[fieldName]).length >= 1) ||
       (operatorsOpts && Array.isArray(operatorsOpts[fieldName]));
     const operatorsConfig = hasOperatorsConfig
-      ? operatorsOpts[fieldName]
+      ? operatorsOpts && operatorsOpts[fieldName]
       : !(operatorsOpts === false);
 
     // prevent infinite recursion
