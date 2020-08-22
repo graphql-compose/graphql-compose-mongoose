@@ -3,7 +3,6 @@ import {
   ObjectTypeComposer,
   InputTypeComposer,
   NonNullComposer,
-  ListComposer,
 } from 'graphql-compose';
 import { filterHelperArgs, filterHelper } from '../filter';
 import { OPERATORS_FIELDNAME } from '../filterOperators';

@@ -12,11 +12,10 @@ import { toMongoFilterDottedObject } from '../../../utils/toMongoDottedObject';
 import { UserModel } from '../../../__mocks__/userModel';
 
 let itc: InputTypeComposer<any>;
-let addressItc: InputTypeComposer<any>;
 
 beforeEach(() => {
   schemaComposer.clear();
-  addressItc = schemaComposer.createInputTC({
+  schemaComposer.createInputTC({
     name: 'BillingAddressUserFieldInput',
     fields: {
       street: 'String',
@@ -61,7 +60,7 @@ describe('Resolver helper `filter` ->', () => {
       _createOperatorsField(itc, 'OperatorsTypeName', UserModel, {
         age: ['lt', 'gte'],
         billingAddress: { country: ['nin'], state: ['in'] },
-      });
+      } as any);
       const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
       const billingAddressTC = operatorsTC.getFieldITC('billingAddress');
 
@@ -120,8 +119,8 @@ describe('Resolver helper `filter` ->', () => {
       const fields = itc.getFieldNames();
       expect(fields).toEqual(expect.arrayContaining(['name']));
       expect(itc.hasField('_operators')).toBe(true);
-      expect(itc.getFieldTC('_operators').getFieldNames()).toEqual(['name']);
-      expect(itc.getFieldTC('_operators').getFieldTC('name').getFieldNames()).toEqual(['exists']);
+      expect(itc.getFieldITC('_operators').getFieldNames()).toEqual(['name']);
+      expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);
     });
     it('should respect operators configuration and allow onlyIndexed', () => {
       // By default when using onlyIndex, add all indexed fields, then if operators are supplied allow them as well
@@ -129,9 +128,9 @@ describe('Resolver helper `filter` ->', () => {
       const fields = itc.getFieldNames();
       expect(fields).toEqual(expect.arrayContaining(['name']));
       expect(itc.hasField('_operators')).toBe(true);
-      expect(itc.getFieldTC('_operators').getFieldNames()).toEqual(['_id', 'employment', 'name']);
-      expect(itc.getFieldTC('_operators').getFieldTC('name').getFieldNames()).toEqual(['exists']);
-      expect(itc.getFieldTC('_operators').getFieldTC('employment').getFieldNames()).toEqual([
+      expect(itc.getFieldITC('_operators').getFieldNames()).toEqual(['_id', 'employment', 'name']);
+      expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);
+      expect(itc.getFieldITC('_operators').getFieldITC('employment').getFieldNames()).toEqual([
         'gt',
         'gte',
         'lt',
@@ -142,7 +141,9 @@ describe('Resolver helper `filter` ->', () => {
         'regex',
         'exists',
       ]);
-      expect(itc.getFieldTC('_operators').getFields()).toEqual(expect.not.arrayContaining(['age']));
+      expect(itc.getFieldITC('_operators').getFields()).toEqual(
+        expect.not.arrayContaining(['age'])
+      );
     });
   });
 
