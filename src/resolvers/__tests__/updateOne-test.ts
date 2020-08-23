@@ -149,7 +149,7 @@ describe('updateOne() ->', () => {
         },
       });
 
-      expect(result.errors).toEqual([{ messages: ['this is a validate message'], path: 'valid' }]);
+      expect(result.errors).toEqual([{ message: 'this is a validate message', path: 'valid' }]);
     });
 
     it('should skip records', async () => {

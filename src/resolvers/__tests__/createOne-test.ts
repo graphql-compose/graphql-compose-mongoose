@@ -100,8 +100,8 @@ describe('createOne() ->', () => {
         },
       });
       expect(result.errors).toEqual([
-        { messages: ['Path `n` is required.'], path: 'n' },
-        { messages: ['this is a validate message'], path: 'valid' },
+        { message: 'Path `n` is required.', path: 'n' },
+        { message: 'this is a validate message', path: 'valid' },
       ]);
     });
 

@@ -115,7 +115,7 @@ describe('updateById() ->', () => {
           record: { _id: user1.id, name: 'some name', valid: 'AlwaysFails' },
         },
       });
-      expect(result.errors).toEqual([{ messages: ['this is a validate message'], path: 'valid' }]);
+      expect(result.errors).toEqual([{ message: 'this is a validate message', path: 'valid' }]);
     });
 
     it('should change data via args.record in model', async () => {
