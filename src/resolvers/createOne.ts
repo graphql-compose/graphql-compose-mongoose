@@ -1,6 +1,6 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { getOrCreateErrorPayload } from '../utils/getOrCreateErrorPayload';
+import { getOrCreateErrorInterface } from '../utils/getOrCreateErrorInterface';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
@@ -30,7 +30,7 @@ export default function createOne<TSource = Document, TContext = any>(
     }
   }
 
-  getOrCreateErrorPayload(tc);
+  getOrCreateErrorInterface(tc);
 
   const outputTypeName = `CreateOne${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
@@ -44,8 +44,8 @@ export default function createOne<TSource = Document, TContext = any>(
         description: 'Created document',
       },
       errors: {
-        type: '[ErrorPayload]',
-        description: 'Errors that may occur, typically validations',
+        type: '[ErrorInterface]',
+        description: 'Errors that may occur',
       },
     });
   });
@@ -81,16 +81,15 @@ export default function createOne<TSource = Document, TContext = any>(
       }
 
       const validationErrors = doc.validateSync();
-      let errors: {
+      const errors: {
         path: string;
-        messages: string[];
-      }[];
+        message: string;
+      }[] = [];
       if (validationErrors && validationErrors.errors) {
-        errors = [];
         Object.keys(validationErrors.errors).forEach((key) => {
           errors.push({
             path: key,
-            messages: [validationErrors.errors[key].message],
+            message: validationErrors.errors[key].message,
           });
         });
         return {
