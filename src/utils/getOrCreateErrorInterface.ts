@@ -25,6 +25,10 @@ export function getOrCreateErrorInterface(tc: ObjectTypeComposer): InterfaceType
           description: 'Source of the validation error from the model path',
           type: 'String',
         },
+        value: {
+          description: 'Field value which occurs the validation error',
+          type: 'JSON',
+        },
       });
       otc.addInterface(errorInterface);
     }

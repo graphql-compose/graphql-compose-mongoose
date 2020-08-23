@@ -1,8 +1,9 @@
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer, mapEachKey } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { getOrCreateErrorInterface } from '../utils/getOrCreateErrorInterface';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { GraphQLError } from 'graphql';
 
 export default function createOne<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -84,12 +85,36 @@ export default function createOne<TSource = Document, TContext = any>(
       const errors: {
         path: string;
         message: string;
+        value: any;
       }[] = [];
+
       if (validationErrors && validationErrors.errors) {
+        if (!resolveParams?.projection?.errors) {
+          // if client does not request `errors` field we throw Exception on to level
+          throw new GraphQLError(
+            validationErrors.message,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            {
+              validationErrors: mapEachKey(validationErrors.errors, (e: any) => {
+                return {
+                  path: e.path,
+                  message: e.message,
+                  value: e.value,
+                };
+              }),
+            }
+          );
+        }
         Object.keys(validationErrors.errors).forEach((key) => {
+          const { message, value } = validationErrors.errors[key];
           errors.push({
             path: key,
-            message: validationErrors.errors[key].message,
+            message,
+            value,
           });
         });
         return {

@@ -98,11 +98,26 @@ describe('createOne() ->', () => {
         args: {
           record: { valid: 'AlwaysFails', contacts: { email: 'mail' } },
         },
+        projection: {
+          errors: true,
+        },
       });
       expect(result.errors).toEqual([
-        { message: 'Path `n` is required.', path: 'n' },
-        { message: 'this is a validate message', path: 'valid' },
+        { message: 'Path `n` is required.', path: 'n', value: undefined },
+        { message: 'this is a validate message', path: 'valid', value: 'AlwaysFails' },
       ]);
+    });
+
+    it('should throw GraphQLError if client does not request errors field in payload', async () => {
+      await expect(
+        createOne(UserModel, UserTC).resolve({
+          args: {
+            record: { valid: 'AlwaysFails', contacts: { email: 'mail' } },
+          },
+        })
+      ).rejects.toThrowError(
+        'User validation failed: n: Path `n` is required., valid: this is a validate message'
+      );
     });
 
     it('should return empty payload.errors', async () => {
