@@ -147,9 +147,24 @@ describe('updateOne() ->', () => {
           filter: { _id: user1.id },
           record: { valid: 'AlwaysFails' },
         },
+        projection: {
+          errors: true,
+        },
       });
+      expect(result.errors).toEqual([
+        { message: 'this is a validate message', path: 'valid', value: 'AlwaysFails' },
+      ]);
+    });
 
-      expect(result.errors).toEqual([{ message: 'this is a validate message', path: 'valid' }]);
+    it('should throw GraphQLError if client does not request errors field in payload', async () => {
+      await expect(
+        updateOne(UserModel, UserTC).resolve({
+          args: {
+            filter: { _id: user1.id },
+            record: { valid: 'AlwaysFails' },
+          },
+        })
+      ).rejects.toThrowError('User validation failed: valid: this is a validate message');
     });
 
     it('should skip records', async () => {
