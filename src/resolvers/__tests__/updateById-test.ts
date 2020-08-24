@@ -114,8 +114,23 @@ describe('updateById() ->', () => {
         args: {
           record: { _id: user1.id, name: 'some name', valid: 'AlwaysFails' },
         },
+        projection: {
+          errors: true,
+        },
       });
-      expect(result.errors).toEqual([{ message: 'this is a validate message', path: 'valid' }]);
+      expect(result.errors).toEqual([
+        { message: 'this is a validate message', path: 'valid', value: 'AlwaysFails' },
+      ]);
+    });
+
+    it('should throw GraphQLError if client does not request errors field in payload', async () => {
+      await expect(
+        updateById(UserModel, UserTC).resolve({
+          args: {
+            record: { _id: user1.id, name: 'some name', valid: 'AlwaysFails' },
+          },
+        })
+      ).rejects.toThrowError('User validation failed: valid: this is a validate message');
     });
 
     it('should change data via args.record in model', async () => {

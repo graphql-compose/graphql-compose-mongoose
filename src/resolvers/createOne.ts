@@ -81,7 +81,9 @@ export default function createOne<TSource = Document, TContext = any>(
         if (!doc) return null;
       }
 
-      const validationErrors = doc.validateSync();
+      const validationErrors: any = await new Promise(function (resolve) {
+        doc.validate(null, null, resolve);
+      });
       const errors: {
         path: string;
         message: string;

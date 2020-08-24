@@ -1,8 +1,9 @@
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer, mapEachKey } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { getOrCreateErrorInterface } from '../utils/getOrCreateErrorInterface';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
+import { GraphQLError } from 'graphql';
 
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
@@ -81,6 +82,8 @@ export default function updateById<TSource = Document, TContext = any>(
       resolveParams.args._id = recordData._id;
       delete recordData._id;
 
+      // this feels weird
+      const requestsErrors: any = resolveParams?.projection?.errors;
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
@@ -99,17 +102,42 @@ export default function updateById<TSource = Document, TContext = any>(
       if (recordData) {
         doc.set(recordData);
 
-        const validationErrors = doc.validateSync();
-        let errors: {
+        const validationErrors: any = await new Promise(function (resolve) {
+          doc.validate(null, null, resolve);
+        });
+        const errors: {
           path: string;
           message: string;
-        }[];
+          value: any;
+        }[] = [];
+
         if (validationErrors && validationErrors.errors) {
-          errors = [];
+          if (!requestsErrors) {
+            // if client does not request `errors` field we throw Exception on to level
+            throw new GraphQLError(
+              validationErrors.message,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              undefined,
+              {
+                validationErrors: mapEachKey(validationErrors.errors, (e: any) => {
+                  return {
+                    path: e.path,
+                    message: e.message,
+                    value: e.value,
+                  };
+                }),
+              }
+            );
+          }
           Object.keys(validationErrors.errors).forEach((key) => {
+            const { message, value } = validationErrors.errors[key];
             errors.push({
               path: key,
-              message: validationErrors.errors[key].properties.message,
+              message,
+              value,
             });
           });
           return {
@@ -117,16 +145,17 @@ export default function updateById<TSource = Document, TContext = any>(
             recordId: null,
             errors,
           };
+        } else {
+          await doc.save();
+          return {
+            record: doc,
+            recordId: tc.getRecordIdFn()(doc),
+            errors: null,
+          };
         }
-
-        await doc.save();
       }
 
-      return {
-        record: doc,
-        recordId: tc.getRecordIdFn()(doc),
-        errors: null,
-      };
+      return null;
     }) as any,
   });
 
