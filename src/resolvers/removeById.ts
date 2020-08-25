@@ -2,6 +2,7 @@ import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import findById from './findById';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 
 export default function removeById<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -46,18 +47,16 @@ export default function removeById<TSource = Document, TContext = any>(
       _id: 'MongoID!',
     },
     resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const args = resolveParams.args || {};
+      const _id = resolveParams?.args?._id;
 
-      if (!args._id) {
+      if (!_id) {
         throw new Error(`${tc.getTypeName()}.removeById resolver requires args._id value`);
       }
 
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      resolveParams.projection = {};
-
-      let doc = await findByIdResolver.resolve(resolveParams);
+      let doc = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
@@ -74,6 +73,8 @@ export default function removeById<TSource = Document, TContext = any>(
       return null;
     }) as any,
   });
+
+  addErrorCatcherField(resolver);
 
   return resolver as any;
 }

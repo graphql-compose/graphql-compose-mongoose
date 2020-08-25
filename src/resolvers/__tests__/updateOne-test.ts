@@ -134,26 +134,42 @@ describe('updateOne() ->', () => {
       expect(result.record.id).toBe(user1.id);
     });
 
-    it('should return empty payload.errors', async () => {
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = updateOne(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('requires at least one value in args.filter'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError(
+        'requires at least one value in args.filter'
+      );
+    });
+
+    it('should return empty payload.error', async () => {
       const result = await updateOne(UserModel, UserTC).resolve({
         args: { filter: { _id: user1.id } },
       });
-      expect(result.errors).toEqual(null);
+      expect(result.error).toEqual(undefined);
     });
 
-    it('should return payload.errors', async () => {
+    it('should return payload.error', async () => {
       const result = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { _id: user1.id },
           record: { valid: 'AlwaysFails' },
         },
         projection: {
-          errors: true,
+          error: true,
         },
       });
-      expect(result.errors).toEqual([
-        { message: 'this is a validate message', path: 'valid', value: 'AlwaysFails' },
-      ]);
+      expect(result.error).toEqual({
+        message: 'this is a validate message',
+        path: 'valid',
+        value: 'AlwaysFails',
+      });
     });
 
     it('should throw GraphQLError if client does not request errors field in payload', async () => {

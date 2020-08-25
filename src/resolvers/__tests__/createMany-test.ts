@@ -104,6 +104,20 @@ describe('createMany() ->', () => {
       expect(result.records[1].name).toBe('newName1');
     });
 
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = createMany(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('requires args.records to be an Array'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError(
+        'requires args.records to be an Array'
+      );
+    });
+
     it('should save documents to database', async () => {
       const checkedName = 'nameForMongoDB';
       const res = await createMany(UserModel, UserTC).resolve({

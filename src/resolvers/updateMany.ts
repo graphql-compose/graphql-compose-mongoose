@@ -16,6 +16,7 @@ import {
 import { toMongoDottedObject } from '../utils/toMongoDottedObject';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
+import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 
 export default function updateMany<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -75,13 +76,12 @@ export default function updateMany<TSource = Document, TContext = any>(
       }),
     },
     resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || {};
+      const recordData = resolveParams?.args?.record;
 
       if (!(typeof recordData === 'object') || Object.keys(recordData).length === 0) {
         return Promise.reject(
           new Error(
-            `${tc.getTypeName()}.updateMany resolver requires ` +
-              'at least one value in args.record'
+            `${tc.getTypeName()}.updateMany resolver requires at least one value in args.record`
           )
         );
       }
@@ -120,6 +120,8 @@ export default function updateMany<TSource = Document, TContext = any>(
       throw new Error(JSON.stringify(res));
     }) as any,
   });
+
+  addErrorCatcherField(resolver);
 
   return resolver;
 }

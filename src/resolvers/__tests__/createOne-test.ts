@@ -93,19 +93,36 @@ describe('createOne() ->', () => {
       expect(result.record.id).toBe(result.recordId);
     });
 
-    it('should return payload.errors', async () => {
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = createOne(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('requires at least one value in args'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError(
+        'requires at least one value in args'
+      );
+    });
+
+    it('should return validation error in payload.error', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
         args: {
           record: { valid: 'AlwaysFails', contacts: { email: 'mail' } },
         },
         projection: {
-          errors: true,
+          error: true,
         },
       });
-      expect(result.errors).toEqual([
-        { message: 'Path `n` is required.', path: 'n', value: undefined },
-        { message: 'this is a validate message', path: 'valid', value: 'AlwaysFails' },
-      ]);
+      // TODO: FIX error
+      expect(result.error).toEqual(
+        [
+          { message: 'Path `n` is required.', path: 'n', value: undefined },
+          { message: 'this is a validate message', path: 'valid', value: 'AlwaysFails' },
+        ][0] // <---- [0] remove after preparation correct ValidationErrorsType
+      );
     });
 
     it('should throw GraphQLError if client does not request errors field in payload', async () => {
@@ -120,13 +137,13 @@ describe('createOne() ->', () => {
       );
     });
 
-    it('should return empty payload.errors', async () => {
+    it('should return empty payload.error', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
         args: {
           record: { n: 'foo', contacts: { email: 'mail' } },
         },
       });
-      expect(result.errors).toEqual(null);
+      expect(result.error).toEqual(undefined);
     });
 
     it('should return mongoose document', async () => {

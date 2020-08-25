@@ -1,7 +1,9 @@
-import type { ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import type { ObjectTypeComposer, InterfaceTypeComposer, SchemaComposer } from 'graphql-compose';
 
-export function getOrCreateErrorInterface(tc: ObjectTypeComposer): InterfaceTypeComposer {
-  const errorInterface: InterfaceTypeComposer = tc.schemaComposer.getOrCreateIFTC(
+export function getOrCreateErrorInterface(
+  schemaComposer: SchemaComposer<any>
+): InterfaceTypeComposer {
+  const errorInterface: InterfaceTypeComposer = schemaComposer.getOrCreateIFTC(
     'ErrorInterface',
     (iftc: InterfaceTypeComposer) => {
       iftc.addFields({
@@ -13,7 +15,7 @@ export function getOrCreateErrorInterface(tc: ObjectTypeComposer): InterfaceType
     }
   );
 
-  const validationErrorOTC: ObjectTypeComposer = tc.schemaComposer.getOrCreateOTC(
+  const validationErrorOTC: ObjectTypeComposer = schemaComposer.getOrCreateOTC(
     'ValidationError',
     (otc: ObjectTypeComposer) => {
       otc.addFields({
@@ -33,9 +35,9 @@ export function getOrCreateErrorInterface(tc: ObjectTypeComposer): InterfaceType
       otc.addInterface(errorInterface);
     }
   );
-  tc.schemaComposer.addSchemaMustHaveType(validationErrorOTC);
+  schemaComposer.addSchemaMustHaveType(validationErrorOTC);
 
-  const runtimeErrorOTC: ObjectTypeComposer = tc.schemaComposer.getOrCreateOTC(
+  const runtimeErrorOTC: ObjectTypeComposer = schemaComposer.getOrCreateOTC(
     'RuntimeError',
     (otc: ObjectTypeComposer) => {
       otc.addFields({
@@ -47,9 +49,9 @@ export function getOrCreateErrorInterface(tc: ObjectTypeComposer): InterfaceType
       otc.addInterface(errorInterface);
     }
   );
-  tc.schemaComposer.addSchemaMustHaveType(runtimeErrorOTC);
+  schemaComposer.addSchemaMustHaveType(runtimeErrorOTC);
 
-  const mongoErrorOTC: ObjectTypeComposer = tc.schemaComposer.getOrCreateOTC(
+  const mongoErrorOTC: ObjectTypeComposer = schemaComposer.getOrCreateOTC(
     'MongoError',
     (otc: ObjectTypeComposer) => {
       otc.addFields({
@@ -65,7 +67,7 @@ export function getOrCreateErrorInterface(tc: ObjectTypeComposer): InterfaceType
       otc.addInterface(errorInterface);
     }
   );
-  tc.schemaComposer.addSchemaMustHaveType(mongoErrorOTC);
+  schemaComposer.addSchemaMustHaveType(mongoErrorOTC);
 
   const resolveType = (value: any) => {
     if (value) {

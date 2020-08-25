@@ -72,6 +72,18 @@ describe('removeById() ->', () => {
       expect(result.recordId).toBe(user.id);
     });
 
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = removeById(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('resolver requires args._id'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError('resolver requires args._id');
+    });
+
     it('should remove document in database', async () => {
       await removeById(UserModel, UserTC).resolve({
         args: {

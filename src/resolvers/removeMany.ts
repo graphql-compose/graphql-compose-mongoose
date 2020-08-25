@@ -3,6 +3,7 @@ import type { Model, Document } from 'mongoose';
 import { filterHelperArgs, filterHelper, prepareAliases } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
+import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 
 export default function removeMany<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -48,7 +49,7 @@ export default function removeMany<TSource = Document, TContext = any>(
       }),
     },
     resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const filterData = (resolveParams.args && resolveParams.args.filter) || {};
+      const filterData = resolveParams?.args?.filter;
 
       if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
         throw new Error(
@@ -86,6 +87,8 @@ export default function removeMany<TSource = Document, TContext = any>(
       throw new Error(JSON.stringify(res));
     }) as any,
   });
+
+  addErrorCatcherField(resolver);
 
   return resolver as any;
 }
