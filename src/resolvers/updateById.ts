@@ -1,10 +1,9 @@
 import { Resolver, ObjectTypeComposer, mapEachKey } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { getOrCreateErrorInterface } from '../utils/getOrCreateErrorInterface';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
 import { GraphQLError } from 'graphql';
-
+import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 
 export default function updateById<TSource = Document, TContext = any>(
@@ -22,8 +21,6 @@ export default function updateById<TSource = Document, TContext = any>(
     );
   }
 
-  getOrCreateErrorInterface(tc);
-
   const findByIdResolver = findById(model, tc);
 
   const outputTypeName = `UpdateById${tc.getTypeName()}Payload`;
@@ -36,10 +33,6 @@ export default function updateById<TSource = Document, TContext = any>(
       record: {
         type: tc,
         description: 'Updated document',
-      },
-      errors: {
-        type: '[ErrorInterface]',
-        description: 'Errors that may occur',
       },
     });
   });
@@ -65,7 +58,7 @@ export default function updateById<TSource = Document, TContext = any>(
       }),
     },
     resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || {};
+      const recordData = resolveParams?.args?.record;
 
       if (!(typeof recordData === 'object')) {
         return Promise.reject(
@@ -82,14 +75,10 @@ export default function updateById<TSource = Document, TContext = any>(
       resolveParams.args._id = recordData._id;
       delete recordData._id;
 
-      // this feels weird
-      const requestsErrors: any = resolveParams?.projection?.errors;
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      resolveParams.projection = {};
-
-      let doc = await findByIdResolver.resolve(resolveParams);
+      let doc = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
@@ -112,7 +101,7 @@ export default function updateById<TSource = Document, TContext = any>(
         }[] = [];
 
         if (validationErrors && validationErrors.errors) {
-          if (!requestsErrors) {
+          if (!resolveParams?.projection?.error) {
             // if client does not request `errors` field we throw Exception on to level
             throw new GraphQLError(
               validationErrors.message,
@@ -143,14 +132,13 @@ export default function updateById<TSource = Document, TContext = any>(
           return {
             record: null,
             recordId: null,
-            errors,
+            error: errors[0], // TODO: refactor: wrap all validation errors inside on Error object
           };
         } else {
           await doc.save();
           return {
             record: doc,
             recordId: tc.getRecordIdFn()(doc),
-            errors: null,
           };
         }
       }
@@ -158,6 +146,8 @@ export default function updateById<TSource = Document, TContext = any>(
       return null;
     }) as any,
   });
+
+  addErrorCatcherField(resolver);
 
   return resolver;
 }

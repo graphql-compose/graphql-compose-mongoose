@@ -2,6 +2,7 @@ import type { ObjectTypeComposer, Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 
 async function createSingle(
   model: Model<any>,
@@ -80,7 +81,7 @@ export default function createMany<TSource = Document, TContext = any>(
       },
     },
     resolve: async (resolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.records) || [];
+      const recordData = resolveParams?.args?.records;
 
       if (!Array.isArray(recordData) || recordData.length === 0) {
         throw new Error(
@@ -120,6 +121,8 @@ export default function createMany<TSource = Document, TContext = any>(
       return returnObj;
     },
   });
+
+  addErrorCatcherField(resolver);
 
   return resolver;
 }

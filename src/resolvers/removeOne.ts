@@ -3,6 +3,7 @@ import type { Model, Document } from 'mongoose';
 import { filterHelperArgs, sortHelperArgs } from './helpers';
 import findOne from './findOne';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 
 export default function removeOne<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -55,7 +56,7 @@ export default function removeOne<TSource = Document, TContext = any>(
       }),
     },
     resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const filterData = (resolveParams.args && resolveParams.args.filter) || {};
+      const filterData = resolveParams?.args?.filter;
 
       if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
         return Promise.reject(
@@ -88,6 +89,8 @@ export default function removeOne<TSource = Document, TContext = any>(
       return null;
     }) as any,
   });
+
+  addErrorCatcherField(resolver);
 
   return resolver as any;
 }

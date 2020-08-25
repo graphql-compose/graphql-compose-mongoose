@@ -1,9 +1,9 @@
 import { Resolver, ObjectTypeComposer, mapEachKey } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { getOrCreateErrorInterface } from '../utils/getOrCreateErrorInterface';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { GraphQLError } from 'graphql';
+import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 
 export default function createOne<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -31,8 +31,6 @@ export default function createOne<TSource = Document, TContext = any>(
     }
   }
 
-  getOrCreateErrorInterface(tc);
-
   const outputTypeName = `CreateOne${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
@@ -43,10 +41,6 @@ export default function createOne<TSource = Document, TContext = any>(
       record: {
         type: tc,
         description: 'Created document',
-      },
-      errors: {
-        type: '[ErrorInterface]',
-        description: 'Errors that may occur',
       },
     });
   });
@@ -67,7 +61,7 @@ export default function createOne<TSource = Document, TContext = any>(
       }),
     },
     resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || {};
+      const recordData = resolveParams?.args?.record;
 
       if (!(typeof recordData === 'object') || Object.keys(recordData).length === 0) {
         throw new Error(
@@ -91,7 +85,7 @@ export default function createOne<TSource = Document, TContext = any>(
       }[] = [];
 
       if (validationErrors && validationErrors.errors) {
-        if (!resolveParams?.projection?.errors) {
+        if (!resolveParams?.projection?.error) {
           // if client does not request `errors` field we throw Exception on to level
           throw new GraphQLError(
             validationErrors.message,
@@ -122,18 +116,19 @@ export default function createOne<TSource = Document, TContext = any>(
         return {
           record: null,
           recordId: null,
-          errors,
+          error: errors[0], // TODO: refactor: wrap all validation errors inside on Error object
         };
       } else {
         await doc.save();
         return {
           record: doc,
           recordId: tc.getRecordIdFn()(doc),
-          errors: null,
         };
       }
     }) as any,
   });
+
+  addErrorCatcherField(resolver);
 
   return resolver;
 }

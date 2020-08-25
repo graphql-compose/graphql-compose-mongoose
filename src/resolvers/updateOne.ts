@@ -1,10 +1,10 @@
 import { Resolver, ObjectTypeComposer, mapEachKey } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
-import { getOrCreateErrorInterface } from '../utils/getOrCreateErrorInterface';
 import { skipHelperArgs, recordHelperArgs, filterHelperArgs, sortHelperArgs } from './helpers';
 import findOne from './findOne';
 import { GraphQLError } from 'graphql';
+import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 
 export default function updateOne<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -21,8 +21,6 @@ export default function updateOne<TSource = Document, TContext = any>(
   }
 
   const findOneResolver = findOne(model, tc, opts);
-
-  getOrCreateErrorInterface(tc);
 
   const outputTypeName = `UpdateOne${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
@@ -73,8 +71,8 @@ export default function updateOne<TSource = Document, TContext = any>(
       ...skipHelperArgs(),
     },
     resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || null;
-      const filterData = (resolveParams.args && resolveParams.args.filter) || {};
+      const recordData = resolveParams?.args?.record;
+      const filterData = resolveParams?.args?.filter;
 
       if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
         return Promise.reject(
@@ -84,14 +82,10 @@ export default function updateOne<TSource = Document, TContext = any>(
         );
       }
 
-      // this feels weird
-      const requestsErrors: any = resolveParams?.projection?.errors;
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      resolveParams.projection = {};
-
-      let doc = await findOneResolver.resolve(resolveParams);
+      let doc = await findOneResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
@@ -110,7 +104,7 @@ export default function updateOne<TSource = Document, TContext = any>(
         }[] = [];
 
         if (validationErrors && validationErrors.errors) {
-          if (!requestsErrors) {
+          if (!resolveParams?.projection?.error) {
             // if client does not request `errors` field we throw Exception on to level
             throw new GraphQLError(
               validationErrors.message,
@@ -141,14 +135,13 @@ export default function updateOne<TSource = Document, TContext = any>(
           return {
             record: null,
             recordId: null,
-            errors,
+            error: errors[0], // TODO: refactor: wrap all validation errors inside on Error object
           };
         } else {
           await doc.save();
           return {
             record: doc,
             recordId: tc.getRecordIdFn()(doc),
-            errors: null,
           };
         }
       }
@@ -157,13 +150,14 @@ export default function updateOne<TSource = Document, TContext = any>(
         return {
           record: doc,
           recordId: tc.getRecordIdFn()(doc),
-          errors: null,
         };
       }
 
       return null;
     }) as any,
   });
+
+  addErrorCatcherField(resolver);
 
   return resolver;
 }

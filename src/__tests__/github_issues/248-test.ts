@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { schemaComposer, graphql } from 'graphql-compose';
@@ -45,7 +43,7 @@ describe("issue #248 - payloads' errors", () => {
   });
   const schema = schemaComposer.buildSchema();
 
-  it('check errors in payload if errors field requested', async () => {
+  it('catch resolver error in payload if `error` field was requested by client', async () => {
     const res = await graphql.graphql({
       schema,
       source: `
@@ -54,7 +52,7 @@ describe("issue #248 - payloads' errors", () => {
             record { 
               name
             }
-            errors {
+            error {
               __typename
               message
               ... on ValidationError {
@@ -71,14 +69,12 @@ describe("issue #248 - payloads' errors", () => {
       data: {
         createOne: {
           record: null,
-          errors: [
-            {
-              __typename: 'ValidationError',
-              message: 'this is a validate message',
-              path: 'someStrangeField',
-              value: 'Test',
-            },
-          ],
+          error: {
+            __typename: 'ValidationError',
+            message: 'this is a validate message',
+            path: 'someStrangeField',
+            value: 'Test',
+          },
         },
       },
     });

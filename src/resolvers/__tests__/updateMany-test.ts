@@ -119,6 +119,18 @@ describe('updateMany() ->', () => {
       expect(result.numAffected).toBe(2);
     });
 
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = updateMany(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('at least one value in args.record'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError('at least one value in args.record');
+    });
+
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
       let beforeQueryCalled = false;
       const result = await updateMany(UserModel, UserTC).resolve({

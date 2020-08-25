@@ -110,6 +110,20 @@ describe('removeMany() ->', () => {
       expect(result.numAffected).toBe(2);
     });
 
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = removeMany(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('requires at least one value in args.filter'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError(
+        'requires at least one value in args.filter'
+      );
+    });
+
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
       let beforeQueryCalled = false;
       const result = await removeMany(UserModel, UserTC).resolve({
