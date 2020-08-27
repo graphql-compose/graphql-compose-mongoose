@@ -60,7 +60,7 @@ describe('removeById() ->', () => {
 
     it('should rejected with Error if args._id is empty', async () => {
       const result = removeById(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow('User.removeById resolver requires args._id value');
     });
 
     it('should return payload.recordId', async () => {
@@ -156,7 +156,7 @@ describe('removeById() ->', () => {
           return record;
         },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow('Denied due context ReadOnly');
       const exist = await UserModel.collection.findOne({ _id: user._id });
       expect(exist.n).toBe(user.name);
     });

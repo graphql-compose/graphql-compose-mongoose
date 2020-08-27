@@ -51,7 +51,9 @@ describe('createOne() ->', () => {
 
     it('should rejected with Error if args.record is empty', async () => {
       const result = createOne(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.createOne resolver requires at least one value in args.record'
+      );
     });
 
     it('should return payload.recordId', async () => {

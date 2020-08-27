@@ -91,7 +91,9 @@ describe('updateOne() ->', () => {
 
     it('should rejected with Error if args.filter is empty', async () => {
       const result = updateOne(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.updateOne resolver requires at least one value in args.filter'
+      );
     });
 
     it('should return payload.recordId', async () => {
@@ -265,7 +267,7 @@ describe('updateOne() ->', () => {
           return record;
         },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow('Denied due context ReadOnly');
       const exist = await UserModel.collection.findOne({ _id: user1._id });
       expect(exist.n).toBe(user1.name);
     });

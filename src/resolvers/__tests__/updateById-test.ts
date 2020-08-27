@@ -88,7 +88,9 @@ describe('updateById() ->', () => {
       const result = updateById(UserModel, UserTC).resolve({
         args: { record: {} },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.updateById resolver requires args.record._id value'
+      );
     });
 
     it('should return payload.recordId', async () => {
@@ -232,7 +234,7 @@ describe('updateById() ->', () => {
           return record;
         },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow('Denied due context ReadOnly');
       const exist = await UserModel.collection.findOne({ _id: user1._id });
       expect(exist.n).toBe(user1.name);
     });

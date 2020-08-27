@@ -176,7 +176,9 @@ describe('removeOne() ->', () => {
 
     it('should rejected with Error if args.filter is empty', async () => {
       const result = removeOne(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.removeOne resolver requires at least one value in args.filter'
+      );
     });
 
     it('should call `beforeRecordMutate` method with founded `record` and `resolveParams` as args', async () => {
@@ -209,7 +211,7 @@ describe('removeOne() ->', () => {
           return record;
         },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow('Denied due context ReadOnly');
       const exist = await UserModel.collection.findOne({ _id: user1._id });
       expect(exist.n).toBe(user1.name);
     });
