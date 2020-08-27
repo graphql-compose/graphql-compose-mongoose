@@ -93,7 +93,9 @@ describe('updateMany() ->', () => {
 
     it('should rejected with Error if args.record is empty', async () => {
       const result = updateMany(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.updateMany resolver requires at least one value in args.record'
+      );
     });
 
     it('should change data via args.record in database', async () => {

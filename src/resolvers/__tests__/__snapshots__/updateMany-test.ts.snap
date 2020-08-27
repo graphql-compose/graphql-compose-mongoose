@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`updateMany() -> Resolver.resolve():Promise should rejected with Error if args.record is empty 1`] = `[Error: User.updateMany resolver requires at least one value in args.record]`;

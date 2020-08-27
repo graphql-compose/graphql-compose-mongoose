@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`createMany() -> Resolver.resolve():Promise should rejected with Error if args.records is array with empty items 1`] = `[Error: User.createMany resolver requires args.records to contain non-empty records, with at least one value]`;
-
-exports[`createMany() -> Resolver.resolve():Promise should rejected with Error if args.records is empty 1`] = `[Error: User.createMany resolver requires args.records to be an Array and must contain at least one record]`;
-
-exports[`createMany() -> Resolver.resolve():Promise should rejected with Error if args.records is empty array 1`] = `[Error: User.createMany resolver requires args.records to be an Array and must contain at least one record]`;
-
-exports[`createMany() -> Resolver.resolve():Promise should rejected with Error if args.records is not array 1`] = `[Error: User.createMany resolver requires args.records to be an Array and must contain at least one record]`;

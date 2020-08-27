@@ -79,7 +79,9 @@ describe('removeMany() ->', () => {
 
     it('should rejected with Error if args.filter is empty', async () => {
       const result = removeMany(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.removeMany resolver requires at least one value in args.filter'
+      );
     });
 
     it('should remove data in database', async () => {

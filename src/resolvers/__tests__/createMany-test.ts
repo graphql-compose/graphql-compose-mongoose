@@ -59,26 +59,34 @@ describe('createMany() ->', () => {
 
     it('should rejected with Error if args.records is empty', async () => {
       const result = createMany(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.createMany resolver requires args.records to be an Array and must contain at least one record'
+      );
     });
 
     it('should rejected with Error if args.records is not array', async () => {
       const result = createMany(UserModel, UserTC).resolve({ args: { records: {} } });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'ser.createMany resolver requires args.records to be an Array and must contain at least one record'
+      );
     });
 
     it('should rejected with Error if args.records is empty array', async () => {
       const result = createMany(UserModel, UserTC).resolve({
         args: { records: [] },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.createMany resolver requires args.records to be an Array and must contain at least one record'
+      );
     });
 
     it('should rejected with Error if args.records is array with empty items', async () => {
       const result = createMany(UserModel, UserTC).resolve({
         args: { records: [{ name: 'fails' }, {}] },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.createMany resolver requires args.records to contain non-empty records, with at least one value'
+      );
     });
 
     it('should return payload.recordIds', async () => {
