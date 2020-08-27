@@ -114,7 +114,7 @@ export type TypeConverterResolversOpts = {
   pagination?: PaginationResolverOpts | false;
 };
 
-export function composeWithMongoose<TSource, TContext>(
+export function composeWithMongoose<TSource = any, TContext = any>(
   model: Model<any>,
   opts: ComposeWithMongooseOpts<TContext> = {}
 ): ObjectTypeComposer<TSource, TContext> {

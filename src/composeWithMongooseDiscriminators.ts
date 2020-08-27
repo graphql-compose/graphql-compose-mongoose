@@ -4,7 +4,7 @@ import { ComposeWithMongooseDiscriminatorsOpts, DiscriminatorTypeComposer } from
 
 export * from './discriminators';
 
-export function composeWithMongooseDiscriminators<TSource, TContext>(
+export function composeWithMongooseDiscriminators<TSource = any, TContext = any>(
   baseModel: Model<any>,
   opts?: ComposeWithMongooseDiscriminatorsOpts<TContext>
 ): DiscriminatorTypeComposer<TSource, TContext> {

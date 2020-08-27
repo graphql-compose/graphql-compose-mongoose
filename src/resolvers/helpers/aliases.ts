@@ -12,6 +12,8 @@ export function prepareAliases(model: Model<any>): AliasesMap | false {
   return false;
 }
 
+// TODO: change by translateAliases()
+// @see https://github.com/Automattic/mongoose/issues/6427
 export function replaceAliases(
   data: Record<string, any>,
   aliases: AliasesMap | false
