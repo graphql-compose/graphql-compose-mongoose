@@ -3,17 +3,26 @@ import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { addErrorCatcherField } from './helpers/addErrorCatcherField';
+import { ValidationError } from '../errors';
 
 async function createSingle(
   model: Model<any>,
   recordData: any,
-  resolveParams: ExtendedResolveParams
+  resolveParams: ExtendedResolveParams,
+  idx: number
 ) {
   // eslint-disable-next-line new-cap
   let doc = new model(recordData);
   if (resolveParams.beforeRecordMutate) {
     doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
     if (!doc) return null;
+  }
+
+  const validationErrors = await new Promise((resolve) => {
+    doc.validate(resolve);
+  });
+  if (validationErrors) {
+    throw new ValidationError(validationErrors as any, { pathPrefix: `${idx}.` });
   }
 
   return doc.save();
@@ -53,7 +62,7 @@ export default function createMany<TSource = Document, TContext = any>(
         description: 'Created document ID',
       },
       records: {
-        type: tc.getTypeNonNull().getTypePlural().getTypeNonNull(),
+        type: tc.NonNull.List,
         description: 'Created documents',
       },
       createCount: {
@@ -99,8 +108,10 @@ export default function createMany<TSource = Document, TContext = any>(
 
       const recordPromises = [];
       // concurrently create docs
-      for (const record of recordData) {
-        recordPromises.push(createSingle(model, record, resolveParams as ExtendedResolveParams));
+      for (let i = 0; i < recordData.length; i++) {
+        recordPromises.push(
+          createSingle(model, recordData[i], resolveParams as ExtendedResolveParams, i)
+        );
       }
 
       const results = await Promise.all(recordPromises);
@@ -122,6 +133,8 @@ export default function createMany<TSource = Document, TContext = any>(
     },
   });
 
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
   addErrorCatcherField(resolver);
 
   return resolver;

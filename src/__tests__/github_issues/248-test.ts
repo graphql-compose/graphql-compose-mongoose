@@ -35,11 +35,10 @@ describe("issue #248 - payloads' errors", () => {
 
   const User = mongoose.model('User', UserSchema);
   const UserTC = composeWithMongoose(User);
-  schemaComposer.Query.addFields({
-    findMany: UserTC.getResolver('findMany'),
-  });
+  schemaComposer.Query.addFields({ noop: 'String' });
   schemaComposer.Mutation.addFields({
     createOne: UserTC.getResolver('createOne'),
+    createMany: UserTC.getResolver('createMany'),
   });
   const schema = schemaComposer.buildSchema();
 
@@ -56,8 +55,11 @@ describe("issue #248 - payloads' errors", () => {
               __typename
               message
               ... on ValidationError {
-                path
-                value
+                errors {
+                  message
+                  path
+                  value
+                }
               }
             }
           }
@@ -71,9 +73,14 @@ describe("issue #248 - payloads' errors", () => {
           record: null,
           error: {
             __typename: 'ValidationError',
-            message: 'this is a validate message',
-            path: 'someStrangeField',
-            value: 'Test',
+            message: 'User validation failed: someStrangeField: this is a validate message',
+            errors: [
+              {
+                message: 'this is a validate message',
+                path: 'someStrangeField',
+                value: 'Test',
+              },
+            ],
           },
         },
       },
@@ -94,8 +101,6 @@ describe("issue #248 - payloads' errors", () => {
       `,
     });
 
-    (res as any).errors[0] = convertToSimpleObject((res as any).errors[0]);
-
     expect(res).toEqual({
       data: {
         createOne: null,
@@ -104,25 +109,64 @@ describe("issue #248 - payloads' errors", () => {
         expect.objectContaining({
           message: 'User validation failed: someStrangeField: this is a validate message',
           extensions: {
-            validationErrors: {
-              someStrangeField: {
+            name: 'ValidationError',
+            errors: [
+              {
                 message: 'this is a validate message',
                 path: 'someStrangeField',
                 value: 'Test',
               },
-            },
+            ],
           },
           path: ['createOne'],
         }),
       ],
     });
   });
-});
 
-function convertToSimpleObject(theClass: Error): Record<string, any> {
-  const keys = Object.getOwnPropertyNames(theClass);
-  return keys.reduce((classAsObj, key) => {
-    classAsObj[key] = (theClass as any)[key];
-    return classAsObj;
-  }, {} as Record<string, any>);
-}
+  it('check validation for createMany', async () => {
+    const res = await graphql.graphql({
+      schema,
+      source: `
+        mutation { 
+          createMany(records: [{ name: "Ok"}, { name: "John", someStrangeField: "Test" }]) { 
+            records { 
+              name
+            }
+            error {
+              __typename
+              message
+              ... on ValidationError {
+                errors {
+                  message
+                  path
+                  value
+                }
+              }
+            }
+          }
+        }
+      `,
+    });
+
+    expect(res).toEqual({
+      data: {
+        createMany: {
+          records: null,
+          error: {
+            __typename: 'ValidationError',
+            message: 'User validation failed: someStrangeField: this is a validate message',
+            errors: [
+              {
+                message: 'this is a validate message',
+                path: '1.someStrangeField',
+                //     ^^ - we add idx of broken record
+                value: 'Test',
+              },
+            ],
+          },
+        },
+      },
+    });
+  });
+});

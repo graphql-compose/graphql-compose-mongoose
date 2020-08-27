@@ -237,7 +237,7 @@ describe('createMany() ->', () => {
 
     it('should have records field, NonNull List', () => {
       const resolver = createMany(UserModel, UserTC);
-      expect(resolver.getOTC().getFieldTypeName('records')).toEqual('[User!]!');
+      expect(resolver.getOTC().getFieldTypeName('records')).toEqual('[User!]');
     });
 
     it('should have user.contacts.mail required field', () => {

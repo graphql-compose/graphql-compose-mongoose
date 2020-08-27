@@ -90,6 +90,8 @@ export default function removeOne<TSource = Document, TContext = any>(
     }) as any,
   });
 
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
   addErrorCatcherField(resolver);
 
   return resolver as any;
