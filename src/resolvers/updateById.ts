@@ -1,10 +1,10 @@
-import { Resolver, ObjectTypeComposer, mapEachKey } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
-import { GraphQLError } from 'graphql';
 import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { ValidationError } from '../errors';
 
 export default function updateById<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -91,62 +91,27 @@ export default function updateById<TSource = Document, TContext = any>(
       if (recordData) {
         doc.set(recordData);
 
-        const validationErrors: any = await new Promise(function (resolve) {
+        const validationErrors = await new Promise((resolve) => {
           doc.validate(null, null, resolve);
         });
-        const errors: {
-          path: string;
-          message: string;
-          value: any;
-        }[] = [];
-
-        if (validationErrors && validationErrors.errors) {
-          if (!resolveParams?.projection?.error) {
-            // if client does not request `errors` field we throw Exception on to level
-            throw new GraphQLError(
-              validationErrors.message,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              {
-                validationErrors: mapEachKey(validationErrors.errors, (e: any) => {
-                  return {
-                    path: e.path,
-                    message: e.message,
-                    value: e.value,
-                  };
-                }),
-              }
-            );
-          }
-          Object.keys(validationErrors.errors).forEach((key) => {
-            const { message, value } = validationErrors.errors[key];
-            errors.push({
-              path: key,
-              message,
-              value,
-            });
-          });
-          return {
-            record: null,
-            recordId: null,
-            error: errors[0], // TODO: refactor: wrap all validation errors inside on Error object
-          };
-        } else {
-          await doc.save();
-          return {
-            record: doc,
-            recordId: tc.getRecordIdFn()(doc),
-          };
+        if (validationErrors) {
+          throw new ValidationError(validationErrors as any);
         }
+
+        await doc.save();
+
+        return {
+          record: doc,
+          recordId: tc.getRecordIdFn()(doc),
+        };
       }
 
       return null;
     }) as any,
   });
 
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
   addErrorCatcherField(resolver);
 
   return resolver;

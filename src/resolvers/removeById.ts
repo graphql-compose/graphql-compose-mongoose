@@ -7,7 +7,7 @@ import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 export default function removeById<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  _opts?: GenResolverOpts // eslint-disable-line no-unused-vars
+  _opts?: GenResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');
@@ -56,7 +56,7 @@ export default function removeById<TSource = Document, TContext = any>(
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      let doc = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
+      let doc: Document = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
@@ -66,7 +66,7 @@ export default function removeById<TSource = Document, TContext = any>(
 
         return {
           record: doc,
-          recordId: tc.getRecordIdFn()(doc),
+          recordId: tc.getRecordIdFn()(doc as any),
         };
       }
 
@@ -74,6 +74,8 @@ export default function removeById<TSource = Document, TContext = any>(
     }) as any,
   });
 
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
   addErrorCatcherField(resolver);
 
   return resolver as any;

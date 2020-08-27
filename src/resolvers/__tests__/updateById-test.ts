@@ -132,11 +132,17 @@ describe('updateById() ->', () => {
           error: true,
         },
       });
-      expect(result.error).toEqual({
-        message: 'this is a validate message',
-        path: 'valid',
-        value: 'AlwaysFails',
-      });
+
+      expect(result.error.message).toEqual(
+        'User validation failed: valid: this is a validate message'
+      );
+      expect(result.error.errors).toEqual([
+        {
+          message: 'this is a validate message',
+          path: 'valid',
+          value: 'AlwaysFails',
+        },
+      ]);
     });
 
     it('should throw GraphQLError if client does not request errors field in payload', async () => {

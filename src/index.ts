@@ -8,4 +8,5 @@ export * from './composeWithMongoose';
 export * from './composeWithMongooseDiscriminators';
 export * from './fieldsConverter';
 export * from './resolvers';
+export * from './errors';
 export { GraphQLMongoID, GraphQLBSONDecimal };
