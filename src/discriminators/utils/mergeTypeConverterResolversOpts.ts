@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import type { TypeConverterResolversOpts } from '../../composeWithMongoose';
 import { MergeAbleHelperArgsOpts } from '../../resolvers/helpers';
 import { mergeStringAndStringArraysFields } from './mergeCustomizationOptions';
@@ -31,9 +32,9 @@ export function mergePrimitiveTypeFields(
 export function mergeFilterOperatorsOptsMap(
   baseFilterOperatorField: TypeFieldMap,
   childFilterOperatorField?: TypeFieldMap
-) {
+): TypeFieldMap {
   const baseOptsKeys = Object.keys(baseFilterOperatorField);
-  const baseOptsTypes = {} as Record<string, any>;
+  const baseOptsTypes = {} as TypeFieldMap;
   for (const key of baseOptsKeys) {
     baseOptsTypes[key] = 'string[]';
   }
@@ -49,7 +50,13 @@ export function mergeFilterOperatorsOptsMap(
   return childFilterOperatorField;
 }
 
-export function mergeArraysTypeFields(baseField: any, childField: any, argOptsType: TypeFieldMap) {
+export function mergeArraysTypeFields(
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  baseField: any,
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  childField: any,
+  argOptsType: TypeFieldMap
+): TypeFieldMap {
   let merged = childField !== undefined ? childField : {};
   if (Array.isArray(argOptsType)) {
     for (const argType of argOptsType) {
@@ -68,7 +75,11 @@ export function mergeArraysTypeFields(baseField: any, childField: any, argOptsTy
   return merged;
 }
 
-export function mergeMapTypeFields(baseField: any, childField: any, argOptsTypes: TypeFieldMap) {
+export function mergeMapTypeFields(
+  baseField: TypeFieldMap,
+  childField: TypeFieldMap | undefined,
+  argOptsTypes: TypeFieldMap
+): TypeFieldMap {
   const merged = childField === undefined ? {} : childField;
 
   if (argOptsTypes !== null && typeof argOptsTypes === 'object') {

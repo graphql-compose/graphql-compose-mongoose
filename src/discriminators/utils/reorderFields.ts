@@ -6,7 +6,7 @@ export function reorderFields<TContext>(
   order: string[] | boolean | undefined,
   DKey: string,
   commonFieldKeys?: string[]
-) {
+): DiscriminatorTypeComposer<any, TContext> | ObjectTypeComposer<any, TContext> {
   if (order) {
     if (Array.isArray(order)) {
       modelTC.reorderFields(order);

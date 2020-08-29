@@ -24,7 +24,7 @@ export type FilterHelperArgsOpts = {
 };
 
 // for merging, discriminators merge-able only
-export const getFilterHelperArgOptsMap = () => ({
+export const getFilterHelperArgOptsMap = (): Record<string, string | string[]> => ({
   // filterTypeName? : 'string'
   isRequired: 'boolean',
   onlyIndexed: 'boolean',

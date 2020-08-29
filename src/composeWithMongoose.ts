@@ -164,7 +164,7 @@ export function prepareFields(
     only?: string[];
     remove?: string[];
   }
-) {
+): void {
   if (Array.isArray(opts.only)) {
     const onlyFieldNames: string[] = opts.only;
     const removeFields = Object.keys(tc.getFields()).filter(
@@ -184,7 +184,7 @@ export function prepareInputFields(
     remove?: string[];
     required?: string[];
   }
-) {
+): void {
   if (Array.isArray(inputFieldsOpts.only)) {
     const onlyFieldNames: string[] = inputFieldsOpts.only;
     const removeFields = Object.keys(inputTypeComposer.getFields()).filter(

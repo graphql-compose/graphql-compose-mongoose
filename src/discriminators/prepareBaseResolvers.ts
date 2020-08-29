@@ -27,7 +27,7 @@ function setDKeyEnumOnITCArgs(resolver: Resolver, baseTC: DiscriminatorTypeCompo
 // recomposing sets up the DInterface as the return types for
 // Also sets up DKey enum as type for DKey field on composers with filter and/or record args
 // composeWithMongoose composers
-export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>) {
+export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>): void {
   for (const resolverName in EMCResolvers) {
     if (EMCResolvers.hasOwnProperty(resolverName) && baseTC.hasResolver(resolverName)) {
       const resolver = baseTC.getResolver(resolverName);

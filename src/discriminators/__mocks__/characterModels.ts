@@ -11,7 +11,7 @@ const enumCharacterType = {
 export const CharacterObject = {
   _id: {
     type: String,
-    default: () => new Types.ObjectId(),
+    default: (): any => new Types.ObjectId(),
   },
   name: String,
 
@@ -33,7 +33,9 @@ export const CharacterObject = {
 const CharacterSchema = new Schema(CharacterObject);
 const ACharacterSchema = new Schema({ ...CharacterObject });
 
-export function getCharacterModels(DKey: string) {
+export function getCharacterModels(
+  DKey: string
+): { CharacterModel: Model<any>; PersonModel: Model<any>; DroidModel: Model<any> } {
   CharacterSchema.set('discriminatorKey', DKey);
 
   const CharacterModel: Model<any> = mongoose.models.Character
@@ -51,7 +53,7 @@ export function getCharacterModels(DKey: string) {
   return { CharacterModel, PersonModel, DroidModel };
 }
 
-export function getCharacterModelClone() {
+export function getCharacterModelClone(): { NoDKeyCharacterModel: Model<any> } {
   const NoDKeyCharacterModel = mongoose.model('NoDKeyCharacter', ACharacterSchema);
 
   /*
