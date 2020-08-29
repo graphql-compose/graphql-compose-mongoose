@@ -16,7 +16,7 @@ export type RecordHelperArgsOpts = {
 };
 
 // for merging, discriminators merge-able only
-export const getRecordHelperArgsOptsMap = () => ({
+export const getRecordHelperArgsOptsMap = (): Record<string, string> => ({
   isRequired: 'boolean',
   removeFields: 'string[]',
   requiredFields: 'string[]',

@@ -135,7 +135,7 @@ export function prepareChildResolvers<TSource, TContext>(
   baseDTC: DiscriminatorTypeComposer<TSource, TContext>,
   childTC: ObjectTypeComposer<TSource, TContext>,
   opts: ComposeWithMongooseDiscriminatorsOpts<TContext>
-) {
+): void {
   for (const resolverName in EMCResolvers) {
     if (EMCResolvers.hasOwnProperty(resolverName) && childTC.hasResolver(resolverName)) {
       const resolver = childTC.getResolver(resolverName);

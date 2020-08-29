@@ -59,7 +59,7 @@ export default function createMany<TSource = Document, TContext = any>(
     t.addFields({
       recordIds: {
         type: '[MongoID!]!',
-        description: 'Created document ID',
+        description: 'Created document IDs',
       },
       records: {
         type: tc.NonNull.List,
@@ -67,7 +67,7 @@ export default function createMany<TSource = Document, TContext = any>(
       },
       createCount: {
         type: 'Int!',
-        description: 'Count of all documents created',
+        description: 'Number of created documents',
       },
     });
   });

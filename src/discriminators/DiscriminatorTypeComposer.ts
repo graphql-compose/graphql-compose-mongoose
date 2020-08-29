@@ -15,7 +15,7 @@ import { composeChildTC } from './composeChildTC';
 import { mergeCustomizationOptions } from './utils/mergeCustomizationOptions';
 import { prepareBaseResolvers } from './prepareBaseResolvers';
 import { reorderFields } from './utils/reorderFields';
-import { GraphQLFieldConfig } from 'graphql-compose/lib/graphql';
+import { GraphQLFieldConfig, GraphQLObjectType } from 'graphql-compose/lib/graphql';
 
 export interface ComposeWithMongooseDiscriminatorsOpts<TContext>
   extends ComposeWithMongooseOpts<TContext> {
@@ -75,7 +75,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   DInterface?: InterfaceTypeComposer<TSource, TContext>;
   DKeyETC?: EnumTypeComposer<TContext>;
 
-  constructor(gqType: any, schemaComposer: SchemaComposer<TContext>) {
+  constructor(gqType: GraphQLObjectType, schemaComposer: SchemaComposer<TContext>) {
     super(gqType, schemaComposer);
     return this;
   }
@@ -83,7 +83,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   static createFromModel<TSrc = any, TCtx = any>(
     baseModel: Model<any>,
     schemaComposer: SchemaComposer<TCtx>,
-    opts?: any
+    opts?: ComposeWithMongooseDiscriminatorsOpts<any>
   ): DiscriminatorTypeComposer<TSrc, TCtx> {
     if (!baseModel || !baseModel.discriminators) {
       throw Error('Discriminator Key not Set, Use composeWithMongoose for Normal Collections');
