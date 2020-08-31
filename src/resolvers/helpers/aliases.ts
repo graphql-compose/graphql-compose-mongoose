@@ -5,7 +5,14 @@ export type AliasesMap = {
 };
 
 export function prepareAliases(model: Model<any>): AliasesMap | false {
-  const aliases = (model?.schema as any)?.aliases;
+  const aliases = (model?.schema as any)?.aliases || {};
+
+  if (model.discriminators) {
+    Object.keys(model.discriminators).forEach((subModelName: string) => {
+      const submodel: Model<any> = (model.discriminators as any)[subModelName];
+      Object.assign(aliases, (submodel?.schema as any)?.aliases);
+    });
+  }
   if (Object.keys(aliases).length > 0) {
     return aliases;
   }
