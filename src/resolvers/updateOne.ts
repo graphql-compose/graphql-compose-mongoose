@@ -5,6 +5,7 @@ import { skipHelperArgs, recordHelperArgs, filterHelperArgs, sortHelperArgs } fr
 import findOne from './findOne';
 import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 import { ValidationError } from '../errors';
+import { validationsForDocument, ValidationsWithMessage } from '../errors/validationsForDocument';
 
 export default function updateOne<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -94,11 +95,27 @@ export default function updateOne<TSource = Document, TContext = any>(
       if (recordData) {
         doc.set(recordData);
 
-        const validationErrors = await new Promise((resolve) => {
-          doc.validate(resolve);
-        });
-        if (validationErrors) {
-          throw new ValidationError(validationErrors as any);
+        const validations: ValidationsWithMessage | null = await validationsForDocument(doc);
+
+        if (validations) {
+          if (!resolveParams?.projection?.error) {
+            // if client does not request `errors` field we throw Exception on to level
+            throw new ValidationError(validations);
+          }
+          return {
+            record: null,
+            recordId: null,
+            error: {
+              name: 'ValidationError',
+              ...validations,
+            },
+          };
+        } else {
+          await doc.save();
+          return {
+            record: doc,
+            recordId: tc.getRecordIdFn()(doc as any),
+          };
         }
 
         await doc.save();

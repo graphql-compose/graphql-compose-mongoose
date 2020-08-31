@@ -1,27 +1,17 @@
-import { Resolver } from 'graphql-compose';
-import { getErrorInterface, MongoError, ValidationError } from '../../errors';
+import { Resolver, ResolverResolveParams } from 'graphql-compose';
+import {
+  getErrorInterface,
+  getManyErrorInterface,
+  MongoError,
+  ValidationError,
+  ManyValidationError,
+} from '../../errors';
 import { GraphQLError } from 'graphql-compose/lib/graphql';
 
-/**
- * This helper add `error` field in payload & wraps `resolve` method.
- * It catches exception and return it in payload if user
- * requested `err` field in GraphQL-query.
- */
-export function addErrorCatcherField(resolver: Resolver<any, any, any>): void {
-  getErrorInterface(resolver.schemaComposer);
-
-  const payloadTC = resolver.getOTC();
-
-  if (!payloadTC.hasField('error')) {
-    payloadTC.setField('error', {
-      type: 'ErrorInterface',
-      description:
-        'Error that may occur during operation. If you request this field in GraphQL query, you will receive typed error in payload; otherwise error will be provided in root `errors` field of GraphQL response.',
-    });
-  }
-
-  const childResolve = resolver.resolve.bind(resolver);
-  resolver.setResolve(async (rp) => {
+export function makeHandleResolverError(childResolve: any): any {
+  return async function handleResolverError(
+    rp: ResolverResolveParams<any, any, any>
+  ): Promise<any> {
     try {
       const res = await childResolve(rp);
       return res;
@@ -30,6 +20,12 @@ export function addErrorCatcherField(resolver: Resolver<any, any, any>): void {
       if (e instanceof ValidationError) {
         error = {
           name: 'ValidationError',
+          message: e.message,
+          errors: e.errors,
+        };
+      } else if (e instanceof ManyValidationError) {
+        error = {
+          name: 'ManyValidationError',
           message: e.message,
           errors: e.errors,
         };
@@ -65,5 +61,48 @@ export function addErrorCatcherField(resolver: Resolver<any, any, any>): void {
         );
       }
     }
-  });
+  };
+}
+/**
+ * This helper add `error` field in payload & wraps `resolve` method.
+ * It catches exception and return it in payload if user
+ * requested `err` field in GraphQL-query.
+ */
+export function addErrorCatcherField(resolver: Resolver<any, any, any>): void {
+  getErrorInterface(resolver.schemaComposer);
+
+  const payloadTC = resolver.getOTC();
+
+  if (!payloadTC.hasField('error')) {
+    payloadTC.setField('error', {
+      type: 'ErrorInterface',
+      description:
+        'Error that may occur during operation. If you request this field in GraphQL query, you will receive typed error in payload; otherwise error will be provided in root `errors` field of GraphQL response.',
+    });
+  }
+
+  const childResolve = resolver.resolve.bind(resolver);
+  resolver.setResolve(makeHandleResolverError(childResolve));
+}
+
+/**
+ * This helper add `error` field in payload & wraps `resolve` method.
+ * It catches exception and return it in payload if user
+ * requested `err` field in GraphQL-query.
+ */
+export function addManyErrorCatcherField(resolver: Resolver<any, any, any>): void {
+  getManyErrorInterface(resolver.schemaComposer);
+
+  const payloadTC = resolver.getOTC();
+
+  if (!payloadTC.hasField('error')) {
+    payloadTC.setField('error', {
+      type: 'ManyErrorInterface',
+      description:
+        'Error that may occur during operation. If you request this field in GraphQL query, you will receive typed error in payload; otherwise error will be provided in root `errors` field of GraphQL response.',
+    });
+  }
+
+  const childResolve = resolver.resolve.bind(resolver);
+  resolver.setResolve(makeHandleResolverError(childResolve));
 }

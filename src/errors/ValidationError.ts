@@ -1,53 +1,44 @@
-import type { Error as MongooseError } from 'mongoose';
 import { SchemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { GraphQLError } from 'graphql';
 
-interface Opts {
-  /** Adds prefix to error `path` property. It's useful for createMany resolver which shows `idx` of broken record */
-  pathPrefix?: string;
-}
+import type { Validations, ValidationsWithMessage } from './validationsForDocument';
 
-export class ValidationError extends Error {
-  public errors: Array<{
-    path: string;
-    message: string;
-    value: any;
-  }>;
+export class ValidationError extends GraphQLError {
+  public errors: Validations;
 
-  constructor(data: MongooseError.ValidationError, opts?: Opts) {
-    super(data.message);
-    this.errors = [];
-    Object.keys(data.errors).forEach((key) => {
-      const e = data.errors[key];
-      this.errors.push({
-        path: opts?.pathPrefix ? `${opts?.pathPrefix}${e.path}` : e.path,
-        message: e.message,
-        value: e.value,
-      });
+  constructor(validation: ValidationsWithMessage) {
+    super(validation.message, undefined, undefined, undefined, undefined, undefined, {
+      validations: validation.errors,
     });
+
+    this.errors = validation.errors;
 
     (this as any).__proto__ = ValidationError.prototype;
   }
 }
 
+export function getValidationOTC(schemaComposer: SchemaComposer<any>): ObjectTypeComposer {
+  return schemaComposer.getOrCreateOTC('Validation', (otc) => {
+    otc.addFields({
+      message: {
+        description: 'Validation error message',
+        type: 'String',
+      },
+      path: {
+        description: 'Source of the validation error from the model path',
+        type: 'String',
+      },
+      value: {
+        description: 'Field value which occurs the validation error',
+        type: 'JSON',
+      },
+    });
+  });
+}
+
 export function getValidationErrorOTC(schemaComposer: SchemaComposer<any>): ObjectTypeComposer {
   return schemaComposer.getOrCreateOTC('ValidationError', (otc) => {
-    const ValidatorError = schemaComposer.getOrCreateOTC('ValidatorError', (otc) => {
-      otc.addFields({
-        message: {
-          description: 'Validation error message',
-          type: 'String',
-        },
-        path: {
-          description: 'Source of the validation error from the model path',
-          type: 'String',
-        },
-        value: {
-          description: 'Field value which occurs the validation error',
-          type: 'JSON',
-        },
-      });
-    });
-
+    const Validation = getValidationOTC(schemaComposer);
     otc.addFields({
       message: {
         description: 'Combined error message from all validators',
@@ -55,7 +46,7 @@ export function getValidationErrorOTC(schemaComposer: SchemaComposer<any>): Obje
       },
       errors: {
         description: 'List of validator errors',
-        type: ValidatorError.NonNull.List,
+        type: Validation.NonNull.List,
       },
     });
   });

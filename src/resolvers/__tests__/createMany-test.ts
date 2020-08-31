@@ -94,6 +94,7 @@ describe('createMany() ->', () => {
         args: {
           records: [{ name: 'newName', contacts: { email: 'mail' } }],
         },
+        projection: { error: true },
       });
       expect(result.recordIds).toBeTruthy();
     });
@@ -105,6 +106,7 @@ describe('createMany() ->', () => {
             { name: 'newName0', contacts: { email: 'mail' } },
             { name: 'newName1', contacts: { email: 'mail' } },
           ],
+          projection: { error: true },
         },
       });
       expect(result.createCount).toBe(2);
@@ -134,6 +136,7 @@ describe('createMany() ->', () => {
             { name: checkedName, contacts: { email: 'mail' } },
             { name: checkedName, contacts: { email: 'mail' } },
           ],
+          projection: { error: true },
         },
       });
 
@@ -147,6 +150,7 @@ describe('createMany() ->', () => {
       const result = await createMany(UserModel, UserTC).resolve({
         args: {
           records: [{ name: 'NewUser', contacts: { email: 'mail' } }],
+          projection: { error: true },
         },
       });
       expect(result.records[0]._id).toBe(result.recordIds[0]);
@@ -155,6 +159,7 @@ describe('createMany() ->', () => {
     it('should return mongoose documents', async () => {
       const result = await createMany(UserModel, UserTC).resolve({
         args: { records: [{ name: 'NewUser', contacts: { email: 'mail' } }] },
+        projection: { error: true },
       });
       expect(result.records[0]).toBeInstanceOf(UserModel);
     });
@@ -166,6 +171,7 @@ describe('createMany() ->', () => {
             { name: 'NewUser0', contacts: { email: 'mail' } },
             { name: 'NewUser1', contacts: { email: 'mail' } },
           ],
+          projection: { error: true },
         },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
@@ -203,6 +209,7 @@ describe('createMany() ->', () => {
             { name: 'NewUser0', contacts: { email: 'mail' } },
             { name: 'NewUser1', contacts: { email: 'mail' } },
           ],
+          projection: { error: true },
         },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {

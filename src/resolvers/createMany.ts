@@ -1,32 +1,15 @@
 import type { ObjectTypeComposer, Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
-import { addErrorCatcherField } from './helpers/addErrorCatcherField';
-import { ValidationError } from '../errors';
-
-async function createSingle(
-  model: Model<any>,
-  recordData: any,
-  resolveParams: ExtendedResolveParams,
-  idx: number
-) {
-  // eslint-disable-next-line new-cap
-  let doc = new model(recordData);
-  if (resolveParams.beforeRecordMutate) {
-    doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
-    if (!doc) return null;
-  }
-
-  const validationErrors = await new Promise((resolve) => {
-    doc.validate(resolve);
-  });
-  if (validationErrors) {
-    throw new ValidationError(validationErrors as any, { pathPrefix: `${idx}.` });
-  }
-
-  return doc.save();
-}
+import type { GenResolverOpts } from './index';
+import { addManyErrorCatcherField } from './helpers/addErrorCatcherField';
+import { ManyValidationError } from '../errors';
+import {
+  validationsForDocument,
+  ValidationsWithMessage,
+  ManyValidations,
+  ManyValidationsWithMessage,
+} from '../errors/validationsForDocument';
 
 export default function createMany<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -106,36 +89,59 @@ export default function createMany<TSource = Document, TContext = any>(
         }
       }
 
-      const recordPromises = [];
-      // concurrently create docs
-      for (let i = 0; i < recordData.length; i++) {
-        recordPromises.push(
-          createSingle(model, recordData[i], resolveParams as ExtendedResolveParams, i)
-        );
-      }
+      const manyValidations: ManyValidations = [];
+      const docs = [];
 
-      const results = await Promise.all(recordPromises);
-      const returnObj = {
-        records: [] as any[],
-        recordIds: [] as any[],
-        createCount: 0,
-      };
-
-      for (const doc of results) {
-        if (doc) {
-          returnObj.createCount += 1;
-          returnObj.records.push(doc);
-          returnObj.recordIds.push(doc._id);
+      for (const record of recordData) {
+        // eslint-disable-next-line new-cap
+        let doc = new model(record);
+        if (resolveParams.beforeRecordMutate) {
+          doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
         }
+
+        const validations: ValidationsWithMessage | null = await validationsForDocument(doc);
+
+        manyValidations.push(validations ? validations : null);
+        docs.push(doc);
       }
 
-      return returnObj;
+      const hasValidationError = !manyValidations.every((error) => error === null);
+      if (!hasValidationError) {
+        await model.create(docs);
+      }
+
+      if (hasValidationError) {
+        const manyValidationsWithMessage: ManyValidationsWithMessage = {
+          message: 'Cannot createMany some documents contain errors',
+          errors: manyValidations,
+        };
+
+        if (!resolveParams?.projection?.error) {
+          // if client does not request `errors` field we throw Exception on to level
+          throw new ManyValidationError(manyValidationsWithMessage);
+        }
+        return {
+          records: null,
+          recordIds: null,
+          error: {
+            name: 'ManyValidationError',
+            ...manyValidationsWithMessage,
+          },
+          createCount: 0,
+        };
+      } else {
+        return {
+          records: docs,
+          recordIds: docs.map((doc) => doc._id),
+          createCount: docs.length,
+        };
+      }
     },
   });
 
   // Add `error` field to payload which can catch resolver Error
   // and return it in mutation payload
-  addErrorCatcherField(resolver);
+  addManyErrorCatcherField(resolver);
 
   return resolver;
 }
