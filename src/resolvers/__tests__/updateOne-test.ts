@@ -171,6 +171,7 @@ describe('updateOne() ->', () => {
       expect(result.error.message).toEqual(
         'User validation failed: valid: this is a validate message'
       );
+
       expect(result.error.errors).toEqual([
         {
           message: 'this is a validate message',
