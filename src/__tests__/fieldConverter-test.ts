@@ -16,8 +16,8 @@ import {
   referenceToGraphQL,
   convertModelToGraphQL,
 } from '../fieldsConverter';
-import GraphQLMongoID from '../types/mongoid';
-import GraphQLBSONDecimal from '../types/bsonDecimal';
+import GraphQLMongoID from '../types/MongoID';
+import GraphQLBSONDecimal from '../types/BSONDecimal';
 
 describe('fieldConverter', () => {
   const fields: { [key: string]: any } = getFieldsFromModel(UserModel);
