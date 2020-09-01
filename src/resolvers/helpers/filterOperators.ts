@@ -136,24 +136,19 @@ export function _recurseSchema(
     // alias
     const fullPath = pathName ? `${pathName}.${fieldName}` : fieldName;
     let schemaType;
-    if (schema) {
-      // @ts-ignore
-      if (schema.pathType) {
-        // @ts-ignore
-        const pathType = schema.pathType(fullPath);
-        // @ts-ignore
-        schemaType = schema.path(fullPath);
-        // @ts-ignore
-        if (pathType === 'virtual') schemaType = schema.virtualpath(fullPath);
+    const _schema = schema as any;
+    if (_schema) {
+      if (_schema.pathType) {
+        const pathType = _schema.pathType(fullPath);
+        schemaType = _schema.path(fullPath);
+        if (pathType === 'virtual') schemaType = _schema.virtualpath(fullPath);
         if (pathType === 'nested') schemaType = null;
-        // @ts-ignore
-      } else if (typeof schema.path === 'string') {
+      } else if (typeof _schema.path === 'string') {
         schemaType = null; // array
       }
     }
 
     // Need to dig into this space
-    // @ts-ignore
     const isIndexed: boolean = schemaType?.options?.index || fieldName === '_id';
 
     const hasOperatorsConfig =
@@ -181,12 +176,11 @@ export function _recurseSchema(
 
       _recurseSchema(
         newITC,
-        // @ts-ignore
-        fieldTC,
+        fieldTC as InputTypeComposer,
         `${upperFirst(fieldName)}${typeName}`,
         schemaType || schema,
         `${fieldName}`,
-        operatorsConfig,
+        operatorsConfig as FilterOperatorsOpts,
         onlyIndexed
       );
       if ((onlyIndexed && isIndexed) || hasOperatorsConfig || !operatorsOpts) {
@@ -241,18 +235,12 @@ export const _recurseFields = (fields: SelectorOptions): SelectorOptions => {
       const operators: string[] = Object.values(availableOperators);
       if (operators.includes(fieldName)) {
         if (fieldName === 'regex') {
-          selectors[`$${fieldName}`] = new RegExp(
-            // @ts-ignore
-            fields[`${fieldName}`].match,
-            // @ts-ignore
-            fields[`${fieldName}`].options
-          );
+          selectors[`$${fieldName}`] = fields[fieldName];
         } else {
           selectors[`$${fieldName}`] = fields[fieldName];
         }
       } else {
-        // @ts-ignore
-        selectors[fieldName] = _recurseFields(fields[fieldName]);
+        selectors[fieldName] = _recurseFields(fields[fieldName] as SelectorOptions);
       }
     });
   } else if (Array.isArray(fields)) {
@@ -273,10 +261,8 @@ export function processFilterOperators(filter: Record<string, any>): SelectorOpt
   if (filter[OPERATORS_FIELDNAME]) {
     const operatorFields = filter[OPERATORS_FIELDNAME];
     Object.keys(operatorFields).forEach((fieldName) => {
-      // eslint-disable-next-line no-param-reassign
       filter[fieldName] = _recurseFields(operatorFields[fieldName]);
     });
-    // eslint-disable-next-line no-param-reassign
     delete filter[OPERATORS_FIELDNAME];
   }
 
@@ -284,7 +270,6 @@ export function processFilterOperators(filter: Record<string, any>): SelectorOpt
 }
 
 export function _prepareAndOrFilter(filter: Record<'OR' | 'AND' | '$or' | '$and', any>): void {
-  /* eslint-disable no-param-reassign */
   if (!filter.OR && !filter.AND) return;
 
   const { OR, AND } = filter;
@@ -305,5 +290,4 @@ export function _prepareAndOrFilter(filter: Record<'OR' | 'AND' | '$or' | '$and'
     filter.$and = $and;
     delete filter.AND;
   }
-  /* eslint-enable no-param-reassign */
 }
