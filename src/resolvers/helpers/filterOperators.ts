@@ -13,6 +13,7 @@ import type { InputTypeComposerFieldConfigAsObjectDefinition } from 'graphql-com
 
 import { upperFirst } from '../../utils';
 import type { FilterHelperArgsOpts } from './filter';
+import GraphQLRegExpAsString from '../../types/RegExpAsString';
 
 export type FilterOperatorNames =
   | 'gt'
@@ -45,28 +46,11 @@ export type FilterOperatorsOpts =
 
 export const OPERATORS_FIELDNAME = '_operators';
 
-export function _createRegexInput(itc: InputTypeComposer<any>): void {
-  itc.schemaComposer.getOrCreateITC(`${OPERATORS_FIELDNAME}RegexInput`, (tc) => {
-    tc.addFields({
-      match: {
-        name: `${OPERATORS_FIELDNAME}RegexStringInput`,
-        type: 'String!',
-      },
-      options: {
-        name: `${OPERATORS_FIELDNAME}RegexOptionsInput`,
-        type: 'String',
-      },
-    });
-  });
-}
-
 export function addFilterOperators(
   itc: InputTypeComposer<any>,
   model: Model<any>,
   opts: FilterHelperArgsOpts
 ): void {
-  _createRegexInput(itc);
-
   if (!{}.hasOwnProperty.call(opts, 'operators') || opts.operators !== false) {
     _createOperatorsField(
       itc,
@@ -118,7 +102,7 @@ export function _availableOperatorsFields(
         if (operatorName === 'exists') {
           fieldType = 'Boolean';
         } else if (operatorName === 'regex') {
-          fieldType = itc.schemaComposer.getITC(`${OPERATORS_FIELDNAME}RegexInput`);
+          fieldType = GraphQLRegExpAsString;
         }
         fields[operatorName] = {
           ...fc,
@@ -232,8 +216,6 @@ export function _createOperatorsField<TContext>(
   operatorsOpts: FilterOperatorsOpts,
   onlyIndexed: boolean = false
 ): InputTypeComposer<TContext> {
-  _createRegexInput(itc);
-
   const operatorsITC = itc.schemaComposer.getOrCreateITC(typeName, (tc) => {
     tc.setDescription('For performance reason this type contains only *indexed* fields.');
   });
