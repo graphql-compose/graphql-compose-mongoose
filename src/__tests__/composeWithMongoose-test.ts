@@ -5,7 +5,7 @@ import { ObjectTypeComposer, InputTypeComposer, schemaComposer } from 'graphql-c
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../__mocks__/userModel';
 import { composeWithMongoose } from '../composeWithMongoose';
-import GraphQLMongoID from '../types/mongoid';
+import GraphQLMongoID from '../types/MongoID';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());

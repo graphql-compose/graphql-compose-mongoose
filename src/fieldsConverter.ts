@@ -11,8 +11,8 @@ import type {
 } from 'graphql-compose';
 import { upperFirst } from 'graphql-compose';
 import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
-import GraphQLMongoID from './types/mongoid';
-import GraphQLBSONDecimal from './types/bsonDecimal';
+import GraphQLMongoID from './types/MongoID';
+import GraphQLBSONDecimal from './types/BSONDecimal';
 
 type MongooseFieldT = {
   path?: string;

@@ -4,7 +4,7 @@ import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import createOne from '../createOne';
 import { convertModelToGraphQL } from '../../fieldsConverter';
-import GraphQLMongoID from '../../types/mongoid';
+import GraphQLMongoID from '../../types/MongoID';
 import { ExtendedResolveParams } from '..';
 
 beforeAll(() => UserModel.base.createConnection());

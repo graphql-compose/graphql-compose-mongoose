@@ -8,7 +8,7 @@ import {
 } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import updateById from '../updateById';
-import GraphQLMongoID from '../../types/mongoid';
+import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 

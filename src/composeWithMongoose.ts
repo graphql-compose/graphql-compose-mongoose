@@ -11,7 +11,7 @@ import type {
   SortHelperArgsOpts,
   RecordHelperArgsOpts,
 } from './resolvers/helpers';
-import MongoID from './types/mongoid';
+import MongoID from './types/MongoID';
 import type { PaginationResolverOpts } from './resolvers/pagination';
 import type { ConnectionOpts } from './resolvers/connection';
 

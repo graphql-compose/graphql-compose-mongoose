@@ -1,6 +1,6 @@
 import { composeWithMongoose } from './composeWithMongoose';
-import GraphQLMongoID from './types/mongoid';
-import GraphQLBSONDecimal from './types/bsonDecimal';
+import GraphQLMongoID from './types/MongoID';
+import GraphQLBSONDecimal from './types/BSONDecimal';
 
 export default composeWithMongoose;
 

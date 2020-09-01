@@ -3,7 +3,7 @@ import { GraphQLNonNull, GraphQLList } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { PostModel, IPost } from '../../__mocks__/postModel';
 import findByIds from '../findByIds';
-import GraphQLMongoID from '../../types/mongoid';
+import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
