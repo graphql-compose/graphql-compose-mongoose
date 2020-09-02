@@ -25,7 +25,16 @@ beforeAll(async () => {
 });
 afterAll(() => UserModel.base.disconnect());
 
-const UserTC = composeWithMongoose(UserModel);
+const UserTC = composeWithMongoose(UserModel, {
+  resolvers: {
+    findMany: {
+      filter: {
+        operators: true,
+      },
+    },
+  },
+});
+// console.log(UserTC.getResolver('findOne').getArgITC('filter').toSDL({ deep: true }));
 schemaComposer.Query.addFields({
   findMany: UserTC.getResolver('findMany'),
 });

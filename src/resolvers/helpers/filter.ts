@@ -4,17 +4,22 @@ import { ObjectTypeComposer, ObjectTypeComposerArgumentConfigMap } from 'graphql
 import type { Model } from 'mongoose';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
-import { FilterOperatorsOpts, addFilterOperators, processFilterOperators } from './filterOperators';
+import {
+  FieldsOperatorsConfig,
+  addFilterOperators,
+  processFilterOperators,
+} from './filterOperators';
 import type { AliasesMap } from './aliases';
 import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
 
 export type FilterHelperArgsOpts = {
   prefix?: string;
   suffix?: string;
+  baseTypeName?: string;
   isRequired?: boolean;
   onlyIndexed?: boolean;
   requiredFields?: string | string[];
-  operators?: FilterOperatorsOpts | false;
+  operators?: FieldsOperatorsConfig | false;
   removeFields?: string | string[];
 };
 
@@ -79,6 +84,9 @@ export const filterHelperArgs = (
     return {};
   }
 
+  if (!opts.baseTypeName) {
+    opts.baseTypeName = typeComposer.getTypeName();
+  }
   addFilterOperators(itc, model, opts);
 
   return {
