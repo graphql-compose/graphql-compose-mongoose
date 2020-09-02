@@ -164,7 +164,7 @@ export function _recurseSchema(
     if (sourceITC.getType() === fieldType) return;
 
     if (fieldType instanceof GraphQLScalarType) {
-      const newITC = schemaComposer.createInputTC(`${fieldName}${typeName}`);
+      const newITC = schemaComposer.createInputTC(`${upperFirst(fieldName)}${typeName}`);
       if ((onlyIndexed && isIndexed) || hasOperatorsConfig || !operatorsOpts) {
         newITC.addFields(_availableOperatorsFields(fieldName, sourceITC, operatorsConfig));
         inputITC.addFields({
@@ -172,7 +172,7 @@ export function _recurseSchema(
         });
       }
     } else if (fieldType instanceof GraphQLInputObjectType) {
-      const newITC = schemaComposer.createInputTC(`${fieldName}${typeName}`);
+      const newITC = schemaComposer.createInputTC(`${upperFirst(fieldName)}${typeName}`);
 
       _recurseSchema(
         newITC,
@@ -190,7 +190,7 @@ export function _recurseSchema(
       }
     } else if (fieldType instanceof GraphQLEnumType) {
       const newITC = schemaComposer.createInputTC({
-        name: `${fieldName}${typeName}`,
+        name: `${upperFirst(fieldName)}${typeName}`,
         fields: {},
       });
       if ((onlyIndexed && isIndexed) || hasOperatorsConfig || !operatorsOpts) {
