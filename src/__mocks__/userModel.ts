@@ -16,12 +16,12 @@ const UserSchema = new Schema(
 
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'UserModel',
+      ref: 'User',
     },
 
     users: {
       type: [Schema.Types.ObjectId],
-      ref: 'UserModel',
+      ref: 'User',
     },
 
     n: {
@@ -144,6 +144,7 @@ export interface IUser extends Document {
   relocation?: boolean;
   contacts: {
     email: string;
+    skype?: string;
   };
 }
 
