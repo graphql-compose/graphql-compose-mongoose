@@ -6,6 +6,7 @@ import {
   GraphQLInputObjectType,
   GraphQLScalarType,
   GraphQLEnumType,
+  GraphQLString,
 } from 'graphql-compose/lib/graphql';
 import type { Model, Schema, SchemaType, VirtualType } from 'mongoose';
 import type { InputTypeComposer } from 'graphql-compose';
@@ -79,14 +80,13 @@ export function _availableOperatorsFields(
     : Object.values(availableOperators);
 
   operators.forEach((operatorName: string) => {
-    const fc = itc.getFieldConfig(fieldName);
     // unwrap from GraphQLNonNull and GraphQLList, if present
-    let fieldType: GraphQLInputType | InputTypeComposer | string = getNamedType(
-      fc.type
+    let fieldType: GraphQLInputType | string = getNamedType(
+      itc.getFieldType(fieldName)
     ) as GraphQLInputType;
 
     // just treat enums as strings
-    if (getNamedType(fc.type) instanceof GraphQLEnumType) {
+    if (fieldType instanceof GraphQLEnumType) {
       fieldType = 'String';
     }
 
@@ -94,20 +94,18 @@ export function _availableOperatorsFields(
       if (['in', 'nin', 'in[]', 'nin[]'].includes(operatorName)) {
         // wrap with GraphQLList, if operator required this with `[]`
         const newName = operatorName.slice(-2) === '[]' ? operatorName.slice(0, -2) : operatorName;
-        fields[newName] = {
-          ...fc,
-          type: [fieldType],
-        } as any;
+        fields[newName] = { type: [fieldType] };
       } else {
         if (operatorName === 'exists') {
-          fieldType = 'Boolean';
+          fields[operatorName] = { type: 'Boolean' };
         } else if (operatorName === 'regex') {
-          fieldType = GraphQLRegExpAsString;
+          // Only for fields with type String allow regex operator
+          if (fieldType === GraphQLString) {
+            fields[operatorName] = { type: GraphQLRegExpAsString };
+          }
+        } else {
+          fields[operatorName] = { type: fieldType } as any;
         }
-        fields[operatorName] = {
-          ...fc,
-          type: fieldType,
-        } as any;
       }
     }
   });
@@ -234,11 +232,7 @@ export const _recurseFields = (fields: SelectorOptions): SelectorOptions => {
     Object.keys(fields).forEach((fieldName) => {
       const operators: string[] = Object.values(availableOperators);
       if (operators.includes(fieldName)) {
-        if (fieldName === 'regex') {
-          selectors[`$${fieldName}`] = fields[fieldName];
-        } else {
-          selectors[`$${fieldName}`] = fields[fieldName];
-        }
+        selectors[`$${fieldName}`] = fields[fieldName];
       } else {
         selectors[fieldName] = _recurseFields(fields[fieldName] as SelectorOptions);
       }
