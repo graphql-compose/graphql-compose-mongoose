@@ -29,7 +29,7 @@ export type AllowedOperatorsName = typeof availableOperators[number];
 
 export type FieldsOperatorsConfig =
   | {
-      [fieldName: string]: FieldsOperatorsConfig | AllowedOperatorsName[] | false;
+      [fieldName: string]: FieldsOperatorsConfig | AllowedOperatorsName[] | boolean;
     }
   | boolean;
 
@@ -168,7 +168,7 @@ export function _recurseSchema(
         {
           ...opts,
           baseTypeName,
-          operators: fieldOperatorsConfig,
+          operators: fieldOperatorsConfig as FieldsOperatorsConfig,
         },
         indexedFields,
         fieldPath
