@@ -39,28 +39,41 @@ beforeEach(() => {
 describe('Resolver helper `filter` ->', () => {
   describe('_createOperatorsField()', () => {
     it('should add OPERATORS_FIELDNAME to filterType', () => {
-      _createOperatorsField(itc, 'OperatorsTypeName', UserModel, {});
+      _createOperatorsField(itc, UserModel, {
+        baseTypeName: 'TypeNameOperators',
+      });
       expect(itc.hasField(OPERATORS_FIELDNAME)).toBe(true);
-      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('OperatorsTypeName');
+      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('TypeNameOperators');
     });
     it('should have only provided fields via options', () => {
-      _createOperatorsField(itc, 'OperatorsTypeName', UserModel, { age: ['lt'] });
+      _createOperatorsField(itc, UserModel, {
+        baseTypeName: 'TypeNameOperators',
+        operators: {
+          age: ['lt'],
+        },
+      });
       const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
       expect(operatorsTC.hasField('age')).toBe(true);
     });
     it('should have only provided operators via options for field', () => {
-      _createOperatorsField(itc, 'OperatorsTypeName', UserModel, {
-        age: ['lt', 'gte'],
+      _createOperatorsField(itc, UserModel, {
+        baseTypeName: 'TypeNameOperators',
+        operators: {
+          age: ['lt', 'gte'],
+        },
       });
       const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
       const ageTC = operatorsTC.getFieldITC('age');
       expect(ageTC.getFieldNames()).toEqual(expect.arrayContaining(['lt', 'gte']));
     });
     it('should handle nested fields recursively', () => {
-      _createOperatorsField(itc, 'OperatorsTypeName', UserModel, {
-        age: ['lt', 'gte'],
-        billingAddress: { country: ['nin'], state: ['in'] },
-      } as any);
+      _createOperatorsField(itc, UserModel, {
+        baseTypeName: 'TypeNameOperators',
+        operators: {
+          age: ['lt', 'gte'],
+          billingAddress: { country: ['nin'], state: ['in'] },
+        },
+      });
       const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
       const billingAddressTC = operatorsTC.getFieldITC('billingAddress');
 
@@ -90,16 +103,16 @@ describe('Resolver helper `filter` ->', () => {
     });
     it('should reuse existed operatorsType', () => {
       const existedITC = itc.schemaComposer.getOrCreateITC('ExistedType');
-      _createOperatorsField(itc, 'ExistedType', UserModel, {});
+      _createOperatorsField(itc, UserModel, { baseTypeName: 'ExistedType' });
       expect(itc.getFieldType(OPERATORS_FIELDNAME)).toBe(existedITC.getType());
     });
   });
 
   describe('addFilterOperators()', () => {
     it('should add OPERATORS_FIELDNAME via _createOperatorsField()', () => {
-      addFilterOperators(itc, UserModel, {});
+      addFilterOperators(itc, UserModel, { baseTypeName: 'UserFilter', suffix: 'Input' });
       expect(itc.hasField(OPERATORS_FIELDNAME)).toBe(true);
-      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('OperatorsUserFilterInput');
+      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('UserFilterOperatorsInput');
     });
     it('should add OR field', () => {
       addFilterOperators(itc, UserModel, {});
@@ -119,16 +132,30 @@ describe('Resolver helper `filter` ->', () => {
       const fields = itc.getFieldNames();
       expect(fields).toEqual(expect.arrayContaining(['name']));
       expect(itc.hasField('_operators')).toBe(true);
-      expect(itc.getFieldITC('_operators').getFieldNames()).toEqual(['name']);
+      expect(itc.getFieldITC('_operators').getFieldNames()).toEqual([
+        '_id',
+        'employment',
+        'name',
+        'billingAddress',
+      ]);
       expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);
     });
     it('should respect operators configuration and allow onlyIndexed', () => {
       // By default when using onlyIndex, add all indexed fields, then if operators are supplied allow them as well
-      addFilterOperators(itc, UserModel, { onlyIndexed: true, operators: { name: ['exists'] } });
+      addFilterOperators(itc, UserModel, {
+        baseTypeName: 'User',
+        onlyIndexed: true,
+        operators: { name: ['exists'] },
+      });
       const fields = itc.getFieldNames();
       expect(fields).toEqual(expect.arrayContaining(['name']));
       expect(itc.hasField('_operators')).toBe(true);
-      expect(itc.getFieldITC('_operators').getFieldNames()).toEqual(['_id', 'employment', 'name']);
+      expect(itc.getFieldITC('_operators').getFieldNames()).toEqual([
+        '_id',
+        'employment',
+        'name',
+        'billingAddress',
+      ]);
       expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);
       expect(itc.getFieldITC('_operators').getFieldITC('employment').getFieldNames()).toEqual([
         'gt',

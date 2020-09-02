@@ -1,49 +1,37 @@
-/* eslint-disable no-use-before-define */
-
 import {
   getNamedType,
-  GraphQLInputType,
   GraphQLInputObjectType,
   GraphQLScalarType,
   GraphQLEnumType,
   GraphQLString,
 } from 'graphql-compose/lib/graphql';
-import type { Model, Schema, SchemaType, VirtualType } from 'mongoose';
-import type { InputTypeComposer } from 'graphql-compose';
+import type { Model } from 'mongoose';
+import { InputTypeComposer, inspect } from 'graphql-compose';
 import type { InputTypeComposerFieldConfigAsObjectDefinition } from 'graphql-compose';
 
-import { upperFirst } from '../../utils';
+import { upperFirst, getIndexesFromModel } from '../../utils';
 import type { FilterHelperArgsOpts } from './filter';
 import GraphQLRegExpAsString from '../../types/RegExpAsString';
 
-export type FilterOperatorNames =
-  | 'gt'
-  | 'gte'
-  | 'lt'
-  | 'lte'
-  | 'ne'
-  | 'in[]'
-  | 'nin[]'
-  | 'regex'
-  | 'exists';
+export const availableOperators = [
+  'gt',
+  'gte',
+  'lt',
+  'lte',
+  'ne',
+  'in',
+  'nin',
+  'regex',
+  'exists',
+] as const;
 
-export enum availableOperators {
-  GT = 'gt',
-  GTE = 'gte',
-  LT = 'lt',
-  LTE = 'lte',
-  NE = 'ne',
-  IN = 'in',
-  NIN = 'nin',
-  REGEX = 'regex',
-  EXISTS = 'exists',
-}
+export type AllowedOperatorsName = typeof availableOperators[number];
 
-export type FilterOperatorsOpts =
+export type FieldsOperatorsConfig =
   | {
-      [fieldName: string]: FilterOperatorsOpts | FilterOperatorNames[] | false;
+      [fieldName: string]: FieldsOperatorsConfig | AllowedOperatorsName[] | false;
     }
-  | false;
+  | boolean;
 
 export const OPERATORS_FIELDNAME = '_operators';
 
@@ -52,14 +40,14 @@ export function addFilterOperators(
   model: Model<any>,
   opts: FilterHelperArgsOpts
 ): void {
-  if (!{}.hasOwnProperty.call(opts, 'operators') || opts.operators !== false) {
-    _createOperatorsField(
-      itc,
-      `Operators${itc.getTypeName() || ''}`,
-      model,
-      opts.operators || false,
-      opts.onlyIndexed
-    );
+  if (opts?.operators !== false) {
+    _createOperatorsField(itc, model, {
+      baseTypeName: opts.baseTypeName || itc.getTypeName(),
+      operators: opts.operators,
+      onlyIndexed: opts.onlyIndexed || true,
+      prefix: opts.prefix || '',
+      suffix: `Operators${opts.suffix || ''}`,
+    });
   }
 
   itc.addFields({
@@ -71,30 +59,23 @@ export function addFilterOperators(
 export function _availableOperatorsFields(
   fieldName: string,
   itc: InputTypeComposer,
-  operatorsConfig: any
+  useOperators: AllowedOperatorsName[] | undefined | true
 ): Record<string, InputTypeComposerFieldConfigAsObjectDefinition> {
   const fields: Record<string, InputTypeComposerFieldConfigAsObjectDefinition> = {};
 
-  const operators = Array.isArray(operatorsConfig)
-    ? operatorsConfig.filter((value) => Object.values(availableOperators).includes(value))
-    : Object.values(availableOperators);
+  const operators = Array.isArray(useOperators)
+    ? useOperators.filter((value) => availableOperators.includes(value))
+    : availableOperators;
 
   operators.forEach((operatorName: string) => {
     // unwrap from GraphQLNonNull and GraphQLList, if present
-    let fieldType: GraphQLInputType | string = getNamedType(
-      itc.getFieldType(fieldName)
-    ) as GraphQLInputType;
-
-    // just treat enums as strings
-    if (fieldType instanceof GraphQLEnumType) {
-      fieldType = 'String';
-    }
+    const fieldType = getNamedType(itc.getFieldType(fieldName));
 
     if (fieldType) {
       if (['in', 'nin', 'in[]', 'nin[]'].includes(operatorName)) {
         // wrap with GraphQLList, if operator required this with `[]`
         const newName = operatorName.slice(-2) === '[]' ? operatorName.slice(0, -2) : operatorName;
-        fields[newName] = { type: [fieldType] };
+        fields[newName] = { type: [fieldType] as any };
       } else {
         if (operatorName === 'exists') {
           fields[operatorName] = { type: 'Boolean' };
@@ -104,7 +85,7 @@ export function _availableOperatorsFields(
             fields[operatorName] = { type: GraphQLRegExpAsString };
           }
         } else {
-          fields[operatorName] = { type: fieldType } as any;
+          fields[operatorName] = { type: fieldType as any };
         }
       }
     }
@@ -119,105 +100,119 @@ export type OperatorsConfig = {
 export function _recurseSchema(
   inputITC: InputTypeComposer,
   sourceITC: InputTypeComposer<any>,
-  typeName: string,
-  schema: Schema | SchemaType | VirtualType | null,
-  pathName: string | null,
-  operatorsOpts: FilterOperatorsOpts,
-  onlyIndexed: boolean
+  opts: CreateOperatorsFieldOpts,
+  indexedFields: string[],
+  pathName: string | null
 ): void {
   const { schemaComposer } = sourceITC;
 
-  Object.keys(sourceITC.getFields()).forEach((fieldName: string) => {
-    const fieldTC = sourceITC.getFieldTC(fieldName);
-    const fieldType = sourceITC.getFieldTC(fieldName).getType();
+  sourceITC.getFieldNames().forEach((fieldName: string) => {
+    const fieldPath = pathName ? `${pathName}.${fieldName}` : fieldName;
+    // if field is indexed or indexed some sub-field
+    const isIndexed = indexedFields.some((v) => v === fieldPath || v.startsWith(`${fieldPath}.`));
 
-    // alias
-    const fullPath = pathName ? `${pathName}.${fieldName}` : fieldName;
-    let schemaType;
-    const _schema = schema as any;
-    if (_schema) {
-      if (_schema.pathType) {
-        const pathType = _schema.pathType(fullPath);
-        schemaType = _schema.path(fullPath);
-        if (pathType === 'virtual') schemaType = _schema.virtualpath(fullPath);
-        if (pathType === 'nested') schemaType = null;
-      } else if (typeof _schema.path === 'string') {
-        schemaType = null; // array
-      }
+    const fieldOperatorsConfig =
+      opts.operators === true ? true : opts.operators && opts.operators[fieldName];
+    if (fieldOperatorsConfig === false) {
+      // operators are disabled for current field SO skip field addition
+      return;
+    }
+    if (opts.onlyIndexed && !isIndexed && !fieldOperatorsConfig) {
+      // field does not have index & does not have manual config SO skip field addition
+      return;
+    }
+    if (Array.isArray(fieldOperatorsConfig) && fieldOperatorsConfig.length === 0) {
+      // empty list of available operators SO skip field addition
+      return;
     }
 
-    // Need to dig into this space
-    const isIndexed: boolean = schemaType?.options?.index || fieldName === '_id';
-
-    const hasOperatorsConfig =
-      (operatorsOpts &&
-        operatorsOpts[fieldName] &&
-        Object.keys(operatorsOpts[fieldName]).length >= 1) ||
-      (operatorsOpts && Array.isArray(operatorsOpts[fieldName]));
-    const operatorsConfig = hasOperatorsConfig
-      ? operatorsOpts && operatorsOpts[fieldName]
-      : !(operatorsOpts === false);
+    const fieldTC = sourceITC.getFieldTC(fieldName);
+    const fieldType = fieldTC.getType();
 
     // prevent infinite recursion
     if (sourceITC.getType() === fieldType) return;
 
-    if (fieldType instanceof GraphQLScalarType) {
-      const newITC = schemaComposer.createInputTC(`${upperFirst(fieldName)}${typeName}`);
-      if ((onlyIndexed && isIndexed) || hasOperatorsConfig || !operatorsOpts) {
-        newITC.addFields(_availableOperatorsFields(fieldName, sourceITC, operatorsConfig));
+    const baseTypeName = `${opts.baseTypeName}${upperFirst(fieldName)}`;
+    const inputFieldTypeName = `${opts.prefix || ''}${baseTypeName}${opts.suffix || ''}`;
+
+    if (fieldType instanceof GraphQLScalarType || fieldType instanceof GraphQLEnumType) {
+      if (
+        fieldOperatorsConfig &&
+        !Array.isArray(fieldOperatorsConfig) &&
+        fieldOperatorsConfig !== true
+      ) {
+        throw new Error(
+          `You provide incorrect operators config for field '${
+            opts.baseTypeName
+          }.${fieldName}'. This field has Scalar type, so you may provide array or false. Received: ${inspect(
+            fieldOperatorsConfig
+          )}`
+        );
+      }
+      const fields = _availableOperatorsFields(fieldName, sourceITC, fieldOperatorsConfig);
+      if (Object.keys(fields).length > 0) {
+        // create new input type with operators for current field
+        const fieldOperatorsITC = schemaComposer
+          .createInputTC(inputFieldTypeName)
+          .addFields(fields);
+        // add new field to filter with new input type
         inputITC.addFields({
-          [fieldName]: newITC,
+          [fieldName]: fieldOperatorsITC,
         });
       }
     } else if (fieldType instanceof GraphQLInputObjectType) {
-      const newITC = schemaComposer.createInputTC(`${upperFirst(fieldName)}${typeName}`);
-
+      const fieldOperatorsITC = schemaComposer.createInputTC(inputFieldTypeName);
       _recurseSchema(
-        newITC,
+        fieldOperatorsITC,
         fieldTC as InputTypeComposer,
-        `${upperFirst(fieldName)}${typeName}`,
-        schemaType || schema,
-        `${fieldName}`,
-        operatorsConfig as FilterOperatorsOpts,
-        onlyIndexed
+        {
+          ...opts,
+          baseTypeName,
+          operators: fieldOperatorsConfig,
+        },
+        indexedFields,
+        fieldPath
       );
-      if ((onlyIndexed && isIndexed) || hasOperatorsConfig || !operatorsOpts) {
-        inputITC.addFields({
-          [fieldName]: newITC,
-        });
-      }
-    } else if (fieldType instanceof GraphQLEnumType) {
-      const newITC = schemaComposer.createInputTC({
-        name: `${upperFirst(fieldName)}${typeName}`,
-        fields: {},
+      inputITC.addFields({
+        [fieldName]: fieldOperatorsITC,
       });
-      if ((onlyIndexed && isIndexed) || hasOperatorsConfig || !operatorsOpts) {
-        newITC.addFields(_availableOperatorsFields(fieldName, sourceITC, operatorsConfig));
-        inputITC.addFields({
-          [fieldName]: newITC,
-        });
-      }
     }
   });
 }
 
+interface CreateOperatorsFieldOpts {
+  baseTypeName: string;
+  operators?: FieldsOperatorsConfig;
+  onlyIndexed?: boolean;
+  prefix?: string;
+  suffix?: string;
+}
+
 export function _createOperatorsField<TContext>(
   itc: InputTypeComposer<TContext>,
-  typeName: string,
   model: Model<any>,
-  operatorsOpts: FilterOperatorsOpts,
-  onlyIndexed: boolean = false
+  opts: CreateOperatorsFieldOpts
 ): InputTypeComposer<TContext> {
-  const operatorsITC = itc.schemaComposer.getOrCreateITC(typeName, (tc) => {
-    tc.setDescription('For performance reason this type contains only *indexed* fields.');
-  });
+  const operatorsITC = itc.schemaComposer.getOrCreateITC(
+    `${opts.prefix || ''}${opts.baseTypeName}${opts.suffix || ''}`,
+    (tc) => {
+      if (opts.onlyIndexed) {
+        tc.setDescription('For performance reason this type contains only *indexed* fields.');
+      }
+    }
+  );
 
-  _recurseSchema(operatorsITC, itc, typeName, model.schema, null, operatorsOpts, onlyIndexed);
+  const indexedFields = getIndexesFromModel(model).map((o) => Object.keys(o)[0]);
+  _recurseSchema(operatorsITC, itc, opts, indexedFields, null);
 
-  itc.setField(OPERATORS_FIELDNAME, {
-    type: operatorsITC,
-    description: 'List of *indexed* fields that can be filtered via operators.',
-  });
+  if (operatorsITC.getFieldNames().length > 0) {
+    itc.setField(OPERATORS_FIELDNAME, {
+      type: operatorsITC,
+      description: opts.onlyIndexed
+        ? 'List of *indexed* fields that can be filtered via operators.'
+        : undefined,
+    });
+  }
 
   return operatorsITC;
 }
