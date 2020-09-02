@@ -16,7 +16,7 @@ const baseConverterResolverOpts: TypeConverterResolversOpts = {
       removeFields: ['id', 'dob'],
       operators: {
         one: ['gt', 'gte', 'lt'],
-        two: ['gt', 'gte', 'lt', 'in[]', 'nin[]'],
+        two: ['gt', 'gte', 'lt', 'in', 'nin'],
       },
     },
   },
@@ -41,7 +41,7 @@ const childConverterResolverOpts: TypeConverterResolversOpts = {
     filter: {
       removeFields: ['gender', 'dob', 'age'],
       operators: {
-        one: ['gt', 'lte', 'ne', 'in[]', 'nin[]'],
+        one: ['gt', 'lte', 'ne', 'in', 'nin'],
         two: ['gt', 'gte', 'lt', 'lte', 'ne'],
         three: ['gte', 'lt'],
       },
@@ -68,8 +68,8 @@ const expectedConverterResolverOpts: TypeConverterResolversOpts = {
       isRequired: true,
       removeFields: ['id', 'dob', 'gender', 'age'],
       operators: {
-        one: ['gt', 'gte', 'lt', 'lte', 'ne', 'in[]', 'nin[]'],
-        two: ['gt', 'gte', 'lt', 'in[]', 'nin[]', 'lte', 'ne'],
+        one: ['gt', 'gte', 'lt', 'lte', 'ne', 'in', 'nin'],
+        two: ['gt', 'gte', 'lt', 'in', 'nin', 'lte', 'ne'],
         three: ['gte', 'lt'],
       },
     },
