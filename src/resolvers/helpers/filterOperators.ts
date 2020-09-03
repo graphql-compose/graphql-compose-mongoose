@@ -51,8 +51,8 @@ export function addFilterOperators(
   }
 
   itc.addFields({
-    OR: [itc.getTypeNonNull()],
-    AND: [itc.getTypeNonNull()],
+    OR: itc.NonNull.List,
+    AND: itc.NonNull.List,
   });
 }
 

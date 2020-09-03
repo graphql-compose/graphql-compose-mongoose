@@ -31,7 +31,7 @@ export default function findMany<TSource = Document, TContext = any>(
   const aliases = prepareAliases(model);
 
   return tc.schemaComposer.createResolver({
-    type: tc.getTypeNonNull().getTypePlural(),
+    type: tc.NonNull.List.NonNull,
     name: 'findMany',
     kind: 'query',
     args: {
@@ -57,7 +57,7 @@ export default function findMany<TSource = Document, TContext = any>(
       limitHelper(resolveParams);
       sortHelper(resolveParams);
       projectionHelper(resolveParams, aliases);
-      return beforeQueryHelper(resolveParams);
+      return beforeQueryHelper(resolveParams) || [];
     }) as any,
   });
 }

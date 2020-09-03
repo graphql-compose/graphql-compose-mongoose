@@ -37,6 +37,7 @@ export default function createMany<TSource = Document, TContext = any>(
       recordIds: {
         type: '[MongoID!]!',
         description: 'Created document IDs',
+        resolve: (s: any) => s.recordIds || [],
       },
       records: {
         type: tc.NonNull.List,

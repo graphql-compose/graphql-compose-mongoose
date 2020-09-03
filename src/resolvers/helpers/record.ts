@@ -59,7 +59,7 @@ export const recordHelperArgs = (
 
   return {
     record: {
-      type: opts.isRequired ? recordITC.getTypeNonNull() : recordITC,
+      type: opts.isRequired ? recordITC.NonNull : recordITC,
     },
   };
 };

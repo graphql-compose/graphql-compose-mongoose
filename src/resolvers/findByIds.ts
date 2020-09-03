@@ -29,7 +29,7 @@ export default function findByIds<TSource = Document, TContext = any>(
   const aliases = prepareAliases(model);
 
   return tc.schemaComposer.createResolver({
-    type: tc.getTypeNonNull().getTypePlural(),
+    type: tc.NonNull.List.NonNull,
     name: 'findByIds',
     kind: 'query',
     args: {
@@ -58,7 +58,7 @@ export default function findByIds<TSource = Document, TContext = any>(
       projectionHelper(resolveParams, aliases);
       limitHelper(resolveParams);
       sortHelper(resolveParams);
-      return beforeQueryHelper(resolveParams);
+      return beforeQueryHelper(resolveParams) || [];
     }) as any,
   }) as any;
 }

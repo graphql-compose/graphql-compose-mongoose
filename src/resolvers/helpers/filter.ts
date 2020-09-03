@@ -91,7 +91,7 @@ export const filterHelperArgs = (
 
   return {
     filter: {
-      type: opts.isRequired ? itc.getTypeNonNull() : itc,
+      type: opts.isRequired ? itc.NonNull : itc,
       description: opts.onlyIndexed ? 'Filter only by indexed fields' : 'Filter by fields',
     },
   };
