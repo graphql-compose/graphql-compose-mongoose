@@ -8,7 +8,6 @@ import {
   validationsForDocument,
   ValidationsWithMessage,
   ManyValidations,
-  ManyValidationsWithMessage,
 } from '../errors/validationsForDocument';
 
 export default function createMany<TSource = Document, TContext = any>(
@@ -51,6 +50,7 @@ export default function createMany<TSource = Document, TContext = any>(
       createCount: {
         type: 'Int!',
         description: 'Number of created documents',
+        resolve: (s: any) => s.createCount || 0,
       },
     });
   });
@@ -106,36 +106,20 @@ export default function createMany<TSource = Document, TContext = any>(
       }
 
       const hasValidationError = !manyValidations.every((error) => error === null);
-      if (!hasValidationError) {
-        await model.create(docs);
-      }
-
       if (hasValidationError) {
-        const manyValidationsWithMessage: ManyValidationsWithMessage = {
-          message: 'Cannot createMany some documents contain errors',
+        throw new ManyValidationError({
+          message: 'Cannot execute createMany, some documents contain errors',
           errors: manyValidations,
-        };
-
-        if (!resolveParams?.projection?.error) {
-          // if client does not request `errors` field we throw Exception on to level
-          throw new ManyValidationError(manyValidationsWithMessage);
-        }
-        return {
-          records: null,
-          recordIds: null,
-          error: {
-            name: 'ManyValidationError',
-            ...manyValidationsWithMessage,
-          },
-          createCount: 0,
-        };
-      } else {
-        return {
-          records: docs,
-          recordIds: docs.map((doc) => doc._id),
-          createCount: docs.length,
-        };
+        });
       }
+
+      await model.create(docs);
+
+      return {
+        records: docs,
+        recordIds: docs.map((doc) => doc._id),
+        createCount: docs.length,
+      };
     },
   });
 
