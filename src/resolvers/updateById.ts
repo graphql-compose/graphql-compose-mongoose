@@ -4,8 +4,7 @@ import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
 import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
-import { validationsForDocument, ValidationsWithMessage } from '../errors/validationsForDocument';
-import { ValidationError } from '../errors';
+import { validateAndThrow } from './helpers/validate';
 
 export default function updateById<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -96,12 +95,7 @@ export default function updateById<TSource = Document, TContext = any>(
       }
 
       doc.set(recordData);
-
-      const validations: ValidationsWithMessage | null = await validationsForDocument(doc);
-      if (validations) {
-        throw new ValidationError(validations);
-      }
-
+      await validateAndThrow(doc);
       await doc.save({ validateBeforeSave: false });
 
       return {

@@ -3,12 +3,7 @@ import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers';
 import type { GenResolverOpts } from './index';
 import { addManyErrorCatcherField } from './helpers/addErrorCatcherField';
-import { ManyValidationError } from '../errors';
-import {
-  validationsForDocument,
-  ValidationsWithMessage,
-  ManyValidations,
-} from '../errors/validationsForDocument';
+import { validateManyAndThrow } from './helpers/validate';
 
 export default function createMany<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -89,30 +84,17 @@ export default function createMany<TSource = Document, TContext = any>(
         }
       }
 
-      const manyValidations: ManyValidations = [];
       const docs = [];
-
       for (const record of recordData) {
         // eslint-disable-next-line new-cap
         let doc: Document = new model(record);
         if (resolveParams.beforeRecordMutate) {
           doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
         }
-
-        const validations: ValidationsWithMessage | null = await validationsForDocument(doc);
-
-        manyValidations.push(validations ? validations : null);
         docs.push(doc);
       }
 
-      const hasValidationError = !manyValidations.every((error) => error === null);
-      if (hasValidationError) {
-        throw new ManyValidationError({
-          message: 'Cannot execute createMany, some documents contain errors',
-          errors: manyValidations,
-        });
-      }
-
+      await validateManyAndThrow(docs);
       await model.create(docs, { validateBeforeSave: false });
 
       return {
