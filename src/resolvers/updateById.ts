@@ -88,25 +88,27 @@ export default function updateById<TSource = Document, TContext = any>(
         throw new Error('Document not found');
       }
 
-      if (recordData) {
-        doc.set(recordData);
-
-        const validationErrors = await new Promise((resolve) => {
-          doc.validate(null, null, resolve);
-        });
-        if (validationErrors) {
-          throw new ValidationError(validationErrors as any);
-        }
-
-        await doc.save();
-
-        return {
-          record: doc,
-          recordId: tc.getRecordIdFn()(doc),
-        };
+      if (!recordData) {
+        throw new Error(
+          `${tc.getTypeName()}.updateById resolver doesn't receive new data in args.record`
+        );
       }
 
-      return null;
+      doc.set(recordData);
+
+      const validationErrors = await new Promise((resolve) => {
+        doc.validate(null, null, resolve);
+      });
+      if (validationErrors) {
+        throw new ValidationError(validationErrors as any);
+      }
+
+      await doc.save();
+
+      return {
+        record: doc,
+        recordId: tc.getRecordIdFn()(doc),
+      };
     }) as any,
   });
 

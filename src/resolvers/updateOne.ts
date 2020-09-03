@@ -34,10 +34,6 @@ export default function updateOne<TSource = Document, TContext = any>(
         type: tc,
         description: 'Updated document',
       },
-      errors: {
-        type: '[ErrorInterface]',
-        description: 'Errors that may occur',
-      },
     });
   });
 
@@ -92,43 +88,23 @@ export default function updateOne<TSource = Document, TContext = any>(
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
       }
 
+      if (!doc) return null;
+
       if (recordData) {
         doc.set(recordData);
 
         const validations: ValidationsWithMessage | null = await validationsForDocument(doc);
-
         if (validations) {
-          if (!resolveParams?.projection?.error) {
-            // if client does not request `errors` field we throw Exception on to level
-            throw new ValidationError(validations);
-          }
-          return {
-            record: null,
-            recordId: null,
-            error: {
-              name: 'ValidationError',
-              ...validations,
-            },
-          };
-        } else {
-          await doc.save();
-          return {
-            record: doc,
-            recordId: tc.getRecordIdFn()(doc as any),
-          };
+          throw new ValidationError(validations);
         }
 
         await doc.save();
       }
 
-      if (doc) {
-        return {
-          record: doc,
-          recordId: tc.getRecordIdFn()(doc as any),
-        };
-      }
-
-      return null;
+      return {
+        record: doc,
+        recordId: tc.getRecordIdFn()(doc as any),
+      };
     }) as any,
   });
 
