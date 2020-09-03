@@ -141,6 +141,7 @@ describe("issue #248 - payloads' errors", () => {
                   message
                   path
                   value
+                  idx
                 }
               }
             }
@@ -155,13 +156,13 @@ describe("issue #248 - payloads' errors", () => {
           records: null,
           error: {
             __typename: 'ValidationError',
-            message: 'User validation failed: someStrangeField: this is a validate message',
+            message: 'Nothing has been saved. Some documents contain validation errors',
             errors: [
               {
                 message: 'this is a validate message',
-                path: '1.someStrangeField',
-                //     ^^ - we add idx of broken record
+                path: 'someStrangeField',
                 value: 'Test',
+                idx: 1,
               },
             ],
           },

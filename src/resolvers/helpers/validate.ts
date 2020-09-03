@@ -1,11 +1,16 @@
 import type { Error as MongooseError } from 'mongoose';
 import type { Document } from 'mongoose';
-import { ValidationError, ManyValidationError, ManyValidationsByIdx } from '../../errors';
+import { ValidationError } from '../../errors';
 
 export type ValidationErrorData = {
   path: string;
   message: string;
   value: any;
+  /**
+   * This `idx` property is used only for *Many operations.
+   * It stores idx from received array of records which occurs Validation Error.
+   */
+  idx?: number;
 };
 
 export type ValidationsWithMessage = {
@@ -48,29 +53,32 @@ export async function validateAndThrow(doc: Document): Promise<void> {
 /**
  * Make async validation for array of mongoose documents.
  * And if they have validation errors then throw one Error with embedding
- * all validation errors for every document separately.
- * If document does not have error then in embedded errors' array will
- * be `null` at the same idx position.
+ * all validator errors into one array with addition of `idx` property.
+ * `idx` represent record index in array received from user.
  */
 export async function validateManyAndThrow(docs: Document[]): Promise<void> {
-  const manyValidations: ManyValidationsByIdx = [];
+  const combinedValidators: Array<ValidationErrorData> = [];
   let hasValidationError = false;
 
-  for (const doc of docs) {
-    const validations: ValidationsWithMessage | null = await validateDoc(doc);
+  for (let idx = 0; idx < docs.length; idx++) {
+    const validations: ValidationsWithMessage | null = await validateDoc(docs[idx]);
 
     if (validations) {
-      manyValidations.push(validations);
+      validations.errors.forEach((validatorError) => {
+        combinedValidators.push({
+          ...validatorError,
+          idx,
+        });
+      });
+
       hasValidationError = true;
-    } else {
-      manyValidations.push(null);
     }
   }
 
   if (hasValidationError) {
-    throw new ManyValidationError({
-      message: 'Some documents contain validation errors',
-      errors: manyValidations,
+    throw new ValidationError({
+      message: 'Nothing has been saved. Some documents contain validation errors',
+      errors: combinedValidators,
     });
   }
 }
