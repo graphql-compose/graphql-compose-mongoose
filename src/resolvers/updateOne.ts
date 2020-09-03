@@ -4,8 +4,7 @@ import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { skipHelperArgs, recordHelperArgs, filterHelperArgs, sortHelperArgs } from './helpers';
 import findOne from './findOne';
 import { addErrorCatcherField } from './helpers/addErrorCatcherField';
-import { ValidationError } from '../errors';
-import { validationsForDocument, ValidationsWithMessage } from '../errors/validationsForDocument';
+import { validateAndThrow } from './helpers/validate';
 
 export default function updateOne<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -92,12 +91,7 @@ export default function updateOne<TSource = Document, TContext = any>(
 
       if (recordData) {
         doc.set(recordData);
-
-        const validations: ValidationsWithMessage | null = await validationsForDocument(doc);
-        if (validations) {
-          throw new ValidationError(validations);
-        }
-
+        await validateAndThrow(doc);
         await doc.save({ validateBeforeSave: false });
       }
 

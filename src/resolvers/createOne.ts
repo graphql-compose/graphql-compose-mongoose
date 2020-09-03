@@ -3,8 +3,7 @@ import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { addErrorCatcherField } from './helpers/addErrorCatcherField';
-import { ValidationError } from '../errors';
-import { validationsForDocument, ValidationsWithMessage } from '../errors/validationsForDocument';
+import { validateAndThrow } from './helpers/validate';
 
 export default function createOne<TSource = Document, TContext = any>(
   model: Model<any>,
@@ -76,11 +75,7 @@ export default function createOne<TSource = Document, TContext = any>(
         if (!doc) return null;
       }
 
-      const validations: ValidationsWithMessage | null = await validationsForDocument(doc);
-      if (validations) {
-        throw new ValidationError(validations);
-      }
-
+      await validateAndThrow(doc);
       await doc.save({ validateBeforeSave: false });
       return {
         record: doc,

@@ -1,10 +1,9 @@
 import { SchemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLError } from 'graphql';
-
-import type { Validations, ValidationsWithMessage } from './validationsForDocument';
+import type { ValidationErrorData, ValidationsWithMessage } from '../resolvers/helpers/validate';
 
 export class ValidationError extends GraphQLError {
-  public errors: Validations;
+  public errors: ValidationErrorData[];
 
   constructor(validation: ValidationsWithMessage) {
     super(validation.message, undefined, undefined, undefined, undefined, undefined, {
