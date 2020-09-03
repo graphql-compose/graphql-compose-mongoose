@@ -3,7 +3,7 @@ import type { Model, Document } from 'mongoose';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { skipHelperArgs, recordHelperArgs, filterHelperArgs, sortHelperArgs } from './helpers';
 import findOne from './findOne';
-import { addErrorCatcherField } from './helpers/addErrorCatcherField';
+import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateAndThrow } from './helpers/validate';
 
 export default function updateOne<TSource = Document, TContext = any>(

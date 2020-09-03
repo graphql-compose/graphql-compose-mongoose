@@ -2,7 +2,7 @@ import type { ObjectTypeComposer, Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers';
 import type { GenResolverOpts } from './index';
-import { addManyErrorCatcherField } from './helpers/addErrorCatcherField';
+import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateManyAndThrow } from './helpers/validate';
 
 export default function createMany<TSource = Document, TContext = any>(
@@ -107,7 +107,7 @@ export default function createMany<TSource = Document, TContext = any>(
 
   // Add `error` field to payload which can catch resolver Error
   // and return it in mutation payload
-  addManyErrorCatcherField(resolver);
+  addErrorCatcherField(resolver);
 
   return resolver;
 }
