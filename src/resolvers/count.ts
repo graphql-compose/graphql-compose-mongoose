@@ -25,7 +25,7 @@ export default function count<TSource = Document, TContext = any>(
     kind: 'query',
     args: {
       ...filterHelperArgs(tc, model, {
-        prefix: 'Filter', // TODO: rename to FilterCount in 9.0.0
+        prefix: 'FilterCount',
         suffix: 'Input',
         ...opts?.filter,
       }),

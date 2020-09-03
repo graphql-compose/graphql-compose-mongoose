@@ -35,7 +35,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
       switch (resolverName) {
         case EMCResolvers.findMany:
         case EMCResolvers.findByIds:
-          resolver.setType(baseTC.getDInterface().getTypePlural());
+          resolver.setType(baseTC.getDInterface().List);
           // @ts-expect-error
           resolver.projection[baseTC.getDKey()] = 1;
           break;
@@ -62,7 +62,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
 
         case EMCResolvers.createMany:
           resolver.getOTC().extendField('records', {
-            type: baseTC.getDInterface().getTypePlural().getTypeNonNull(),
+            type: baseTC.getDInterface().List.NonNull,
             projection: {
               [baseTC.getDKey()]: 1,
             },
@@ -71,7 +71,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
 
         case EMCResolvers.pagination:
           resolver.getOTC().extendField('items', {
-            type: baseTC.getDInterface().getTypePlural(),
+            type: baseTC.getDInterface().List,
             projection: {
               [baseTC.getDKey()]: 1,
             },
@@ -85,15 +85,13 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
             .clone(`${baseTC.getTypeName()}Edge`);
 
           edgesTC.extendField('node', {
-            type: baseTC.getDInterface().getTypeNonNull(),
+            type: baseTC.getDInterface().NonNull,
             projection: {
               [baseTC.getDKey()]: 1,
             },
           });
 
-          resolver
-            .getOTC()
-            .setField('edges', edgesTC.getTypeNonNull().getTypePlural().getTypeNonNull());
+          resolver.getOTC().setField('edges', edgesTC.NonNull.List.NonNull);
           break;
 
         default:
@@ -106,7 +104,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
       if (resolverName === EMCResolvers.createOne || resolverName === EMCResolvers.createMany) {
         const fieldName = resolverName === EMCResolvers.createMany ? 'records' : 'record';
         resolver.getArgITC(fieldName).extendField(baseTC.getDKey(), {
-          type: baseTC.getDKeyETC().getTypeNonNull(),
+          type: baseTC.getDKeyETC().NonNull,
         });
       }
     }

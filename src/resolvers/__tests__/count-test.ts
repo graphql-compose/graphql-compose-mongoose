@@ -61,7 +61,7 @@ describe('count() ->', () => {
       const resolver = count(UserModel, UserTC);
       expect(resolver.getArgITC('filter').getFieldITC('contacts').toSDL({ omitDescriptions: true }))
         .toMatchInlineSnapshot(`
-        "input FilterUserContactsInput {
+        "input FilterCountUserContactsInput {
           phones: [String]
           email: String
           skype: String
