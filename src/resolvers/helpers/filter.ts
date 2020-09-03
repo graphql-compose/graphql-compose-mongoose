@@ -18,6 +18,7 @@ export type FilterHelperArgsOpts = {
   baseTypeName?: string;
   isRequired?: boolean;
   onlyIndexed?: boolean;
+  allowAll?: boolean;
   requiredFields?: string | string[];
   operators?: FieldsOperatorsConfig | false;
   removeFields?: string | string[];

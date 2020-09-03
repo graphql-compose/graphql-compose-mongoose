@@ -45,6 +45,7 @@ export function addFilterOperators(
       baseTypeName: opts.baseTypeName || itc.getTypeName(),
       operators: opts.operators,
       onlyIndexed: opts.onlyIndexed || true,
+      allowAll: opts.allowAll || false,
       prefix: opts.prefix || '',
       suffix: `Operators${opts.suffix || ''}`,
     });
@@ -117,7 +118,7 @@ export function _recurseSchema(
       // operators are disabled for current field SO skip field addition
       return;
     }
-    if (opts.onlyIndexed && !isIndexed && !fieldOperatorsConfig) {
+    if (opts.onlyIndexed && !isIndexed && !fieldOperatorsConfig && !opts.allowAll) {
       // field does not have index & does not have manual config SO skip field addition
       return;
     }
@@ -184,6 +185,7 @@ interface CreateOperatorsFieldOpts {
   baseTypeName: string;
   operators?: FieldsOperatorsConfig;
   onlyIndexed?: boolean;
+  allowAll?: boolean;
   prefix?: string;
   suffix?: string;
 }
