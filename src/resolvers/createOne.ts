@@ -81,7 +81,7 @@ export default function createOne<TSource = Document, TContext = any>(
         throw new ValidationError(validations);
       }
 
-      await doc.save();
+      await doc.save({ validateBeforeSave: false });
       return {
         record: doc,
         recordId: tc.getRecordIdFn()(doc as any),
