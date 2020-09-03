@@ -106,8 +106,8 @@ describe('createMany() ->', () => {
             { name: 'newName0', contacts: { email: 'mail' } },
             { name: 'newName1', contacts: { email: 'mail' } },
           ],
-          projection: { error: true },
         },
+        projection: { error: true },
       });
       expect(result.createCount).toBe(2);
       expect(result.records[0].name).toBe('newName0');
@@ -136,8 +136,8 @@ describe('createMany() ->', () => {
             { name: checkedName, contacts: { email: 'mail' } },
             { name: checkedName, contacts: { email: 'mail' } },
           ],
-          projection: { error: true },
         },
+        projection: { error: true },
       });
 
       const docs = await UserModel.collection.find({ _id: { $in: res.recordIds } }).toArray();
@@ -150,8 +150,8 @@ describe('createMany() ->', () => {
       const result = await createMany(UserModel, UserTC).resolve({
         args: {
           records: [{ name: 'NewUser', contacts: { email: 'mail' } }],
-          projection: { error: true },
         },
+        projection: { error: true },
       });
       expect(result.records[0]._id).toBe(result.recordIds[0]);
     });
@@ -171,8 +171,8 @@ describe('createMany() ->', () => {
             { name: 'NewUser0', contacts: { email: 'mail' } },
             { name: 'NewUser1', contacts: { email: 'mail' } },
           ],
-          projection: { error: true },
         },
+        projection: { error: true },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           record.name = 'OverriddenName';
@@ -209,8 +209,8 @@ describe('createMany() ->', () => {
             { name: 'NewUser0', contacts: { email: 'mail' } },
             { name: 'NewUser1', contacts: { email: 'mail' } },
           ],
-          projection: { error: true },
         },
+        projection: { error: true },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           record.name = 'OverriddenName';
