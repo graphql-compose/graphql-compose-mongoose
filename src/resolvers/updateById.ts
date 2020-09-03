@@ -4,6 +4,7 @@ import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
 import { addErrorCatcherField } from './helpers/addErrorCatcherField';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { validationsForDocument, ValidationsWithMessage } from '../errors/validationsForDocument';
 import { ValidationError } from '../errors';
 
 export default function updateById<TSource = Document, TContext = any>(
@@ -78,7 +79,7 @@ export default function updateById<TSource = Document, TContext = any>(
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      let doc = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
+      let doc: Document = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
@@ -96,18 +97,16 @@ export default function updateById<TSource = Document, TContext = any>(
 
       doc.set(recordData);
 
-      const validationErrors = await new Promise((resolve) => {
-        doc.validate(null, null, resolve);
-      });
-      if (validationErrors) {
-        throw new ValidationError(validationErrors as any);
+      const validations: ValidationsWithMessage | null = await validationsForDocument(doc);
+      if (validations) {
+        throw new ValidationError(validations);
       }
 
-      await doc.save();
+      await doc.save({ validateBeforeSave: false });
 
       return {
         record: doc,
-        recordId: tc.getRecordIdFn()(doc),
+        recordId: tc.getRecordIdFn()(doc as any),
       };
     }) as any,
   });

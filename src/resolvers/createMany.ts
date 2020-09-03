@@ -94,7 +94,7 @@ export default function createMany<TSource = Document, TContext = any>(
 
       for (const record of recordData) {
         // eslint-disable-next-line new-cap
-        let doc = new model(record);
+        let doc: Document = new model(record);
         if (resolveParams.beforeRecordMutate) {
           doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
         }
@@ -113,7 +113,7 @@ export default function createMany<TSource = Document, TContext = any>(
         });
       }
 
-      await model.create(docs);
+      await model.create(docs, { validateBeforeSave: false });
 
       return {
         records: docs,
