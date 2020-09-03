@@ -2,7 +2,7 @@ import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import findById from './findById';
 import type { ExtendedResolveParams } from './index';
-import { addErrorCatcherField } from './helpers/addErrorCatcherField';
+import { addErrorCatcherField } from './helpers/errorCatcher';
 
 export default function removeById<TSource = Document, TContext = any>(
   model: Model<any>,

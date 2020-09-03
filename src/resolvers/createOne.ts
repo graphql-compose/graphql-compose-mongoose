@@ -2,7 +2,7 @@ import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
-import { addErrorCatcherField } from './helpers/addErrorCatcherField';
+import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateAndThrow } from './helpers/validate';
 
 export default function createOne<TSource = Document, TContext = any>(

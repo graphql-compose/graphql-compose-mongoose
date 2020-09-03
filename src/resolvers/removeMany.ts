@@ -3,7 +3,7 @@ import type { Model, Document } from 'mongoose';
 import { filterHelperArgs, filterHelper, prepareAliases } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
-import { addErrorCatcherField } from './helpers/addErrorCatcherField';
+import { addErrorCatcherField } from './helpers/errorCatcher';
 
 export default function removeMany<TSource = Document, TContext = any>(
   model: Model<any>,

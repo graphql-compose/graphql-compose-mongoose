@@ -2,7 +2,7 @@ import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs } from './helpers/record';
 import findById from './findById';
-import { addErrorCatcherField } from './helpers/addErrorCatcherField';
+import { addErrorCatcherField } from './helpers/errorCatcher';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { validateAndThrow } from './helpers/validate';
 
