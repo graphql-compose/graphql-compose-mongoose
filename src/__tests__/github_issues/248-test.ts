@@ -124,7 +124,7 @@ describe("issue #248 - payloads' errors", () => {
     });
   });
 
-  it('check validation for createMany', async () => {
+  it('check validation for createMany with error in mutation payload', async () => {
     const res = await graphql.graphql({
       schema,
       source: `
@@ -168,6 +168,42 @@ describe("issue #248 - payloads' errors", () => {
           },
         },
       },
+    });
+  });
+
+  it('check validation for createMany with root-level errors & extension', async () => {
+    const res = await graphql.graphql({
+      schema,
+      source: `
+        mutation { 
+          createMany(records: [{ name: "Ok"}, { name: "John", someStrangeField: "Test" }]) { 
+            records { 
+              name
+            }
+          }
+        }
+      `,
+    });
+
+    expect(res).toEqual({
+      data: { createMany: null },
+      errors: [
+        expect.objectContaining({
+          message: 'Nothing has been saved. Some documents contain validation errors',
+          extensions: {
+            name: 'ValidationError',
+            errors: [
+              {
+                idx: 1,
+                message: 'this is a validate message',
+                path: 'someStrangeField',
+                value: 'Test',
+              },
+            ],
+          },
+          path: ['createMany'],
+        }),
+      ],
     });
   });
 });
