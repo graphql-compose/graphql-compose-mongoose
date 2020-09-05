@@ -48,10 +48,11 @@ export default function updateById<TSource = Document, TContext = any>(
       '4) And save it.',
     type: outputType,
     args: {
+      _id: 'MongoID!',
       ...recordHelperArgs(tc, {
+        removeFields: ['_id'], // pull out `_id` to top-level
         prefix: 'UpdateById',
         suffix: 'Input',
-        requiredFields: ['_id'],
         isRequired: true,
         allFieldsNullable: true,
         ...(opts && opts.record),
@@ -66,13 +67,12 @@ export default function updateById<TSource = Document, TContext = any>(
         );
       }
 
-      if (!recordData._id) {
+      if (!resolveParams?.args?._id) {
         return Promise.reject(
-          new Error(`${tc.getTypeName()}.updateById resolver requires args.record._id value`)
+          new Error(`${tc.getTypeName()}.updateById resolver requires args._id value`)
         );
       }
 
-      resolveParams.args._id = recordData._id;
       delete recordData._id;
 
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
@@ -109,5 +109,5 @@ export default function updateById<TSource = Document, TContext = any>(
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver;
+  return resolver as any;
 }
