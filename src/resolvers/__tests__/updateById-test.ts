@@ -1,11 +1,7 @@
 /* eslint-disable no-param-reassign */
 
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
-import {
-  GraphQLNonNull,
-  GraphQLInputObjectType,
-  getNullableType,
-} from 'graphql-compose/lib/graphql';
+import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import updateById from '../updateById';
 import GraphQLMongoID from '../../types/MongoID';
@@ -63,17 +59,9 @@ describe('updateById() ->', () => {
       expect(argConfig.type.ofType.name).toBe('UpdateByIdUserInput');
     });
 
-    it('should have `record._id` required arg', () => {
+    it('should have `_id` required arg', () => {
       const resolver = updateById(UserModel, UserTC);
-      const argConfig: any = resolver.getArgConfig('record') || {};
-      expect(argConfig.type.ofType).toBeInstanceOf(GraphQLInputObjectType);
-      if (argConfig.type && argConfig.type.ofType) {
-        const _idFieldType = schemaComposer
-          .createInputTC(argConfig.type.ofType)
-          .getFieldType('_id');
-        expect(_idFieldType).toBeInstanceOf(GraphQLNonNull);
-        expect(getNullableType(_idFieldType)).toBe(GraphQLMongoID);
-      }
+      expect(resolver.getArgTypeName('_id')).toBe('MongoID!');
     });
   });
 
@@ -84,19 +72,18 @@ describe('updateById() ->', () => {
       result.catch(() => 'catch error if appear, hide it from mocha');
     });
 
-    it('should rejected with Error if args.record._id is empty', async () => {
+    it('should rejected with Error if args._id is empty', async () => {
       const result = updateById(UserModel, UserTC).resolve({
         args: { record: {} },
       });
-      await expect(result).rejects.toThrow(
-        'User.updateById resolver requires args.record._id value'
-      );
+      await expect(result).rejects.toThrow('User.updateById resolver requires args._id value');
     });
 
     it('should return payload.recordId', async () => {
       const result = await updateById(UserModel, UserTC).resolve({
         args: {
-          record: { _id: user1.id, name: 'some name' },
+          _id: user1.id,
+          record: { name: 'some name' },
         },
       });
       expect(result.recordId).toBe(user1.id);
@@ -117,7 +104,8 @@ describe('updateById() ->', () => {
     it('should return empty payload.error', async () => {
       const result = await updateById(UserModel, UserTC).resolve({
         args: {
-          record: { _id: user1.id, name: 'some name' },
+          _id: user1.id,
+          record: { name: 'some name' },
         },
       });
       expect(result.error).toEqual(undefined);
@@ -126,7 +114,8 @@ describe('updateById() ->', () => {
     it('should return payload.error', async () => {
       const result = await updateById(UserModel, UserTC).resolve({
         args: {
-          record: { _id: user1.id, name: 'some name', valid: 'AlwaysFails' },
+          _id: user1.id,
+          record: { name: 'some name', valid: 'AlwaysFails' },
         },
         projection: {
           error: true,
@@ -149,7 +138,8 @@ describe('updateById() ->', () => {
       await expect(
         updateById(UserModel, UserTC).resolve({
           args: {
-            record: { _id: user1.id, name: 'some name', valid: 'AlwaysFails' },
+            _id: user1.id,
+            record: { name: 'some name', valid: 'AlwaysFails' },
           },
         })
       ).rejects.toThrowError('User validation failed: valid: this is a validate message');
@@ -158,7 +148,8 @@ describe('updateById() ->', () => {
     it('should change data via args.record in model', async () => {
       const result = await updateById(UserModel, UserTC).resolve({
         args: {
-          record: { _id: user1.id, name: 'newName' },
+          _id: user1.id,
+          record: { name: 'newName' },
         },
       });
       expect(result.record.name).toBe('newName');
@@ -168,7 +159,8 @@ describe('updateById() ->', () => {
       const checkedName = 'nameForMongoDB';
       await updateById(UserModel, UserTC).resolve({
         args: {
-          record: { _id: user1.id, name: checkedName },
+          _id: user1.id,
+          record: { name: checkedName },
         },
       });
 
@@ -181,7 +173,8 @@ describe('updateById() ->', () => {
       const checkedName = 'anyName123';
       const result = await updateById(UserModel, UserTC).resolve({
         args: {
-          record: { _id: user1.id, name: checkedName },
+          _id: user1.id,
+          record: { name: checkedName },
         },
       });
       expect(result.record.id).toBe(user1.id);
@@ -191,9 +184,8 @@ describe('updateById() ->', () => {
     it('should pass empty projection to findById and got full document data', async () => {
       const result = await updateById(UserModel, UserTC).resolve({
         args: {
-          record: {
-            _id: user1.id,
-          },
+          _id: user1.id,
+          record: {},
         },
         projection: {
           record: {
@@ -208,7 +200,7 @@ describe('updateById() ->', () => {
 
     it('should return mongoose document', async () => {
       const result = await updateById(UserModel, UserTC).resolve({
-        args: { record: { _id: user1.id } },
+        args: { _id: user1.id, record: {} },
       });
       expect(result.record).toBeInstanceOf(UserModel);
     });
@@ -216,7 +208,7 @@ describe('updateById() ->', () => {
     it('should call `beforeRecordMutate` method with founded `record` and `resolveParams` as args', async () => {
       let beforeMutationId;
       const result = await updateById(UserModel, UserTC).resolve({
-        args: { record: { _id: user1.id } },
+        args: { _id: user1.id, record: {} },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           beforeMutationId = record.id;
@@ -231,7 +223,7 @@ describe('updateById() ->', () => {
 
     it('`beforeRecordMutate` may reject operation', async () => {
       const result = updateById(UserModel, UserTC).resolve({
-        args: { record: { _id: user1.id, name: 'new name' } },
+        args: { _id: user1.id, record: { name: 'new name' } },
         context: { readOnly: true },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           if (rp.context.readOnly) {
@@ -249,7 +241,7 @@ describe('updateById() ->', () => {
       let beforeQueryCalled = false;
 
       const result = await updateById(UserModel, UserTC).resolve({
-        args: { record: { _id: user1.id, name: 'new name' } },
+        args: { _id: user1.id, record: { name: 'new name' } },
         beforeQuery: (query: any, rp: ExtendedResolveParams) => {
           expect(query).toHaveProperty('exec');
           expect(rp.model).toBe(UserModel);
@@ -295,7 +287,7 @@ describe('updateById() ->', () => {
 
     it('should have all fields optional in record', () => {
       const resolver = updateById(UserModel, UserTC);
-      expect(resolver.getArgITC('record').getFieldTypeName('_id')).toBe('MongoID!');
+      expect(resolver.getArgTypeName('_id')).toBe('MongoID!');
       expect(resolver.getArgITC('record').getFieldTypeName('name')).toBe('String');
       expect(resolver.getArgITC('record').getFieldTypeName('age')).toBe('Float');
     });
