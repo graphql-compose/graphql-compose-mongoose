@@ -61,6 +61,28 @@ export type TypeConverterResolversOpts = {
         limit?: LimitHelperArgsOpts | false;
         skip?: false;
       };
+  findByIdLean?: false;
+  findByIdsLean?:
+    | false
+    | {
+        limit?: LimitHelperArgsOpts | false;
+        sort?: SortHelperArgsOpts | false;
+      };
+  findOneLean?:
+    | false
+    | {
+        filter?: FilterHelperArgsOpts | false;
+        sort?: SortHelperArgsOpts | false;
+        skip?: false;
+      };
+  findManyLean?:
+    | false
+    | {
+        filter?: FilterHelperArgsOpts | false;
+        sort?: SortHelperArgsOpts | false;
+        limit?: LimitHelperArgsOpts | false;
+        skip?: false;
+      };
   updateById?:
     | false
     | {

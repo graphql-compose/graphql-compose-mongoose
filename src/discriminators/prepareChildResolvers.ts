@@ -166,6 +166,8 @@ export function prepareChildResolvers<TSource, TContext>(
 
         case EMCResolvers.findOne:
         case EMCResolvers.findMany:
+        case EMCResolvers.findOneLean:
+        case EMCResolvers.findManyLean:
         case EMCResolvers.removeOne:
         case EMCResolvers.removeMany:
         case EMCResolvers.count:
