@@ -1,8 +1,6 @@
 import type { Model } from 'mongoose';
 
-export type AliasesMap = {
-  [key: string]: string;
-};
+export type AliasesMap = Record<string, string>;
 
 export function prepareAliases(model: Model<any>): AliasesMap | false {
   const aliases = (model?.schema as any)?.aliases;
@@ -12,8 +10,19 @@ export function prepareAliases(model: Model<any>): AliasesMap | false {
   return false;
 }
 
-// TODO: change by translateAliases()
-// @see https://github.com/Automattic/mongoose/issues/6427
+export function prepareAliasesReverse(model: Model<any>): AliasesMap | false {
+  const aliases = (model?.schema as any)?.aliases;
+  const keys = Object.keys(aliases);
+  if (keys.length > 0) {
+    const r = {} as AliasesMap;
+    keys.forEach((k) => {
+      r[aliases[k]] = k;
+    });
+    return r;
+  }
+  return false;
+}
+
 export function replaceAliases(
   data: Record<string, any>,
   aliases: AliasesMap | false

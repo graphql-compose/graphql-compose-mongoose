@@ -11,6 +11,11 @@ import findByIds from './findByIds';
 import findMany from './findMany';
 import findOne from './findOne';
 
+import findByIdLean from './findByIdLean';
+import findByIdsLean from './findByIdsLean';
+import findManyLean from './findManyLean';
+import findOneLean from './findOneLean';
+
 import type {
   FilterHelperArgsOpts,
   LimitHelperArgsOpts,
@@ -49,6 +54,10 @@ export {
   findByIds,
   findOne,
   findMany,
+  findByIdLean,
+  findByIdsLean,
+  findOneLean,
+  findManyLean,
   updateById,
   updateOne,
   updateMany,
@@ -68,6 +77,10 @@ export function getAvailableNames(): (keyof typeof EMCResolvers)[] {
     'findByIds',
     'findOne',
     'findMany',
+    'findByIdLean',
+    'findByIdsLean',
+    'findOneLean',
+    'findManyLean',
     'updateById',
     'updateOne',
     'updateMany',
@@ -88,6 +101,10 @@ export const EMCResolvers = {
   findByIds: 'findByIds',
   findOne: 'findOne',
   findMany: 'findMany',
+  findByIdLean: 'findByIdLean',
+  findByIdsLean: 'findByIdsLean',
+  findOneLean: 'findOneLean',
+  findManyLean: 'findManyLean',
   updateById: 'updateById',
   updateOne: 'updateOne',
   updateMany: 'updateMany',
