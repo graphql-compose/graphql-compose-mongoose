@@ -1,6 +1,6 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { projectionHelper, prepareAliases, prepareAliasesReverse } from './helpers';
+import { projectionHelper, prepareAliases, prepareAliasesReverse, replaceAliases } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
@@ -29,14 +29,15 @@ export default function findByIdLean<TSource = Document, TContext = any>(
     args: {
       _id: 'MongoID!',
     },
-    resolve: ((resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
       if (args._id) {
         resolveParams.query = model.findById(args._id);
         resolveParams.model = model;
         projectionHelper(resolveParams, aliases);
-        return beforeQueryHelperLean(resolveParams, aliasesReverse);
+        const result = await beforeQueryHelperLean(resolveParams);
+        return result && aliasesReverse ? replaceAliases(result, aliasesReverse) : result;
       }
       return Promise.resolve(null);
     }) as any,

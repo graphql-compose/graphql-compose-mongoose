@@ -12,6 +12,7 @@ import {
   projectionHelper,
   prepareAliases,
   prepareAliasesReverse,
+  replaceAliases,
 } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
@@ -53,7 +54,7 @@ export default function findManyLean<TSource = Document, TContext = any>(
         ...opts?.sort,
       }),
     },
-    resolve: ((resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams) => {
       resolveParams.query = model.find();
       resolveParams.model = model;
       filterHelper(resolveParams, aliases);
@@ -61,7 +62,10 @@ export default function findManyLean<TSource = Document, TContext = any>(
       limitHelper(resolveParams);
       sortHelper(resolveParams);
       projectionHelper(resolveParams, aliases);
-      return beforeQueryHelperLean(resolveParams, aliasesReverse) || [];
+      const result = (await beforeQueryHelperLean(resolveParams)) || [];
+      return Array.isArray(result) && aliasesReverse
+        ? result.map((r) => replaceAliases(r, aliasesReverse))
+        : result;
     }) as any,
   });
 }

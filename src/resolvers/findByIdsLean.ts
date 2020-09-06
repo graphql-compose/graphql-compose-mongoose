@@ -8,6 +8,7 @@ import {
   projectionHelper,
   prepareAliases,
   prepareAliasesReverse,
+  replaceAliases,
 } from './helpers';
 import type { ExtendedResolveParams, GenResolverOpts } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
@@ -44,7 +45,7 @@ export default function findByIdsLean<TSource = Document, TContext = any>(
         ...opts?.sort,
       }),
     },
-    resolve: ((resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams) => {
       const args = resolveParams.args || {};
 
       if (!Array.isArray(args._ids) || args._ids.length === 0) {
@@ -60,7 +61,10 @@ export default function findByIdsLean<TSource = Document, TContext = any>(
       projectionHelper(resolveParams, aliases);
       limitHelper(resolveParams);
       sortHelper(resolveParams);
-      return beforeQueryHelperLean(resolveParams, aliasesReverse) || [];
+      const result = (await beforeQueryHelperLean(resolveParams)) || [];
+      return Array.isArray(result) && aliasesReverse
+        ? result.map((r) => replaceAliases(r, aliasesReverse))
+        : result;
     }) as any,
   }) as any;
 }
