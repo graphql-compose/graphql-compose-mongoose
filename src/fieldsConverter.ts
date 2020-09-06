@@ -374,7 +374,7 @@ export function enumToGraphQL(
 
     const fields = valueList.reduce((result, value) => {
       const key = value.replace(/[^_a-zA-Z0-9]/g, '_');
-      result[key] = { value }; // eslint-disable-line no-param-reassign
+      result[key] = { value };
       return result;
     }, {} as Record<string, { value: any }>);
     etc.setFields(fields);

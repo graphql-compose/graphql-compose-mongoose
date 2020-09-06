@@ -79,7 +79,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
           break;
 
         case EMCResolvers.connection:
-          const edgesTC = resolver // eslint-disable-line no-case-declarations
+          const edgesTC = resolver
             .getOTC()
             .getFieldOTC('edges')
             .clone(`${baseTC.getTypeName()}Edge`);

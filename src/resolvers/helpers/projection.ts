@@ -5,7 +5,6 @@ export function projectionHelper(
   resolveParams: ExtendedResolveParams,
   aliases: AliasesMap | false
 ): void {
-  // eslint-disable-line
   const projection = resolveParams.projection;
   if (projection) {
     // if projection has '*' key, then omit field projection (fetch all fields from database)
@@ -34,7 +33,7 @@ export function projectionHelper(
     }
 
     if (Object.keys(flatProjection).length > 0) {
-      resolveParams.query = resolveParams.query.select(flatProjection); // eslint-disable-line
+      resolveParams.query = resolveParams.query.select(flatProjection);
     }
   }
 }

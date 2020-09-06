@@ -45,7 +45,7 @@ export default function findOne<TSource = Document, TContext = any>(
       }),
     },
     resolve: ((resolveParams: ExtendedResolveParams) => {
-      resolveParams.query = model.findOne({}); // eslint-disable-line
+      resolveParams.query = model.findOne({});
       resolveParams.model = model;
       filterHelper(resolveParams, aliases);
       skipHelper(resolveParams);

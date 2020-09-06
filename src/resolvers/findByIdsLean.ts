@@ -55,8 +55,8 @@ export default function findByIdsLean<TSource = Document, TContext = any>(
         _id: { $in: args._ids },
       };
 
-      resolveParams.query = model.find(selector); // eslint-disable-line
-      resolveParams.model = model; // eslint-disable-line
+      resolveParams.query = model.find(selector);
+      resolveParams.model = model;
       projectionHelper(resolveParams, aliases);
       limitHelper(resolveParams);
       sortHelper(resolveParams);
