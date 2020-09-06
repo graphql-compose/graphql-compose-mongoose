@@ -30,8 +30,8 @@ export default function findById<TSource = Document, TContext = any>(
       const args = resolveParams.args || {};
 
       if (args._id) {
-        resolveParams.query = model.findById(args._id); // eslint-disable-line
-        resolveParams.model = model; // eslint-disable-line
+        resolveParams.query = model.findById(args._id);
+        resolveParams.model = model;
         projectionHelper(resolveParams, aliases);
         return beforeQueryHelper(resolveParams);
       }

@@ -93,7 +93,7 @@ export default function updateMany<TSource = Document, TContext = any>(
       sortHelper(resolveParams);
       limitHelper(resolveParams);
 
-      resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
+      resolveParams.query = resolveParams.query.setOptions({ multi: true });
 
       // @ts-expect-error
       if (resolveParams.query.updateMany) {

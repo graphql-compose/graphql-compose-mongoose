@@ -22,6 +22,6 @@ export const limitHelperArgs = (
 export function limitHelper(resolveParams: ExtendedResolveParams): void {
   const limit = parseInt(resolveParams.args && resolveParams.args.limit, 10) || 0;
   if (limit > 0) {
-    resolveParams.query = resolveParams.query.limit(limit); // eslint-disable-line
+    resolveParams.query = resolveParams.query.limit(limit);
   }
 }

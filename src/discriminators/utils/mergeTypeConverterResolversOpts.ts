@@ -63,7 +63,7 @@ export function mergeArraysTypeFields(
       if (argType === 'FilterOperatorsOptsMap') {
         merged = mergeFilterOperatorsOptsMap(baseField, merged);
 
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       merged = mergePrimitiveTypeFields(baseField, childField, argType);
@@ -86,11 +86,11 @@ export function mergeMapTypeFields(
     for (const argOptType in argOptsTypes) {
       if (argOptsTypes.hasOwnProperty(argOptType)) {
         if (baseField[argOptType] === undefined) {
-          continue; // eslint-disable-line no-continue
+          continue;
         }
 
         if (childField === undefined) {
-          childField = {}; // eslint-disable-line no-param-reassign
+          childField = {};
         }
 
         if (argOptType === 'FilterOperatorsOptsMap') {
@@ -98,7 +98,7 @@ export function mergeMapTypeFields(
             baseField[argOptType],
             merged[argOptType]
           );
-          continue; // eslint-disable-line no-continue
+          continue;
         }
 
         merged[argOptType] = mergePrimitiveTypeFields(
@@ -150,13 +150,13 @@ export function mergeTypeConverterResolverOpts(
 
       // e.g. { findMany: ... findById: ... }  baseResolverOpt = findById
       if (baseResolverArgs === undefined) {
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       // if nothing set for child resolver set base
       if (baseResolverArgs === false && childResolverArgs === undefined) {
         mergedTypeConverterResolverOpts[baseResolverOpt] = false;
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       // set to empty object in-order to reference
@@ -175,7 +175,7 @@ export function mergeTypeConverterResolverOpts(
 
           // e.g. {limit: ...}  baseResolverArg = limit
           if (baseResolverArgs[baseResolverArg] === undefined) {
-            continue; // eslint-disable-line no-continue
+            continue;
           }
 
           mergedResolverArgs[baseResolverArg] = mergePrimitiveTypeFields(
