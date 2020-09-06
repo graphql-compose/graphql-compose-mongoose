@@ -13,10 +13,18 @@ export async function beforeQueryHelper(resolveParams: ExtendedResolveParams): P
   }
 
   const result = await resolveParams.beforeQuery(resolveParams.query, resolveParams);
-  if (result && typeof result.exec === 'function') {
-    return result.exec();
+  if (result !== undefined) {
+    if (typeof result?.exec === 'function') {
+      // if `beforeQuery` returns new `query` object
+      return result.exec();
+    } else {
+      // if `beforeQuery` returns data
+      return result;
+    }
+  } else {
+    // if `beforeQuery` modifies initial `query` object
+    return resolveParams.query.exec();
   }
-  return result;
 }
 
 export async function beforeQueryHelperLean(resolveParams: ExtendedResolveParams): Promise<any> {
@@ -28,9 +36,17 @@ export async function beforeQueryHelperLean(resolveParams: ExtendedResolveParams
     return resolveParams.query.lean();
   }
 
-  const result = resolveParams.beforeQuery(resolveParams.query, resolveParams);
-  if (result && typeof (result as any).lean === 'function') {
-    return (result as any).lean();
+  const result = await resolveParams.beforeQuery(resolveParams.query, resolveParams);
+  if (result !== undefined) {
+    if (typeof result?.lean === 'function') {
+      // if `beforeQuery` returns new `query` object
+      return result.lean();
+    } else {
+      // if `beforeQuery` returns data
+      return result;
+    }
+  } else {
+    // if `beforeQuery` modifies initial `query` object
+    return resolveParams.query.lean();
   }
-  return result;
 }

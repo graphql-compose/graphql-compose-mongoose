@@ -16,6 +16,11 @@ import findByIdsLean from './findByIdsLean';
 import findManyLean from './findManyLean';
 import findOneLean from './findOneLean';
 
+import dataLoader from './dataLoader';
+import dataLoaderLean from './dataLoaderLean';
+import dataLoaderMany from './dataLoader';
+import dataLoaderManyLean from './dataLoaderLean';
+
 import type {
   FilterHelperArgsOpts,
   LimitHelperArgsOpts,
@@ -58,6 +63,10 @@ export {
   findByIdsLean,
   findOneLean,
   findManyLean,
+  dataLoader,
+  dataLoaderLean,
+  dataLoaderMany,
+  dataLoaderManyLean,
   updateById,
   updateOne,
   updateMany,
@@ -81,6 +90,10 @@ export function getAvailableNames(): (keyof typeof EMCResolvers)[] {
     'findByIdsLean',
     'findOneLean',
     'findManyLean',
+    'dataLoader',
+    'dataLoaderLean',
+    'dataLoaderMany',
+    'dataLoaderManyLean',
     'updateById',
     'updateOne',
     'updateMany',
@@ -105,6 +118,10 @@ export const EMCResolvers = {
   findByIdsLean: 'findByIdsLean',
   findOneLean: 'findOneLean',
   findManyLean: 'findManyLean',
+  dataLoader: 'dataLoader',
+  dataLoaderLean: 'dataLoaderLean',
+  dataLoaderMany: 'dataLoaderMany',
+  dataLoaderManyLean: 'dataLoaderManyLean',
   updateById: 'updateById',
   updateOne: 'updateOne',
   updateMany: 'updateMany',

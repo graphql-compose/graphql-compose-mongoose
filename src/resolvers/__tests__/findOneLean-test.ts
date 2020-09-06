@@ -135,7 +135,7 @@ describe('findOneLean() ->', () => {
         beforeQuery(query: any, rp: ExtendedResolveParams) {
           expect(rp.model).toBe(UserModel);
           expect(rp.query).toHaveProperty('lean');
-          return query.findOne({ _id: user2._id });
+          return query.findOne({ _id: user2._id }).lean();
         },
       });
 

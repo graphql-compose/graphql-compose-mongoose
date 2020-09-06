@@ -23,7 +23,9 @@
     "url": "https://github.com/graphql-compose/graphql-compose-mongoose/issues"
   },
   "homepage": "https://github.com/graphql-compose/graphql-compose-mongoose",
-  "dependencies": {},
+  "dependencies": {
+    "dataloader": "^2.0.0"
+  },
   "optionalDependencies": {
     "graphql-compose-connection": "^7.0.0",
     "graphql-compose-pagination": "^7.0.0"
