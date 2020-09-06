@@ -83,6 +83,10 @@ export type TypeConverterResolversOpts = {
         limit?: LimitHelperArgsOpts | false;
         skip?: false;
       };
+  dataLoader?: false;
+  dataLoaderLean?: false;
+  dataLoaderMany?: false;
+  dataLoaderManyLean?: false;
   updateById?:
     | false
     | {
