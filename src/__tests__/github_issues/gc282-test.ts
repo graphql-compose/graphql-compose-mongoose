@@ -60,7 +60,9 @@ beforeAll(async () => {
 });
 afterAll(() => EventModel.base.disconnect());
 
-describe('issue #282 - Filter nested array by string', () => {
+// Issue from graphql-compose repo
+// @see https://github.com/graphql-compose/graphql-compose/pull/282
+describe('graphql-compose/issue #282 - Filter nested array by string', () => {
   it('correct request', async () => {
     expect(
       await graphql.graphql(

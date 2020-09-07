@@ -18,8 +18,8 @@ import findOneLean from './findOneLean';
 
 import dataLoader from './dataLoader';
 import dataLoaderLean from './dataLoaderLean';
-import dataLoaderMany from './dataLoader';
-import dataLoaderManyLean from './dataLoaderLean';
+import dataLoaderMany from './dataLoaderMany';
+import dataLoaderManyLean from './dataLoaderManyLean';
 
 import type {
   FilterHelperArgsOpts,
