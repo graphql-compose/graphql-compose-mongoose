@@ -1,12 +1,12 @@
 import DataLoader, { BatchLoadFn } from 'dataloader';
 import { GraphQLResolveInfo } from 'graphql-compose/lib/graphql';
 
-export function getDataLoader(
-  context: Record<string, any>,
+export function getDataLoader<TContext extends Record<any, any> = any>(
+  context: TContext,
   info: GraphQLResolveInfo,
   batchLoadFn: BatchLoadFn<any, any>
 ): DataLoader<any, any> {
-  if (!context._gqlDataLoaders) context._gqlDataLoaders = new WeakMap();
+  if (!context._gqlDataLoaders) (context as any)._gqlDataLoaders = new WeakMap();
   const { _gqlDataLoaders } = context;
 
   // for different parts of GraphQL queries, key will be new

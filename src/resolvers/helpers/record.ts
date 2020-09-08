@@ -4,6 +4,7 @@ import {
   InputTypeComposer,
 } from 'graphql-compose';
 import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
+import { Document } from 'mongoose';
 
 export type RecordHelperArgsOpts = {
   prefix?: string;
@@ -22,10 +23,10 @@ export const getRecordHelperArgsOptsMap = (): Record<string, string> => ({
   requiredFields: 'string[]',
 });
 
-export const recordHelperArgs = (
-  tc: ObjectTypeComposer<any, any>,
+export function recordHelperArgs<TDoc extends Document = any>(
+  tc: ObjectTypeComposer<TDoc, any>,
   opts?: RecordHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMapDefinition<{ record: any }> => {
+): ObjectTypeComposerArgumentConfigMapDefinition<{ record: any }> {
   if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
     throw new Error('First arg for recordHelperArgs() should be instance of ObjectTypeComposer.');
   }
@@ -62,4 +63,4 @@ export const recordHelperArgs = (
       type: opts.isRequired ? recordITC.NonNull : recordITC,
     },
   };
-};
+}

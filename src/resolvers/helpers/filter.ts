@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 
 import { ObjectTypeComposer, ObjectTypeComposerArgumentConfigMap } from 'graphql-compose';
-import type { Model } from 'mongoose';
+import type { Model, Document } from 'mongoose';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
 import {
@@ -33,11 +33,11 @@ export const getFilterHelperArgOptsMap = (): Record<string, string | string[]> =
   removeFields: ['string', 'string[]'],
 });
 
-export const filterHelperArgs = (
-  typeComposer: ObjectTypeComposer<any, any>,
-  model: Model<any>,
+export function filterHelperArgs<TDoc extends Document = any>(
+  typeComposer: ObjectTypeComposer<TDoc, any>,
+  model: Model<TDoc>,
   opts?: FilterHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMap<{ filter: any }> => {
+): ObjectTypeComposerArgumentConfigMap<{ filter: any }> {
   if (!(typeComposer instanceof ObjectTypeComposer)) {
     throw new Error('First arg for filterHelperArgs() should be instance of ObjectTypeComposer.');
   }
@@ -95,7 +95,7 @@ export const filterHelperArgs = (
       description: opts.onlyIndexed ? 'Filter only by indexed fields' : 'Filter by fields',
     },
   };
-};
+}
 
 export function filterHelper(
   resolveParams: ExtendedResolveParams,

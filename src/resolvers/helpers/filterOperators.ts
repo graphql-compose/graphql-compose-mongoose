@@ -221,7 +221,7 @@ export type SelectorOptions = {
   [k: string]: SelectorOptions | string | string[] | RegExp;
 };
 
-export const _recurseFields = (fields: SelectorOptions): SelectorOptions => {
+export function _recurseFields(fields: SelectorOptions): SelectorOptions {
   let selectors: SelectorOptions = {};
   if (fields === Object(fields)) {
     Object.keys(fields).forEach((fieldName) => {
@@ -240,7 +240,7 @@ export const _recurseFields = (fields: SelectorOptions): SelectorOptions => {
     selectors = fields;
   }
   return selectors;
-};
+}
 
 export function processFilterOperators(filter: Record<string, any>): SelectorOptions {
   if (!filter) return filter;
