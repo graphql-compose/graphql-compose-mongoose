@@ -25,7 +25,7 @@ export const getRecordHelperArgsOptsMap = (): Record<string, string> => ({
 export const recordHelperArgs = (
   tc: ObjectTypeComposer<any, any>,
   opts?: RecordHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMapDefinition => {
+): ObjectTypeComposerArgumentConfigMapDefinition<{ record: any }> => {
   if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
     throw new Error('First arg for recordHelperArgs() should be instance of ObjectTypeComposer.');
   }

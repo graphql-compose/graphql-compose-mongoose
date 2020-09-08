@@ -14,6 +14,7 @@ import {
   FilterHelperArgsOpts,
   SortHelperArgsOpts,
   LimitHelperArgsOpts,
+  ArgsMap,
 } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
@@ -25,11 +26,11 @@ export interface FindManyResolverOpts {
   skip?: false;
 }
 
-export default function findMany<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function findMany<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindManyResolverOpts
-): Resolver<TSource, TContext> {
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findMany() should be instance of Mongoose Model.');
   }
@@ -59,7 +60,7 @@ export default function findMany<TSource = Document, TContext = any>(
         ...opts?.sort,
       }),
     },
-    resolve: ((resolveParams: ExtendedResolveParams) => {
+    resolve: ((resolveParams: ExtendedResolveParams<TDoc>) => {
       resolveParams.query = model.find();
       resolveParams.model = model;
       filterHelper(resolveParams, aliases);
@@ -69,5 +70,5 @@ export default function findMany<TSource = Document, TContext = any>(
       projectionHelper(resolveParams, aliases);
       return beforeQueryHelper(resolveParams) || [];
     }) as any,
-  });
+  }) as any;
 }

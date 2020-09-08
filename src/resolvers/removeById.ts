@@ -3,11 +3,12 @@ import type { Model, Document } from 'mongoose';
 import findById from './findById';
 import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
+import { ArgsMap } from './helpers';
 
-export default function removeById<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>
-): Resolver<TSource, TContext> {
+export default function removeById<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');
   }
@@ -45,7 +46,7 @@ export default function removeById<TSource = Document, TContext = any>(
     args: {
       _id: 'MongoID!',
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       const _id = resolveParams?.args?._id;
 
       if (!_id) {
@@ -55,7 +56,7 @@ export default function removeById<TSource = Document, TContext = any>(
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      let doc: Document = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
+      let doc: TDoc = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);

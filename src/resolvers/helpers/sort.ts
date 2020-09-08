@@ -18,7 +18,7 @@ export const sortHelperArgs = (
   tc: ObjectTypeComposer<any, any>,
   model: Model<any>,
   opts?: SortHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMapDefinition => {
+): ObjectTypeComposerArgumentConfigMapDefinition<{ sort: any }> => {
   if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
     throw new Error('First arg for sortHelperArgs() should be instance of ObjectTypeComposer.');
   }

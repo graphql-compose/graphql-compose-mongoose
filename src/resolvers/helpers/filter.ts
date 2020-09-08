@@ -37,7 +37,7 @@ export const filterHelperArgs = (
   typeComposer: ObjectTypeComposer<any, any>,
   model: Model<any>,
   opts?: FilterHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMap => {
+): ObjectTypeComposerArgumentConfigMap<{ filter: any }> => {
   if (!(typeComposer instanceof ObjectTypeComposer)) {
     throw new Error('First arg for filterHelperArgs() should be instance of ObjectTypeComposer.');
   }
@@ -81,7 +81,7 @@ export const filterHelperArgs = (
   }
 
   if (itc.getFieldNames().length === 0) {
-    return {};
+    return {} as any;
   }
 
   if (!opts.baseTypeName) {

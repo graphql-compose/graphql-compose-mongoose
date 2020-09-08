@@ -13,6 +13,7 @@ import {
   replaceAliases,
   SortHelperArgsOpts,
   FilterHelperArgsOpts,
+  ArgsMap,
 } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
@@ -23,11 +24,11 @@ export interface FindOneLeanResolverOpts {
   skip?: false;
 }
 
-export default function findOneLean<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function findOneLean<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindOneLeanResolverOpts
-): Resolver<TSource, TContext> {
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findOneLean() should be instance of Mongoose Model.');
   }
@@ -57,7 +58,7 @@ export default function findOneLean<TSource = Document, TContext = any>(
         ...opts?.sort,
       }),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       resolveParams.query = model.findOne({});
       resolveParams.model = model;
       filterHelper(resolveParams, aliases);
@@ -67,5 +68,5 @@ export default function findOneLean<TSource = Document, TContext = any>(
       const result = await beforeQueryHelperLean(resolveParams);
       return result && aliasesReverse ? replaceAliases(result, aliasesReverse) : result;
     }) as any,
-  });
+  }) as any;
 }

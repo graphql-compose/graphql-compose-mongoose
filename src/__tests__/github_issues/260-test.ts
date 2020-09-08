@@ -1,6 +1,7 @@
 import { schemaComposer, graphql } from 'graphql-compose';
 import { composeWithMongoose } from '../../index';
 import { mongoose } from '../../__mocks__/mongooseCommon';
+import { Document } from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -11,8 +12,18 @@ const PostSchema = new mongoose.Schema({
   reviewerIds: { type: [mongoose.Types.ObjectId] },
 });
 
-const UserModel = mongoose.model('User', UserSchema);
-const PostModel = mongoose.model('Post', PostSchema);
+interface IUser extends Document {
+  name: string;
+}
+
+interface IPost extends Document {
+  title: string;
+  authorId?: mongoose.Types.ObjectId;
+  reviewerIds?: [mongoose.Types.ObjectId];
+}
+
+const UserModel = mongoose.model<IUser>('User', UserSchema);
+const PostModel = mongoose.model<IPost>('Post', PostSchema);
 
 const UserTC = composeWithMongoose(UserModel);
 const PostTC = composeWithMongoose(PostModel);

@@ -6,6 +6,7 @@ import type {
   ObjectTypeComposerFieldConfigMap,
 } from 'graphql-compose';
 import { getUniqueIndexes, extendByReversedIndexes, IndexT } from '../utils/getIndexesFromModel';
+import { ArgsMap } from './helpers';
 
 export type ConnectionOpts<TContext = any> = _ConnectionSortMapOpts & {
   edgeFields?: ObjectTypeComposerFieldConfigMap<any, TContext>;
@@ -15,11 +16,11 @@ export type ConnectionOpts<TContext = any> = _ConnectionSortMapOpts & {
   edgeTypeName?: string;
 };
 
-export default function connection<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function connection<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: ConnectionOpts<TContext>
-): Resolver<TSource, TContext> | undefined {
+): Resolver<TSource, TContext, ArgsMap, TDoc> | undefined {
   try {
     require.resolve('graphql-compose-connection');
   } catch (e) {
