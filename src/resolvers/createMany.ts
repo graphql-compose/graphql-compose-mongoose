@@ -1,6 +1,6 @@
 import type { ObjectTypeComposer, Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { recordHelperArgs, RecordHelperArgsOpts } from './helpers';
+import { recordHelperArgs, RecordHelperArgsOpts, ArgsMap } from './helpers';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateManyAndThrow } from './helpers/validate';
 
@@ -8,11 +8,11 @@ export interface CreateManyResolverOpts {
   records?: RecordHelperArgsOpts | false;
 }
 
-export default function createMany<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function createMany<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: CreateManyResolverOpts
-): Resolver<TSource, TContext, any> {
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createMany() should be instance of Mongoose Model.');
   }
@@ -88,10 +88,10 @@ export default function createMany<TSource = Document, TContext = any>(
         }
       }
 
-      const docs = [];
+      const docs = [] as TDoc[];
       for (const record of recordData) {
         // eslint-disable-next-line new-cap
-        let doc: Document = new model(record);
+        let doc = new model(record);
         if (resolveParams.beforeRecordMutate) {
           doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
         }
@@ -99,7 +99,7 @@ export default function createMany<TSource = Document, TContext = any>(
       }
 
       await validateManyAndThrow(docs);
-      await model.create(docs, { validateBeforeSave: false });
+      await model.create(docs as any, { validateBeforeSave: false });
 
       return {
         records: docs,
@@ -113,5 +113,5 @@ export default function createMany<TSource = Document, TContext = any>(
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver;
+  return resolver as any;
 }

@@ -1,15 +1,16 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
+import { ArgsMap } from './helpers';
 
 export type PaginationResolverOpts = {
   perPage?: number;
 };
 
-export default function pagination<TSource = Document, TContext = any>(
-  _model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function pagination<TSource = any, TContext = any, TDoc extends Document = any>(
+  _model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: PaginationResolverOpts
-): Resolver<TSource, TContext> | undefined {
+): Resolver<TSource, TContext, ArgsMap, TDoc> | undefined {
   try {
     require.resolve('graphql-compose-pagination');
   } catch (e) {

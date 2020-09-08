@@ -1,14 +1,14 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { projectionHelper, prepareAliases } from './helpers';
+import { projectionHelper, prepareAliases, ArgsMap } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 import { getDataLoader } from './helpers/dataLoaderHelper';
 
-export default function dataLoader<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>
-): Resolver<TSource, TContext> {
+export default function dataLoader<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver dataLoader() should be instance of Mongoose Model.');
   }
@@ -28,7 +28,7 @@ export default function dataLoader<TSource = Document, TContext = any>(
     args: {
       _id: 'MongoID!',
     },
-    resolve: ((resolveParams: ExtendedResolveParams) => {
+    resolve: ((resolveParams: ExtendedResolveParams<TDoc>) => {
       const args = resolveParams.args || {};
 
       if (!args._id) {
@@ -44,7 +44,7 @@ export default function dataLoader<TSource = Document, TContext = any>(
       const dl = getDataLoader(resolveParams.context, resolveParams.info, (ids) => {
         resolveParams.query = model.find({
           _id: { $in: ids },
-        });
+        } as any);
         resolveParams.model = model;
         projectionHelper(resolveParams, aliases);
         return beforeQueryHelper(resolveParams) || [];

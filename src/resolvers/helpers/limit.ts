@@ -10,7 +10,7 @@ export const getLimitHelperArgsOptsMap = (): Record<string, string> => ({ defaul
 
 export const limitHelperArgs = (
   opts?: LimitHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMapDefinition => {
+): ObjectTypeComposerArgumentConfigMapDefinition<{ limit: any }> => {
   return {
     limit: {
       type: 'Int',

@@ -1,14 +1,24 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { projectionHelper, prepareAliases, prepareAliasesReverse, replaceAliases } from './helpers';
+import {
+  projectionHelper,
+  prepareAliases,
+  prepareAliasesReverse,
+  replaceAliases,
+  ArgsMap,
+} from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 import { getDataLoader } from './helpers/dataLoaderHelper';
 
-export default function dataLoaderManyLean<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>
-): Resolver<TSource, TContext> {
+export default function dataLoaderManyLean<
+  TSource = any,
+  TContext = any,
+  TDoc extends Document = any
+>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(
       'First arg for Resolver dataLoaderMany() should be instance of Mongoose Model.'
@@ -31,7 +41,7 @@ export default function dataLoaderManyLean<TSource = Document, TContext = any>(
     args: {
       _ids: '[MongoID]!',
     },
-    resolve: ((resolveParams: ExtendedResolveParams) => {
+    resolve: ((resolveParams: ExtendedResolveParams<TDoc>) => {
       const args = resolveParams.args || {};
 
       if (!Array.isArray(args._ids) || args._ids.length === 0) {
@@ -47,7 +57,7 @@ export default function dataLoaderManyLean<TSource = Document, TContext = any>(
       const dl = getDataLoader(resolveParams.context, resolveParams.info, async (ids) => {
         resolveParams.query = model.find({
           _id: { $in: ids },
-        });
+        } as any);
         resolveParams.model = model;
         projectionHelper(resolveParams, aliases);
         const result = (await beforeQueryHelperLean(resolveParams)) || [];

@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import type { Schema, Model } from 'mongoose';
 import type {
   SchemaComposer,
@@ -130,11 +130,11 @@ export function getFieldsFromModel(model: Model<any> | MongoosePseudoModelT): Mo
   return fields;
 }
 
-export function convertModelToGraphQL<TSource, TContext>(
-  model: Model<any> | MongoosePseudoModelT,
+export function convertModelToGraphQL<TDoc extends Document, TContext>(
+  model: Model<TDoc> | MongoosePseudoModelT,
   typeName: string,
   schemaComposer: SchemaComposer<TContext>
-): ObjectTypeComposer<TSource, TContext> {
+): ObjectTypeComposer<TDoc, TContext> {
   const sc = schemaComposer;
 
   if (!typeName) {

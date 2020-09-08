@@ -5,16 +5,17 @@ import findById from './findById';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import type { ExtendedResolveParams } from './index';
 import { validateAndThrow } from './helpers/validate';
+import { ArgsMap } from './helpers';
 
 export interface UpdateByIdResolverOpts {
   record?: RecordHelperArgsOpts | false;
 }
 
-export default function updateById<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function updateById<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: UpdateByIdResolverOpts
-): Resolver<TSource, TContext> {
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateById() should be instance of Mongoose Model.');
   }
@@ -62,7 +63,7 @@ export default function updateById<TSource = Document, TContext = any>(
         ...(opts && opts.record),
       }),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       const recordData = resolveParams?.args?.record;
 
       if (!(typeof recordData === 'object')) {
@@ -82,7 +83,7 @@ export default function updateById<TSource = Document, TContext = any>(
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      let doc: Document = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
+      let doc: TDoc = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);

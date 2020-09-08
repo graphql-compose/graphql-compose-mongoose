@@ -5,6 +5,7 @@ import {
   sortHelperArgs,
   SortHelperArgsOpts,
   FilterHelperArgsOpts,
+  ArgsMap,
 } from './helpers';
 import findOne from './findOne';
 import type { ExtendedResolveParams } from './index';
@@ -15,11 +16,11 @@ export interface RemoveOneResolverOpts {
   sort?: SortHelperArgsOpts | false;
 }
 
-export default function removeOne<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function removeOne<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: RemoveOneResolverOpts
-): Resolver<TSource, TContext> {
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeOne() should be instance of Mongoose Model.');
   }
@@ -65,7 +66,7 @@ export default function removeOne<TSource = Document, TContext = any>(
         ...opts?.sort,
       }),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       const filterData = resolveParams?.args?.filter;
 
       if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
@@ -81,7 +82,7 @@ export default function removeOne<TSource = Document, TContext = any>(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      let doc = await findOneResolver.resolve(resolveParams);
+      let doc: TDoc = await findOneResolver.resolve(resolveParams);
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);

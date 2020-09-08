@@ -1,13 +1,19 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { projectionHelper, prepareAliases, prepareAliasesReverse, replaceAliases } from './helpers';
+import {
+  projectionHelper,
+  prepareAliases,
+  prepareAliasesReverse,
+  replaceAliases,
+  ArgsMap,
+} from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
-export default function findByIdLean<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>
-): Resolver<TSource, TContext> {
+export default function findByIdLean<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIdLean() should be instance of Mongoose Model.');
   }
@@ -28,7 +34,7 @@ export default function findByIdLean<TSource = Document, TContext = any>(
     args: {
       _id: 'MongoID!',
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       const args = resolveParams.args || {};
 
       if (args._id) {

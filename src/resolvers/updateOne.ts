@@ -9,6 +9,7 @@ import {
   FilterHelperArgsOpts,
   RecordHelperArgsOpts,
   SortHelperArgsOpts,
+  ArgsMap,
 } from './helpers';
 import findOne from './findOne';
 import { addErrorCatcherField } from './helpers/errorCatcher';
@@ -21,11 +22,11 @@ export interface UpdateOneResolverOpts {
   skip?: false;
 }
 
-export default function updateOne<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function updateOne<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: UpdateOneResolverOpts
-): Resolver<TSource, TContext> {
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateOne() should be instance of Mongoose Model.');
   }
@@ -81,7 +82,7 @@ export default function updateOne<TSource = Document, TContext = any>(
       }),
       ...skipHelperArgs(),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       const recordData = resolveParams?.args?.record;
       const filterData = resolveParams?.args?.filter;
 
@@ -96,7 +97,7 @@ export default function updateOne<TSource = Document, TContext = any>(
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      let doc: Document = await findOneResolver.resolve({ ...resolveParams, projection: {} });
+      let doc: TDoc = await findOneResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
@@ -121,5 +122,5 @@ export default function updateOne<TSource = Document, TContext = any>(
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver;
+  return resolver as any;
 }

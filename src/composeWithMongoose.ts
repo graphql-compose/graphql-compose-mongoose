@@ -39,10 +39,10 @@ export type TypeConverterInputTypeOpts = {
   };
 };
 
-export function composeWithMongoose<TSource = any, TContext = any>(
-  model: Model<any>,
+export function composeWithMongoose<TDoc extends Document, TContext = any>(
+  model: Model<TDoc>,
   opts: ComposeWithMongooseOpts<TContext> = {}
-): ObjectTypeComposer<TSource, TContext> {
+): ObjectTypeComposer<TDoc, TContext> {
   const m: Model<any> = model;
   const name: string = (opts && opts.name) || m.modelName;
 

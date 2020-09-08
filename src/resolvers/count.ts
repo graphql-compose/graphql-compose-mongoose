@@ -1,6 +1,12 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { filterHelper, filterHelperArgs, prepareAliases, FilterHelperArgsOpts } from './helpers';
+import {
+  filterHelper,
+  filterHelperArgs,
+  prepareAliases,
+  FilterHelperArgsOpts,
+  ArgsMap,
+} from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
@@ -8,11 +14,11 @@ export interface CountResolverOpts {
   filter?: FilterHelperArgsOpts | false;
 }
 
-export default function count<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function count<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: CountResolverOpts
-): Resolver<TSource, TContext> {
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver count() should be instance of Mongoose Model.');
   }
@@ -34,7 +40,7 @@ export default function count<TSource = Document, TContext = any>(
         ...opts?.filter,
       }),
     },
-    resolve: ((resolveParams: ExtendedResolveParams) => {
+    resolve: ((resolveParams: ExtendedResolveParams<TDoc>) => {
       resolveParams.query = model.find();
       resolveParams.model = model;
       filterHelper(resolveParams, aliases);
@@ -48,5 +54,5 @@ export default function count<TSource = Document, TContext = any>(
         return beforeQueryHelper(resolveParams);
       }
     }) as any,
-  });
+  }) as any;
 }

@@ -1,6 +1,6 @@
 import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { recordHelperArgs, RecordHelperArgsOpts } from './helpers';
+import { recordHelperArgs, RecordHelperArgsOpts, ArgsMap } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateAndThrow } from './helpers/validate';
@@ -9,11 +9,11 @@ export interface CreateOneResolverOpts {
   record?: RecordHelperArgsOpts | false;
 }
 
-export default function createOne<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function createOne<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: CreateOneResolverOpts
-): Resolver<TSource, TContext> {
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createOne() should be instance of Mongoose Model.');
   }
@@ -64,7 +64,7 @@ export default function createOne<TSource = Document, TContext = any>(
         ...(opts && opts.record),
       }),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       const recordData = resolveParams?.args?.record;
 
       if (!(typeof recordData === 'object') || Object.keys(recordData).length === 0) {
@@ -73,7 +73,7 @@ export default function createOne<TSource = Document, TContext = any>(
         );
       }
 
-      let doc: Document = new model(recordData);
+      let doc = new model(recordData);
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
         if (!doc) return null;
@@ -92,5 +92,5 @@ export default function createOne<TSource = Document, TContext = any>(
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver;
+  return resolver as any;
 }

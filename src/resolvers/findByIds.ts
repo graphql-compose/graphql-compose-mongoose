@@ -9,6 +9,7 @@ import {
   prepareAliases,
   LimitHelperArgsOpts,
   SortHelperArgsOpts,
+  ArgsMap,
 } from './helpers';
 import type { ExtendedResolveParams } from './';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
@@ -18,11 +19,11 @@ export interface FindByIdsResolverOpts {
   sort?: SortHelperArgsOpts | false;
 }
 
-export default function findByIds<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
+export default function findByIds<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindByIdsResolverOpts
-): Resolver<TSource, TContext> {
+): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIds() should be instance of Mongoose Model.');
   }
@@ -49,18 +50,16 @@ export default function findByIds<TSource = Document, TContext = any>(
         ...opts?.sort,
       }),
     },
-    resolve: ((resolveParams: ExtendedResolveParams) => {
+    resolve: ((resolveParams: ExtendedResolveParams<TDoc>) => {
       const args = resolveParams.args || {};
 
       if (!Array.isArray(args._ids) || args._ids.length === 0) {
         return Promise.resolve([]);
       }
 
-      const selector = {
+      resolveParams.query = model.find({
         _id: { $in: args._ids },
-      };
-
-      resolveParams.query = model.find(selector);
+      } as any);
       resolveParams.model = model;
       projectionHelper(resolveParams, aliases);
       limitHelper(resolveParams);

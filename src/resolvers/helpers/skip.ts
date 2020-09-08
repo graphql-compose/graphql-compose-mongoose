@@ -1,7 +1,7 @@
 import type { ObjectTypeComposerArgumentConfigMapDefinition } from 'graphql-compose';
 import type { ExtendedResolveParams } from '../index';
 
-export const skipHelperArgs = (): ObjectTypeComposerArgumentConfigMapDefinition => {
+export const skipHelperArgs = (): ObjectTypeComposerArgumentConfigMapDefinition<{ skip: any }> => {
   return {
     skip: {
       type: 'Int',

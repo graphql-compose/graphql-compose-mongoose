@@ -1,5 +1,5 @@
 import type { ResolverResolveParams } from 'graphql-compose';
-import type { Query, Model } from 'mongoose';
+import type { Query, Model, Document } from 'mongoose';
 import count, { CountResolverOpts } from './count';
 import findById from './findById';
 import findByIds, { FindByIdsResolverOpts } from './findByIds';
@@ -50,12 +50,14 @@ export type AllResolversOpts = {
   pagination?: false | PaginationResolverOpts;
 };
 
-export type ExtendedResolveParams = Partial<ResolverResolveParams<any, any, any>> & {
+export type ExtendedResolveParams<TDoc extends Document = any, TContext = any> = Partial<
+  ResolverResolveParams<TDoc, TContext, any>
+> & {
   query: Query<any>;
   rawQuery: { [optName: string]: any };
-  beforeQuery?: (query: Query<any>, rp: ExtendedResolveParams) => Promise<any>;
-  beforeRecordMutate?: (record: any, rp: ExtendedResolveParams) => Promise<any>;
-  model: Model<any>;
+  beforeQuery?: (query: Query<any>, rp: ExtendedResolveParams<TDoc>) => Promise<any>;
+  beforeRecordMutate?: (record: TDoc, rp: ExtendedResolveParams<TDoc>) => Promise<any>;
+  model: Model<TDoc>;
 };
 
 export {
