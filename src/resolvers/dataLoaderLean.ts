@@ -8,7 +8,6 @@ import { getDataLoader } from './helpers/dataLoaderHelper';
 export default function dataLoaderLean<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>
-  // _opts?: GenResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(

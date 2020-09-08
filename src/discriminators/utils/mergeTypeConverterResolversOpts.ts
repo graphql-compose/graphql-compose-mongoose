@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import type { TypeConverterResolversOpts } from '../../composeWithMongoose';
 import { MergeAbleHelperArgsOpts } from '../../resolvers/helpers';
 import { mergeStringAndStringArraysFields } from './mergeCustomizationOptions';
+import { AllResolversOpts } from 'src/resolvers';
 
 type TypeFieldMap = {
   [fieldName: string]: any;
@@ -126,9 +126,9 @@ export function mergeMapTypeFields(
 }
 
 export function mergeTypeConverterResolverOpts(
-  baseTypeConverterResolverOpts?: TypeConverterResolversOpts | false,
-  childTypeConverterResolverOpts?: TypeConverterResolversOpts | false
-): TypeConverterResolversOpts | false | void {
+  baseTypeConverterResolverOpts?: AllResolversOpts | false,
+  childTypeConverterResolverOpts?: AllResolversOpts | false
+): AllResolversOpts | false | void {
   if (!baseTypeConverterResolverOpts) {
     return childTypeConverterResolverOpts;
   }

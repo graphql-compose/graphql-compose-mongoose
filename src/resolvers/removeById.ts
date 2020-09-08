@@ -7,7 +7,6 @@ import { addErrorCatcherField } from './helpers/errorCatcher';
 export default function removeById<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>
-  // _opts?: GenResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');

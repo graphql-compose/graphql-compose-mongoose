@@ -11,14 +11,24 @@ import {
   sortHelperArgs,
   projectionHelper,
   prepareAliases,
+  FilterHelperArgsOpts,
+  SortHelperArgsOpts,
+  LimitHelperArgsOpts,
 } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
+
+export interface FindManyResolverOpts {
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  limit?: LimitHelperArgsOpts | false;
+  skip?: false;
+}
 
 export default function findMany<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: FindManyResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findMany() should be instance of Mongoose Model.');

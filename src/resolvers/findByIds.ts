@@ -7,14 +7,21 @@ import {
   sortHelperArgs,
   projectionHelper,
   prepareAliases,
+  LimitHelperArgsOpts,
+  SortHelperArgsOpts,
 } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
+
+export interface FindByIdsResolverOpts {
+  limit?: LimitHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+}
 
 export default function findByIds<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: FindByIdsResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIds() should be instance of Mongoose Model.');

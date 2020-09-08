@@ -9,14 +9,21 @@ import {
   prepareAliases,
   prepareAliasesReverse,
   replaceAliases,
+  LimitHelperArgsOpts,
+  SortHelperArgsOpts,
 } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
+
+export interface FindByIdsLeanResolverOpts {
+  limit?: LimitHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+}
 
 export default function findByIdsLean<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: FindByIdsLeanResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIdsLean() should be instance of Mongoose Model.');

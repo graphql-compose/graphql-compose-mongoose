@@ -1,14 +1,18 @@
 import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { recordHelperArgs } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { recordHelperArgs, RecordHelperArgsOpts } from './helpers';
+import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateAndThrow } from './helpers/validate';
+
+export interface CreateOneResolverOpts {
+  record?: RecordHelperArgsOpts | false;
+}
 
 export default function createOne<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: CreateOneResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createOne() should be instance of Mongoose Model.');

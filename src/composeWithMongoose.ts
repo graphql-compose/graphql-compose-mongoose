@@ -2,18 +2,11 @@
 
 import type { ObjectTypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
 import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
-import type { Model } from 'mongoose';
+import type { Model, Document } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
 import * as resolvers from './resolvers';
-import type {
-  FilterHelperArgsOpts,
-  LimitHelperArgsOpts,
-  SortHelperArgsOpts,
-  RecordHelperArgsOpts,
-} from './resolvers/helpers';
 import MongoID from './types/MongoID';
-import type { PaginationResolverOpts } from './resolvers/pagination';
-import type { ConnectionOpts } from './resolvers/connection';
+import { GraphQLResolveInfo } from 'graphql';
 
 export type ComposeWithMongooseOpts<TContext> = {
   schemaComposer?: SchemaComposer<TContext>;
@@ -25,8 +18,16 @@ export type ComposeWithMongooseOpts<TContext> = {
     remove?: string[];
   };
   inputType?: TypeConverterInputTypeOpts;
-  resolvers?: false | TypeConverterResolversOpts;
+  resolvers?: false | resolvers.AllResolversOpts;
+  /** You may customize document id */
+  transformRecordId?: TransformRecordIdFn<TContext>;
 };
+
+export type TransformRecordIdFn<TContext = any> = (
+  source: Document,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => any;
 
 export type TypeConverterInputTypeOpts = {
   name?: string;
@@ -36,108 +37,6 @@ export type TypeConverterInputTypeOpts = {
     remove?: string[];
     required?: string[];
   };
-};
-
-export type TypeConverterResolversOpts = {
-  findById?: false;
-  findByIds?:
-    | false
-    | {
-        limit?: LimitHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-      };
-  findOne?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        skip?: false;
-      };
-  findMany?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        limit?: LimitHelperArgsOpts | false;
-        skip?: false;
-      };
-  findByIdLean?: false;
-  findByIdsLean?:
-    | false
-    | {
-        limit?: LimitHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-      };
-  findOneLean?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        skip?: false;
-      };
-  findManyLean?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        limit?: LimitHelperArgsOpts | false;
-        skip?: false;
-      };
-  dataLoader?: false;
-  dataLoaderLean?: false;
-  dataLoaderMany?: false;
-  dataLoaderManyLean?: false;
-  updateById?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-      };
-  updateOne?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        skip?: false;
-      };
-  updateMany?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        limit?: LimitHelperArgsOpts | false;
-        skip?: false;
-      };
-  removeById?: false;
-  removeOne?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-      };
-  removeMany?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-      };
-  createOne?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-      };
-  createMany?:
-    | false
-    | {
-        records?: RecordHelperArgsOpts | false;
-      };
-  count?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-      };
-  connection?: ConnectionOpts<any> | false;
-  pagination?: PaginationResolverOpts | false;
 };
 
 export function composeWithMongoose<TSource = any, TContext = any>(
@@ -248,10 +147,9 @@ export function createInputType(
 export function createResolvers(
   model: Model<any>,
   tc: ObjectTypeComposer<any, any>,
-  opts: TypeConverterResolversOpts
+  opts: resolvers.AllResolversOpts
 ): void {
-  const names = resolvers.getAvailableNames();
-  names.forEach((resolverName) => {
+  resolvers.availableResolverNames.forEach((resolverName) => {
     if (!{}.hasOwnProperty.call(opts, resolverName) || opts[resolverName] !== false) {
       const createResolverFn = resolvers[resolverName] as any;
       if (typeof createResolverFn === 'function') {

@@ -1,15 +1,30 @@
 import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
-import { skipHelperArgs, recordHelperArgs, filterHelperArgs, sortHelperArgs } from './helpers';
+import type { ExtendedResolveParams } from './index';
+import {
+  skipHelperArgs,
+  recordHelperArgs,
+  filterHelperArgs,
+  sortHelperArgs,
+  FilterHelperArgsOpts,
+  RecordHelperArgsOpts,
+  SortHelperArgsOpts,
+} from './helpers';
 import findOne from './findOne';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateAndThrow } from './helpers/validate';
 
+export interface UpdateOneResolverOpts {
+  record?: RecordHelperArgsOpts | false;
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  skip?: false;
+}
+
 export default function updateOne<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: UpdateOneResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateOne() should be instance of Mongoose Model.');

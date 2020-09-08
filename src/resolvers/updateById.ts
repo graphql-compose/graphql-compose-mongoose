@@ -1,15 +1,19 @@
 import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { recordHelperArgs } from './helpers/record';
+import { recordHelperArgs, RecordHelperArgsOpts } from './helpers/record';
 import findById from './findById';
 import { addErrorCatcherField } from './helpers/errorCatcher';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './index';
 import { validateAndThrow } from './helpers/validate';
+
+export interface UpdateByIdResolverOpts {
+  record?: RecordHelperArgsOpts | false;
+}
 
 export default function updateById<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: UpdateByIdResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateById() should be instance of Mongoose Model.');

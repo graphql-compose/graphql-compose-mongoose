@@ -8,7 +8,6 @@ import { getDataLoader } from './helpers/dataLoaderHelper';
 export default function dataLoader<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>
-  // _opts?: GenResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver dataLoader() should be instance of Mongoose Model.');

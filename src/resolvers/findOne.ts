@@ -9,14 +9,22 @@ import {
   sortHelperArgs,
   projectionHelper,
   prepareAliases,
+  FilterHelperArgsOpts,
+  SortHelperArgsOpts,
 } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
+
+export interface FindOneResolverOpts {
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  skip?: false;
+}
 
 export default function findOne<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: FindOneResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findOne() should be instance of Mongoose Model.');

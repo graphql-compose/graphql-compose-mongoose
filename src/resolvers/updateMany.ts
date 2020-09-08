@@ -12,16 +12,28 @@ import {
   sortHelperArgs,
   prepareAliases,
   replaceAliases,
+  RecordHelperArgsOpts,
+  FilterHelperArgsOpts,
+  SortHelperArgsOpts,
+  LimitHelperArgsOpts,
 } from './helpers';
 import { toMongoDottedObject } from '../utils/toMongoDottedObject';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 import { addErrorCatcherField } from './helpers/errorCatcher';
+
+export interface UpdateManyResolverOpts {
+  record?: RecordHelperArgsOpts | false;
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  limit?: LimitHelperArgsOpts | false;
+  skip?: false;
+}
 
 export default function updateMany<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: UpdateManyResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateMany() should be instance of Mongoose Model.');
