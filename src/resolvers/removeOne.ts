@@ -1,14 +1,24 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { filterHelperArgs, sortHelperArgs } from './helpers';
+import {
+  filterHelperArgs,
+  sortHelperArgs,
+  SortHelperArgsOpts,
+  FilterHelperArgsOpts,
+} from './helpers';
 import findOne from './findOne';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
+
+export interface RemoveOneResolverOpts {
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+}
 
 export default function removeOne<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: RemoveOneResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeOne() should be instance of Mongoose Model.');

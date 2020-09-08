@@ -11,14 +11,22 @@ import {
   prepareAliases,
   prepareAliasesReverse,
   replaceAliases,
+  SortHelperArgsOpts,
+  FilterHelperArgsOpts,
 } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
+
+export interface FindOneLeanResolverOpts {
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  skip?: false;
+}
 
 export default function findOneLean<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: FindOneLeanResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findOneLean() should be instance of Mongoose Model.');

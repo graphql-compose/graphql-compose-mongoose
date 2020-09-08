@@ -1,14 +1,18 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { filterHelperArgs, filterHelper, prepareAliases } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { filterHelperArgs, filterHelper, prepareAliases, FilterHelperArgsOpts } from './helpers';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 import { addErrorCatcherField } from './helpers/errorCatcher';
+
+export interface RemoveManyResolverOpts {
+  filter?: FilterHelperArgsOpts | false;
+}
 
 export default function removeMany<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: RemoveManyResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeMany() should be instance of Mongoose Model.');

@@ -1,12 +1,12 @@
-import type { TypeConverterResolversOpts } from '../../../composeWithMongoose';
 import {
   mergeTypeConverterResolverOpts,
   mergePrimitiveTypeFields,
   mergeMapTypeFields,
   mergeFilterOperatorsOptsMap,
 } from '../mergeTypeConverterResolversOpts';
+import { AllResolversOpts } from 'src/resolvers';
 
-const baseConverterResolverOpts: TypeConverterResolversOpts = {
+const baseConverterResolverOpts: AllResolversOpts = {
   findMany: {
     limit: { defaultValue: 20 },
     // sort: false,
@@ -33,7 +33,7 @@ const baseConverterResolverOpts: TypeConverterResolversOpts = {
   },
 };
 
-const childConverterResolverOpts: TypeConverterResolversOpts = {
+const childConverterResolverOpts: AllResolversOpts = {
   findMany: {
     limit: { defaultValue: 50 },
     sort: false,
@@ -59,7 +59,7 @@ const childConverterResolverOpts: TypeConverterResolversOpts = {
   },
 };
 
-const expectedConverterResolverOpts: TypeConverterResolversOpts = {
+const expectedConverterResolverOpts: AllResolversOpts = {
   findMany: {
     limit: { defaultValue: 50 },
     sort: false,

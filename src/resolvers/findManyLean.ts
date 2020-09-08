@@ -13,14 +13,24 @@ import {
   prepareAliases,
   prepareAliasesReverse,
   replaceAliases,
+  FilterHelperArgsOpts,
+  SortHelperArgsOpts,
+  LimitHelperArgsOpts,
 } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
+
+export interface FindManyLeanResolverOpts {
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  limit?: LimitHelperArgsOpts | false;
+  skip?: false;
+}
 
 export default function findManyLean<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: FindManyLeanResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findManyLean() should be instance of Mongoose Model.');

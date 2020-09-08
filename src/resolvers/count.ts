@@ -1,13 +1,17 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { filterHelper, filterHelperArgs, prepareAliases } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { filterHelper, filterHelperArgs, prepareAliases, FilterHelperArgsOpts } from './helpers';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
+
+export interface CountResolverOpts {
+  filter?: FilterHelperArgsOpts | false;
+}
 
 export default function count<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
+  opts?: CountResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver count() should be instance of Mongoose Model.');

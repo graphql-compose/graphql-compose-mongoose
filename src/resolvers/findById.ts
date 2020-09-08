@@ -7,7 +7,6 @@ import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 export default function findById<TSource = Document, TContext = any>(
   model: Model<any>,
   tc: ObjectTypeComposer<TSource, TContext>
-  // _opts?: GenResolverOpts
 ): Resolver<TSource, TContext> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findById() should be instance of Mongoose Model.');
