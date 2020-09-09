@@ -7,6 +7,7 @@ import updateOne from '../updateOne';
 import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -96,9 +97,13 @@ describe('updateOne() ->', () => {
       );
     });
 
-    it('should return payload.recordId', async () => {
-      const result = await updateOne(UserModel, UserTC).resolve({
-        args: { filter: { _id: user1.id } },
+    it('should return payload.recordId when it requested', async () => {
+      const result = await testFieldConfig({
+        field: updateOne(UserModel, UserTC),
+        args: { filter: { _id: user1.id }, record: {} },
+        selection: `{
+          recordId
+        }`,
       });
       expect(result.recordId).toBe(user1.id);
     });

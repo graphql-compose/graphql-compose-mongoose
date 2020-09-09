@@ -70,8 +70,6 @@ export function composeWithMongoose<TDoc extends Document, TContext = any>(
     prepareFields(tc, opts.fields);
   }
 
-  tc.setRecordIdFn((source) => (source ? `${(source as any)._id}` : ''));
-
   createInputType(tc, opts.inputType);
 
   if (!{}.hasOwnProperty.call(opts, 'resolvers') || opts.resolvers !== false) {

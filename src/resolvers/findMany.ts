@@ -20,6 +20,7 @@ import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
 export interface FindManyResolverOpts {
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
   limit?: LimitHelperArgsOpts | false;

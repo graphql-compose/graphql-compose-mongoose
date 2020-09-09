@@ -6,6 +6,7 @@ import removeOne from '../removeOne';
 import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -94,8 +95,12 @@ describe('removeOne() ->', () => {
     });
 
     it('should return payload.recordId if record existed in db', async () => {
-      const result = await removeOne(UserModel, UserTC).resolve({
+      const result = await testFieldConfig({
+        field: removeOne(UserModel, UserTC),
         args: { filter: { _id: user1.id } },
+        selection: `{
+          recordId
+        }`,
       });
       expect(result.recordId).toBe(user1.id);
     });

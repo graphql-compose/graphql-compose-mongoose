@@ -12,6 +12,7 @@ import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 
 export interface RemoveManyResolverOpts {
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
 }
 

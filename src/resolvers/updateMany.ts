@@ -24,7 +24,9 @@ import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 
 export interface UpdateManyResolverOpts {
+  /** Customize input-type for `record` argument. */
   record?: RecordHelperArgsOpts | false;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
   limit?: LimitHelperArgsOpts | false;

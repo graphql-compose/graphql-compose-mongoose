@@ -8,7 +8,10 @@ import { validateAndThrow } from './helpers/validate';
 import { ArgsMap } from './helpers';
 
 export interface UpdateByIdResolverOpts {
+  /** Customize input-type for `record` argument. */
   record?: RecordHelperArgsOpts | false;
+  /** Customize payload.recordId field. By default: `doc._id`. */
+  recordIdFn?: (doc: any, context: any) => any;
 }
 
 export default function updateById<TSource = any, TContext = any, TDoc extends Document = any>(
@@ -34,6 +37,11 @@ export default function updateById<TSource = any, TContext = any, TDoc extends D
       recordId: {
         type: 'MongoID',
         description: 'Updated document ID',
+        resolve: (source, _, context) => {
+          const doc = source?.record;
+          if (!doc) return;
+          return opts?.recordIdFn ? opts.recordIdFn(doc, context) : doc?._id;
+        },
       },
       record: {
         type: tc,
@@ -105,7 +113,6 @@ export default function updateById<TSource = any, TContext = any, TDoc extends D
 
       return {
         record: doc,
-        recordId: tc.getRecordIdFn()(doc as any),
       };
     }) as any,
   });

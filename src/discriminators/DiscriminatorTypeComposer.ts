@@ -4,7 +4,6 @@ import {
   ObjectTypeComposer,
   InterfaceTypeComposer,
   ObjectTypeComposerRelationOpts,
-  ObjectTypeComposerGetRecordIdFn,
   ObjectTypeComposerFieldConfigDefinition,
   ObjectTypeComposerFieldConfigMapDefinition,
   ObjectTypeComposerFieldConfigAsObjectDefinition,
@@ -359,16 +358,6 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
 
     for (const childTC of this.childTCs) {
       childTC.addRelation(fieldName, relationOpts);
-    }
-
-    return this;
-  }
-
-  setRecordIdFn(fn: ObjectTypeComposerGetRecordIdFn<any, any>): this {
-    super.setRecordIdFn(fn);
-
-    for (const childTC of this.childTCs) {
-      childTC.setRecordIdFn(fn);
     }
 
     return this;

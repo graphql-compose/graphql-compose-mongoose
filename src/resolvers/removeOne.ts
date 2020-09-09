@@ -12,8 +12,11 @@ import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 
 export interface RemoveOneResolverOpts {
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
+  /** Customize payload.recordId field. By default: `doc._id`. */
+  recordIdFn?: (doc: any, context: any) => any;
 }
 
 export default function removeOne<TSource = any, TContext = any, TDoc extends Document = any>(
@@ -39,6 +42,11 @@ export default function removeOne<TSource = any, TContext = any, TDoc extends Do
       recordId: {
         type: 'MongoID',
         description: 'Removed document ID',
+        resolve: (source, _, context) => {
+          const doc = source?.record;
+          if (!doc) return;
+          return opts?.recordIdFn ? opts.recordIdFn(doc, context) : doc?._id;
+        },
       },
       record: {
         type: tc,
@@ -93,7 +101,6 @@ export default function removeOne<TSource = any, TContext = any, TDoc extends Do
 
         return {
           record: doc,
-          recordId: tc.getRecordIdFn()(doc),
         };
       }
 
