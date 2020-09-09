@@ -6,6 +6,7 @@ import createOne from '../createOne';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import GraphQLMongoID from '../../types/MongoID';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -56,11 +57,13 @@ describe('createOne() ->', () => {
       );
     });
 
-    it('should return payload.recordId', async () => {
-      const result = await createOne(UserModel, UserTC).resolve({
-        args: {
-          record: { name: 'newName', contacts: { email: 'mail' } },
-        },
+    it('should return payload.recordId when it requested', async () => {
+      const result = await testFieldConfig({
+        field: createOne(UserModel, UserTC),
+        args: { record: { name: 'newName', contacts: { email: 'mail' } } },
+        selection: `{
+          recordId
+        }`,
       });
       expect(result.recordId).toBeTruthy();
     });
@@ -86,13 +89,18 @@ describe('createOne() ->', () => {
       expect(doc.n).toBe(checkedName);
     });
 
-    it('should return payload.record', async () => {
-      const result = await createOne(UserModel, UserTC).resolve({
-        args: {
-          record: { name: 'NewUser', contacts: { email: 'mail' } },
-        },
+    it('should return payload.record when it requested', async () => {
+      const result = await testFieldConfig({
+        field: createOne(UserModel, UserTC),
+        args: { record: { name: 'NewUser', contacts: { email: 'mail' } } },
+        selection: `{
+          record {
+            _id
+          }
+          recordId
+        }`,
       });
-      expect(result.record.id).toBe(result.recordId);
+      expect(result.record._id).toBe(result.recordId);
     });
 
     it('should return resolver runtime error in payload.error', async () => {

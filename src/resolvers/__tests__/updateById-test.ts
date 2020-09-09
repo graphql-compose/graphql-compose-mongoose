@@ -7,6 +7,7 @@ import updateById from '../updateById';
 import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -80,11 +81,15 @@ describe('updateById() ->', () => {
     });
 
     it('should return payload.recordId', async () => {
-      const result = await updateById(UserModel, UserTC).resolve({
+      const result = await testFieldConfig({
+        field: updateById(UserModel, UserTC),
         args: {
           _id: user1.id,
           record: { name: 'some name' },
         },
+        selection: `{
+          recordId
+        }`,
       });
       expect(result.recordId).toBe(user1.id);
     });

@@ -6,7 +6,10 @@ import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateAndThrow } from './helpers/validate';
 
 export interface CreateOneResolverOpts {
+  /** Customize input-type for `record` argument. */
   record?: RecordHelperArgsOpts | false;
+  /** Customize payload.recordId field. By default: `doc._id`. */
+  recordIdFn?: (doc: any, context: any) => any;
 }
 
 export default function createOne<TSource = any, TContext = any, TDoc extends Document = any>(
@@ -41,6 +44,11 @@ export default function createOne<TSource = any, TContext = any, TDoc extends Do
       recordId: {
         type: 'MongoID',
         description: 'Created document ID',
+        resolve: (source, _, context) => {
+          const doc = source?.record;
+          if (!doc) return;
+          return opts?.recordIdFn ? opts.recordIdFn(doc, context) : doc?._id;
+        },
       },
       record: {
         type: tc,
@@ -81,9 +89,9 @@ export default function createOne<TSource = any, TContext = any, TDoc extends Do
 
       await validateAndThrow(doc);
       await doc.save({ validateBeforeSave: false });
+
       return {
         record: doc,
-        recordId: tc.getRecordIdFn()(doc as any),
       };
     }) as any,
   });

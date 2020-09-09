@@ -22,6 +22,7 @@ import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
 export interface FindManyLeanResolverOpts {
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
   limit?: LimitHelperArgsOpts | false;

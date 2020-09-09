@@ -7,6 +7,7 @@ import removeById from '../removeById';
 import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -63,11 +64,13 @@ describe('removeById() ->', () => {
       await expect(result).rejects.toThrow('User.removeById resolver requires args._id value');
     });
 
-    it('should return payload.recordId', async () => {
-      const result = await removeById(UserModel, UserTC).resolve({
-        args: {
-          _id: user.id,
-        },
+    it('should return payload.recordId when it requested', async () => {
+      const result = await testFieldConfig({
+        field: removeById(UserModel, UserTC),
+        args: { _id: user.id },
+        selection: `{
+          recordId
+        }`,
       });
       expect(result.recordId).toBe(user.id);
     });

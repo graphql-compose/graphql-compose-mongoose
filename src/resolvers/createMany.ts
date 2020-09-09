@@ -5,6 +5,7 @@ import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateManyAndThrow } from './helpers/validate';
 
 export interface CreateManyResolverOpts {
+  /** Customize input-type for `records` argument. */
   records?: RecordHelperArgsOpts | false;
 }
 

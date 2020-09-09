@@ -14,7 +14,7 @@ import createOne, { CreateOneResolverOpts } from './createOne';
 import updateById, { UpdateByIdResolverOpts } from './updateById';
 import updateMany, { UpdateManyResolverOpts } from './updateMany';
 import updateOne, { UpdateOneResolverOpts } from './updateOne';
-import removeById from './removeById';
+import removeById, { RemoveByIdResolverOpts } from './removeById';
 import removeMany, { RemoveManyResolverOpts } from './removeMany';
 import removeOne, { RemoveOneResolverOpts } from './removeOne';
 import dataLoader from './dataLoader';
@@ -43,7 +43,7 @@ export type AllResolversOpts = {
   updateById?: false | UpdateByIdResolverOpts;
   updateOne?: false | UpdateOneResolverOpts;
   updateMany?: false | UpdateManyResolverOpts;
-  removeById?: false;
+  removeById?: false | RemoveByIdResolverOpts;
   removeOne?: false | RemoveOneResolverOpts;
   removeMany?: false | RemoveManyResolverOpts;
   connection?: false | ConnectionOpts<any>;

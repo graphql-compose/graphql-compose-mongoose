@@ -5,9 +5,15 @@ import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { ArgsMap } from './helpers';
 
+export interface RemoveByIdResolverOpts {
+  /** Customize payload.recordId field. By default: `doc._id`. */
+  recordIdFn?: (doc: any, context: any) => any;
+}
+
 export default function removeById<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  opts?: RemoveByIdResolverOpts
 ): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');
@@ -27,6 +33,11 @@ export default function removeById<TSource = any, TContext = any, TDoc extends D
       recordId: {
         type: 'MongoID',
         description: 'Removed document ID',
+        resolve: (source, _, context) => {
+          const doc = source?.record;
+          if (!doc) return;
+          return opts?.recordIdFn ? opts.recordIdFn(doc, context) : doc?._id;
+        },
       },
       record: {
         type: tc,
@@ -66,7 +77,6 @@ export default function removeById<TSource = any, TContext = any, TDoc extends D
 
         return {
           record: doc,
-          recordId: tc.getRecordIdFn()(doc as any),
         };
       }
 
