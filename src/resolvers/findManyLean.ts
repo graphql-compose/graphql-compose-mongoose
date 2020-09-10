@@ -29,7 +29,7 @@ export interface FindManyLeanResolverOpts {
   skip?: false;
 }
 
-export default function findManyLean<TSource = any, TContext = any, TDoc extends Document = any>(
+export function findManyLean<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindManyLeanResolverOpts

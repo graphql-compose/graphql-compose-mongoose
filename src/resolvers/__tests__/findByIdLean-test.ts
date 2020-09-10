@@ -1,7 +1,7 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { PostModel, IPost } from '../../__mocks__/postModel';
-import findByIdLean from '../findByIdLean';
+import { findByIdLean } from '../findByIdLean';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 

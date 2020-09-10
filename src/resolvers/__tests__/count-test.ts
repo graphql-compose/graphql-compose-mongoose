@@ -1,7 +1,7 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLInt } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
-import count from '../count';
+import { count } from '../count';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 

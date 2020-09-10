@@ -4,7 +4,7 @@ import type { ObjectTypeComposer, InputTypeComposer, SchemaComposer } from 'grap
 import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
-import * as resolvers from './resolvers';
+import { allResolvers, AllResolversOpts } from './resolvers';
 import MongoID from './types/MongoID';
 import { GraphQLResolveInfo } from 'graphql';
 
@@ -18,7 +18,7 @@ export type ComposeWithMongooseOpts<TContext> = {
     remove?: string[];
   };
   inputType?: TypeConverterInputTypeOpts;
-  resolvers?: false | resolvers.AllResolversOpts;
+  resolvers?: false | AllResolversOpts;
   /** You may customize document id */
   transformRecordId?: TransformRecordIdFn<TContext>;
 };
@@ -145,11 +145,11 @@ export function createInputType(
 export function createResolvers(
   model: Model<any>,
   tc: ObjectTypeComposer<any, any>,
-  opts: resolvers.AllResolversOpts
+  opts: AllResolversOpts
 ): void {
-  resolvers.availableResolverNames.forEach((resolverName) => {
-    if (!{}.hasOwnProperty.call(opts, resolverName) || opts[resolverName] !== false) {
-      const createResolverFn = resolvers[resolverName] as any;
+  (Object.keys(allResolvers) as any).forEach((resolverName: keyof typeof allResolvers) => {
+    if (!opts.hasOwnProperty(resolverName) || opts[resolverName] !== false) {
+      const createResolverFn = allResolvers[resolverName] as any;
       if (typeof createResolverFn === 'function') {
         const resolver = createResolverFn(model, tc, opts[resolverName] || {});
         if (resolver) {

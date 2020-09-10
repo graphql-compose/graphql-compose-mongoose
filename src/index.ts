@@ -5,6 +5,7 @@ import GraphQLBSONDecimal from './types/BSONDecimal';
 export default composeWithMongoose;
 
 export * from './composeWithMongoose';
+export * from './composeMongoose';
 export * from './composeWithMongooseDiscriminators';
 export * from './fieldsConverter';
 export * from './resolvers';

@@ -6,7 +6,7 @@ export type PaginationResolverOpts = {
   perPage?: number;
 };
 
-export default function pagination<TSource = any, TContext = any, TDoc extends Document = any>(
+export function pagination<TSource = any, TContext = any, TDoc extends Document = any>(
   _model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: PaginationResolverOpts

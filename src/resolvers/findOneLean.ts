@@ -25,7 +25,7 @@ export interface FindOneLeanResolverOpts {
   skip?: false;
 }
 
-export default function findOneLean<TSource = any, TContext = any, TDoc extends Document = any>(
+export function findOneLean<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindOneLeanResolverOpts

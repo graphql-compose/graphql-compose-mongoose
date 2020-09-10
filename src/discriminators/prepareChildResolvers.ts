@@ -3,7 +3,7 @@ import {
   ComposeWithMongooseDiscriminatorsOpts,
   DiscriminatorTypeComposer,
 } from './DiscriminatorTypeComposer';
-import { availableResolverNames } from '../resolvers';
+import { allResolvers } from '../resolvers';
 
 // set the DKey as a query on filter, also project it
 // Also look at it like setting for filters, makes sure to limit
@@ -136,7 +136,7 @@ export function prepareChildResolvers<TSource, TContext>(
   childTC: ObjectTypeComposer<TSource, TContext>,
   opts: ComposeWithMongooseDiscriminatorsOpts<TContext>
 ): void {
-  availableResolverNames.forEach((resolverName) => {
+  Object.keys(allResolvers).forEach((resolverName) => {
     if (childTC.hasResolver(resolverName)) {
       const resolver = childTC.getResolver(resolverName);
 

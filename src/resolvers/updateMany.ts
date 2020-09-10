@@ -33,7 +33,7 @@ export interface UpdateManyResolverOpts {
   skip?: false;
 }
 
-export default function updateMany<TSource = any, TContext = any, TDoc extends Document = any>(
+export function updateMany<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: UpdateManyResolverOpts

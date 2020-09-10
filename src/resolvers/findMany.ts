@@ -27,7 +27,7 @@ export interface FindManyResolverOpts {
   skip?: false;
 }
 
-export default function findMany<TSource = any, TContext = any, TDoc extends Document = any>(
+export function findMany<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindManyResolverOpts

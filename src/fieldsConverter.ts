@@ -146,6 +146,8 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
     return sc.getOTC(model.schema);
   }
 
+  // add type to registry before fields creation
+  // it helps to avoid circuit dependencies, eg. `User { friends: [User] }`
   const typeComposer = sc.getOrCreateOTC(typeName);
   sc.set(model.schema, typeComposer);
   sc.set(typeName, typeComposer);
@@ -167,7 +169,7 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
 
     if (
       mongooseField.isRequired &&
-      // conditional required field in mongoose cannot be NonNulable in GraphQL
+      // conditional required field in mongoose cannot be NonNullable in GraphQL
       typeof mongooseField?.originalRequiredValue !== 'function'
     ) {
       requiredFields.push(fieldName);

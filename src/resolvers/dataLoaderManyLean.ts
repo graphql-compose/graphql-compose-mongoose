@@ -11,13 +11,14 @@ import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 import { getDataLoader } from './helpers/dataLoaderHelper';
 
-export default function dataLoaderManyLean<
-  TSource = any,
-  TContext = any,
-  TDoc extends Document = any
->(
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface DataLoaderManyLeanResolverOpts {}
+
+export function dataLoaderManyLean<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _opts?: DataLoaderManyLeanResolverOpts
 ): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(

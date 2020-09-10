@@ -15,7 +15,7 @@ export interface CountResolverOpts {
   filter?: FilterHelperArgsOpts | false;
 }
 
-export default function count<TSource = any, TContext = any, TDoc extends Document = any>(
+export function count<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: CountResolverOpts

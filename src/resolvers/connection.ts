@@ -8,7 +8,7 @@ import type {
 import { getUniqueIndexes, extendByReversedIndexes, IndexT } from '../utils/getIndexesFromModel';
 import { ArgsMap } from './helpers';
 
-export type ConnectionOpts<TContext = any> = _ConnectionSortMapOpts & {
+export type ConnectionResolverOpts<TContext = any> = _ConnectionSortMapOpts & {
   edgeFields?: ObjectTypeComposerFieldConfigMap<any, TContext>;
   connectionResolverName?: string;
   findResolverName?: string;
@@ -16,10 +16,10 @@ export type ConnectionOpts<TContext = any> = _ConnectionSortMapOpts & {
   edgeTypeName?: string;
 };
 
-export default function connection<TSource = any, TContext = any, TDoc extends Document = any>(
+export function connection<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
-  opts?: ConnectionOpts<TContext>
+  opts?: ConnectionResolverOpts<TContext>
 ): Resolver<TSource, TContext, ArgsMap, TDoc> | undefined {
   try {
     require.resolve('graphql-compose-connection');

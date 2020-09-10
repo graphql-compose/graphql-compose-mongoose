@@ -12,7 +12,7 @@ export interface CreateOneResolverOpts {
   recordIdFn?: (doc: any, context: any) => any;
 }
 
-export default function createOne<TSource = any, TContext = any, TDoc extends Document = any>(
+export function createOne<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: CreateOneResolverOpts

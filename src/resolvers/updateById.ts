@@ -1,7 +1,7 @@
 import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs, RecordHelperArgsOpts } from './helpers/record';
-import findById from './findById';
+import { findById } from './findById';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import type { ExtendedResolveParams } from './index';
 import { validateAndThrow } from './helpers/validate';
@@ -14,7 +14,7 @@ export interface UpdateByIdResolverOpts {
   recordIdFn?: (doc: any, context: any) => any;
 }
 
-export default function updateById<TSource = any, TContext = any, TDoc extends Document = any>(
+export function updateById<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: UpdateByIdResolverOpts
