@@ -5,9 +5,14 @@ import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 import { getDataLoader } from './helpers/dataLoaderHelper';
 
-export default function dataLoader<TSource = any, TContext = any, TDoc extends Document = any>(
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface DataLoaderResolverOpts {}
+
+export function dataLoader<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _opts?: DataLoaderResolverOpts
 ): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver dataLoader() should be instance of Mongoose Model.');

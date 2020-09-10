@@ -23,7 +23,7 @@ export interface FindOneResolverOpts {
   skip?: false;
 }
 
-export default function findOne<TSource = any, TContext = any, TDoc extends Document = any>(
+export function findOne<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindOneResolverOpts

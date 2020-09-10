@@ -11,7 +11,7 @@ import {
   SortHelperArgsOpts,
   ArgsMap,
 } from './helpers';
-import findOne from './findOne';
+import { findOne } from './findOne';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateAndThrow } from './helpers/validate';
 
@@ -26,7 +26,7 @@ export interface UpdateOneResolverOpts {
   recordIdFn?: (doc: any, context: any) => any;
 }
 
-export default function updateOne<TSource = any, TContext = any, TDoc extends Document = any>(
+export function updateOne<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: UpdateOneResolverOpts

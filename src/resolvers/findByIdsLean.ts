@@ -21,7 +21,7 @@ export interface FindByIdsLeanResolverOpts {
   sort?: SortHelperArgsOpts | false;
 }
 
-export default function findByIdsLean<TSource = any, TContext = any, TDoc extends Document = any>(
+export function findByIdsLean<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindByIdsLeanResolverOpts

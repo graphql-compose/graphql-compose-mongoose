@@ -2,7 +2,7 @@ import { Query } from 'mongoose';
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLInt, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import updateMany from '../updateMany';
+import { updateMany } from '../updateMany';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 

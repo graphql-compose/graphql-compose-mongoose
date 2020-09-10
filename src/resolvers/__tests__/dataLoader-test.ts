@@ -2,7 +2,7 @@ import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { PostModel, IPost } from '../../__mocks__/postModel';
 import { mongoose } from '../../__mocks__/mongooseCommon';
-import dataLoader from '../dataLoader';
+import { dataLoader } from '../dataLoader';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 import { GraphQLResolveInfo } from 'graphql';

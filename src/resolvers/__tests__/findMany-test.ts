@@ -1,6 +1,6 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import findMany from '../findMany';
+import { findMany } from '../findMany';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 

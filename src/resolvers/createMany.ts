@@ -9,7 +9,7 @@ export interface CreateManyResolverOpts {
   records?: RecordHelperArgsOpts | false;
 }
 
-export default function createMany<TSource = any, TContext = any, TDoc extends Document = any>(
+export function createMany<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: CreateManyResolverOpts

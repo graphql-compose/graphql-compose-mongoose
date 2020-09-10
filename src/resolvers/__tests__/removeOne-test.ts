@@ -2,7 +2,7 @@
 
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import removeOne from '../removeOne';
+import { removeOne } from '../removeOne';
 import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';

@@ -10,9 +10,14 @@ import {
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
-export default function findByIdLean<TSource = any, TContext = any, TDoc extends Document = any>(
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface FindByIdLeanResolverOpts {}
+
+export function findByIdLean<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _opts?: FindByIdLeanResolverOpts
 ): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIdLean() should be instance of Mongoose Model.');

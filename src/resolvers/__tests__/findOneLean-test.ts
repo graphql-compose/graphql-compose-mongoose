@@ -1,7 +1,7 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import findOneLean from '../findOneLean';
+import { findOneLean } from '../findOneLean';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 

@@ -16,7 +16,7 @@ export interface RemoveManyResolverOpts {
   filter?: FilterHelperArgsOpts | false;
 }
 
-export default function removeMany<TSource = any, TContext = any, TDoc extends Document = any>(
+export function removeMany<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: RemoveManyResolverOpts

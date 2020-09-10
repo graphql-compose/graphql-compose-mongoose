@@ -1,9 +1,9 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { Query } from 'mongoose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import connection, { prepareCursorQuery } from '../connection';
-import findMany from '../findMany';
-import count from '../count';
+import { connection, prepareCursorQuery } from '../connection';
+import { findMany } from '../findMany';
+import { count } from '../count';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 

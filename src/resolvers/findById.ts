@@ -4,9 +4,14 @@ import { projectionHelper, prepareAliases, ArgsMap } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
-export default function findById<TSource = any, TContext = any, TDoc extends Document = any>(
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface FindByIdResolverOpts {}
+
+export function findById<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _opts?: FindByIdResolverOpts
 ): Resolver<TSource, TContext, ArgsMap, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findById() should be instance of Mongoose Model.');

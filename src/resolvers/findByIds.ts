@@ -19,7 +19,7 @@ export interface FindByIdsResolverOpts {
   sort?: SortHelperArgsOpts | false;
 }
 
-export default function findByIds<TSource = any, TContext = any, TDoc extends Document = any>(
+export function findByIds<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindByIdsResolverOpts

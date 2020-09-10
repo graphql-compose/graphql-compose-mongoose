@@ -7,7 +7,7 @@ import {
   FilterHelperArgsOpts,
   ArgsMap,
 } from './helpers';
-import findOne from './findOne';
+import { findOne } from './findOne';
 import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 
@@ -19,7 +19,7 @@ export interface RemoveOneResolverOpts {
   recordIdFn?: (doc: any, context: any) => any;
 }
 
-export default function removeOne<TSource = any, TContext = any, TDoc extends Document = any>(
+export function removeOne<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: RemoveOneResolverOpts
