@@ -1,22 +1,29 @@
 import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { recordHelperArgs, RecordHelperArgsOpts, ArgsMap } from './helpers';
+import { recordHelperArgs, RecordHelperArgsOpts } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateAndThrow } from './helpers/validate';
+import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
 export interface CreateOneResolverOpts {
-  /** Customize input-type for `record` argument. */
-  record?: RecordHelperArgsOpts | false;
-  /** Customize payload.recordId field. By default: `doc._id`. */
-  recordIdFn?: (doc: any, context: any) => any;
+  // TODO: add description
+  suffix?: string;
+  /** Customize input-type for `record` argument */
+  record?: RecordHelperArgsOpts;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
 }
+
+type TArgs = {
+  record: Record<string, any>;
+};
 
 export function createOne<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: CreateOneResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createOne() should be instance of Mongoose Model.');
   }
@@ -38,18 +45,10 @@ export function createOne<TSource = any, TContext = any, TDoc extends Document =
     }
   }
 
-  const outputTypeName = `CreateOne${tc.getTypeName()}Payload`;
+  const outputTypeName = `CreateOne${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
-    t.addFields({
-      recordId: {
-        type: 'MongoID',
-        description: 'Created document ID',
-        resolve: (source, _, context) => {
-          const doc = source?.record;
-          if (!doc) return;
-          return opts?.recordIdFn ? opts.recordIdFn(doc, context) : doc?._id;
-        },
-      },
+    t.setFields({
+      ...payloadRecordId(tc, opts?.recordId),
       record: {
         type: tc,
         description: 'Created document',
@@ -57,19 +56,19 @@ export function createOne<TSource = any, TContext = any, TDoc extends Document =
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
-    name: 'createOne',
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
+    name: `createOne${opts?.suffix || ''}`,
     kind: 'mutation',
     description: 'Create one document with mongoose defaults, setters, hooks and validation',
     type: outputType,
     args: {
       ...recordHelperArgs(tc, {
         prefix: 'CreateOne',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
         requiredFields,
-        ...(opts && opts.record),
+        ...opts?.record,
       }),
     },
     resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
@@ -100,5 +99,5 @@ export function createOne<TSource = any, TContext = any, TDoc extends Document =
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver as any;
+  return resolver;
 }

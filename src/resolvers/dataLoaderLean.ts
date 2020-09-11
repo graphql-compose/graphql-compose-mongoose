@@ -1,3 +1,4 @@
+import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
@@ -40,7 +41,7 @@ export function dataLoaderLean<TSource = any, TContext = any, TDoc extends Docum
     name: 'dataLoaderLean',
     kind: 'query',
     args: {
-      _id: 'MongoID!',
+      _id: tc.hasField('_id') ? toInputType(tc.getFieldTC('_id')).NonNull : 'MongoID!',
     },
     resolve: ((resolveParams: ExtendedResolveParams<TDoc>) => {
       const args = resolveParams.args || {};

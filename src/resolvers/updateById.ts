@@ -1,3 +1,4 @@
+import { toInputType } from 'graphql-compose';
 import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs, RecordHelperArgsOpts } from './helpers/record';
@@ -6,12 +7,13 @@ import { addErrorCatcherField } from './helpers/errorCatcher';
 import type { ExtendedResolveParams } from './index';
 import { validateAndThrow } from './helpers/validate';
 import { ArgsMap } from './helpers';
+import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
 export interface UpdateByIdResolverOpts {
   /** Customize input-type for `record` argument. */
-  record?: RecordHelperArgsOpts | false;
-  /** Customize payload.recordId field. By default: `doc._id`. */
-  recordIdFn?: (doc: any, context: any) => any;
+  record?: RecordHelperArgsOpts;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
 }
 
 export function updateById<TSource = any, TContext = any, TDoc extends Document = any>(
@@ -33,16 +35,8 @@ export function updateById<TSource = any, TContext = any, TDoc extends Document 
 
   const outputTypeName = `UpdateById${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
-    t.addFields({
-      recordId: {
-        type: 'MongoID',
-        description: 'Updated document ID',
-        resolve: (source, _, context) => {
-          const doc = source?.record;
-          if (!doc) return;
-          return opts?.recordIdFn ? opts.recordIdFn(doc, context) : doc?._id;
-        },
-      },
+    t.setFields({
+      ...payloadRecordId(tc, opts?.recordId),
       record: {
         type: tc,
         description: 'Updated document',
@@ -61,14 +55,14 @@ export function updateById<TSource = any, TContext = any, TDoc extends Document 
       '4) And save it.',
     type: outputType,
     args: {
-      _id: 'MongoID!',
+      _id: tc.hasField('_id') ? toInputType(tc.getFieldTC('_id')).NonNull : 'MongoID!',
       ...recordHelperArgs(tc, {
-        removeFields: ['_id'], // pull out `_id` to top-level
+        removeFields: ['_id', 'id'], // pull out `_id` to top-level
         prefix: 'UpdateById',
         suffix: 'Input',
         isRequired: true,
         allFieldsNullable: true,
-        ...(opts && opts.record),
+        ...opts?.record,
       }),
     },
     resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {

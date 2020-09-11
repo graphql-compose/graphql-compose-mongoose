@@ -27,28 +27,38 @@ async function testOperation(opts: TestOperationOpts): Promise<ExecutionResult> 
   return res;
 }
 
-interface TestFieldConfigOpts {
-  args?: Record<string, any>;
-  field: ObjectTypeComposerFieldConfigAsObjectDefinition<any, any, any> | Resolver;
+interface TestFieldConfigOpts<TSource = any, TContext = any, TArgs = any> {
+  args?: TArgs;
+  field:
+    | ObjectTypeComposerFieldConfigAsObjectDefinition<TSource, TContext, TArgs>
+    | Resolver<TSource, TContext, TArgs>;
   selection: string;
   source?: Record<string, any>;
-  context?: Record<string, any>;
-  schemaComposer?: SchemaComposer<any>;
+  context?: TContext;
+  schemaComposer?: SchemaComposer<TContext>;
 }
 
-export async function testFieldConfig(opts: TestFieldConfigOpts): Promise<any> {
+export async function testFieldConfig<TSource = any, TContext = any, TArgs = any>(
+  opts: TestFieldConfigOpts<TSource, TContext, TArgs>
+): Promise<any> {
   const { field, selection, args, ...restOpts } = opts;
 
   const sc = opts?.schemaComposer || new SchemaComposer();
-  sc.Query.setField(FIELD, field);
+  sc.Query.setField<any>(FIELD, field);
 
   const ac = _getArgsForQuery(field, args, sc);
+  const selectionSet = selection.trim();
+  if (!selectionSet.startsWith('{') || !selectionSet.endsWith('}')) {
+    throw new Error(
+      `Error in testFieldConfig({ selection: '...' }) – selection must be a string started from "{" and ended with "}"`
+    );
+  }
   const res = await testOperation({
     ...restOpts,
     variables: args,
     operation: `
       query ${ac.queryVars} {
-        ${FIELD}${ac.fieldVars} ${selection.trim()}
+        ${FIELD}${ac.fieldVars} ${selectionSet}
       }
     `,
     schemaComposer: sc,

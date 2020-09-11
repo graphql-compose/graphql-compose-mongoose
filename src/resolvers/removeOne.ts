@@ -10,13 +10,14 @@ import {
 import { findOne } from './findOne';
 import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
+import { payloadRecordId, PayloadRecordIdHelperOpts } from './helpers/payloadRecordId';
 
 export interface RemoveOneResolverOpts {
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
-  /** Customize payload.recordId field. By default: `doc._id`. */
-  recordIdFn?: (doc: any, context: any) => any;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
 }
 
 export function removeOne<TSource = any, TContext = any, TDoc extends Document = any>(
@@ -38,16 +39,8 @@ export function removeOne<TSource = any, TContext = any, TDoc extends Document =
 
   const outputTypeName = `RemoveOne${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
-    t.addFields({
-      recordId: {
-        type: 'MongoID',
-        description: 'Removed document ID',
-        resolve: (source, _, context) => {
-          const doc = source?.record;
-          if (!doc) return;
-          return opts?.recordIdFn ? opts.recordIdFn(doc, context) : doc?._id;
-        },
-      },
+    t.setFields({
+      ...payloadRecordId(tc, opts?.recordId),
       record: {
         type: tc,
         description: 'Removed document',

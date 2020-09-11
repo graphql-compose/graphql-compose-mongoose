@@ -58,9 +58,9 @@ describe('issue #136 - Mongoose virtuals', () => {
 
     const res = await graphql.graphql({
       schema,
-      source: 'mutation { createManyComments(records: [{ links: ["a"] }]) { createCount } }',
+      source: 'mutation { createManyComments(records: [{ links: ["a"] }]) { createdCount } }',
     });
 
-    expect(res).toEqual({ data: { createManyComments: { createCount: 1 } } });
+    expect(res).toEqual({ data: { createManyComments: { createdCount: 1 } } });
   });
 });
