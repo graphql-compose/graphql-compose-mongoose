@@ -3,7 +3,6 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { removeOne } from '../removeOne';
-import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 import { testFieldConfig } from '../../utils/testHelpers';
@@ -248,9 +247,7 @@ describe('removeOne() ->', () => {
     });
 
     it('should have recordId field', () => {
-      const outputType: any = removeOne(UserModel, UserTC).getType();
-      const recordIdField = schemaComposer.createObjectTC(outputType).getFieldConfig('recordId');
-      expect(recordIdField.type).toBe(GraphQLMongoID);
+      expect(removeOne(UserModel, UserTC).getOTC().getFieldTypeName('recordId')).toBe('MongoID');
     });
 
     it('should have record field', () => {

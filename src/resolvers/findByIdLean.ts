@@ -1,3 +1,4 @@
+import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
@@ -37,7 +38,7 @@ export function findByIdLean<TSource = any, TContext = any, TDoc extends Documen
     name: 'findByIdLean',
     kind: 'query',
     args: {
-      _id: 'MongoID!',
+      _id: tc.hasField('_id') ? toInputType(tc.getFieldTC('_id')).NonNull : 'MongoID!',
     },
     resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       const args = resolveParams.args || {};

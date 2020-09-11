@@ -1,3 +1,4 @@
+import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
@@ -36,11 +37,13 @@ export function dataLoaderManyLean<TSource = any, TContext = any, TDoc extends D
   const aliasesReverse = prepareAliasesReverse(model);
 
   return tc.schemaComposer.createResolver({
-    type: tc.NonNull.List.NonNull,
+    type: tc.List.NonNull,
     name: 'dataLoaderManyLean',
     kind: 'query',
     args: {
-      _ids: '[MongoID]!',
+      _ids: tc.hasField('_id')
+        ? toInputType(tc.getFieldTC('_id')).NonNull.List.NonNull
+        : '[MongoID!]!',
     },
     resolve: ((resolveParams: ExtendedResolveParams<TDoc>) => {
       const args = resolveParams.args || {};

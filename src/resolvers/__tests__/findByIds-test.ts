@@ -51,7 +51,7 @@ describe('findByIds() ->', () => {
   describe('Resolver.args', () => {
     it('should have non-null `_ids` arg', () => {
       const resolver = findByIds(UserModel, UserTC);
-      expect(resolver.getArgTypeName('_ids')).toBe('[MongoID]!');
+      expect(resolver.getArgTypeName('_ids')).toBe('[MongoID!]!');
     });
 
     it('should have `limit` arg', () => {

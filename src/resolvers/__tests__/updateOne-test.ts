@@ -4,7 +4,6 @@ import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { updateOne } from '../updateOne';
-import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 import { testFieldConfig } from '../../utils/testHelpers';
@@ -311,9 +310,7 @@ describe('updateOne() ->', () => {
     });
 
     it('should have recordId field', () => {
-      const outputType: any = updateOne(UserModel, UserTC).getType();
-      const recordIdField = schemaComposer.createObjectTC(outputType).getFieldConfig('recordId');
-      expect(recordIdField.type).toBe(GraphQLMongoID);
+      expect(updateOne(UserModel, UserTC).getOTC().getFieldTypeName('recordId')).toBe('MongoID');
     });
 
     it('should have record field', () => {

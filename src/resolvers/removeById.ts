@@ -1,13 +1,15 @@
+import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { findById } from './findById';
 import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { ArgsMap } from './helpers';
+import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
 export interface RemoveByIdResolverOpts {
-  /** Customize payload.recordId field. By default: `doc._id`. */
-  recordIdFn?: (doc: any, context: any) => any;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
 }
 
 export function removeById<TSource = any, TContext = any, TDoc extends Document = any>(
@@ -29,16 +31,8 @@ export function removeById<TSource = any, TContext = any, TDoc extends Document 
 
   const outputTypeName = `RemoveById${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
-    t.addFields({
-      recordId: {
-        type: 'MongoID',
-        description: 'Removed document ID',
-        resolve: (source, _, context) => {
-          const doc = source?.record;
-          if (!doc) return;
-          return opts?.recordIdFn ? opts.recordIdFn(doc, context) : doc?._id;
-        },
-      },
+    t.setFields({
+      ...payloadRecordId(tc, opts?.recordId),
       record: {
         type: tc,
         description: 'Removed document',
@@ -55,7 +49,7 @@ export function removeById<TSource = any, TContext = any, TDoc extends Document 
       '2) Return removed document.',
     type: outputType,
     args: {
-      _id: 'MongoID!',
+      _id: tc.hasField('_id') ? toInputType(tc.getFieldTC('_id')).NonNull : 'MongoID!',
     },
     resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       const _id = resolveParams?.args?._id;

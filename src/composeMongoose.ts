@@ -30,9 +30,12 @@ export type GenerateResolverType<TDoc extends Document, TContext = any> = {
   // get all available resolver generators, then leave only 3rd arg – opts
   // because first two args will be attached via bind() method at runtime:
   //   count = count.bind(undefined, model, tc);
+  // TODO: explain infer
   [resolver in keyof typeof allResolvers]: <TSource = any>(
     opts?: Parameters<typeof allResolvers[resolver]>[2]
-  ) => Resolver<TSource, TContext, ArgsMap, TDoc>;
+  ) => typeof allResolvers[resolver] extends (...args: any) => Resolver<any, any, infer TArgs, any>
+    ? Resolver<TSource, TContext, TArgs, TDoc>
+    : any;
 };
 
 export function composeMongoose<TDoc extends Document, TContext = any>(

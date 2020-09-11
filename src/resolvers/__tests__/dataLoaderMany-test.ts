@@ -50,7 +50,7 @@ describe('dataLoaderMany() ->', () => {
   describe('Resolver.args', () => {
     it('should have non-null `_id` arg', () => {
       const resolver = dataLoaderMany(UserModel, UserTC);
-      expect(resolver.getArgTypeName('_ids')).toBe('[MongoID]!');
+      expect(resolver.getArgTypeName('_ids')).toBe('[MongoID!]!');
     });
   });
 

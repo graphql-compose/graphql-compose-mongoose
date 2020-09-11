@@ -1,3 +1,4 @@
+import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
@@ -44,7 +45,9 @@ export function findByIdsLean<TSource = any, TContext = any, TDoc extends Docume
     name: 'findByIdsLean',
     kind: 'query',
     args: {
-      _ids: '[MongoID]!',
+      _ids: tc.hasField('_id')
+        ? toInputType(tc.getFieldTC('_id')).NonNull.List.NonNull
+        : '[MongoID!]!',
       ...limitHelperArgs({
         ...opts?.limit,
       }),

@@ -1,12 +1,15 @@
-import type { ObjectTypeComposer, Resolver } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs, RecordHelperArgsOpts, ArgsMap } from './helpers';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateManyAndThrow } from './helpers/validate';
+import { payloadRecordIds, PayloadRecordIdsHelperOpts } from './helpers/payloadRecordId';
 
 export interface CreateManyResolverOpts {
   /** Customize input-type for `records` argument. */
-  records?: RecordHelperArgsOpts | false;
+  records?: RecordHelperArgsOpts;
+  /** Customize payload.recordIds field. If false, then this field will be removed. */
+  recordIds?: PayloadRecordIdsHelperOpts | false;
 }
 
 export function createMany<TSource = any, TContext = any, TDoc extends Document = any>(
@@ -37,20 +40,16 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
 
   const outputTypeName = `CreateMany${tc.getTypeName()}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
-    t.addFields({
-      recordIds: {
-        type: '[MongoID!]!',
-        description: 'Created document IDs',
-        resolve: (s: any) => s.recordIds || [],
-      },
+    t.setFields({
+      ...payloadRecordIds(tc, opts?.recordIds),
       records: {
         type: tc.NonNull.List,
         description: 'Created documents',
       },
-      createCount: {
+      createdCount: {
         type: 'Int!',
         description: 'Number of created documents',
-        resolve: (s: any) => s.createCount || 0,
+        resolve: (s: any) => s.createdCount || 0,
       },
     });
   });
@@ -68,7 +67,7 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
           removeFields: ['id', '_id'],
           isRequired: true,
           requiredFields,
-          ...(opts && opts.records),
+          ...opts?.records,
         }) as any).record.type.List.NonNull,
       },
     },
@@ -104,8 +103,7 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
 
       return {
         records: docs,
-        recordIds: docs.map((doc) => doc._id),
-        createCount: docs.length,
+        createdCount: docs.length,
       };
     },
   });

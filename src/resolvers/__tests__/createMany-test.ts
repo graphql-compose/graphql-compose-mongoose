@@ -1,12 +1,13 @@
 /* eslint-disable no-param-reassign,func-names */
 
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
-import { GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql-compose/lib/graphql';
+import { GraphQLList, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { mongoose } from '../../__mocks__/mongooseCommon';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { createMany } from '../createMany';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -90,11 +91,12 @@ describe('createMany() ->', () => {
     });
 
     it('should return payload.recordIds', async () => {
-      const result = await createMany(UserModel, UserTC).resolve({
-        args: {
-          records: [{ name: 'newName', contacts: { email: 'mail' } }],
-        },
-        projection: { error: true },
+      const result = await testFieldConfig({
+        field: createMany(UserModel, UserTC),
+        args: { records: [{ name: 'newName', contacts: { email: 'mail' } }] },
+        selection: `{
+          recordIds
+        }`,
       });
       expect(result.recordIds).toBeTruthy();
     });
@@ -109,7 +111,7 @@ describe('createMany() ->', () => {
         },
         projection: { error: true },
       });
-      expect(result.createCount).toBe(2);
+      expect(result.createdCount).toBe(2);
       expect(result.records[0].name).toBe('newName0');
       expect(result.records[1].name).toBe('newName1');
     });
@@ -130,28 +132,40 @@ describe('createMany() ->', () => {
 
     it('should save documents to database', async () => {
       const checkedName = 'nameForMongoDB';
-      const res = await createMany(UserModel, UserTC).resolve({
+      const res = await testFieldConfig({
+        field: createMany(UserModel, UserTC),
         args: {
           records: [
             { name: checkedName, contacts: { email: 'mail' } },
             { name: checkedName, contacts: { email: 'mail' } },
           ],
         },
-        projection: { error: true },
+        selection: `{
+          records {
+            _id
+          }
+          recordIds
+        }`,
       });
 
-      const docs = await UserModel.collection.find({ _id: { $in: res.recordIds } }).toArray();
+      const docs = await UserModel.collection
+        .find({ _id: { $in: res.recordIds.map((o: string) => new mongoose.Types.ObjectId(o)) } })
+        .toArray();
       expect(docs.length).toBe(2);
       expect(docs[0].n).toBe(checkedName);
       expect(docs[1].n).toBe(checkedName);
     });
 
     it('should return payload.records', async () => {
-      const result = await createMany(UserModel, UserTC).resolve({
-        args: {
-          records: [{ name: 'NewUser', contacts: { email: 'mail' } }],
-        },
-        projection: { error: true },
+      const result = await testFieldConfig({
+        field: createMany(UserModel, UserTC),
+        args: { records: [{ name: 'newName', contacts: { email: 'mail' } }] },
+        selection: `{
+          records {
+            _id
+          }
+          recordIds
+        }`,
       });
       expect(result.records[0]._id).toBe(result.recordIds[0]);
     });
@@ -254,10 +268,10 @@ describe('createMany() ->', () => {
       );
     });
 
-    it('should have createCount field, Int', () => {
-      const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordField = schemaComposer.createObjectTC(outputType).getFieldConfig('createCount');
-      expect(recordField.type).toEqual(new GraphQLNonNull(GraphQLInt));
+    it('should have createdCount field, Int', () => {
+      expect(createMany(UserModel, UserTC).getOTC().getFieldTypeName('createdCount')).toEqual(
+        'Int!'
+      );
     });
 
     it('should reuse existed outputType', () => {
