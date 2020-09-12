@@ -19,12 +19,12 @@ const UserModel = mongoose.model<IUser>('User', UserSchema);
 const UserTC = composeMongoose(UserModel, { schemaComposer });
 
 schemaComposer.Query.addFields({
-  userById: UserTC.generateResolver.findById(),
-  userFindOne: UserTC.generateResolver.findOne(),
+  userById: UserTC.mongooseResolvers.findById(),
+  userFindOne: UserTC.mongooseResolvers.findOne(),
 });
 schemaComposer.Mutation.addFields({
-  userCreateOne: UserTC.generateResolver.createOne(),
-  userUpdateById: UserTC.generateResolver.updateById(),
+  userCreateOne: UserTC.mongooseResolvers.createOne(),
+  userUpdateById: UserTC.mongooseResolvers.updateById(),
 });
 
 // const schema = schemaComposer.buildSchema();
@@ -48,28 +48,28 @@ describe('issue #141 - createOne with custom id (not MongoId)', () => {
   });
 
   it('Resolvers *ById should have Int type for args._id', () => {
-    expect(UserTC.generateResolver.findById().getArgTypeName('_id')).toBe('Int!');
-    expect(UserTC.generateResolver.findByIdLean().getArgTypeName('_id')).toBe('Int!');
-    expect(UserTC.generateResolver.removeById().getArgTypeName('_id')).toBe('Int!');
-    expect(UserTC.generateResolver.updateById().getArgTypeName('_id')).toBe('Int!');
+    expect(UserTC.mongooseResolvers.findById().getArgTypeName('_id')).toBe('Int!');
+    expect(UserTC.mongooseResolvers.findByIdLean().getArgTypeName('_id')).toBe('Int!');
+    expect(UserTC.mongooseResolvers.removeById().getArgTypeName('_id')).toBe('Int!');
+    expect(UserTC.mongooseResolvers.updateById().getArgTypeName('_id')).toBe('Int!');
 
-    expect(UserTC.generateResolver.findByIds().getArgTypeName('_ids')).toBe('[Int!]!');
-    expect(UserTC.generateResolver.findByIdsLean().getArgTypeName('_ids')).toBe('[Int!]!');
+    expect(UserTC.mongooseResolvers.findByIds().getArgTypeName('_ids')).toBe('[Int!]!');
+    expect(UserTC.mongooseResolvers.findByIdsLean().getArgTypeName('_ids')).toBe('[Int!]!');
   });
 
   it('Resolvers dataLoader* should have Int type for args._id', () => {
-    expect(UserTC.generateResolver.dataLoader().getArgTypeName('_id')).toBe('Int!');
-    expect(UserTC.generateResolver.dataLoaderLean().getArgTypeName('_id')).toBe('Int!');
-    expect(UserTC.generateResolver.dataLoaderMany().getArgTypeName('_ids')).toBe('[Int!]!');
-    expect(UserTC.generateResolver.dataLoaderManyLean().getArgTypeName('_ids')).toBe('[Int!]!');
+    expect(UserTC.mongooseResolvers.dataLoader().getArgTypeName('_id')).toBe('Int!');
+    expect(UserTC.mongooseResolvers.dataLoaderLean().getArgTypeName('_id')).toBe('Int!');
+    expect(UserTC.mongooseResolvers.dataLoaderMany().getArgTypeName('_ids')).toBe('[Int!]!');
+    expect(UserTC.mongooseResolvers.dataLoaderManyLean().getArgTypeName('_ids')).toBe('[Int!]!');
   });
 
   it('Check createOne/findOne resolvers', async () => {
-    UserTC.generateResolver.createOne();
+    UserTC.mongooseResolvers.createOne();
 
     expect(
       await testFieldConfig({
-        field: UserTC.generateResolver.createOne({
+        field: UserTC.mongooseResolvers.createOne({
           suffix: 'WithId',
           record: {
             removeFields: [], // <-- empty array allows to override removing _id arg
@@ -89,7 +89,7 @@ describe('issue #141 - createOne with custom id (not MongoId)', () => {
 
     expect(
       await testFieldConfig({
-        field: UserTC.generateResolver.findById(),
+        field: UserTC.mongooseResolvers.findById(),
         args: {
           _id: 15,
         },
@@ -132,26 +132,26 @@ describe('issue #141 - createOne with custom id (not MongoId)', () => {
         zone: String
       }"
     `);
-    expect(ComplexTC.generateResolver.findById().getArgTypeName('_id')).toBe('Complex_idInput!');
-    expect(ComplexTC.generateResolver.findByIdLean().getArgTypeName('_id')).toBe(
+    expect(ComplexTC.mongooseResolvers.findById().getArgTypeName('_id')).toBe('Complex_idInput!');
+    expect(ComplexTC.mongooseResolvers.findByIdLean().getArgTypeName('_id')).toBe(
       'Complex_idInput!'
     );
-    expect(ComplexTC.generateResolver.removeById().getArgTypeName('_id')).toBe('Complex_idInput!');
-    expect(ComplexTC.generateResolver.updateById().getArgTypeName('_id')).toBe('Complex_idInput!');
-    expect(ComplexTC.generateResolver.findByIds().getArgTypeName('_ids')).toBe(
+    expect(ComplexTC.mongooseResolvers.removeById().getArgTypeName('_id')).toBe('Complex_idInput!');
+    expect(ComplexTC.mongooseResolvers.updateById().getArgTypeName('_id')).toBe('Complex_idInput!');
+    expect(ComplexTC.mongooseResolvers.findByIds().getArgTypeName('_ids')).toBe(
       '[Complex_idInput!]!'
     );
-    expect(ComplexTC.generateResolver.findByIdsLean().getArgTypeName('_ids')).toBe(
+    expect(ComplexTC.mongooseResolvers.findByIdsLean().getArgTypeName('_ids')).toBe(
       '[Complex_idInput!]!'
     );
-    expect(ComplexTC.generateResolver.dataLoader().getArgTypeName('_id')).toBe('Complex_idInput!');
-    expect(ComplexTC.generateResolver.dataLoaderLean().getArgTypeName('_id')).toBe(
+    expect(ComplexTC.mongooseResolvers.dataLoader().getArgTypeName('_id')).toBe('Complex_idInput!');
+    expect(ComplexTC.mongooseResolvers.dataLoaderLean().getArgTypeName('_id')).toBe(
       'Complex_idInput!'
     );
-    expect(ComplexTC.generateResolver.dataLoaderMany().getArgTypeName('_ids')).toBe(
+    expect(ComplexTC.mongooseResolvers.dataLoaderMany().getArgTypeName('_ids')).toBe(
       '[Complex_idInput!]!'
     );
-    expect(ComplexTC.generateResolver.dataLoaderManyLean().getArgTypeName('_ids')).toBe(
+    expect(ComplexTC.mongooseResolvers.dataLoaderManyLean().getArgTypeName('_ids')).toBe(
       '[Complex_idInput!]!'
     );
 
@@ -161,7 +161,7 @@ describe('issue #141 - createOne with custom id (not MongoId)', () => {
     });
     expect(
       await testFieldConfig({
-        field: ComplexTC.generateResolver.findById(),
+        field: ComplexTC.mongooseResolvers.findById(),
         args: { _id: { region: 'us-west', zone: 'a' } },
         selection: `{
           _id {
