@@ -46,7 +46,7 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
   model: Model<TDoc>,
   opts: ComposeMongooseOpts<TContext> = {}
 ): ObjectTypeComposer<TDoc, TContext> & {
-  generateResolver: GenerateResolverType<TDoc, TContext>;
+  mongooseResolvers: GenerateResolverType<TDoc, TContext>;
 } {
   const m: Model<any> = model;
   const name: string = (opts && opts.name) || m.modelName;
@@ -82,11 +82,11 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
 
   tc.makeFieldNonNull('_id');
 
-  const generateResolver = {} as any;
+  const mongooseResolvers = {} as any;
   Object.keys(allResolvers).forEach((name) => {
-    generateResolver[name] = (allResolvers as any)[name].bind(undefined, model, tc);
+    mongooseResolvers[name] = (allResolvers as any)[name].bind(undefined, model, tc);
   });
-  (tc as any).generateResolver = generateResolver;
+  (tc as any).mongooseResolvers = mongooseResolvers;
 
   return tc as any;
 }
