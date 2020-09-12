@@ -5,7 +5,6 @@ import {
   sortHelperArgs,
   SortHelperArgsOpts,
   FilterHelperArgsOpts,
-  ArgsMap,
 } from './helpers';
 import { findOne } from './findOne';
 import type { ExtendedResolveParams } from './index';
@@ -20,11 +19,16 @@ export interface RemoveOneResolverOpts {
   recordId?: PayloadRecordIdHelperOpts | false;
 }
 
+type TArgs = {
+  filter?: any;
+  sort?: Record<string, any>;
+};
+
 export function removeOne<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: RemoveOneResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeOne() should be instance of Mongoose Model.');
   }
@@ -48,7 +52,7 @@ export function removeOne<TSource = any, TContext = any, TDoc extends Document =
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'removeOne',
     kind: 'mutation',
     description:
@@ -105,5 +109,5 @@ export function removeOne<TSource = any, TContext = any, TDoc extends Document =
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver as any;
+  return resolver;
 }

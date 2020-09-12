@@ -119,11 +119,9 @@ describe('removeOne() ->', () => {
     });
 
     it('should remove document in database', async () => {
-      const checkedName = 'nameForMongoDB';
       await removeOne(UserModel, UserTC).resolve({
         args: {
           filter: { _id: user1.id },
-          input: { name: checkedName },
         },
       });
 

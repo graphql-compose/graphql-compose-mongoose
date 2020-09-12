@@ -59,14 +59,22 @@ describe('createMany() ->', () => {
     });
 
     it('should rejected with Error if args.records is empty', async () => {
-      const result = createMany(UserModel, UserTC).resolve({ args: {} });
+      const result = createMany(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
       await expect(result).rejects.toThrow(
         'User.createMany resolver requires args.records to be an Array and must contain at least one record'
       );
     });
 
     it('should rejected with Error if args.records is not array', async () => {
-      const result = createMany(UserModel, UserTC).resolve({ args: { records: {} } });
+      const result = createMany(UserModel, UserTC).resolve({
+        args: {
+          // @ts-expect-error
+          records: {},
+        },
+      });
       await expect(result).rejects.toThrow(
         'ser.createMany resolver requires args.records to be an Array and must contain at least one record'
       );

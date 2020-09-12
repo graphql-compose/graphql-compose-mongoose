@@ -6,7 +6,6 @@ import { findById } from './findById';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import type { ExtendedResolveParams } from './index';
 import { validateAndThrow } from './helpers/validate';
-import { ArgsMap } from './helpers';
 import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
 export interface UpdateByIdResolverOpts {
@@ -16,11 +15,16 @@ export interface UpdateByIdResolverOpts {
   recordId?: PayloadRecordIdHelperOpts | false;
 }
 
+type TArgs = {
+  _id: any;
+  record: any;
+};
+
 export function updateById<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: UpdateByIdResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateById() should be instance of Mongoose Model.');
   }
@@ -44,7 +48,7 @@ export function updateById<TSource = any, TContext = any, TDoc extends Document 
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'updateById',
     kind: 'mutation',
     description:
@@ -115,5 +119,5 @@ export function updateById<TSource = any, TContext = any, TDoc extends Document 
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver as any;
+  return resolver;
 }

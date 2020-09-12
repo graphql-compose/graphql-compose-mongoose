@@ -1,6 +1,6 @@
 import { ObjectTypeComposer, Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { recordHelperArgs, RecordHelperArgsOpts, ArgsMap } from './helpers';
+import { recordHelperArgs, RecordHelperArgsOpts } from './helpers';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateManyAndThrow } from './helpers/validate';
 import { payloadRecordIds, PayloadRecordIdsHelperOpts } from './helpers/payloadRecordId';
@@ -12,11 +12,15 @@ export interface CreateManyResolverOpts {
   recordIds?: PayloadRecordIdsHelperOpts | false;
 }
 
+type TArgs = {
+  records: any[];
+};
+
 export function createMany<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: CreateManyResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createMany() should be instance of Mongoose Model.');
   }
@@ -54,7 +58,7 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'createMany',
     kind: 'mutation',
     description: 'Creates Many documents with mongoose defaults, setters, hooks and validation',
@@ -112,5 +116,5 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver as any;
+  return resolver;
 }

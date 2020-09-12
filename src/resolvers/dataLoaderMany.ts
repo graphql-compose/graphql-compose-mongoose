@@ -1,7 +1,7 @@
 import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { projectionHelper, prepareAliases, ArgsMap } from './helpers';
+import { projectionHelper, prepareAliases } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 import { getDataLoader } from './helpers/dataLoaderHelper';
@@ -9,12 +9,16 @@ import { getDataLoader } from './helpers/dataLoaderHelper';
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface DataLoaderManyResolverOpts {}
 
+type TArgs = {
+  _ids: any;
+};
+
 export function dataLoaderMany<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _opts?: DataLoaderManyResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(
       'First arg for Resolver dataLoaderMany() should be instance of Mongoose Model.'
@@ -29,7 +33,7 @@ export function dataLoaderMany<TSource = any, TContext = any, TDoc extends Docum
 
   const aliases = prepareAliases(model);
 
-  return tc.schemaComposer.createResolver({
+  return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc.List.NonNull,
     name: 'dataLoaderMany',
     kind: 'query',
@@ -62,5 +66,5 @@ export function dataLoaderMany<TSource = any, TContext = any, TDoc extends Docum
 
       return dl.loadMany(args._ids);
     }) as any,
-  }) as any;
+  });
 }

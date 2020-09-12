@@ -16,7 +16,6 @@ import {
   FilterHelperArgsOpts,
   SortHelperArgsOpts,
   LimitHelperArgsOpts,
-  ArgsMap,
 } from './helpers';
 import { toMongoDottedObject } from '../utils/toMongoDottedObject';
 import type { ExtendedResolveParams } from './index';
@@ -33,11 +32,19 @@ export interface UpdateManyResolverOpts {
   skip?: false;
 }
 
+type TArgs = {
+  record: any;
+  filter?: any;
+  limit?: number;
+  skip?: number;
+  sort?: string;
+};
+
 export function updateMany<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: UpdateManyResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateMany() should be instance of Mongoose Model.');
   }
@@ -59,7 +66,7 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
 
   const aliases = prepareAliases(model);
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'updateMany',
     kind: 'mutation',
     description:
@@ -140,5 +147,5 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver as any;
+  return resolver;
 }

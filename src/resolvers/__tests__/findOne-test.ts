@@ -98,7 +98,7 @@ describe('findOne() ->', () => {
 
     it('should return document if provided existed id', async () => {
       const result = await findOne(UserModel, UserTC).resolve({
-        args: { id: user1._id },
+        args: { filter: { _id: user1._id } },
       });
       expect(result.name).toBe(user1.name);
     });
@@ -122,14 +122,14 @@ describe('findOne() ->', () => {
 
     it('should return mongoose document', async () => {
       const result = await findOne(UserModel, UserTC).resolve({
-        args: { _id: user1._id },
+        args: { filter: { _id: user1._id } },
       });
       expect(result).toBeInstanceOf(UserModel);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
       const result = await findOne(UserModel, UserTC).resolve({
-        args: { _id: user1._id },
+        args: { filter: { _id: user1._id } },
         beforeQuery(query: any, rp: ExtendedResolveParams) {
           expect(rp.model).toBe(UserModel);
           expect(rp.query).toHaveProperty('exec');

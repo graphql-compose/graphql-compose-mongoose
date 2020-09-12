@@ -31,7 +31,7 @@
     "graphql-compose-pagination": "^7.0.0"
   },
   "peerDependencies": {
-    "graphql-compose": "^7.21.0",
+    "graphql-compose": "^7.21.1",
     "mongoose": "^5.0.0 || ^4.4.0"
   },
   "devDependencies": {
@@ -46,12 +46,12 @@
     "eslint-plugin-import": "2.22.0",
     "eslint-plugin-prettier": "3.1.4",
     "graphql": "15.3.0",
-    "graphql-compose": "7.21.0",
+    "graphql-compose": "7.21.1",
     "graphql-compose-connection": "^7.0.0",
     "graphql-compose-pagination": "^7.0.0",
     "jest": "26.4.2",
     "mongodb-memory-server": "6.7.4",
-    "mongoose": "5.10.4",
+    "mongoose": "5.10.5",
     "prettier": "2.1.1",
     "request": "2.88.2",
     "rimraf": "3.0.2",

@@ -43,7 +43,7 @@ export async function testFieldConfig<TSource = any, TContext = any, TArgs = any
 ): Promise<any> {
   const { field, selection, args, ...restOpts } = opts;
 
-  const sc = opts?.schemaComposer || new SchemaComposer();
+  const sc = opts?.schemaComposer || new SchemaComposer<TContext>();
   sc.Query.setField<any>(FIELD, field);
 
   const ac = _getArgsForQuery(field, args, sc);
@@ -72,7 +72,7 @@ export async function testFieldConfig<TSource = any, TContext = any, TArgs = any
 }
 
 function _getArgsForQuery(
-  fc: ObjectTypeComposerFieldConfigAsObjectDefinition<any, any, any> | Resolver,
+  fc: ObjectTypeComposerFieldConfigAsObjectDefinition<any, any, any> | Resolver<any, any, any>,
   variables: Record<string, any> = {},
   schemaComposer?: SchemaComposer<any>
 ): {

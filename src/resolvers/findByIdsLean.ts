@@ -12,7 +12,6 @@ import {
   replaceAliases,
   LimitHelperArgsOpts,
   SortHelperArgsOpts,
-  ArgsMap,
 } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
@@ -22,11 +21,17 @@ export interface FindByIdsLeanResolverOpts {
   sort?: SortHelperArgsOpts | false;
 }
 
+type TArgs = {
+  _ids: any;
+  limit?: number;
+  sort?: Record<string, any>;
+};
+
 export function findByIdsLean<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindByIdsLeanResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIdsLean() should be instance of Mongoose Model.');
   }
@@ -40,7 +45,7 @@ export function findByIdsLean<TSource = any, TContext = any, TDoc extends Docume
   const aliases = prepareAliases(model);
   const aliasesReverse = prepareAliasesReverse(model);
 
-  return tc.schemaComposer.createResolver({
+  return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc.NonNull.List.NonNull,
     name: 'findByIdsLean',
     kind: 'query',
@@ -75,5 +80,5 @@ export function findByIdsLean<TSource = any, TContext = any, TDoc extends Docume
         ? result.map((r) => replaceAliases(r, aliasesReverse))
         : result;
     }) as any,
-  }) as any;
+  });
 }

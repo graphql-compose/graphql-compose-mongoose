@@ -1,13 +1,7 @@
 import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import {
-  projectionHelper,
-  prepareAliases,
-  prepareAliasesReverse,
-  replaceAliases,
-  ArgsMap,
-} from './helpers';
+import { projectionHelper, prepareAliases, prepareAliasesReverse, replaceAliases } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 import { getDataLoader } from './helpers/dataLoaderHelper';
@@ -15,12 +9,16 @@ import { getDataLoader } from './helpers/dataLoaderHelper';
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface DataLoaderLeanResolverOpts {}
 
+type TArgs = {
+  _id: any;
+};
+
 export function dataLoaderLean<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _opts?: DataLoaderLeanResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error(
       'First arg for Resolver dataLoaderLean() should be instance of Mongoose Model.'
@@ -36,7 +34,7 @@ export function dataLoaderLean<TSource = any, TContext = any, TDoc extends Docum
   const aliases = prepareAliases(model);
   const aliasesReverse = prepareAliasesReverse(model);
 
-  return tc.schemaComposer.createResolver({
+  return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc,
     name: 'dataLoaderLean',
     kind: 'query',
@@ -70,5 +68,5 @@ export function dataLoaderLean<TSource = any, TContext = any, TDoc extends Docum
 
       return dl.load(args._id);
     }) as any,
-  }) as any;
+  });
 }

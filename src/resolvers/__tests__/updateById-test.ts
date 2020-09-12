@@ -75,6 +75,7 @@ describe('updateById() ->', () => {
 
     it('should rejected with Error if args._id is empty', async () => {
       const result = updateById(UserModel, UserTC).resolve({
+        // @ts-expect-error
         args: { record: {} },
       });
       await expect(result).rejects.toThrow('User.updateById resolver requires args._id value');

@@ -1,9 +1,6 @@
 import { getFilterHelperArgOptsMap } from './filter';
 import { getLimitHelperArgsOptsMap } from './limit';
 import { getRecordHelperArgsOptsMap } from './record';
-import { ArgsMap } from 'graphql-compose/lib/ObjectTypeComposer';
-
-export { ArgsMap };
 
 export * from './aliases';
 export * from './filter';
