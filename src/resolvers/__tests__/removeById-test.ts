@@ -60,7 +60,10 @@ describe('removeById() ->', () => {
     });
 
     it('should rejected with Error if args._id is empty', async () => {
-      const result = removeById(UserModel, UserTC).resolve({ args: {} });
+      const result = removeById(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
       await expect(result).rejects.toThrow('User.removeById resolver requires args._id value');
     });
 

@@ -11,7 +11,6 @@ import {
   prepareAliases,
   FilterHelperArgsOpts,
   SortHelperArgsOpts,
-  ArgsMap,
 } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
@@ -23,11 +22,17 @@ export interface FindOneResolverOpts {
   skip?: false;
 }
 
+type TArgs = {
+  filter?: any;
+  sort?: Record<string, any>;
+  skip?: number;
+};
+
 export function findOne<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindOneResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findOne() should be instance of Mongoose Model.');
   }
@@ -38,7 +43,7 @@ export function findOne<TSource = any, TContext = any, TDoc extends Document = a
 
   const aliases = prepareAliases(model);
 
-  return tc.schemaComposer.createResolver({
+  return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc,
     name: 'findOne',
     kind: 'query',
@@ -63,5 +68,5 @@ export function findOne<TSource = any, TContext = any, TDoc extends Document = a
       projectionHelper(resolveParams, aliases);
       return beforeQueryHelper(resolveParams);
     }) as any,
-  }) as any;
+  });
 }

@@ -9,7 +9,6 @@ import {
   FilterHelperArgsOpts,
   RecordHelperArgsOpts,
   SortHelperArgsOpts,
-  ArgsMap,
 } from './helpers';
 import { findOne } from './findOne';
 import { addErrorCatcherField } from './helpers/errorCatcher';
@@ -27,11 +26,18 @@ export interface UpdateOneResolverOpts {
   recordId?: PayloadRecordIdHelperOpts | false;
 }
 
+type TArgs = {
+  record: any;
+  filter?: any;
+  skip?: number;
+  sort?: Record<string, any>;
+};
+
 export function updateOne<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: UpdateOneResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateOne() should be instance of Mongoose Model.');
   }
@@ -54,7 +60,7 @@ export function updateOne<TSource = any, TContext = any, TDoc extends Document =
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'updateOne',
     kind: 'mutation',
     description:
@@ -107,11 +113,9 @@ export function updateOne<TSource = any, TContext = any, TDoc extends Document =
 
       if (!doc) return null;
 
-      if (recordData) {
-        doc.set(recordData);
-        await validateAndThrow(doc);
-        await doc.save({ validateBeforeSave: false });
-      }
+      doc.set(recordData);
+      await validateAndThrow(doc);
+      await doc.save({ validateBeforeSave: false });
 
       return {
         record: doc,
@@ -123,5 +127,5 @@ export function updateOne<TSource = any, TContext = any, TDoc extends Document =
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver as any;
+  return resolver;
 }

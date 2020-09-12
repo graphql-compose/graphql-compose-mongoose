@@ -90,7 +90,10 @@ describe('updateOne() ->', () => {
     });
 
     it('should rejected with Error if args.filter is empty', async () => {
-      const result = updateOne(UserModel, UserTC).resolve({ args: {} });
+      const result = updateOne(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
       await expect(result).rejects.toThrow(
         'User.updateOne resolver requires at least one value in args.filter'
       );
@@ -135,7 +138,7 @@ describe('updateOne() ->', () => {
 
     it('should return payload.record', async () => {
       const result = await updateOne(UserModel, UserTC).resolve({
-        args: { filter: { _id: user1.id } },
+        args: { filter: { _id: user1.id }, record: { name: 'abc' } },
       });
       expect(result.record.id).toBe(user1.id);
     });
@@ -156,7 +159,7 @@ describe('updateOne() ->', () => {
 
     it('should return empty payload.error', async () => {
       const result = await updateOne(UserModel, UserTC).resolve({
-        args: { filter: { _id: user1.id } },
+        args: { filter: { _id: user1.id }, record: { name: 'abc' } },
       });
       expect(result.error).toEqual(undefined);
     });
@@ -200,12 +203,14 @@ describe('updateOne() ->', () => {
       const result1 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
+          record: { name: 'abc' },
           skip: 0,
         },
       });
       const result2 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
+          record: { name: 'abc' },
           skip: 1,
         },
       });
@@ -216,12 +221,14 @@ describe('updateOne() ->', () => {
       const result1 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
+          record: { name: 'abc' },
           sort: { _id: 1 },
         },
       });
       const result2 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
+          record: { name: 'abc' },
           sort: { _id: -1 },
         },
       });
@@ -232,6 +239,7 @@ describe('updateOne() ->', () => {
       const result = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { _id: user1.id },
+          record: { name: 'abc' },
         },
         projection: {
           record: {
@@ -240,13 +248,16 @@ describe('updateOne() ->', () => {
         },
       });
       expect(result.record.id).toBe(user1.id);
-      expect(result.record.name).toBe(user1.name);
+      expect(result.record.name).toBe('abc');
       expect(result.record.gender).toBe(user1.gender);
     });
 
     it('should return mongoose document', async () => {
       const result = await updateOne(UserModel, UserTC).resolve({
-        args: { filter: { _id: user1.id } },
+        args: {
+          filter: { _id: user1.id },
+          record: { name: 'abc' },
+        },
       });
       expect(result.record).toBeInstanceOf(UserModel);
     });
@@ -254,7 +265,10 @@ describe('updateOne() ->', () => {
     it('should call `beforeRecordMutate` method with founded `record`  and `resolveParams` as args', async () => {
       let beforeMutationId;
       const result = await updateOne(UserModel, UserTC).resolve({
-        args: { filter: { _id: user1.id } },
+        args: {
+          filter: { _id: user1.id },
+          record: { name: 'abc' },
+        },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           beforeMutationId = record.id;

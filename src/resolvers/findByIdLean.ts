@@ -1,25 +1,23 @@
 import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import {
-  projectionHelper,
-  prepareAliases,
-  prepareAliasesReverse,
-  replaceAliases,
-  ArgsMap,
-} from './helpers';
+import { projectionHelper, prepareAliases, prepareAliasesReverse, replaceAliases } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface FindByIdLeanResolverOpts {}
 
+type TArgs = {
+  _id: any;
+};
+
 export function findByIdLean<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _opts?: FindByIdLeanResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIdLean() should be instance of Mongoose Model.');
   }
@@ -33,7 +31,7 @@ export function findByIdLean<TSource = any, TContext = any, TDoc extends Documen
   const aliases = prepareAliases(model);
   const aliasesReverse = prepareAliasesReverse(model);
 
-  return tc.schemaComposer.createResolver({
+  return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc,
     name: 'findByIdLean',
     kind: 'query',
@@ -52,5 +50,5 @@ export function findByIdLean<TSource = any, TContext = any, TDoc extends Documen
       }
       return Promise.resolve(null);
     }) as any,
-  }) as any;
+  });
 }

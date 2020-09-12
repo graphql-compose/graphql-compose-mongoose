@@ -4,7 +4,6 @@ import type { Model, Document } from 'mongoose';
 import { findById } from './findById';
 import type { ExtendedResolveParams } from './index';
 import { addErrorCatcherField } from './helpers/errorCatcher';
-import { ArgsMap } from './helpers';
 import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
 export interface RemoveByIdResolverOpts {
@@ -12,11 +11,15 @@ export interface RemoveByIdResolverOpts {
   recordId?: PayloadRecordIdHelperOpts | false;
 }
 
+type TArgs = {
+  _id: any;
+};
+
 export function removeById<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: RemoveByIdResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeById() should be instance of Mongoose Model.');
   }
@@ -40,7 +43,7 @@ export function removeById<TSource = any, TContext = any, TDoc extends Document 
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'removeById',
     kind: 'mutation',
     description:
@@ -82,5 +85,5 @@ export function removeById<TSource = any, TContext = any, TDoc extends Document 
   // and return it in mutation payload
   addErrorCatcherField(resolver);
 
-  return resolver as any;
+  return resolver;
 }

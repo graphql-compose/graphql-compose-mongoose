@@ -62,7 +62,7 @@ describe('dataLoaderMany() ->', () => {
 
     it('should return Error if args.ids contains incorrect ObjectId', async () => {
       // For more info see https://github.com/graphql/dataloader#loadmanykeys
-      //   var [ a, b, c ] = await myLoader.loadMany([ 'a', 'b', 'badkey' ]);
+      //   var [ a, b, c ] = await myLoader.loadMany([ 'a', 'b', 'badKey' ]);
       //   // c instanceof Error
       const result = await dataLoaderMany(UserModel, UserTC).resolve({
         args: { _ids: [1] },

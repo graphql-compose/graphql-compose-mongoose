@@ -4,7 +4,6 @@ import type { Model, Document } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
 import { allResolvers } from './resolvers';
 import MongoID from './types/MongoID';
-import { ArgsMap } from './resolvers/helpers';
 import {
   prepareFields,
   createInputType,
@@ -27,13 +26,18 @@ export type ComposeMongooseOpts<TContext> = {
 };
 
 export type GenerateResolverType<TDoc extends Document, TContext = any> = {
-  // get all available resolver generators, then leave only 3rd arg – opts
+  // Get all available resolver generators, then leave only 3rd arg – opts
   // because first two args will be attached via bind() method at runtime:
   //   count = count.bind(undefined, model, tc);
-  // TODO: explain infer
   [resolver in keyof typeof allResolvers]: <TSource = any>(
     opts?: Parameters<typeof allResolvers[resolver]>[2]
-  ) => typeof allResolvers[resolver] extends (...args: any) => Resolver<any, any, infer TArgs, any>
+  ) => // Also we should patch generics of the returned Resolver
+  //   attach TContext TDoc from the code which will bind at runtime
+  //   and allow user to attach TSource via generic at call
+  // For this case we are using `extends infer` construction
+  //   it helps to extract any Generic from existed method
+  //   and then construct new combined return type
+  typeof allResolvers[resolver] extends (...args: any) => Resolver<any, any, infer TArgs, any>
     ? Resolver<TSource, TContext, TArgs, TDoc>
     : any;
 };

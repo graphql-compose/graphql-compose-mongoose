@@ -16,7 +16,6 @@ import {
   FilterHelperArgsOpts,
   SortHelperArgsOpts,
   LimitHelperArgsOpts,
-  ArgsMap,
 } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
@@ -29,11 +28,18 @@ export interface FindManyLeanResolverOpts {
   skip?: false;
 }
 
+type TArgs = {
+  filter?: any;
+  limit?: number;
+  skip?: number;
+  sort?: Record<string, any>;
+};
+
 export function findManyLean<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: FindManyLeanResolverOpts
-): Resolver<TSource, TContext, ArgsMap, TDoc> {
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findManyLean() should be instance of Mongoose Model.');
   }
@@ -47,7 +53,7 @@ export function findManyLean<TSource = any, TContext = any, TDoc extends Documen
   const aliases = prepareAliases(model);
   const aliasesReverse = prepareAliasesReverse(model);
 
-  return tc.schemaComposer.createResolver({
+  return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc.NonNull.List.NonNull,
     name: 'findManyLean',
     kind: 'query',
@@ -79,5 +85,5 @@ export function findManyLean<TSource = any, TContext = any, TDoc extends Documen
         ? result.map((r) => replaceAliases(r, aliasesReverse))
         : result;
     }) as any,
-  }) as any;
+  });
 }

@@ -78,7 +78,10 @@ describe('removeMany() ->', () => {
     });
 
     it('should rejected with Error if args.filter is empty', async () => {
-      const result = removeMany(UserModel, UserTC).resolve({ args: {} });
+      const result = removeMany(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
       await expect(result).rejects.toThrow(
         'User.removeMany resolver requires at least one value in args.filter'
       );
