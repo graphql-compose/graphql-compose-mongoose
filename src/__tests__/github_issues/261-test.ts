@@ -68,7 +68,7 @@ describe('issue #261 - Non-nullability for mongoose fields that have a default v
         name: String!
         age: Float
         isActive: Boolean!
-        analytics: UserAnalytics
+        analytics: UserAnalytics!
         periods: [UserPeriods]!
       }
       
