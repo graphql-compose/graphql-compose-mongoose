@@ -7,7 +7,7 @@ import { validateAndThrow } from './helpers/validate';
 import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
 export interface CreateOneResolverOpts {
-  // TODO: add description
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
   suffix?: string;
   /** Customize input-type for `record` argument */
   record?: RecordHelperArgsOpts;

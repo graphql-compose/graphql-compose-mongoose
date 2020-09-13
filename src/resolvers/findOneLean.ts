@@ -18,6 +18,8 @@ import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
 export interface FindOneLeanResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
@@ -55,12 +57,12 @@ export function findOneLean<TSource = any, TContext = any, TDoc extends Document
     args: {
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterFindOneLean',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...skipHelperArgs(),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortFindOneLean${tc.getTypeName()}Input`,
+        sortTypeName: `SortFindOneLean${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
     },

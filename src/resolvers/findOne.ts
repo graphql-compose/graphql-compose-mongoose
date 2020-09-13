@@ -16,6 +16,8 @@ import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
 export interface FindOneResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
@@ -50,12 +52,12 @@ export function findOne<TSource = any, TContext = any, TDoc extends Document = a
     args: {
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterFindOne',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...skipHelperArgs(),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortFindOne${tc.getTypeName()}Input`,
+        sortTypeName: `SortFindOne${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
     },

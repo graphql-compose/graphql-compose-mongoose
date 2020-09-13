@@ -12,6 +12,8 @@ import { addErrorCatcherField } from './helpers/errorCatcher';
 import { payloadRecordId, PayloadRecordIdHelperOpts } from './helpers/payloadRecordId';
 
 export interface RemoveOneResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
@@ -41,7 +43,7 @@ export function removeOne<TSource = any, TContext = any, TDoc extends Document =
 
   const findOneResolver = findOne(model, tc, opts);
 
-  const outputTypeName = `RemoveOne${tc.getTypeName()}Payload`;
+  const outputTypeName = `RemoveOne${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.setFields({
       ...payloadRecordId(tc, opts?.recordId),
@@ -63,11 +65,11 @@ export function removeOne<TSource = any, TContext = any, TDoc extends Document =
     args: {
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterRemoveOne',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortRemoveOne${tc.getTypeName()}Input`,
+        sortTypeName: `SortRemoveOne${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
     },

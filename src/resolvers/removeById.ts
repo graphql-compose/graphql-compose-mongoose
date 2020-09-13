@@ -7,6 +7,8 @@ import { addErrorCatcherField } from './helpers/errorCatcher';
 import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
 export interface RemoveByIdResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize payload.recordId field. If false, then this field will be removed. */
   recordId?: PayloadRecordIdHelperOpts | false;
 }
@@ -32,7 +34,7 @@ export function removeById<TSource = any, TContext = any, TDoc extends Document 
 
   const findByIdResolver = findById(model, tc);
 
-  const outputTypeName = `RemoveById${tc.getTypeName()}Payload`;
+  const outputTypeName = `RemoveById${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.setFields({
       ...payloadRecordId(tc, opts?.recordId),
