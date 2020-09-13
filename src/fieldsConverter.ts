@@ -24,6 +24,7 @@ type MongooseFieldT = {
   };
   originalRequiredValue?: string | (() => any);
   isRequired?: boolean;
+  defaultValue?: any;
   enumValues?: string[];
   schema?: Schema;
   _index?: { [optionName: string]: any };
@@ -187,6 +188,11 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
       type,
       description: _getFieldDescription(mongooseField),
     };
+
+    if (mongooseField?.defaultValue !== null && mongooseField?.defaultValue !== undefined) {
+      if (!graphqlFields[fieldName].extensions) graphqlFields[fieldName].extensions = {};
+      (graphqlFields as any)[fieldName].extensions.defaultValue = mongooseField?.defaultValue;
+    }
 
     if (deriveComplexType(mongooseField) === ComplexTypes.EMBEDDED) {
       // https://github.com/nodkz/graphql-compose-mongoose/issues/7

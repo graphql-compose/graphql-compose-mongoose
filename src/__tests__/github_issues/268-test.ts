@@ -55,7 +55,7 @@ describe('issue #268 - Allow to provide `suffix` option for resolvers configs', 
     expect(createOne2.getArgITC('record').toSDL()).toMatchInlineSnapshot(`
       "\\"\\"\\"\\"\\"\\"
       input CreateOneUserShortInput {
-        _id: Int!
+        _id: Int
         name: String!
       }"
     `);
