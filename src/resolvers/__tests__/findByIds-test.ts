@@ -115,6 +115,19 @@ describe('findByIds() ->', () => {
       expect(result[1]).toBeInstanceOf(UserModel);
     });
 
+    it('should return lean records with alias support', async () => {
+      const result = await findByIds(UserModel, UserTC, { lean: true }).resolve({
+        args: { _ids: [user1._id, user2._id] },
+      });
+      expect(result[0]).not.toBeInstanceOf(UserModel);
+      expect(result[1]).not.toBeInstanceOf(UserModel);
+      // should translate aliases fields
+      expect(result).toEqual([
+        expect.objectContaining({ name: 'nodkz1' }),
+        expect.objectContaining({ name: 'nodkz2' }),
+      ]);
+    });
+
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
       const result = await findByIds(UserModel, UserTC).resolve({
         args: { _ids: [user1._id, user2._id] },

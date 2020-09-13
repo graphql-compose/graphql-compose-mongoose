@@ -1,5 +1,5 @@
 import { schemaComposer, graphql } from 'graphql-compose';
-import { composeWithMongoose } from '../../index';
+import { composeMongoose } from '../../index';
 import { mongoose } from '../../__mocks__/mongooseCommon';
 import { Document } from 'mongoose';
 
@@ -25,12 +25,13 @@ interface IPost extends Document {
 const UserModel = mongoose.model<IUser>('User', UserSchema);
 const PostModel = mongoose.model<IPost>('Post', PostSchema);
 
-const UserTC = composeWithMongoose(UserModel);
-const PostTC = composeWithMongoose(PostModel);
+const UserTC = composeMongoose(UserModel);
+const PostTC = composeMongoose(PostModel);
 
 PostTC.addRelation('author', {
-  // resolver: UserTC.getResolver('dataLoader'), // <---- DataLoader for getting one mongoose doc by id (slower than `dataLoaderLean` but more functional)
-  resolver: UserTC.getResolver('dataLoaderLean'), // <---- `Lean` loads record from DB without support of mongoose getters & virtuals
+  resolver: UserTC.mongooseResolvers.dataLoader({
+    lean: true, // <---- `Lean` loads record from DB without support of mongoose getters & virtuals
+  }),
   prepareArgs: {
     _id: (s) => s.authorId,
   },
@@ -38,8 +39,9 @@ PostTC.addRelation('author', {
 });
 
 PostTC.addRelation('reviewers', {
-  // resolver: UserTC.getResolver('dataLoaderMany'), // <---- DataLoader for getting many mongoose docs by ids (slower than `dataLoaderManyLean` but more functional)
-  resolver: UserTC.getResolver('dataLoaderManyLean'), // <---- `Lean` loads records from DB without support of mongoose getters & virtuals
+  resolver: UserTC.mongooseResolvers.dataLoaderMany({
+    lean: true, // <---- `Lean` loads records from DB without support of mongoose getters & virtuals
+  }),
   prepareArgs: {
     _ids: (s) => s.reviewerIds,
   },
@@ -47,7 +49,7 @@ PostTC.addRelation('reviewers', {
 });
 
 schemaComposer.Query.addFields({
-  posts: PostTC.getResolver('findMany'),
+  posts: PostTC.mongooseResolvers.findMany(),
 });
 const schema = schemaComposer.buildSchema();
 

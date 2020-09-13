@@ -49,19 +49,15 @@ describe('issue #141 - createOne with custom id (not MongoId)', () => {
 
   it('Resolvers *ById should have Int type for args._id', () => {
     expect(UserTC.mongooseResolvers.findById().getArgTypeName('_id')).toBe('Int!');
-    expect(UserTC.mongooseResolvers.findByIdLean().getArgTypeName('_id')).toBe('Int!');
     expect(UserTC.mongooseResolvers.removeById().getArgTypeName('_id')).toBe('Int!');
     expect(UserTC.mongooseResolvers.updateById().getArgTypeName('_id')).toBe('Int!');
 
     expect(UserTC.mongooseResolvers.findByIds().getArgTypeName('_ids')).toBe('[Int!]!');
-    expect(UserTC.mongooseResolvers.findByIdsLean().getArgTypeName('_ids')).toBe('[Int!]!');
   });
 
   it('Resolvers dataLoader* should have Int type for args._id', () => {
     expect(UserTC.mongooseResolvers.dataLoader().getArgTypeName('_id')).toBe('Int!');
-    expect(UserTC.mongooseResolvers.dataLoaderLean().getArgTypeName('_id')).toBe('Int!');
     expect(UserTC.mongooseResolvers.dataLoaderMany().getArgTypeName('_ids')).toBe('[Int!]!');
-    expect(UserTC.mongooseResolvers.dataLoaderManyLean().getArgTypeName('_ids')).toBe('[Int!]!');
   });
 
   it('Check createOne/findOne resolvers', async () => {
@@ -133,25 +129,13 @@ describe('issue #141 - createOne with custom id (not MongoId)', () => {
       }"
     `);
     expect(ComplexTC.mongooseResolvers.findById().getArgTypeName('_id')).toBe('Complex_idInput!');
-    expect(ComplexTC.mongooseResolvers.findByIdLean().getArgTypeName('_id')).toBe(
-      'Complex_idInput!'
-    );
     expect(ComplexTC.mongooseResolvers.removeById().getArgTypeName('_id')).toBe('Complex_idInput!');
     expect(ComplexTC.mongooseResolvers.updateById().getArgTypeName('_id')).toBe('Complex_idInput!');
     expect(ComplexTC.mongooseResolvers.findByIds().getArgTypeName('_ids')).toBe(
       '[Complex_idInput!]!'
     );
-    expect(ComplexTC.mongooseResolvers.findByIdsLean().getArgTypeName('_ids')).toBe(
-      '[Complex_idInput!]!'
-    );
     expect(ComplexTC.mongooseResolvers.dataLoader().getArgTypeName('_id')).toBe('Complex_idInput!');
-    expect(ComplexTC.mongooseResolvers.dataLoaderLean().getArgTypeName('_id')).toBe(
-      'Complex_idInput!'
-    );
     expect(ComplexTC.mongooseResolvers.dataLoaderMany().getArgTypeName('_ids')).toBe(
-      '[Complex_idInput!]!'
-    );
-    expect(ComplexTC.mongooseResolvers.dataLoaderManyLean().getArgTypeName('_ids')).toBe(
       '[Complex_idInput!]!'
     );
 

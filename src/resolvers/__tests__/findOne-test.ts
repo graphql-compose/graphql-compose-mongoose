@@ -127,6 +127,15 @@ describe('findOne() ->', () => {
       expect(result).toBeInstanceOf(UserModel);
     });
 
+    it('should return lean object with alias support', async () => {
+      const result = await findOne(UserModel, UserTC, { lean: true }).resolve({
+        args: { filter: { _id: user1._id } },
+      });
+      expect(result).not.toBeInstanceOf(UserModel);
+      // should translate aliases fields
+      expect(result).toEqual(expect.objectContaining({ name: 'userName1' }));
+    });
+
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
       const result = await findOne(UserModel, UserTC).resolve({
         args: { filter: { _id: user1._id } },

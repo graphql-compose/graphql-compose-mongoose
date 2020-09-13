@@ -33,7 +33,7 @@ beforeAll(async () => {
 });
 afterAll(() => UserModel.base.disconnect());
 
-describe('issue #268 - Allow to provide `suffixes` for resolvers configs', () => {
+describe('issue #268 - Allow to provide `suffix` option for resolvers configs', () => {
   it('generate deferent resolvers with different configs', async () => {
     const createOne1 = UserTC.mongooseResolvers.createOne();
     expect(createOne1.getTypeName()).toBe('CreateOneUserPayload');
@@ -76,28 +76,12 @@ describe('issue #268 - Allow to provide `suffixes` for resolvers configs', () =>
     expect(resolver.getArgTypeName('sort')).toBe('SortFindManyUserXXXInput');
   });
 
-  it('Resolver:findManyLean', () => {
-    const resolver = UserTC.mongooseResolvers.findManyLean({
-      suffix: 'XXX',
-    });
-    expect(resolver.getArgTypeName('filter')).toBe('FilterFindManyLeanUserXXXInput');
-    expect(resolver.getArgTypeName('sort')).toBe('SortFindManyLeanUserXXXInput');
-  });
-
   it('Resolver:findOne', () => {
     const resolver = UserTC.mongooseResolvers.findOne({
       suffix: 'XXX',
     });
     expect(resolver.getArgTypeName('filter')).toBe('FilterFindOneUserXXXInput');
     expect(resolver.getArgTypeName('sort')).toBe('SortFindOneUserXXXInput');
-  });
-
-  it('Resolver:findOneLean', () => {
-    const resolver = UserTC.mongooseResolvers.findOneLean({
-      suffix: 'XXX',
-    });
-    expect(resolver.getArgTypeName('filter')).toBe('FilterFindOneLeanUserXXXInput');
-    expect(resolver.getArgTypeName('sort')).toBe('SortFindOneLeanUserXXXInput');
   });
 
   it('Resolver:createMany', () => {
