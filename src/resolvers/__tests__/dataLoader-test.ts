@@ -92,6 +92,15 @@ describe('dataLoader() ->', () => {
       expect(result).toBeInstanceOf(UserModel);
     });
 
+    it('should return lean object from DB', async () => {
+      const result = await dataLoader(UserModel, UserTC, { lean: true }).resolve({
+        args: { _id: user._id },
+        context: {},
+        info,
+      });
+      expect(result).not.toBeInstanceOf(UserModel);
+    });
+
     it('should return mongoose Post document', async () => {
       const result = await dataLoader(PostModel, PostTypeComposer).resolve({
         args: { _id: 1 },
@@ -99,6 +108,15 @@ describe('dataLoader() ->', () => {
         info,
       });
       expect(result).toBeInstanceOf(PostModel);
+    });
+
+    it('should return lean Post object directly from DB', async () => {
+      const result = await dataLoader(PostModel, PostTypeComposer, { lean: true }).resolve({
+        args: { _id: 1 },
+        context: {},
+        info,
+      });
+      expect(result).not.toBeInstanceOf(PostModel);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
@@ -162,5 +180,15 @@ describe('dataLoader() ->', () => {
 
     // return undefined for not found record
     expect(await resultPromise5).toBe(undefined);
+  });
+
+  it('check aliases for lean record', async () => {
+    const resolver = dataLoader(UserModel, UserTC, { lean: true });
+    const resultPromise1 = resolver.resolve({
+      args: { _id: user2._id },
+      context: {},
+      info,
+    });
+    expect((await resultPromise1).name).toEqual('user2');
   });
 });

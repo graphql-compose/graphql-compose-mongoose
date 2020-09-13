@@ -30,7 +30,7 @@ const UserTC = composeMongoose(UserModel);
 const PostTC = composeMongoose(PostModel);
 
 PostTC.addRelation('author', {
-  resolver: UserTC.mongooseResolvers.dataLoaderLean(),
+  resolver: UserTC.mongooseResolvers.dataLoader({ lean: true }),
   prepareArgs: {
     _id: (s) => s.authorId,
   },
@@ -38,7 +38,7 @@ PostTC.addRelation('author', {
 });
 
 PostTC.addRelation('reviewers', {
-  resolver: UserTC.mongooseResolvers.dataLoaderManyLean(),
+  resolver: UserTC.mongooseResolvers.dataLoaderMany({ lean: true }),
   prepareArgs: {
     _ids: (s) => s.reviewerIds,
   },

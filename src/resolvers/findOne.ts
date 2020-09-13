@@ -9,13 +9,27 @@ import {
   sortHelperArgs,
   projectionHelper,
   prepareAliases,
+  prepareAliasesReverse,
+  replaceAliases,
   FilterHelperArgsOpts,
   SortHelperArgsOpts,
 } from './helpers';
 import type { ExtendedResolveParams } from './index';
-import { beforeQueryHelper } from './helpers/beforeQueryHelper';
+import { beforeQueryHelper, beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
 export interface FindOneResolverOpts {
+  /**
+   * Enabling the lean option tells Mongoose to skip instantiating
+   * a full Mongoose document and just give you the plain JavaScript objects.
+   * Documents are much heavier than vanilla JavaScript objects,
+   * because they have a lot of internal state for change tracking.
+   * The downside of enabling lean is that lean docs don't have:
+   *   Default values
+   *   Getters and setters
+   *   Virtuals
+   * Read more about `lean`: https://mongoosejs.com/docs/tutorials/lean.html
+   */
+  lean?: boolean;
   /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
   suffix?: string;
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
@@ -44,6 +58,7 @@ export function findOne<TSource = any, TContext = any, TDoc extends Document = a
   }
 
   const aliases = prepareAliases(model);
+  const aliasesReverse = prepareAliasesReverse(model);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc,
@@ -61,14 +76,20 @@ export function findOne<TSource = any, TContext = any, TDoc extends Document = a
         ...opts?.sort,
       }),
     },
-    resolve: ((resolveParams: ExtendedResolveParams<TDoc>) => {
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
       resolveParams.query = model.findOne({});
       resolveParams.model = model;
       filterHelper(resolveParams, aliases);
       skipHelper(resolveParams);
       sortHelper(resolveParams);
       projectionHelper(resolveParams, aliases);
-      return beforeQueryHelper(resolveParams);
+
+      if (opts?.lean) {
+        const result = await beforeQueryHelperLean(resolveParams);
+        return result && aliasesReverse ? replaceAliases(result, aliasesReverse) : result;
+      } else {
+        return beforeQueryHelper(resolveParams);
+      }
     }) as any,
   });
 }
