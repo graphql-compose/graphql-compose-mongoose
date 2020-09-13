@@ -102,15 +102,25 @@ function makeFieldsNonNullWithDefaultValues(
   if (alreadyWorked.has(tc)) return;
   alreadyWorked.add(tc);
 
+  let hasFieldsWithDefaultValues = false;
   tc.getFieldNames().forEach((fieldName) => {
     const fc = tc.getField(fieldName);
-    // traverse nested Objects
+    // traverse nested Object types
     if (fc.type instanceof ObjectTypeComposer) {
       makeFieldsNonNullWithDefaultValues(fc.type);
+      if (fc.type.getExtension('hasFieldsWithDefaultValue')) {
+        tc.makeFieldNonNull(fieldName);
+      }
     }
+
     const defaultValue = fc?.extensions?.defaultValue;
     if (defaultValue !== null && defaultValue !== undefined) {
+      hasFieldsWithDefaultValues = true;
       tc.makeFieldNonNull(fieldName);
     }
   });
+
+  if (hasFieldsWithDefaultValues) {
+    tc.setExtension('hasFieldsWithDefaultValue', true);
+  }
 }
