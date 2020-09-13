@@ -60,6 +60,7 @@
     "typescript": "4.0.2"
   },
   "scripts": {
+    "prepare": "tsc -p ./tsconfig.build.json",
     "build": "rimraf lib && tsc -p ./tsconfig.build.json",
     "watch": "jest --watch",
     "coverage": "jest --coverage --maxWorkers 4",
