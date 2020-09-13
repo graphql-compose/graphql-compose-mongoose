@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions, no-template-curly-in-string */
 
-import { EnumTypeComposer, schemaComposer, ListComposer, SchemaComposer } from 'graphql-compose';
+import { EnumTypeComposer, schemaComposer, SchemaComposer } from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel';
 import { mongoose } from '../__mocks__/mongooseCommon';
 import {
@@ -239,9 +239,8 @@ describe('fieldConverter', () => {
     it('test object with field as array', () => {
       const someDeepTC = embeddedToGraphQL(fields.someDeep, '', schemaComposer);
       expect(someDeepTC.getTypeName()).toBe('SomeDeep');
-      expect(someDeepTC.getField('periods').type).toBeInstanceOf(ListComposer);
+      expect(someDeepTC.getFieldTypeName('periods')).toBe('[SomeDeepPeriods]');
       const tc = someDeepTC.getFieldOTC('periods');
-      expect(tc.getTypeName()).toBe('SomeDeepPeriods');
       expect(tc.hasField('from')).toBeTruthy();
       expect(tc.hasField('to')).toBeTruthy();
     });

@@ -1,5 +1,5 @@
-import type { ObjectTypeComposer, SchemaComposer, Resolver } from 'graphql-compose';
-import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
+import type { SchemaComposer, Resolver } from 'graphql-compose';
+import { schemaComposer as globalSchemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
 import { allResolvers } from './resolvers';
@@ -75,10 +75,14 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
     prepareFields(tc, opts.fields);
   }
 
-  if (opts.inputType) {
-    // generate input type only it was customized
-    createInputType(tc, opts.inputType);
-  }
+  // generate InputObjectType with required fields,
+  // before we made fields with default values required too
+  createInputType(tc, opts.inputType);
+  // making fields with default values required
+  // but do it AFTER input object type generation
+  // NonNull fields !== Required field
+  // default values should not affect on that input fields became required
+  makeFieldsNonNullWithDefaultValues(tc);
 
   tc.makeFieldNonNull('_id');
 
@@ -89,4 +93,24 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
   (tc as any).mongooseResolvers = mongooseResolvers;
 
   return tc as any;
+}
+
+function makeFieldsNonNullWithDefaultValues(
+  tc: ObjectTypeComposer,
+  alreadyWorked = new Set()
+): void {
+  if (alreadyWorked.has(tc)) return;
+  alreadyWorked.add(tc);
+
+  tc.getFieldNames().forEach((fieldName) => {
+    const fc = tc.getField(fieldName);
+    // traverse nested Objects
+    if (fc.type instanceof ObjectTypeComposer) {
+      makeFieldsNonNullWithDefaultValues(fc.type);
+    }
+    const defaultValue = fc?.extensions?.defaultValue;
+    if (defaultValue !== null && defaultValue !== undefined) {
+      tc.makeFieldNonNull(fieldName);
+    }
+  });
 }
