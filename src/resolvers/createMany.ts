@@ -6,6 +6,8 @@ import { validateManyAndThrow } from './helpers/validate';
 import { payloadRecordIds, PayloadRecordIdsHelperOpts } from './helpers/payloadRecordId';
 
 export interface CreateManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `records` argument. */
   records?: RecordHelperArgsOpts;
   /** Customize payload.recordIds field. If false, then this field will be removed. */
@@ -42,7 +44,7 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
     }
   }
 
-  const outputTypeName = `CreateMany${tc.getTypeName()}Payload`;
+  const outputTypeName = `CreateMany${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.setFields({
       ...payloadRecordIds(tc, opts?.recordIds),
@@ -67,7 +69,7 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
       records: {
         type: (recordHelperArgs(tc, {
           prefix: 'CreateMany',
-          suffix: 'Input',
+          suffix: `${opts?.suffix || ''}Input`,
           removeFields: ['id', '_id'],
           isRequired: true,
           requiredFields,

@@ -9,6 +9,8 @@ import { validateAndThrow } from './helpers/validate';
 import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
 export interface UpdateByIdResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `record` argument. */
   record?: RecordHelperArgsOpts;
   /** Customize payload.recordId field. If false, then this field will be removed. */
@@ -37,7 +39,7 @@ export function updateById<TSource = any, TContext = any, TDoc extends Document 
 
   const findByIdResolver = findById(model, tc);
 
-  const outputTypeName = `UpdateById${tc.getTypeName()}Payload`;
+  const outputTypeName = `UpdateById${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.setFields({
       ...payloadRecordId(tc, opts?.recordId),
@@ -63,7 +65,7 @@ export function updateById<TSource = any, TContext = any, TDoc extends Document 
       ...recordHelperArgs(tc, {
         removeFields: ['_id', 'id'], // pull out `_id` to top-level
         prefix: 'UpdateById',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         isRequired: true,
         allFieldsNullable: true,
         ...opts?.record,

@@ -23,6 +23,8 @@ import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 
 export interface UpdateManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `record` argument. */
   record?: RecordHelperArgsOpts;
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
@@ -54,7 +56,7 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
     );
   }
 
-  const outputTypeName = `UpdateMany${tc.getTypeName()}Payload`;
+  const outputTypeName = `UpdateMany${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
       numAffected: {
@@ -77,7 +79,7 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
     args: {
       ...recordHelperArgs(tc, {
         prefix: 'UpdateMany',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
         allFieldsNullable: true,
@@ -85,11 +87,11 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
       }),
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterUpdateMany',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortUpdateMany${tc.getTypeName()}Input`,
+        sortTypeName: `SortUpdateMany${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
       ...skipHelperArgs(),

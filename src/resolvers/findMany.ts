@@ -19,6 +19,8 @@ import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
 export interface FindManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
@@ -55,7 +57,7 @@ export function findMany<TSource = any, TContext = any, TDoc extends Document = 
     args: {
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterFindMany',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...skipHelperArgs(),
@@ -63,7 +65,7 @@ export function findMany<TSource = any, TContext = any, TDoc extends Document = 
         ...opts?.limit,
       }),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortFindMany${tc.getTypeName()}Input`,
+        sortTypeName: `SortFindMany${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
     },

@@ -16,6 +16,8 @@ import { validateAndThrow } from './helpers/validate';
 import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
 export interface UpdateOneResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `record` argument. */
   record?: RecordHelperArgsOpts;
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
@@ -49,7 +51,7 @@ export function updateOne<TSource = any, TContext = any, TDoc extends Document =
 
   const findOneResolver = findOne(model, tc, opts);
 
-  const outputTypeName = `UpdateOne${tc.getTypeName()}Payload`;
+  const outputTypeName = `UpdateOne${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.setFields({
       ...payloadRecordId(tc, opts?.recordId),
@@ -73,7 +75,7 @@ export function updateOne<TSource = any, TContext = any, TDoc extends Document =
     args: {
       ...recordHelperArgs(tc, {
         prefix: 'UpdateOne',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
         allFieldsNullable: true,
@@ -81,11 +83,11 @@ export function updateOne<TSource = any, TContext = any, TDoc extends Document =
       }),
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterUpdateOne',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortUpdateOne${tc.getTypeName()}Input`,
+        sortTypeName: `SortUpdateOne${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
       ...skipHelperArgs(),

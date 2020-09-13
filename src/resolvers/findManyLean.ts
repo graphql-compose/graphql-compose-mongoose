@@ -21,6 +21,8 @@ import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
 export interface FindManyLeanResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   sort?: SortHelperArgsOpts | false;
@@ -60,7 +62,7 @@ export function findManyLean<TSource = any, TContext = any, TDoc extends Documen
     args: {
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterFindManyLean',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...skipHelperArgs(),
@@ -68,7 +70,7 @@ export function findManyLean<TSource = any, TContext = any, TDoc extends Documen
         ...opts?.limit,
       }),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortFindManyLean${tc.getTypeName()}Input`,
+        sortTypeName: `SortFindManyLean${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
     },

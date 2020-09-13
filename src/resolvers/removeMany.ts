@@ -1,13 +1,23 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { filterHelperArgs, filterHelper, prepareAliases, FilterHelperArgsOpts } from './helpers';
+import {
+  filterHelperArgs,
+  filterHelper,
+  prepareAliases,
+  FilterHelperArgsOpts,
+  limitHelperArgs,
+  LimitHelperArgsOpts,
+} from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 
 export interface RemoveManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
+  limit?: LimitHelperArgsOpts | false;
 }
 
 type TArgs = {
@@ -29,7 +39,7 @@ export function removeMany<TSource = any, TContext = any, TDoc extends Document 
     );
   }
 
-  const outputTypeName = `RemoveMany${tc.getTypeName()}Payload`;
+  const outputTypeName = `RemoveMany${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
       numAffected: {
@@ -52,9 +62,12 @@ export function removeMany<TSource = any, TContext = any, TDoc extends Document 
     args: {
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterRemoveMany',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         isRequired: true,
         ...opts?.filter,
+      }),
+      ...limitHelperArgs({
+        ...opts?.limit,
       }),
     },
     resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
