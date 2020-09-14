@@ -1,15 +1,19 @@
-import type { SchemaComposer, Resolver } from 'graphql-compose';
+import type { SchemaComposer, Resolver, InputTypeComposer } from 'graphql-compose';
 import { schemaComposer as globalSchemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
 import { resolverFactory } from './resolvers';
 import MongoID from './types/MongoID';
-import {
-  prepareFields,
-  createInputType,
-  TransformRecordIdFn,
-  TypeConverterInputTypeOpts,
-} from './composeWithMongoose';
+
+export type TypeConverterInputTypeOpts = {
+  name?: string;
+  description?: string;
+  fields?: {
+    only?: string[];
+    remove?: string[];
+    required?: string[];
+  };
+};
 
 export type ComposeMongooseOpts<TContext> = {
   schemaComposer?: SchemaComposer<TContext>;
@@ -21,8 +25,6 @@ export type ComposeMongooseOpts<TContext> = {
     remove?: string[];
   };
   inputType?: TypeConverterInputTypeOpts;
-  /** You may customize `recordId` field in mutation payloads */
-  transformRecordId?: TransformRecordIdFn<TContext>;
 };
 
 export type GenerateResolverType<TDoc extends Document, TContext = any> = {
@@ -122,5 +124,66 @@ function makeFieldsNonNullWithDefaultValues(
 
   if (hasFieldsWithDefaultValues) {
     tc.setExtension('hasFieldsWithDefaultValue', true);
+  }
+}
+
+export function prepareFields(
+  tc: ObjectTypeComposer<any, any>,
+  opts: {
+    only?: string[];
+    remove?: string[];
+  }
+): void {
+  if (Array.isArray(opts.only)) {
+    const onlyFieldNames: string[] = opts.only;
+    const removeFields = Object.keys(tc.getFields()).filter(
+      (fName) => onlyFieldNames.indexOf(fName) === -1
+    );
+    tc.removeField(removeFields);
+  }
+  if (opts.remove) {
+    tc.removeField(opts.remove);
+  }
+}
+
+export function createInputType(
+  tc: ObjectTypeComposer<any, any>,
+  inputTypeOpts: TypeConverterInputTypeOpts = {}
+): void {
+  const inputTypeComposer = tc.getInputTypeComposer();
+
+  if (inputTypeOpts.name) {
+    inputTypeComposer.setTypeName(inputTypeOpts.name);
+  }
+
+  if (inputTypeOpts.description) {
+    inputTypeComposer.setDescription(inputTypeOpts.description);
+  }
+
+  if (inputTypeOpts.fields) {
+    prepareInputFields(inputTypeComposer, inputTypeOpts.fields);
+  }
+}
+
+export function prepareInputFields(
+  inputTypeComposer: InputTypeComposer<any>,
+  inputFieldsOpts: {
+    only?: string[];
+    remove?: string[];
+    required?: string[];
+  }
+): void {
+  if (Array.isArray(inputFieldsOpts.only)) {
+    const onlyFieldNames: string[] = inputFieldsOpts.only;
+    const removeFields = Object.keys(inputTypeComposer.getFields()).filter(
+      (fName) => onlyFieldNames.indexOf(fName) === -1
+    );
+    inputTypeComposer.removeField(removeFields);
+  }
+  if (inputFieldsOpts.remove) {
+    inputTypeComposer.removeField(inputFieldsOpts.remove);
+  }
+  if (inputFieldsOpts.required) {
+    inputTypeComposer.makeFieldNonNull(inputFieldsOpts.required);
   }
 }
