@@ -16,8 +16,15 @@ export function projectionHelper(
 
     if (aliases) {
       Object.keys(flatProjection).forEach((k) => {
-        if (aliases[k]) {
-          flatProjection[aliases[k]] = true;
+        const keys = k.split('.');
+        const parentKey = keys[0];
+        if (aliases[parentKey]) {
+          const otherKeys = keys.slice(1);
+          if (otherKeys.length === 0) {
+            flatProjection[aliases[parentKey]] = true;
+          } else {
+            flatProjection[aliases[parentKey] + '.' + otherKeys.join('.')] = true;
+          }
           delete flatProjection[k];
         }
       });

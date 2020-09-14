@@ -28,7 +28,7 @@ describe('Resolver helper `projection` ->', () => {
     it('should make projection fields flat', () => {
       resolveParams.projection = { name: { first: 1, last: 1 } };
       projectionHelper(resolveParams, { name: 'n' });
-      expect(spyFn).toBeCalledWith({ n: true });
+      expect(spyFn).toBeCalledWith({ 'n.first': true, 'n.last': true });
     });
 
     it('should not call query.select if projection has * key', () => {
