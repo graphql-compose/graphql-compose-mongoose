@@ -1,5 +1,6 @@
 import type { ExtendedResolveParams } from '../index';
 import type { AliasesMap } from './aliases';
+import dotify from './dotify';
 
 export function projectionHelper(
   resolveParams: ExtendedResolveParams,
@@ -11,17 +12,7 @@ export function projectionHelper(
     if (projection['*']) {
       return;
     }
-    const flatProjection: Record<string, any> = {};
-    Object.keys(projection).forEach((key) => {
-      const val = projection[key];
-      if (val && (val.$meta || val.$slice || val.$elemMatch)) {
-        // pass MongoDB projection operators https://docs.mongodb.com/v3.2/reference/operator/projection/meta/
-        flatProjection[key] = val;
-      } else {
-        // if not projection operator, then flatten projection
-        flatProjection[key] = !!val;
-      }
-    });
+    const flatProjection: Record<string, any> = dotify(projection);
 
     if (aliases) {
       Object.keys(flatProjection).forEach((k) => {
