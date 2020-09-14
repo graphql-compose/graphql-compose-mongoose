@@ -148,15 +148,6 @@ describe('connection() resolver', () => {
       expect(resolver.getNestedName()).toEqual('connection');
     });
 
-    it('should return Resolver object with custom name', () => {
-      const resolver = connection(UserModel, UserTC, {
-        connectionResolverName: 'customConnection',
-      } as any);
-      if (!resolver) throw new Error('Connection resolver is undefined');
-      expect(resolver).toBeInstanceOf(Resolver);
-      expect(resolver.getNestedName()).toEqual('customConnection');
-    });
-
     it('Resolver object should have `filter` arg', () => {
       const resolver = connection(UserModel, UserTC);
       if (!resolver) throw new Error('Connection resolver is undefined');
