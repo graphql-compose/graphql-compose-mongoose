@@ -1,26 +1,30 @@
 /* eslint-disable no-use-before-define */
 
 import { ObjectTypeComposer, ObjectTypeComposerArgumentConfigMap } from 'graphql-compose';
-import type { Model } from 'mongoose';
-import GraphQLMongoID from '../../types/mongoid';
+import type { Model, Document } from 'mongoose';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
-import { FilterOperatorsOpts, addFilterOperators, processFilterOperators } from './filterOperators';
+import {
+  FieldsOperatorsConfig,
+  addFilterOperators,
+  processFilterOperators,
+} from './filterOperators';
 import type { AliasesMap } from './aliases';
 import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
 
 export type FilterHelperArgsOpts = {
   prefix?: string;
   suffix?: string;
+  baseTypeName?: string;
   isRequired?: boolean;
   onlyIndexed?: boolean;
   requiredFields?: string | string[];
-  operators?: FilterOperatorsOpts | false;
+  operators?: FieldsOperatorsConfig | false;
   removeFields?: string | string[];
 };
 
 // for merging, discriminators merge-able only
-export const getFilterHelperArgOptsMap = () => ({
+export const getFilterHelperArgOptsMap = (): Record<string, string | string[]> => ({
   // filterTypeName? : 'string'
   isRequired: 'boolean',
   onlyIndexed: 'boolean',
@@ -29,11 +33,11 @@ export const getFilterHelperArgOptsMap = () => ({
   removeFields: ['string', 'string[]'],
 });
 
-export const filterHelperArgs = (
-  typeComposer: ObjectTypeComposer<any, any>,
-  model: Model<any>,
+export function filterHelperArgs<TDoc extends Document = any>(
+  typeComposer: ObjectTypeComposer<TDoc, any>,
+  model: Model<TDoc>,
   opts?: FilterHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMap => {
+): ObjectTypeComposerArgumentConfigMap<{ filter: any }> {
   if (!(typeComposer instanceof ObjectTypeComposer)) {
     throw new Error('First arg for filterHelperArgs() should be instance of ObjectTypeComposer.');
   }
@@ -70,10 +74,6 @@ export const filterHelperArgs = (
 
   makeFieldsRecursiveNullable(itc, { prefix, suffix });
 
-  itc.addFields({
-    _ids: [GraphQLMongoID],
-  });
-
   itc.removeField(removeFields);
 
   if (opts.requiredFields) {
@@ -81,18 +81,21 @@ export const filterHelperArgs = (
   }
 
   if (itc.getFieldNames().length === 0) {
-    return {};
+    return {} as any;
   }
 
+  if (!opts.baseTypeName) {
+    opts.baseTypeName = typeComposer.getTypeName();
+  }
   addFilterOperators(itc, model, opts);
 
   return {
     filter: {
-      type: opts.isRequired ? itc.getTypeNonNull() : itc,
+      type: opts.isRequired ? itc.NonNull : itc,
       description: opts.onlyIndexed ? 'Filter only by indexed fields' : 'Filter by fields',
     },
   };
-};
+}
 
 export function filterHelper(
   resolveParams: ExtendedResolveParams,

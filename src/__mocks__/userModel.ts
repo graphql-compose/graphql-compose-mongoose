@@ -16,12 +16,12 @@ const UserSchema = new Schema(
 
     user: {
       type: Schema.Types.ObjectId,
-      ref: 'UserModel',
+      ref: 'User',
     },
 
     users: {
       type: [Schema.Types.ObjectId],
-      ref: 'UserModel',
+      ref: 'User',
     },
 
     n: {
@@ -110,8 +110,26 @@ const UserSchema = new Schema(
       },
     },
 
-    // createdAt, created via option `timastamp: true` (see bottom)
-    // updatedAt, created via option `timastamp: true` (see bottom)
+    billingAddress: {
+      street: { type: String, index: true },
+      state: { type: String, index: true, enum: ['FL', 'MA', 'NY'] },
+      country: { type: String, index: true },
+    },
+
+    // for error payloads tests
+    valid: {
+      type: String,
+      required: false,
+      validate: [
+        () => {
+          return false;
+        },
+        'this is a validate message',
+      ],
+    },
+
+    // createdAt, created via option `timestamp: true` (see bottom)
+    // updatedAt, created via option `timestamp: true` (see bottom)
   },
   {
     timestamps: true, // add createdAt, updatedAt fields
@@ -138,6 +156,7 @@ export interface IUser extends Document {
   relocation?: boolean;
   contacts: {
     email: string;
+    skype?: string;
   };
 }
 

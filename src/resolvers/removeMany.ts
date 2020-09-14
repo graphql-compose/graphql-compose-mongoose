@@ -1,14 +1,34 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { filterHelperArgs, filterHelper, prepareAliases } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import {
+  filterHelperArgs,
+  filterHelper,
+  prepareAliases,
+  FilterHelperArgsOpts,
+  limitHelperArgs,
+  LimitHelperArgsOpts,
+} from './helpers';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
+import { addErrorCatcherField } from './helpers/errorCatcher';
 
-export default function removeMany<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
-): Resolver<TSource, TContext> {
+export interface RemoveManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  limit?: LimitHelperArgsOpts | false;
+}
+
+type TArgs = {
+  filter: any;
+};
+
+export function removeMany<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  opts?: RemoveManyResolverOpts
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeMany() should be instance of Mongoose Model.');
   }
@@ -19,7 +39,7 @@ export default function removeMany<TSource = Document, TContext = any>(
     );
   }
 
-  const outputTypeName = `RemoveMany${tc.getTypeName()}Payload`;
+  const outputTypeName = `RemoveMany${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
       numAffected: {
@@ -31,7 +51,7 @@ export default function removeMany<TSource = Document, TContext = any>(
 
   const aliases = prepareAliases(model);
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'removeMany',
     kind: 'mutation',
     description:
@@ -42,13 +62,16 @@ export default function removeMany<TSource = Document, TContext = any>(
     args: {
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterRemoveMany',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         isRequired: true,
         ...opts?.filter,
       }),
+      ...limitHelperArgs({
+        ...opts?.limit,
+      }),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const filterData = (resolveParams.args && resolveParams.args.filter) || {};
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
+      const filterData = resolveParams?.args?.filter;
 
       if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
         throw new Error(
@@ -87,5 +110,9 @@ export default function removeMany<TSource = Document, TContext = any>(
     }) as any,
   });
 
-  return resolver as any;
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
+  addErrorCatcherField(resolver);
+
+  return resolver;
 }

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Kind } from 'graphql-compose/lib/graphql';
-import GraphQLMongoID from '../mongoid';
+import GraphQLMongoID from '../MongoID';
 
 const ObjectId = mongoose.Types.ObjectId;
 

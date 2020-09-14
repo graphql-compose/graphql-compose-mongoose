@@ -109,7 +109,10 @@ export type extendByReversedIndexesOpts = {
   reversedFirst?: boolean; // false by default
 };
 
-export function extendByReversedIndexes(indexes: IndexT[], opts: extendByReversedIndexesOpts = {}) {
+export function extendByReversedIndexes(
+  indexes: IndexT[],
+  opts: extendByReversedIndexesOpts = {}
+): IndexT[] {
   const reversedFirst = opts.reversedFirst === undefined ? false : Boolean(opts.reversedFirst);
 
   const result: IndexT[] = [];

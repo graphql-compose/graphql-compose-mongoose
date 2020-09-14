@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 
-import type { Model } from 'mongoose';
+import type { Model, Document } from 'mongoose';
 import type {
   ObjectTypeComposerArgumentConfigMapDefinition,
   ObjectTypeComposer,
@@ -14,11 +14,11 @@ export type SortHelperArgsOpts = {
   sortTypeName?: string;
 };
 
-export const sortHelperArgs = (
-  tc: ObjectTypeComposer<any, any>,
-  model: Model<any>,
+export function sortHelperArgs<TDoc extends Document = any>(
+  tc: ObjectTypeComposer<TDoc, any>,
+  model: Model<TDoc>,
   opts?: SortHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMapDefinition => {
+): ObjectTypeComposerArgumentConfigMapDefinition<{ sort: any }> {
   if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
     throw new Error('First arg for sortHelperArgs() should be instance of ObjectTypeComposer.');
   }
@@ -38,12 +38,12 @@ export const sortHelperArgs = (
       type: gqSortType,
     },
   };
-};
+}
 
 export function sortHelper(resolveParams: ExtendedResolveParams): void {
   const sort = resolveParams && resolveParams.args && resolveParams.args.sort;
   if (sort && typeof sort === 'object' && Object.keys(sort).length > 0) {
-    resolveParams.query = resolveParams.query.sort(sort); // eslint-disable-line
+    resolveParams.query = resolveParams.query.sort(sort);
   }
 }
 

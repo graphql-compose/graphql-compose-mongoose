@@ -4,6 +4,7 @@ import {
   InputTypeComposer,
 } from 'graphql-compose';
 import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
+import { Document } from 'mongoose';
 
 export type RecordHelperArgsOpts = {
   prefix?: string;
@@ -16,16 +17,16 @@ export type RecordHelperArgsOpts = {
 };
 
 // for merging, discriminators merge-able only
-export const getRecordHelperArgsOptsMap = () => ({
+export const getRecordHelperArgsOptsMap = (): Record<string, string> => ({
   isRequired: 'boolean',
   removeFields: 'string[]',
   requiredFields: 'string[]',
 });
 
-export const recordHelperArgs = (
-  tc: ObjectTypeComposer<any, any>,
+export function recordHelperArgs<TDoc extends Document = any>(
+  tc: ObjectTypeComposer<TDoc, any>,
   opts?: RecordHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMapDefinition => {
+): ObjectTypeComposerArgumentConfigMapDefinition<{ record: any }> {
   if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
     throw new Error('First arg for recordHelperArgs() should be instance of ObjectTypeComposer.');
   }
@@ -59,7 +60,7 @@ export const recordHelperArgs = (
 
   return {
     record: {
-      type: opts.isRequired ? recordITC.getTypeNonNull() : recordITC,
+      type: opts.isRequired ? recordITC.NonNull : recordITC,
     },
   };
-};
+}

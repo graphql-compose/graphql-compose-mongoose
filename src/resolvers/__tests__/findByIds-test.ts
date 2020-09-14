@@ -1,9 +1,7 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
-import { GraphQLNonNull, GraphQLList } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { PostModel, IPost } from '../../__mocks__/postModel';
-import findByIds from '../findByIds';
-import GraphQLMongoID from '../../types/mongoid';
+import { findByIds } from '../findByIds';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
@@ -53,11 +51,7 @@ describe('findByIds() ->', () => {
   describe('Resolver.args', () => {
     it('should have non-null `_ids` arg', () => {
       const resolver = findByIds(UserModel, UserTC);
-      expect(resolver.hasArg('_ids')).toBe(true);
-      const argConfig: any = resolver.getArgConfig('_ids');
-      expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
-      expect(argConfig.type.ofType).toBeInstanceOf(GraphQLList);
-      expect(argConfig.type.ofType.ofType).toBe(GraphQLMongoID);
+      expect(resolver.getArgTypeName('_ids')).toBe('[MongoID!]!');
     });
 
     it('should have `limit` arg', () => {
@@ -119,6 +113,19 @@ describe('findByIds() ->', () => {
       });
       expect(result[0]).toBeInstanceOf(UserModel);
       expect(result[1]).toBeInstanceOf(UserModel);
+    });
+
+    it('should return lean records with alias support', async () => {
+      const result = await findByIds(UserModel, UserTC, { lean: true }).resolve({
+        args: { _ids: [user1._id, user2._id] },
+      });
+      expect(result[0]).not.toBeInstanceOf(UserModel);
+      expect(result[1]).not.toBeInstanceOf(UserModel);
+      // should translate aliases fields
+      expect(result).toEqual([
+        expect.objectContaining({ name: 'nodkz1' }),
+        expect.objectContaining({ name: 'nodkz2' }),
+      ]);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {

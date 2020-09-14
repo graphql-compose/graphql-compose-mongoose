@@ -2,18 +2,11 @@
 
 import type { ObjectTypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
 import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
-import type { Model } from 'mongoose';
+import type { Model, Document } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
-import * as resolvers from './resolvers';
-import type {
-  FilterHelperArgsOpts,
-  LimitHelperArgsOpts,
-  SortHelperArgsOpts,
-  RecordHelperArgsOpts,
-} from './resolvers/helpers';
-import MongoID from './types/mongoid';
-import type { PaginationResolverOpts } from './resolvers/pagination';
-import type { ConnectionOpts } from './resolvers/connection';
+import { allResolvers, AllResolversOpts } from './resolvers';
+import MongoID from './types/MongoID';
+import { GraphQLResolveInfo } from 'graphql';
 
 export type ComposeWithMongooseOpts<TContext> = {
   schemaComposer?: SchemaComposer<TContext>;
@@ -25,8 +18,16 @@ export type ComposeWithMongooseOpts<TContext> = {
     remove?: string[];
   };
   inputType?: TypeConverterInputTypeOpts;
-  resolvers?: false | TypeConverterResolversOpts;
+  resolvers?: false | AllResolversOpts;
+  /** You may customize document id */
+  transformRecordId?: TransformRecordIdFn<TContext>;
 };
+
+export type TransformRecordIdFn<TContext = any> = (
+  source: Document,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => any;
 
 export type TypeConverterInputTypeOpts = {
   name?: string;
@@ -38,86 +39,10 @@ export type TypeConverterInputTypeOpts = {
   };
 };
 
-export type TypeConverterResolversOpts = {
-  findById?: false;
-  findByIds?:
-    | false
-    | {
-        limit?: LimitHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-      };
-  findOne?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        skip?: false;
-      };
-  findMany?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        limit?: LimitHelperArgsOpts | false;
-        skip?: false;
-      };
-  updateById?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-      };
-  updateOne?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        skip?: false;
-      };
-  updateMany?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        limit?: LimitHelperArgsOpts | false;
-        skip?: false;
-      };
-  removeById?: false;
-  removeOne?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-      };
-  removeMany?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-      };
-  createOne?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-      };
-  createMany?:
-    | false
-    | {
-        records?: RecordHelperArgsOpts | false;
-      };
-  count?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-      };
-  connection?: ConnectionOpts<any> | false;
-  pagination?: PaginationResolverOpts | false;
-};
-
-export function composeWithMongoose<TSource, TContext>(
-  model: Model<any>,
+export function composeWithMongoose<TDoc extends Document, TContext = any>(
+  model: Model<TDoc>,
   opts: ComposeWithMongooseOpts<TContext> = {}
-): ObjectTypeComposer<TSource, TContext> {
+): ObjectTypeComposer<TDoc, TContext> {
   const m: Model<any> = model;
   const name: string = (opts && opts.name) || m.modelName;
 
@@ -145,8 +70,6 @@ export function composeWithMongoose<TSource, TContext>(
     prepareFields(tc, opts.fields);
   }
 
-  tc.setRecordIdFn((source) => (source ? `${(source as any)._id}` : ''));
-
   createInputType(tc, opts.inputType);
 
   if (!{}.hasOwnProperty.call(opts, 'resolvers') || opts.resolvers !== false) {
@@ -164,7 +87,7 @@ export function prepareFields(
     only?: string[];
     remove?: string[];
   }
-) {
+): void {
   if (Array.isArray(opts.only)) {
     const onlyFieldNames: string[] = opts.only;
     const removeFields = Object.keys(tc.getFields()).filter(
@@ -184,7 +107,7 @@ export function prepareInputFields(
     remove?: string[];
     required?: string[];
   }
-) {
+): void {
   if (Array.isArray(inputFieldsOpts.only)) {
     const onlyFieldNames: string[] = inputFieldsOpts.only;
     const removeFields = Object.keys(inputTypeComposer.getFields()).filter(
@@ -222,12 +145,11 @@ export function createInputType(
 export function createResolvers(
   model: Model<any>,
   tc: ObjectTypeComposer<any, any>,
-  opts: TypeConverterResolversOpts
+  opts: AllResolversOpts
 ): void {
-  const names = resolvers.getAvailableNames();
-  names.forEach((resolverName) => {
-    if (!{}.hasOwnProperty.call(opts, resolverName) || opts[resolverName] !== false) {
-      const createResolverFn = resolvers[resolverName] as any;
+  (Object.keys(allResolvers) as any).forEach((resolverName: keyof typeof allResolvers) => {
+    if (!opts.hasOwnProperty(resolverName) || opts[resolverName] !== false) {
+      const createResolverFn = allResolvers[resolverName] as any;
       if (typeof createResolverFn === 'function') {
         const resolver = createResolverFn(model, tc, opts[resolverName] || {});
         if (resolver) {

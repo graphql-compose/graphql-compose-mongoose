@@ -1,8 +1,6 @@
 import type { Model } from 'mongoose';
 
-export type AliasesMap = {
-  [key: string]: string;
-};
+export type AliasesMap = Record<string, string>;
 
 export function prepareAliases(model: Model<any>): AliasesMap | false {
   const aliases = (model?.schema as any)?.aliases || {};
@@ -15,6 +13,19 @@ export function prepareAliases(model: Model<any>): AliasesMap | false {
   }
   if (Object.keys(aliases).length > 0) {
     return aliases;
+  }
+  return false;
+}
+
+export function prepareAliasesReverse(model: Model<any>): AliasesMap | false {
+  const aliases = (model?.schema as any)?.aliases;
+  const keys = Object.keys(aliases);
+  if (keys.length > 0) {
+    const r = {} as AliasesMap;
+    keys.forEach((k) => {
+      r[aliases[k]] = k;
+    });
+    return r;
   }
   return false;
 }

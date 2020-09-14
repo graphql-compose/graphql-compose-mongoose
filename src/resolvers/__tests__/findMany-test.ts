@@ -1,6 +1,6 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import findMany from '../findMany';
+import { findMany } from '../findMany';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
@@ -119,6 +119,19 @@ describe('findMany() ->', () => {
       const result = await findMany(UserModel, UserTC).resolve({ args: { limit: 2 } });
       expect(result[0]).toBeInstanceOf(UserModel);
       expect(result[1]).toBeInstanceOf(UserModel);
+    });
+
+    it('should return js lean objects with alias support', async () => {
+      const result = await findMany(UserModel, UserTC, { lean: true }).resolve({
+        args: { limit: 2 },
+      });
+      expect(result[0]).not.toBeInstanceOf(UserModel);
+      expect(result[1]).not.toBeInstanceOf(UserModel);
+      // should translate aliases fields
+      expect(result).toEqual([
+        expect.objectContaining({ name: 'userName1' }),
+        expect.objectContaining({ name: 'userName2' }),
+      ]);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {

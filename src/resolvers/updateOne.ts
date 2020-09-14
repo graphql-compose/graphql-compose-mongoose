@@ -1,14 +1,45 @@
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
-import { skipHelperArgs, recordHelperArgs, filterHelperArgs, sortHelperArgs } from './helpers';
-import findOne from './findOne';
+import type { ExtendedResolveParams } from './index';
+import {
+  skipHelperArgs,
+  recordHelperArgs,
+  filterHelperArgs,
+  sortHelperArgs,
+  FilterHelperArgsOpts,
+  RecordHelperArgsOpts,
+  SortHelperArgsOpts,
+} from './helpers';
+import { findOne } from './findOne';
+import { addErrorCatcherField } from './helpers/errorCatcher';
+import { validateAndThrow } from './helpers/validate';
+import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
-export default function updateOne<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
-): Resolver<TSource, TContext> {
+export interface UpdateOneResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `record` argument. */
+  record?: RecordHelperArgsOpts;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  skip?: false;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
+}
+
+type TArgs = {
+  record: any;
+  filter?: any;
+  skip?: number;
+  sort?: Record<string, any>;
+};
+
+export function updateOne<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  opts?: UpdateOneResolverOpts
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateOne() should be instance of Mongoose Model.');
   }
@@ -20,13 +51,10 @@ export default function updateOne<TSource = Document, TContext = any>(
 
   const findOneResolver = findOne(model, tc, opts);
 
-  const outputTypeName = `UpdateOne${tc.getTypeName()}Payload`;
+  const outputTypeName = `UpdateOne${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
-    t.addFields({
-      recordId: {
-        type: 'MongoID',
-        description: 'Updated document ID',
-      },
+    t.setFields({
+      ...payloadRecordId(tc, opts?.recordId),
       record: {
         type: tc,
         description: 'Updated document',
@@ -34,7 +62,7 @@ export default function updateOne<TSource = Document, TContext = any>(
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'updateOne',
     kind: 'mutation',
     description:
@@ -47,7 +75,7 @@ export default function updateOne<TSource = Document, TContext = any>(
     args: {
       ...recordHelperArgs(tc, {
         prefix: 'UpdateOne',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
         allFieldsNullable: true,
@@ -55,18 +83,18 @@ export default function updateOne<TSource = Document, TContext = any>(
       }),
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterUpdateOne',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortUpdateOne${tc.getTypeName()}Input`,
+        sortTypeName: `SortUpdateOne${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
       ...skipHelperArgs(),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || null;
-      const filterData = (resolveParams.args && resolveParams.args.filter) || {};
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
+      const recordData = resolveParams?.args?.record;
+      const filterData = resolveParams?.args?.filter;
 
       if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
         return Promise.reject(
@@ -79,29 +107,27 @@ export default function updateOne<TSource = Document, TContext = any>(
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      resolveParams.projection = {};
-
-      let doc = await findOneResolver.resolve(resolveParams);
+      let doc: TDoc = await findOneResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
       }
 
-      if (doc && recordData) {
-        doc.set(recordData);
-        await doc.save();
-      }
+      if (!doc) return null;
 
-      if (doc) {
-        return {
-          record: doc,
-          recordId: tc.getRecordIdFn()(doc),
-        };
-      }
+      doc.set(recordData);
+      await validateAndThrow(doc);
+      await doc.save({ validateBeforeSave: false });
 
-      return null;
+      return {
+        record: doc,
+      };
     }) as any,
   });
+
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
+  addErrorCatcherField(resolver);
 
   return resolver;
 }

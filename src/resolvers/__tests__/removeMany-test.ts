@@ -2,7 +2,7 @@ import { Query } from 'mongoose';
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLInt } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import removeMany from '../removeMany';
+import { removeMany } from '../removeMany';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
@@ -78,8 +78,13 @@ describe('removeMany() ->', () => {
     });
 
     it('should rejected with Error if args.filter is empty', async () => {
-      const result = removeMany(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      const result = removeMany(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
+      await expect(result).rejects.toThrow(
+        'User.removeMany resolver requires at least one value in args.filter'
+      );
     });
 
     it('should remove data in database', async () => {
@@ -108,6 +113,20 @@ describe('removeMany() ->', () => {
         },
       });
       expect(result.numAffected).toBe(2);
+    });
+
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = removeMany(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('requires at least one value in args.filter'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError(
+        'requires at least one value in args.filter'
+      );
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {

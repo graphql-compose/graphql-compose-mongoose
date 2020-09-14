@@ -1,9 +1,9 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { Query } from 'mongoose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import connection, { prepareCursorQuery } from '../connection';
-import findMany from '../findMany';
-import count from '../count';
+import { connection, prepareCursorQuery } from '../connection';
+import { findMany } from '../findMany';
+import { count } from '../count';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
@@ -146,15 +146,6 @@ describe('connection() resolver', () => {
       if (!resolver) throw new Error('Connection resolver is undefined');
       expect(resolver).toBeInstanceOf(Resolver);
       expect(resolver.getNestedName()).toEqual('connection');
-    });
-
-    it('should return Resolver object with custom name', () => {
-      const resolver = connection(UserModel, UserTC, {
-        connectionResolverName: 'customConnection',
-      } as any);
-      if (!resolver) throw new Error('Connection resolver is undefined');
-      expect(resolver).toBeInstanceOf(Resolver);
-      expect(resolver.getNestedName()).toEqual('customConnection');
     });
 
     it('Resolver object should have `filter` arg', () => {
