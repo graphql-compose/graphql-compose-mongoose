@@ -77,10 +77,25 @@ describe('nested projection - issue #271', () => {
       contextValue: {},
     });
     console.log(JSON.stringify(result));
-    // expect(BookModel.find).toHaveBeenCalledTimes(1);
-    // expect(BookModel.find).toHaveBeenCalledWith(
-    //   {},
-    //   { limit: 1000, projection: { title: true, pageCount: true, 'author.name': true } }
-    // );
+  });
+
+  it('Handles a Fragment', async () => {
+    const result = await graphql.graphql({
+      schema,
+      source: `
+        fragment Auth on Author {
+          name
+        }
+
+        query {
+          booksMany {
+            title
+            pageCount
+            author { ...Auth }
+          }
+        }`,
+      contextValue: {},
+    });
+    console.log(JSON.stringify(result));
   });
 });
