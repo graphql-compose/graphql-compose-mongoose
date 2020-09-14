@@ -48,7 +48,7 @@ export type ExtendedResolveParams<TDoc extends Document = any, TContext = any> =
   model: Model<TDoc>;
 };
 
-export const allResolvers = {
+export const resolverFactory = {
   count,
   findById,
   findByIds,
@@ -66,4 +66,24 @@ export const allResolvers = {
   removeMany,
   pagination,
   connection,
+};
+
+export {
+  CountResolverOpts,
+  FindByIdResolverOpts,
+  FindByIdsResolverOpts,
+  FindManyResolverOpts,
+  FindOneResolverOpts,
+  CreateManyResolverOpts,
+  CreateOneResolverOpts,
+  UpdateByIdResolverOpts,
+  UpdateManyResolverOpts,
+  UpdateOneResolverOpts,
+  RemoveByIdResolverOpts,
+  RemoveManyResolverOpts,
+  RemoveOneResolverOpts,
+  DataLoaderResolverOpts,
+  DataLoaderManyResolverOpts,
+  PaginationResolverOpts,
+  ConnectionResolverOpts,
 };

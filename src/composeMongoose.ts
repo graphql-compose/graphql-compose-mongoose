@@ -2,7 +2,7 @@ import type { SchemaComposer, Resolver } from 'graphql-compose';
 import { schemaComposer as globalSchemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
-import { allResolvers } from './resolvers';
+import { resolverFactory } from './resolvers';
 import MongoID from './types/MongoID';
 import {
   prepareFields,
@@ -29,15 +29,15 @@ export type GenerateResolverType<TDoc extends Document, TContext = any> = {
   // Get all available resolver generators, then leave only 3rd arg – opts
   // because first two args will be attached via bind() method at runtime:
   //   count = count.bind(undefined, model, tc);
-  [resolver in keyof typeof allResolvers]: <TSource = any>(
-    opts?: Parameters<typeof allResolvers[resolver]>[2]
+  [resolver in keyof typeof resolverFactory]: <TSource = any>(
+    opts?: Parameters<typeof resolverFactory[resolver]>[2]
   ) => // Also we should patch generics of the returned Resolver
   //   attach TContext TDoc from the code which will bind at runtime
   //   and allow user to attach TSource via generic at call
   // For this case we are using `extends infer` construction
   //   it helps to extract any Generic from existed method
   //   and then construct new combined return type
-  typeof allResolvers[resolver] extends (...args: any) => Resolver<any, any, infer TArgs, any>
+  typeof resolverFactory[resolver] extends (...args: any) => Resolver<any, any, infer TArgs, any>
     ? Resolver<TSource, TContext, TArgs, TDoc>
     : any;
 };
@@ -87,8 +87,8 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
   tc.makeFieldNonNull('_id');
 
   const mongooseResolvers = {} as any;
-  Object.keys(allResolvers).forEach((name) => {
-    mongooseResolvers[name] = (allResolvers as any)[name].bind(undefined, model, tc);
+  Object.keys(resolverFactory).forEach((name) => {
+    mongooseResolvers[name] = (resolverFactory as any)[name].bind(undefined, model, tc);
   });
   (tc as any).mongooseResolvers = mongooseResolvers;
 
