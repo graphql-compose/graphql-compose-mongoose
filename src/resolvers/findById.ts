@@ -1,7 +1,12 @@
 import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { projectionHelper, prepareAliases, prepareAliasesReverse, replaceAliases } from './helpers';
+import {
+  projectionHelper,
+  prepareNestedAliases,
+  prepareAliasesReverse,
+  replaceAliases,
+} from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper, beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
@@ -38,8 +43,8 @@ export function findById<TSource = any, TContext = any, TDoc extends Document = 
     throw new Error('Second arg for Resolver findById() should be instance of ObjectTypeComposer.');
   }
 
-  const aliases = prepareAliases(model);
-  const aliasesReverse = prepareAliasesReverse(model);
+  const aliases = prepareNestedAliases(model.schema);
+  const aliasesReverse = prepareAliasesReverse(model.schema);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc,

@@ -15,7 +15,7 @@ describe('Resolver helper `projection` ->', () => {
     });
 
     it('should not call query.select if projection is empty', () => {
-      projectionHelper(resolveParams, false);
+      projectionHelper(resolveParams);
       expect(spyFn).not.toBeCalled();
     });
 
@@ -31,29 +31,35 @@ describe('Resolver helper `projection` ->', () => {
       expect(spyFn).toBeCalledWith({ 'n.first': true, 'n.last': true });
     });
 
+    it('should make projection fields flat with nested aliases', () => {
+      resolveParams.projection = { name: { first: 1, last: 1 } };
+      projectionHelper(resolveParams, { name: { __selfAlias: 'n', first: 'f', last: 'l' } });
+      expect(spyFn).toBeCalledWith({ 'n.f': true, 'n.l': true });
+    });
+
     it('should not call query.select if projection has * key', () => {
       resolveParams.projection = { '*': true };
-      projectionHelper(resolveParams, false);
+      projectionHelper(resolveParams);
       expect(spyFn).not.toBeCalled();
     });
 
     describe('projection operators', () => {
       // see more details here https://docs.mongodb.com/v3.2/reference/operator/projection/meta/
-      it('should pass $meta unflatted', () => {
+      it('should pass $meta non-flatten', () => {
         resolveParams.projection = { score: { $meta: 'textScore' } };
-        projectionHelper(resolveParams, false);
+        projectionHelper(resolveParams);
         expect(spyFn).toBeCalledWith({ score: { $meta: 'textScore' } });
       });
 
-      it('should pass $slice unflatted', () => {
+      it('should pass $slice non-flatten', () => {
         resolveParams.projection = { comments: { $slice: 5 } };
-        projectionHelper(resolveParams, false);
+        projectionHelper(resolveParams);
         expect(spyFn).toBeCalledWith({ comments: { $slice: 5 } });
       });
 
-      it('should pass $elemMatch unflatted', () => {
+      it('should pass $elemMatch non-flatten', () => {
         resolveParams.projection = { students: { $elemMatch: { school: 102 } } };
-        projectionHelper(resolveParams, false);
+        projectionHelper(resolveParams);
         expect(spyFn).toBeCalledWith({ students: { $elemMatch: { school: 102 } } });
       });
     });

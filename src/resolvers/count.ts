@@ -1,6 +1,11 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { filterHelper, filterHelperArgs, prepareAliases, FilterHelperArgsOpts } from './helpers';
+import {
+  filterHelper,
+  filterHelperArgs,
+  FilterHelperArgsOpts,
+  prepareNestedAliases,
+} from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
 
@@ -28,7 +33,7 @@ export function count<TSource = any, TContext = any, TDoc extends Document = any
     throw new Error('Second arg for Resolver count() should be instance of ObjectTypeComposer.');
   }
 
-  const aliases = prepareAliases(model);
+  const aliases = prepareNestedAliases(model.schema);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: 'Int',

@@ -9,7 +9,7 @@ import {
   addFilterOperators,
   processFilterOperators,
 } from './filterOperators';
-import type { AliasesMap } from './aliases';
+import type { NestedAliasesMap } from './aliases';
 import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
 
 export type FilterHelperArgsOpts = {
@@ -99,34 +99,45 @@ export function filterHelperArgs<TDoc extends Document = any>(
 
 export function filterHelper(
   resolveParams: ExtendedResolveParams,
-  aliases: AliasesMap | false
+  aliases?: NestedAliasesMap
 ): void {
-  const filter = resolveParams.args && resolveParams.args.filter;
+  const filter = resolveParams.args?.filter;
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
     const modelFields = (resolveParams.query as any)?.schema?.paths;
 
     const { _ids, ...filterFields } = filter;
     if (_ids && Array.isArray(_ids)) {
-      // eslint-disable-next-line
       resolveParams.query = resolveParams.query.where({ _id: { $in: _ids } });
     }
     processFilterOperators(filterFields);
     const clearedFilter: Record<string, any> = {};
     Object.keys(filterFields).forEach((key) => {
-      if (modelFields[key] || key.indexOf('$') === 0) {
-        clearedFilter[key] = filterFields[key];
-      } else if (aliases && aliases?.[key]) {
-        clearedFilter[aliases[key]] = filterFields[key];
+      const value = filterFields[key];
+      if (key.startsWith('$')) {
+        clearedFilter[key] = Array.isArray(value)
+          ? value.map((v) => toMongoFilterDottedObject(v, aliases))
+          : toMongoFilterDottedObject(value, aliases);
+      } else if (modelFields[key] || aliases?.[key]) {
+        const alias = aliases?.[key];
+        let newKey;
+        let subAlias: NestedAliasesMap | undefined;
+        if (typeof alias === 'string') {
+          newKey = alias;
+        } else if (isObject(alias)) {
+          subAlias = alias;
+          newKey = alias?.__selfAlias;
+        } else {
+          newKey = key;
+        }
+        toMongoFilterDottedObject(value, subAlias, clearedFilter, newKey);
       }
     });
     if (Object.keys(clearedFilter).length > 0) {
-      // eslint-disable-next-line
-      resolveParams.query = resolveParams.query.where(toMongoFilterDottedObject(clearedFilter));
+      resolveParams.query = resolveParams.query.where(clearedFilter);
     }
   }
 
   if (isObject(resolveParams.rawQuery)) {
-    // eslint-disable-next-line
     resolveParams.query = resolveParams.query.where(resolveParams.rawQuery);
   }
 }

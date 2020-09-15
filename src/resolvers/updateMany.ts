@@ -10,8 +10,7 @@ import {
   filterHelperArgs,
   sortHelper,
   sortHelperArgs,
-  prepareAliases,
-  replaceAliases,
+  prepareNestedAliases,
   RecordHelperArgsOpts,
   FilterHelperArgsOpts,
   SortHelperArgsOpts,
@@ -66,7 +65,7 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
     });
   });
 
-  const aliases = prepareAliases(model);
+  const aliases = prepareNestedAliases(model.schema);
 
   const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'updateMany',
@@ -123,12 +122,12 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
       if (resolveParams.query.updateMany) {
         // @ts-expect-error
         resolveParams.query.updateMany({
-          $set: toMongoDottedObject(replaceAliases(recordData, aliases)),
+          $set: toMongoDottedObject(recordData, aliases),
         });
       } else {
         // OLD mongoose
         resolveParams.query.update({
-          $set: toMongoDottedObject(replaceAliases(recordData, aliases)),
+          $set: toMongoDottedObject(recordData, aliases),
         });
       }
 

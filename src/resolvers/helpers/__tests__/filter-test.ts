@@ -8,11 +8,11 @@ import { filterHelperArgs, filterHelper } from '../filter';
 import { OPERATORS_FIELDNAME } from '../filterOperators';
 import { UserModel } from '../../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../../fieldsConverter';
-import { prepareAliases } from '../aliases';
+import { prepareNestedAliases } from '../aliases';
 
 describe('Resolver helper `filter` ->', () => {
   let UserTC: ObjectTypeComposer<any, any>;
-  const aliases = prepareAliases(UserModel);
+  const aliases = prepareNestedAliases(UserModel.schema);
 
   beforeEach(() => {
     schemaComposer.clear();
