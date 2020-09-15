@@ -193,20 +193,6 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
       if (!graphqlFields[fieldName].extensions) graphqlFields[fieldName].extensions = {};
       (graphqlFields as any)[fieldName].extensions.defaultValue = mongooseField?.defaultValue;
     }
-
-    if (deriveComplexType(mongooseField) === ComplexTypes.EMBEDDED) {
-      // https://github.com/nodkz/graphql-compose-mongoose/issues/7
-      graphqlFields[fieldName].resolve = (source) => {
-        if (source) {
-          if (source.toObject) {
-            const obj = source.toObject();
-            return obj[fieldName];
-          }
-          return source[fieldName];
-        }
-        return null;
-      };
-    }
   });
 
   typeComposer.addFields(graphqlFields);
