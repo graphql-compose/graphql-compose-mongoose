@@ -12,7 +12,7 @@ describe('integration tests', () => {
   });
 
   describe('check sub-documents', () => {
-    it('should return null if sub-document is empty', async () => {
+    it('should return subDoc fields even subDoc is empty itself', async () => {
       const UserTC = composeWithMongoose(UserModel);
       schemaComposer.Query.addFields({
         user: UserTC.getResolver('findById'),
@@ -41,11 +41,14 @@ describe('integration tests', () => {
 
       expect(result.data.user).toEqual({
         name: 'Test empty subDoc',
-        subDoc: null,
+        subDoc: {
+          field1: null,
+          field2: { field21: null },
+        },
       });
     });
 
-    it('should return sub-document if it is non-empty', async () => {
+    it('should return subDoc fields if it is non-empty', async () => {
       const UserTC = composeWithMongoose(UserModel);
       // UserTC.get('$findById.subDoc').extendField('field2', {
       //   resolve: (source) => {
