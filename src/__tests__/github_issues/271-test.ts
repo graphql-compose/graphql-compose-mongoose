@@ -175,4 +175,57 @@ describe('nested projections with aliases - issue #271', () => {
       data: { booksMany: [{ author: { isAbove100: 'yes' }, bookSize: 'big' }] },
     });
   });
+
+  it('check filter with alias', async () => {
+    // firstly check mongoose query
+    expect(await BookModel.find({ pc: 1168 }).lean()).toEqual([
+      {
+        __v: 0,
+        _id: 1,
+        a: { ag: 115, isAlive: false, name: 'Ayn Rand' },
+        pc: 1168,
+        title: 'Atlas Shrugged',
+      },
+    ]);
+
+    // check that aliases correctly applied to filter
+    const result = await graphql.graphql({
+      schema,
+      source: `
+        query {
+          booksMany(filter: { pageCount: 1168 }) {
+            title
+            pageCount
+          }
+        }`,
+      contextValue: {},
+    });
+    expect(result).toEqual({ data: { booksMany: [{ pageCount: 1168, title: 'Atlas Shrugged' }] } });
+  });
+
+  it('check nested filter with alias', async () => {
+    // firstly check mongoose query
+    expect(await BookModel.find({ 'a.ag': 115 }).lean()).toEqual([
+      {
+        __v: 0,
+        _id: 1,
+        a: { ag: 115, isAlive: false, name: 'Ayn Rand' },
+        pc: 1168,
+        title: 'Atlas Shrugged',
+      },
+    ]);
+
+    const result = await graphql.graphql({
+      schema,
+      source: `
+        query {
+          booksMany(filter: { author: { age: 115 } }) {
+            title
+            pageCount
+          }
+        }`,
+      contextValue: {},
+    });
+    expect(result).toEqual({ data: { booksMany: [{ pageCount: 1168, title: 'Atlas Shrugged' }] } });
+  });
 });

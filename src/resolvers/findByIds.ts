@@ -7,7 +7,7 @@ import {
   sortHelper,
   sortHelperArgs,
   projectionHelper,
-  prepareAliases,
+  prepareNestedAliases,
   prepareAliasesReverse,
   replaceAliases,
   LimitHelperArgsOpts,
@@ -54,8 +54,8 @@ export function findByIds<TSource = any, TContext = any, TDoc extends Document =
     );
   }
 
-  const aliases = prepareAliases(model);
-  const aliasesReverse = prepareAliasesReverse(model);
+  const aliases = prepareNestedAliases(model.schema);
+  const aliasesReverse = prepareAliasesReverse(model.schema);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc.NonNull.List.NonNull,

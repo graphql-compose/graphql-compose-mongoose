@@ -10,7 +10,7 @@ import {
   sortHelper,
   sortHelperArgs,
   projectionHelper,
-  prepareAliases,
+  prepareNestedAliases,
   prepareAliasesReverse,
   replaceAliases,
   FilterHelperArgsOpts,
@@ -62,8 +62,8 @@ export function findMany<TSource = any, TContext = any, TDoc extends Document = 
     throw new Error('Second arg for Resolver findMany() should be instance of ObjectTypeComposer.');
   }
 
-  const aliases = prepareAliases(model);
-  const aliasesReverse = prepareAliasesReverse(model);
+  const aliases = prepareNestedAliases(model.schema);
+  const aliasesReverse = prepareAliasesReverse(model.schema);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
     type: tc.NonNull.List.NonNull,

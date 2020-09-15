@@ -3,7 +3,7 @@ import type { Model, Document } from 'mongoose';
 import {
   filterHelperArgs,
   filterHelper,
-  prepareAliases,
+  prepareNestedAliases,
   FilterHelperArgsOpts,
   limitHelperArgs,
   LimitHelperArgsOpts,
@@ -49,7 +49,7 @@ export function removeMany<TSource = any, TContext = any, TDoc extends Document 
     });
   });
 
-  const aliases = prepareAliases(model);
+  const aliases = prepareNestedAliases(model.schema);
 
   const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'removeMany',
