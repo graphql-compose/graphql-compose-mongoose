@@ -16,7 +16,7 @@ function copyBaseTcRelationsToChildTc(
     if (childRelations[name]) {
       return;
     }
-    childTC.addRelation(name, relations[name] as any);
+    childTC.addRelation(name, relations[name]);
   });
 
   return childTC;
