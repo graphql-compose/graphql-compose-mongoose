@@ -7,7 +7,6 @@
     "lib"
   ],
   "main": "lib/index.js",
-  "module": "mjs/index.mjs",
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
@@ -30,7 +29,7 @@
     "graphql-compose-pagination": "^7.0.0"
   },
   "peerDependencies": {
-    "graphql-compose": "^7.1.0",
+    "graphql-compose": "^7.21.4",
     "mongoose": "^5.0.0 || ^4.4.0"
   },
   "devDependencies": {
@@ -45,7 +44,7 @@
     "eslint-plugin-import": "2.22.0",
     "eslint-plugin-prettier": "3.1.4",
     "graphql": "15.3.0",
-    "graphql-compose": "7.19.4",
+    "graphql-compose": "7.21.4",
     "graphql-compose-connection": "^6.2.0",
     "graphql-compose-pagination": "^6.1.0",
     "jest": "26.4.1",
