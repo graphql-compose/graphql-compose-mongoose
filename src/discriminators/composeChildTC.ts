@@ -6,6 +6,22 @@ import type {
 import { prepareChildResolvers } from './prepareChildResolvers';
 import { reorderFields } from './utils/reorderFields';
 
+function copyBaseTcRelationsToChildTc(
+  baseDTC: ObjectTypeComposer<any, any>,
+  childTC: ObjectTypeComposer<any, any>
+) {
+  const relations = baseDTC.getRelations();
+  const childRelations = childTC.getRelations();
+  Object.keys(relations).forEach((name) => {
+    if (childRelations[name]) {
+      return;
+    }
+    childTC.addRelation(name, relations[name]);
+  });
+
+  return childTC;
+}
+
 // copy all baseTypeComposer fields to childTC
 // these are the fields before calling discriminator
 function copyBaseTCFieldsToChildTC(
@@ -35,7 +51,8 @@ export function composeChildTC<TSource, TContext>(
   childTC: ObjectTypeComposer<TSource, TContext>,
   opts: ComposeWithMongooseDiscriminatorsOpts<TContext>
 ): ObjectTypeComposer<TSource, TContext> {
-  const composedChildTC = copyBaseTCFieldsToChildTC(baseDTC, childTC);
+  let composedChildTC = copyBaseTcRelationsToChildTc(baseDTC, childTC);
+  composedChildTC = copyBaseTCFieldsToChildTC(baseDTC, composedChildTC);
 
   composedChildTC.addInterface(baseDTC.getDInterface());
 
