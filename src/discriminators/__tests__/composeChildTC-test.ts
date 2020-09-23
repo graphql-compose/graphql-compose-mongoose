@@ -8,6 +8,15 @@ beforeAll(() => schemaComposer.clear());
 
 describe('composeChildTC ->', () => {
   const CharacterDTC = composeWithMongooseDiscriminators(CharacterModel);
+  CharacterDTC.addRelation('friends', {
+    resolver: () => CharacterDTC.getResolver('findById'),
+    prepareArgs: {
+      _id: (source) => source.friends,
+    },
+    projection: { friends: 1 },
+  });
+  CharacterDTC.extendField('friends', { type: '[String!]' });
+
   const PersonTC = CharacterDTC.discriminator(PersonModel);
   const DroidTC = CharacterDTC.discriminator(DroidModel);
 
@@ -19,6 +28,16 @@ describe('composeChildTC ->', () => {
   it('should copy all baseFields from BaseDTC to ChildTCs', () => {
     expect(DroidTC.getFieldNames()).toEqual(expect.arrayContaining(CharacterDTC.getFieldNames()));
     expect(PersonTC.getFieldNames()).toEqual(expect.arrayContaining(CharacterDTC.getFieldNames()));
+  });
+
+  it('should copy all relations from BaseDTC to ChildTCs', () => {
+    expect(DroidTC.getRelations()).toEqual(CharacterDTC.getRelations());
+    expect(PersonTC.getRelations()).toEqual(CharacterDTC.getRelations());
+  });
+
+  it('should copy the extended Field from BaseDTC to ChildTCs', () => {
+    expect(DroidTC.getField('friends').type).toEqual(CharacterDTC.getField('friends').type);
+    expect(PersonTC.getField('friends').type).toEqual(CharacterDTC.getField('friends').type);
   });
 
   it('should make childTC have same fieldTypes as baseTC', () => {
