@@ -1,13 +1,12 @@
 import { schemaComposer, graphql } from 'graphql-compose';
 import { composeMongoose } from '../../index';
 import { mongoose } from '../../__mocks__/mongooseCommon';
-import { Document } from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
 });
 
-interface IUser extends Document {
+interface IUser extends mongoose.Document {
   name: string;
 }
 
@@ -17,7 +16,7 @@ const PostSchema = new mongoose.Schema({
   reviewerIds: { type: [mongoose.Types.ObjectId] },
 });
 
-interface IPost extends Document {
+interface IPost extends mongoose.Document {
   title: string;
   authorId?: mongoose.Types.ObjectId;
   reviewerIds?: [mongoose.Types.ObjectId];
@@ -46,7 +45,10 @@ PostTC.addRelation('reviewers', {
 });
 
 schemaComposer.Query.addFields({
+  post: PostTC.mongooseResolvers.findById(),
   posts: PostTC.mongooseResolvers.findMany(),
+  user: UserTC.mongooseResolvers.findById(),
+  users: UserTC.mongooseResolvers.findMany({ sort: false }),
 });
 const schema = schemaComposer.buildSchema();
 
