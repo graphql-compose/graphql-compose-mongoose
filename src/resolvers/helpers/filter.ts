@@ -13,14 +13,41 @@ import type { NestedAliasesMap } from './aliases';
 import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
 
 export type FilterHelperArgsOpts = {
-  prefix?: string;
-  suffix?: string;
-  baseTypeName?: string;
-  isRequired?: boolean;
+  /**
+   * Add to filter arg only that fields which are indexed.
+   * If false then all fields will be available for filtering.
+   * By default: true
+   */
   onlyIndexed?: boolean;
-  requiredFields?: string | string[];
-  operators?: FieldsOperatorsConfig | false;
+  /**
+   * You an remove some fields from type via this option.
+   */
   removeFields?: string | string[];
+  /**
+   * This option makes provided fieldNames as required
+   */
+  requiredFields?: string | string[];
+  /**
+   * Customize operators filtering or disable it at all.
+   * By default will be provided all operators only for indexed fields.
+   */
+  operators?: FieldsOperatorsConfig | false;
+  /**
+   * Make arg `filter` as required if this option is true.
+   */
+  isRequired?: boolean;
+  /**
+   * Base type name for generated filter argument.
+   */
+  baseTypeName?: string;
+  /**
+   * Provide custom prefix for Type name
+   */
+  prefix?: string;
+  /**
+   * Provide custom suffix for Type name
+   */
+  suffix?: string;
 };
 
 // for merging, discriminators merge-able only

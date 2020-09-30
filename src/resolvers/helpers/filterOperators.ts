@@ -27,6 +27,27 @@ export const availableOperators = [
 
 export type AllowedOperatorsName = typeof availableOperators[number];
 
+/**
+ * Customize operators filtering or disable it at all.
+ * By default, for performance reason, `graphql-compose-mongoose` generates operators
+ * *only for indexed* fields.
+ *
+ * BUT you may enable operators for all fields when creating resolver in the following way:
+ *   // enables all operators for all fields
+ *   operators: true,
+ * OR provide a more granular `operators` configuration to suit your needs:
+ *   operators: {
+ *     // for `age` field add just 3 operators
+ *     age: ['in', 'gt', 'lt'],
+ *     // for non-indexed `amount` field add all operators
+ *     amount: true,
+ *     // don't add this field to operators
+ *     indexedField: false,
+ *   }
+ *
+ * Available logic operators: AND, OR
+ * Available field operators: gt, gte, lt, lte, ne, in, nin, regex, exists
+ */
 export type FieldsOperatorsConfig =
   | {
       [fieldName: string]: FieldsOperatorsConfig | AllowedOperatorsName[] | boolean;

@@ -12,12 +12,15 @@ import { getIndexesFromModel, extendByReversedIndexes } from '../../utils/getInd
 import type { ExtendedResolveParams } from '../index';
 
 export type SortHelperArgsOpts = {
-  sortTypeName?: string;
   /**
    * Allow sort by several fields.
    * This makes arg as array of sort values.
    */
   multi?: boolean;
+  /**
+   * This option set custom type name for generated sort argument.
+   */
+  sortTypeName?: string;
 };
 
 export function sortHelperArgs<TDoc extends Document = any>(

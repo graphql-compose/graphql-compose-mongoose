@@ -10,6 +10,55 @@
 
 This is a plugin for [graphql-compose](https://github.com/graphql-compose/graphql-compose), which derives GraphQLType from your [mongoose model](https://github.com/Automattic/mongoose). Also derives bunch of internal GraphQL Types. Provide all CRUD resolvers, including `graphql connection`, also provided basic search via operators ($lt, $gt and so on).
 
+[Release Notes for v9.0.0](https://github.com/graphql-compose/graphql-compose-mongoose/blob/alpha/docs/releases/9.0.0.md) contains a lot of improvements. It's strongly recommended for reading before upgrading from v8.
+
+<!-- TOC depthFrom:2 -->
+
+- [Installation](#installation)
+- [Intro video](#intro-video)
+- [Example](#example)
+  - [Working with Mongoose Collection Level Discriminators](#working-with-mongoose-collection-level-discriminators)
+- [Customization options](#customization-options)
+  - [`composeMongoose` customization options](#composemongoose-customization-options)
+- [Resolvers' customization options](#resolvers-customization-options)
+  - [`connection(opts?: ConnectionResolverOpts)`](#connectionopts-connectionresolveropts)
+  - [`count(opts?: CountResolverOpts)`](#countopts-countresolveropts)
+  - [`createMany(opts?: CreateManyResolverOpts)`](#createmanyopts-createmanyresolveropts)
+  - [`createOne(opts?: CreateOneResolverOpts)`](#createoneopts-createoneresolveropts)
+  - [`dataLoader(opts?: DataLoaderResolverOpts)`](#dataloaderopts-dataloaderresolveropts)
+  - [`dataLoaderMany(opts?: DataLoaderManyResolverOpts)`](#dataloadermanyopts-dataloadermanyresolveropts)
+  - [`findById(opts?: FindByIdResolverOpts)`](#findbyidopts-findbyidresolveropts)
+  - [`findByIds(opts?: FindByIdsResolverOpts)`](#findbyidsopts-findbyidsresolveropts)
+  - [`findMany(opts?: FindManyResolverOpts)`](#findmanyopts-findmanyresolveropts)
+  - [`findOne(opts?: FindOneResolverOpts)`](#findoneopts-findoneresolveropts)
+  - [`pagination(opts?: PaginationResolverOpts)`](#paginationopts-paginationresolveropts)
+  - [`removeById(opts?: RemoveByIdResolverOpts)`](#removebyidopts-removebyidresolveropts)
+  - [`removeMany(opts?: RemoveManyResolverOpts)`](#removemanyopts-removemanyresolveropts)
+  - [`removeOne(opts?: RemoveOneResolverOpts)`](#removeoneopts-removeoneresolveropts)
+  - [`updateById(opts?: UpdateByIdResolverOpts)`](#updatebyidopts-updatebyidresolveropts)
+  - [`updateMany(opts?: UpdateManyResolverOpts)`](#updatemanyopts-updatemanyresolveropts)
+  - [`updateOne(opts?: UpdateOneResolverOpts)`](#updateoneopts-updateoneresolveropts)
+  - [Description of common resolvers' options](#description-of-common-resolvers-options)
+    - [`FilterHelperArgsOpts`](#filterhelperargsopts)
+    - [`SortHelperArgsOpts`](#sorthelperargsopts)
+    - [`RecordHelperArgsOpts`](#recordhelperargsopts)
+    - [`LimitHelperArgsOpts`](#limithelperargsopts)
+- [FAQ](#faq)
+  - [Can I get generated vanilla GraphQL types?](#can-i-get-generated-vanilla-graphql-types)
+  - [How to add custom fields?](#how-to-add-custom-fields)
+  - [How to build nesting/relations?](#how-to-build-nestingrelations)
+  - [Reusing the same mongoose Schema in embedded object fields](#reusing-the-same-mongoose-schema-in-embedded-object-fields)
+  - [Access and modify mongoose doc before save](#access-and-modify-mongoose-doc-before-save)
+  - [How can I push/pop or add/remove values to arrays?](#how-can-i-pushpop-or-addremove-values-to-arrays)
+  - [Is it possible to use several schemas?](#is-it-possible-to-use-several-schemas)
+  - [Embedded documents has `_id` field and you don't need it?](#embedded-documents-has-_id-field-and-you-dont-need-it)
+  - [Can field name in schema have different name in database?](#can-field-name-in-schema-have-different-name-in-database)
+- [Backers](#backers)
+- [Sponsors](#sponsors)
+- [License](#license)
+
+<!-- /TOC -->
+
 ## Installation
 
 ```bash
@@ -18,15 +67,9 @@ npm install graphql graphql-compose mongoose graphql-compose-mongoose --save
 
 Modules `graphql`, `graphql-compose`, `mongoose` are in `peerDependencies`, so should be installed explicitly in your app. They have global objects and should not have ability to be installed as submodule.
 
-If you want to add additional resolvers [`connection`](https://github.com/graphql-compose/graphql-compose-connection) and/or [`pagination`](https://github.com/graphql-compose/graphql-compose-pagination) - just install following packages and `graphql-compose-mongoose` will add them automatically.
-
-```bash
-npm install graphql-compose-connection graphql-compose-pagination --save
-```
-
 ## Intro video
 
-Viktor Kjartansson created a quite solid intro for graphql-compose-mongoose in comparison with graphql-tools:
+Viktor Kjartansson created a quite solid intro for `graphql-compose-mongoose` in comparison with `graphql-tools`:
 
 <a href="https://www.youtube.com/watch?v=RXcY-OoGnQ8" target="_blank"><img src="https://img.youtube.com/vi/RXcY-OoGnQ8/0.jpg" alt="#2 Mongoose - add GraphQL with graphql-compose" style="width: 380px" />
 
@@ -34,9 +77,9 @@ Viktor Kjartansson created a quite solid intro for graphql-compose-mongoose in c
 
 ## Example
 
-Live demo: [https://graphql-compose.herokuapp.com/](https://graphql-compose.herokuapp.com/)
+Live demo: <https://graphql-compose.herokuapp.com/>
 
-Source code: https://github.com/graphql-compose/graphql-compose-examples
+Source code: <https://github.com/graphql-compose/graphql-compose-examples>
 
 Small explanation for variables naming:
 
@@ -45,9 +88,9 @@ Small explanation for variables naming:
 - `UserTC` - this is a `ObjectTypeComposer` instance for User. `ObjectTypeComposer` has `GraphQLObjectType` inside, available via method `UserTC.getType()`.
 - Here and in all other places of code variables suffix `...TC` means that this is `ObjectTypeComposer` instance, `...ITC` - `InputTypeComposer`, `...ETC` - `EnumTypeComposer`.
 
-```js
+```ts
 import mongoose from 'mongoose';
-import { composeWithMongoose } from 'graphql-compose-mongoose';
+import { composeMongoose } from 'graphql-compose-mongoose';
 import { schemaComposer } from 'graphql-compose';
 
 // STEP 1: DEFINE MONGOOSE SCHEMA AND MODEL
@@ -86,40 +129,39 @@ const UserSchema = new mongoose.Schema({
 const User = mongoose.model('User', UserSchema);
 
 
-
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity, described below
-const UserTC = composeWithMongoose(User, customizationOptions);
+const UserTC = composeMongoose(User, customizationOptions);
 
 // STEP 3: Add needed CRUD User operations to the GraphQL Schema
 // via graphql-compose it will be much much easier, with less typing
 schemaComposer.Query.addFields({
-  userById: UserTC.getResolver('findById'),
-  userByIds: UserTC.getResolver('findByIds'),
-  userOne: UserTC.getResolver('findOne'),
-  userMany: UserTC.getResolver('findMany'),
-  userDataLoader: UserTC.getResolver('dataLoader'),
-  userDataLoaderMany: UserTC.getResolver('dataLoaderMany'),
-  userByIdLean: UserTC.getResolver('findByIdLean'),
-  userByIdsLean: UserTC.getResolver('findByIdsLean'),
-  userOneLean: UserTC.getResolver('findOneLean'),
-  userManyLean: UserTC.getResolver('findManyLean'),
-  userDataLoaderLean: UserTC.getResolver('dataLoaderLean'),
-  userDataLoaderManyLean: UserTC.getResolver('dataLoaderManyLean'),
-  userCount: UserTC.getResolver('count'),
-  userConnection: UserTC.getResolver('connection'),
-  userPagination: UserTC.getResolver('pagination'),
+  userById: UserTC.mongooseResolvers.findById(),
+  userByIds: UserTC.mongooseResolvers.findByIds(),
+  userOne: UserTC.mongooseResolvers.findOne(),
+  userMany: UserTC.mongooseResolvers.findMany(),
+  userDataLoader: UserTC.mongooseResolvers.dataLoader(),
+  userDataLoaderMany: UserTC.mongooseResolvers.dataLoaderMany(),
+  userByIdLean: UserTC.mongooseResolvers.findByIdLean(),
+  userByIdsLean: UserTC.mongooseResolvers.findByIdsLean(),
+  userOneLean: UserTC.mongooseResolvers.findOneLean(),
+  userManyLean: UserTC.mongooseResolvers.findManyLean(),
+  userDataLoaderLean: UserTC.mongooseResolvers.dataLoaderLean(),
+  userDataLoaderManyLean: UserTC.mongooseResolvers.dataLoaderManyLean(),
+  userCount: UserTC.mongooseResolvers.count(),
+  userConnection: UserTC.mongooseResolvers.connection(),
+  userPagination: UserTC.mongooseResolvers.pagination(),
 });
 
 schemaComposer.Mutation.addFields({
-  userCreateOne: UserTC.getResolver('createOne'),
-  userCreateMany: UserTC.getResolver('createMany'),
-  userUpdateById: UserTC.getResolver('updateById'),
-  userUpdateOne: UserTC.getResolver('updateOne'),
-  userUpdateMany: UserTC.getResolver('updateMany'),
-  userRemoveById: UserTC.getResolver('removeById'),
-  userRemoveOne: UserTC.getResolver('removeOne'),
-  userRemoveMany: UserTC.getResolver('removeMany'),
+  userCreateOne: UserTC.mongooseResolvers.createOne(),
+  userCreateMany: UserTC.mongooseResolvers.createMany(),
+  userUpdateById: UserTC.mongooseResolvers.updateById(),
+  userUpdateOne: UserTC.mongooseResolvers.updateOne(),
+  userUpdateMany: UserTC.mongooseResolvers.updateMany(),
+  userRemoveById: UserTC.mongooseResolvers.removeById(),
+  userRemoveOne: UserTC.mongooseResolvers.removeOne(),
+  userRemoveMany: UserTC.mongooseResolvers.removeMany(),
 });
 
 const graphqlSchema = schemaComposer.buildSchema();
@@ -136,10 +178,10 @@ Variable Namings
 
 - `...DTC` - Suffix for a `DiscriminatorTypeComposer` instance, which is also an instance of `ObjectTypeComposer`. All fields and Relations manipulations on this instance affects all registered discriminators and the Discriminator Interface.
 
-```js
+```ts
   import mongoose from 'mongoose';
   import { schemaComposer } from 'graphql-compose';
-  import { composeWithMongooseDiscriminators } from 'graphql-compose-mongoose';
+  import { composeMongooseDiscriminators } from 'graphql-compose-mongoose';
 
   // pick a discriminatorKey
   const DKey = 'type';
@@ -188,12 +230,12 @@ Variable Namings
   const PersonModel = CharacterModel.discriminator(enumCharacterType.PERSON, PersonSchema);
 
   // create DiscriminatorTypeComposer
-  const baseOptions = { // regular TypeConverterOptions, passed to composeWithMongoose
+  const baseOptions = { // regular TypeConverterOptions, passed to composeMongoose
     fields: {
       remove: ['friends'],
     }
   }
-  const CharacterDTC = composeWithMongooseDiscriminators(CharacterModel, baseOptions);
+  const CharacterDTC = composeMongooseDiscriminators(CharacterModel, baseOptions);
 
   // create Discriminator Types
   const droidTypeConverterOptions = {  // this options will be merged with baseOptions -> customizationsOptions
@@ -252,12 +294,488 @@ Variable Namings
   });
 ```
 
+## Customization options
+
+### `composeMongoose` customization options
+
+When you converting mongoose model `const UserTC = composeMongoose(User, opts: ComposeMongooseOpts);` you may tune every piece of future derived types – setup name and description for the main type, remove fields or leave only desired fields.
+
+```ts
+type ComposeMongooseOpts = {
+  /**
+   * Which type registry use for generated types.
+   * By default is used global default registry.
+   */
+  schemaComposer?: SchemaComposer<TContext>;
+  /**
+   * What should be base type name for generated type from mongoose model.
+   */
+  name?: string;
+  /**
+   * Provide arbitrary description for generated type.
+   */
+  description?: string;
+  /**
+   * You can leave only whitelisted fields in type via this option.
+   * Any other fields will be removed.
+   */
+  onlyFields?: string[];
+  /**
+   * You an remove some fields from type via this option.
+   */
+  removeFields?: string[];
+  /**
+   * You may configure generated InputType
+   */
+  inputType?: TypeConverterInputTypeOpts;
+  /**
+   * You can make fields as NonNull if they have default value in mongoose model.
+   */
+  defaultsAsNonNull?: boolean;
+};
+```
+
+This is `opts.inputType` options for default InputTypeObject which will be provided to all resolvers for `filter` and `input` args.
+
+```ts
+type TypeConverterInputTypeOpts = {
+  /**
+   * What should be input type name.
+   * By default: baseTypeName + 'Input'
+   */
+  name?: string;
+  /**
+   * Provide arbitrary description for generated type.
+   */
+  description?: string;
+  /**
+   * You can leave only whitelisted fields in type via this option.
+   * Any other fields will be removed.
+   */
+  onlyFields?: string[];
+  /**
+   * You an remove some fields from type via this option.
+   */
+  removeFields?: string[];
+  /**
+   * This option makes provided fieldNames as required
+   */
+  requiredFields?: string[];
+};
+```
+
+## Resolvers' customization options
+
+When you are creating resolvers from `mongooseResolvers` factory, you may provide customizationOptions to it:
+
+```ts
+UserTC.mongooseResolvers.findMany(opts);
+```
+
+### `connection(opts?: ConnectionResolverOpts)`
+
+```ts
+type ConnectionResolverOpts<TContext = any> = {
+  sort: ConnectionSortMapOpts;
+  name?: string;
+  defaultLimit?: number | undefined;
+  edgeTypeName?: string;
+  edgeFields?: ObjectTypeComposerFieldConfigMap<any, TContext>;
+  /** See below **/
+  countOpts?: CountResolverOpts;
+  /** See below **/
+  findManyOpts?: FindManyResolverOpts;
+}
+```
+
+### `count(opts?: CountResolverOpts)`
+
+```ts
+interface CountResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+}
+```
+
+### `createMany(opts?: CreateManyResolverOpts)`
+
+```ts
+interface CreateManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `records` argument. */
+  records?: RecordHelperArgsOpts;
+  /** Customize payload.recordIds field. If false, then this field will be removed. */
+  recordIds?: PayloadRecordIdsHelperOpts | false;
+}
+```
+
+### `createOne(opts?: CreateOneResolverOpts)`
+
+```ts
+interface CreateOneResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `record` argument */
+  record?: RecordHelperArgsOpts;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
+}
+```
+
+### `dataLoader(opts?: DataLoaderResolverOpts)`
+
+```ts
+interface DataLoaderResolverOpts {
+  /**
+   * Enabling the lean option tells Mongoose to skip instantiating
+   * a full Mongoose document and just give you the plain JavaScript objects.
+   * Documents are much heavier than vanilla JavaScript objects,
+   * because they have a lot of internal state for change tracking.
+   * The downside of enabling lean is that lean docs don't have:
+   *   Default values
+   *   Getters and setters
+   *   Virtuals
+   * Read more about `lean`: https://mongoosejs.com/docs/tutorials/lean.html
+   */
+  lean?: boolean;
+}
+```
+
+### `dataLoaderMany(opts?: DataLoaderManyResolverOpts)`
+
+```ts
+interface DataLoaderManyResolverOpts {
+  /**
+   * Enabling the lean option tells Mongoose to skip instantiating
+   * a full Mongoose document and just give you the plain JavaScript objects.
+   * Documents are much heavier than vanilla JavaScript objects,
+   * because they have a lot of internal state for change tracking.
+   * The downside of enabling lean is that lean docs don't have:
+   *   Default values
+   *   Getters and setters
+   *   Virtuals
+   * Read more about `lean`: https://mongoosejs.com/docs/tutorials/lean.html
+   */
+  lean?: boolean;
+}
+```
+
+### `findById(opts?: FindByIdResolverOpts)`
+
+```ts
+interface FindByIdResolverOpts {
+  /**
+   * Enabling the lean option tells Mongoose to skip instantiating
+   * a full Mongoose document and just give you the plain JavaScript objects.
+   * Documents are much heavier than vanilla JavaScript objects,
+   * because they have a lot of internal state for change tracking.
+   * The downside of enabling lean is that lean docs don't have:
+   *   Default values
+   *   Getters and setters
+   *   Virtuals
+   * Read more about `lean`: https://mongoosejs.com/docs/tutorials/lean.html
+   */
+  lean?: boolean;
+}
+```
+
+### `findByIds(opts?: FindByIdsResolverOpts)`
+
+```ts
+interface FindByIdsResolverOpts {
+  /**
+   * Enabling the lean option tells Mongoose to skip instantiating
+   * a full Mongoose document and just give you the plain JavaScript objects.
+   * Documents are much heavier than vanilla JavaScript objects,
+   * because they have a lot of internal state for change tracking.
+   * The downside of enabling lean is that lean docs don't have:
+   *   Default values
+   *   Getters and setters
+   *   Virtuals
+   * Read more about `lean`: https://mongoosejs.com/docs/tutorials/lean.html
+   */
+  lean?: boolean;
+  limit?: LimitHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+}
+```
+
+### `findMany(opts?: FindManyResolverOpts)`
+
+```ts
+interface FindManyResolverOpts {
+  /**
+   * Enabling the lean option tells Mongoose to skip instantiating
+   * a full Mongoose document and just give you the plain JavaScript objects.
+   * Documents are much heavier than vanilla JavaScript objects,
+   * because they have a lot of internal state for change tracking.
+   * The downside of enabling lean is that lean docs don't have:
+   *   Default values
+   *   Getters and setters
+   *   Virtuals
+   * Read more about `lean`: https://mongoosejs.com/docs/tutorials/lean.html
+   */
+  lean?: boolean;
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  limit?: LimitHelperArgsOpts | false;
+  skip?: false;
+}
+```
+
+### `findOne(opts?: FindOneResolverOpts)`
+
+```ts
+interface FindOneResolverOpts {
+  /**
+   * Enabling the lean option tells Mongoose to skip instantiating
+   * a full Mongoose document and just give you the plain JavaScript objects.
+   * Documents are much heavier than vanilla JavaScript objects,
+   * because they have a lot of internal state for change tracking.
+   * The downside of enabling lean is that lean docs don't have:
+   *   Default values
+   *   Getters and setters
+   *   Virtuals
+   * Read more about `lean`: https://mongoosejs.com/docs/tutorials/lean.html
+   */
+  lean?: boolean;
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  skip?: false;
+}
+```
+
+### `pagination(opts?: PaginationResolverOpts)`
+
+```ts
+interface PaginationResolverOpts {
+  name?: string;
+  perPage?: number;
+  countOpts?: CountResolverOpts;
+  findManyOpts?: FindManyResolverOpts;
+}
+```
+
+### `removeById(opts?: RemoveByIdResolverOpts)`
+
+```ts
+interface RemoveByIdResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
+}
+```
+
+### `removeMany(opts?: RemoveManyResolverOpts)`
+
+```ts
+interface RemoveManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  limit?: LimitHelperArgsOpts | false;
+}
+```
+
+### `removeOne(opts?: RemoveOneResolverOpts)`
+
+```ts
+interface RemoveOneResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
+}
+```
+
+### `updateById(opts?: UpdateByIdResolverOpts)`
+
+```ts
+interface UpdateByIdResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `record` argument. */
+  record?: RecordHelperArgsOpts;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
+}
+```
+
+### `updateMany(opts?: UpdateManyResolverOpts)`
+
+```ts
+interface UpdateManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `record` argument. */
+  record?: RecordHelperArgsOpts;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  limit?: LimitHelperArgsOpts | false;
+  skip?: false;
+}
+```
+
+### `updateOne(opts?: UpdateOneResolverOpts)`
+
+```ts
+interface UpdateOneResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `record` argument. */
+  record?: RecordHelperArgsOpts;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  skip?: false;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
+}
+```
+
+### Description of common resolvers' options
+
+#### `FilterHelperArgsOpts`
+
+```ts
+type FilterHelperArgsOpts = {
+  /**
+   * Add to filter arg only that fields which are indexed.
+   * If false then all fields will be available for filtering.
+   * By default: true
+   */
+  onlyIndexed?: boolean;
+  /**
+   * You an remove some fields from type via this option.
+   */
+  removeFields?: string | string[];
+  /**
+   * This option makes provided fieldNames as required
+   */
+  requiredFields?: string | string[];
+  /**
+   * Customize operators filtering or disable it at all.
+   * By default, for performance reason, `graphql-compose-mongoose` generates operators
+   * *only for indexed* fields.
+   *
+   * BUT you may enable operators for all fields when creating resolver in the following way:
+   *   // enables all operators for all fields
+   *   operators: true,
+   * OR provide a more granular `operators` configuration to suit your needs:
+   *   operators: {
+   *     // for `age` field add just 3 operators
+   *     age: ['in', 'gt', 'lt'],
+   *     // for non-indexed `amount` field add all operators
+   *     amount: true,
+   *     // don't add this field to operators
+   *     indexedField: false,
+   *   }
+   *
+   * Available logic operators: AND, OR
+   * Available field operators: gt, gte, lt, lte, ne, in, nin, regex, exists
+   */
+  operators?: FieldsOperatorsConfig | false;
+  /**
+   * Make arg `filter` as required if this option is true.
+   */
+  isRequired?: boolean;
+  /**
+   * Base type name for generated filter argument.
+   */
+  baseTypeName?: string;
+  /**
+   * Provide custom prefix for Type name
+   */
+  prefix?: string;
+  /**
+   * Provide custom suffix for Type name
+   */
+  suffix?: string;
+};
+```
+
+#### `SortHelperArgsOpts`
+
+```ts
+type SortHelperArgsOpts = {
+  /**
+   * Allow sort by several fields.
+   * This makes arg as array of sort values.
+   */
+  multi?: boolean;
+  /**
+   * This option set custom type name for generated sort argument.
+   */
+  sortTypeName?: string;
+};
+```
+
+#### `RecordHelperArgsOpts`
+
+```ts
+type RecordHelperArgsOpts = {
+  /**
+   * You an remove some fields from type via this option.
+   */
+  removeFields?: string[];
+  /**
+   * This option makes provided fieldNames as required
+   */
+  requiredFields?: string[];
+  /**
+   * This option makes all fields nullable by default.
+   * May be overridden by `requiredFields` property
+   */
+  allFieldsNullable?: boolean;
+  /**
+   * Provide custom prefix for Type name
+   */
+  prefix?: string;
+  /**
+   * Provide custom suffix for Type name
+   */
+  suffix?: string;
+  /**
+   * Make arg `record` as required if this option is true.
+   */
+  isRequired?: boolean;
+};
+```
+
+#### `LimitHelperArgsOpts`
+
+```ts
+type LimitHelperArgsOpts = {
+  /**
+   * Set limit for default number of returned records
+   * if it does not provided in query.
+   * By default: 100
+   */
+  defaultValue?: number;
+};
+```
+
 ## FAQ
 
 ### Can I get generated vanilla GraphQL types?
 
-```js
-const UserTC = composeWithMongoose(User);
+```ts
+const UserTC = composeMongoose(User);
 UserTC.getType(); // returns GraphQLObjectType
 UserTC.getInputType(); // returns GraphQLInputObjectType, eg. for args
 UserTC.get('languages').getType(); // get GraphQLObjectType for nested field
@@ -266,7 +784,7 @@ UserTC.get('fieldWithNesting.subNesting').getType(); // get GraphQL type of deep
 
 ### How to add custom fields?
 
-```js
+```ts
 UserTC.addFields({
   lonLat: ObjectTypeComposer.create('type LonLat { lon: Float, lat: Float }'),
   notice: 'String', // shorthand definition
@@ -286,11 +804,11 @@ UserTC.addFields({
 
 Suppose you `User` model has `friendsIds` field with array of user ids. So let build some relations:
 
-```js
+```ts
 UserTC.addRelation(
   'friends',
   {
-    resolver: () => UserTC.getResolver('findByIds'),
+    resolver: () => UserTC.mongooseResolvers.dataLoaderMany(),
     prepareArgs: { // resolver `findByIds` has `_ids` arg, let provide value to it
       _ids: (source) => source.friendsIds,
     },
@@ -300,7 +818,7 @@ UserTC.addRelation(
 UserTC.addRelation(
   'adultFriendsWithSameGender',
   {
-    resolver: () => UserTC.get('$findMany'), // shorthand for `UserTC.getResolver('findMany')`
+    resolver: () => UserTC.mongooseResolvers.findMany(),
     prepareArgs: { // resolver `findMany` has `filter` arg, we may provide mongoose query to it
       filter: (source) => ({
         _operators : { // Applying criteria on fields which have
@@ -324,7 +842,7 @@ Also suppose you want the structure to have the same GraphQL type across all par
 (For instance, to allow reuse of fragments for this type)
 Here are Schemas to demonstrate:
 
-```js
+```ts
 import { Schema } from 'mongoose';
 
 const ImageDataStructure = Schema({
@@ -350,7 +868,7 @@ If you want the `ImageDataStructure` to use the same GraphQL type in both `Artic
 
 Do the following:
 
-```js
+```ts
 import { schemaComposer } from 'graphql-compose'; // get the default schemaComposer or your created schemaComposer
 import { convertSchemaToGraphQL } from 'graphql-compose-mongoose';
 
@@ -359,15 +877,15 @@ convertSchemaToGraphQL(ImageDataStructure, 'EmbeddedImage', schemaComposer); // 
 
 Before continuing to convert your models to TypeComposers:
 
-```js
+```ts
 import mongoose from 'mongoose';
-import { composeWithMongoose } from 'graphql-compose-mongoose';
+import { composeMongoose } from 'graphql-compose-mongoose';
 
 const UserProfile = mongoose.model('UserProfile', UserProfile);
 const Article = mongoose.model('Article', Article);
 
-const UserProfileTC = composeWithMongoose(UserProfile);
-const ArticleTC = composeWithMongoose(Article);
+const UserProfileTC = composeMongoose(UserProfile);
+const ArticleTC = composeMongoose(Article);
 ```
 
 Then, you can use queries like this:
@@ -408,13 +926,13 @@ This library provides some amount of ready resolvers for fetch and update data w
 
 The prototype of before save hook:
 
-```js
+```ts
 (doc: mixed, rp: ResolverResolveParams) => Promise<*>,
 ```
 
 The typical implementation may be like this:
 
-```js
+```ts
 // extend resolve params with hook
 rp.beforeRecordMutate = async function(doc, rp) {
   doc.userTouchedAt = new Date();
@@ -430,7 +948,7 @@ rp.beforeRecordMutate = async function(doc, rp) {
 
 You can provide your implementation directly in type composer:
 
-```js
+```ts
 UserTC.wrapResolverResolve('updateById', next => async rp => {
 
   // extend resolve params with hook
@@ -442,7 +960,7 @@ UserTC.wrapResolverResolve('updateById', next => async rp => {
 
 or you can create wrappers for example to protect access:
 
-```js
+```ts
 function adminAccess(resolvers) {
   Object.keys(resolvers).forEach((k) => {
     resolvers[k] = resolvers[k].wrapResolve(next => async rp => {
@@ -458,11 +976,11 @@ function adminAccess(resolvers) {
 
 // and wrap the resolvers
 schemaComposer.Mutation.addFields({
-  createResource: ResourceTC.getResolver('createOne'),
-  createResources: ResourceTC.getResolver('createMany'),
+  createResource: ResourceTC.mongooseResolvers.createOne(),
+  createResources: ResourceTC.mongooseResolvers.createMany(),
   ...adminAccess({
-    updateResource: ResourceTC.getResolver('updateById'),
-    removeResource: ResourceTC.getResolver('removeById'),
+    updateResource: ResourceTC.mongooseResolvers.updateById(),
+    removeResource: ResourceTC.mongooseResolvers.removeById(),
   }),
 });
 ```
@@ -471,23 +989,23 @@ schemaComposer.Mutation.addFields({
 
 The default resolvers, by design, will replace (overwrite) any supplied array object when using e.g. `updateById`. If you want to push or pop a value in an array you can use a custom resolver with a native MongoDB call.
 
-For example (push):-
+For example (push):
 
-```js
-// Define new resolver 'pushToArray'
-UserTC.addResolver({
-  name: 'pushToArray',
-  type: UserTC,
-  args: { userId: 'MongoID!', valueToPush: 'String' },
-  resolve: async ({ source, args, context, info }) => {
-    const user = await User.update({ _id: args.userId }, { $push: { arrayToPushTo: args.valueToPush } })
-    if (!user) return null // or gracefully return an error etc...
-    return User.findOne({ _id: args.userId }) // return the record
+```ts
+schemaComposer.Mutation.addFields({
+  userPushToArray: {
+    type: UserTC,
+    args: { userId: 'MongoID!', valueToPush: 'String' },
+    resolve: async (source, args, context, info) => {
+      const user = await User.update(
+        { _id: args.userId },
+        { $push: { arrayToPushTo: args.valueToPush } }
+      );
+      if (!user) return null // or gracefully return an error etc...
+      return User.findOne({ _id: args.userId }) // return the record
+    }
   }
 })
-
-// Then add 'pushToArray' as a graphql field e.g.
-schemaComposer.Mutation.addFields({userPushToArray: UserTC.getResolver('pushToArray')})
 ```
 
 `User` is the corresponding Mongoose model. If you do not wish to allow duplicates in the array then replace `$push` with `$addToSet`. Read the graphql-compose docs on custom resolvers for more info: https://graphql-compose.github.io/docs/en/basics-resolvers.html
@@ -496,23 +1014,23 @@ NB if you set `unique: true` on the array then using the `update` `$push` approa
 
 ### Is it possible to use several schemas?
 
-By default `composeWithMongoose` uses global `schemaComposer` for generated types. If you need to create different GraphQL schemas you need create own `schemaComposer`s and provide them to `customizationOptions`:
+By default `composeMongoose` uses global `schemaComposer` for generated types. If you need to create different GraphQL schemas you need create own `schemaComposer`s and provide them to `customizationOptions`:
 
-```js
+```ts
 import { SchemaComposer } from 'graphql-compose';
 
 const schema1 = new SchemaComposer();
 const schema2 = new SchemaComposer();
 
-const UserTCForSchema1 = composeWithMongoose(User, { schemaComposer: schema1 });
-const UserTCForSchema2 = composeWithMongoose(User, { schemaComposer: schema2 });
+const UserTCForSchema1 = composeMongoose(User, { schemaComposer: schema1 });
+const UserTCForSchema2 = composeMongoose(User, { schemaComposer: schema2 });
 ```
 
 ### Embedded documents has `_id` field and you don't need it?
 
 Just turn them off in mongoose:
 
-```js
+```ts
 const UsersSchema = new Schema({
   _id: { type: String }
   emails: [{
@@ -527,7 +1045,7 @@ const UsersSchema = new Schema({
 
 Yes, it can. This package understands mongoose [`alias` option](https://mongoosejs.com/docs/guide.html#aliases) for fields. Just provide `alias: 'country'` for field `c` and you get `country` field name in GraphQL schema and Mongoose model but `c` field in database:
 
-```js
+```ts
 const childSchema = new Schema({
   c: {
     type: String,
@@ -536,158 +1054,26 @@ const childSchema = new Schema({
 });
 ```
 
-## Customization options
+## Backers
 
-When we convert model `const UserTC = composeWithMongoose(User, customizationOptions);` you may tune every piece of future derived types and resolvers.
+Thank you to all our backers! 🙏 [[Become a backer](https://opencollective.com/graphql-compose#backer)]
 
-### Here is typed definition of this options:
+<a href="https://opencollective.com/graphql-compose#backers" target="_blank"><img src="https://opencollective.com/graphql-compose/backers.svg?width=890"></a>
 
-The top level of customization options. Here you setup name and description for the main type, remove fields or leave only desired fields.
+## Sponsors
 
-```js
-export type customizationOptions = {
-  schemaComposer?: SchemaComposer<TContext>, // will be used global schema if not provided specific instance
-  name?: string,
-  description?: string,
-  fields?: {
-    only?: string[],
-    remove?: string[],
-  },
-  inputType?: typeConverterInputTypeOpts,
-  resolvers?: false | typeConverterResolversOpts,
-};
-```
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [[Become a sponsor](https://opencollective.com/graphql-compose#sponsor)]
 
-This is `opts.inputType` level of options for default InputTypeObject which will be provided to all resolvers for `filter` and `input` args.
-
-```js
-export type typeConverterInputTypeOpts = {
-  name?: string,
-  description?: string,
-  fields?: {
-    only?: string[],
-    remove?: string[],
-    required?: string[]
-  },
-};
-```
-
-This is `opts.resolvers` level of options.
-If you set the option to `false` it will disable resolver or some of its input args.
-Every resolver's arg has it own options. They described below.
-
-```js
-export type typeConverterResolversOpts = {
-  findById?: false,
-  findByIds?: false | {
-    limit?: limitHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
-  },
-  findOne?: false | {
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
-    skip?: false,
-  },
-  findMany?: false | {
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
-    limit?: limitHelperArgsOpts | false,
-    skip?: false,
-  },
-  updateById?: false | {
-    record?: recordHelperArgsOpts | false,
-  },
-  updateOne?: false | {
-    record?: recordHelperArgsOpts | false,
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
-    skip?: false,
-  },
-  updateMany?: false | {
-    record?: recordHelperArgsOpts | false,
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
-    limit?: limitHelperArgsOpts | false,
-    skip?: false,
-  },
-  removeById?: false,
-  removeOne?: false | {
-    filter?: filterHelperArgsOpts | false,
-    sort?: sortHelperArgsOpts | false,
-  },
-  removeMany?: false | {
-    filter?: filterHelperArgsOpts | false,
-  },
-  createOne?: false | {
-    record?: recordHelperArgsOpts | false,
-  },
-  createMany?: false | {
-    records?: recordHelperArgsOpts | false,
-  },
-  count?: false | {
-    filter?: filterHelperArgsOpts | false,
-  },
-  connection?: false | {
-    uniqueFields: string[],
-    sortValue: mixed,
-    directionFilter: (<T>(filterArg: T, cursorData: CursorDataType, isBefore: boolean) => T),
-  },
-  pagination?: false | {
-    perPage?: number,
-  },
-};
-```
-
-This is `opts.resolvers.[resolverName].[filter|sort|record|limit]` level of options.
-You may tune every resolver's args independently as you wish.
-Here you may setup every argument and override some fields from the default input object type, described above in `opts.inputType`.
-
-```js
-export type filterHelperArgsOpts = {
-  filterTypeName?: string, // type name for `filter`
-  isRequired?: boolean, // set `filter` arg as required (wraps in GraphQLNonNull)
-  onlyIndexed?: boolean, // leave only that fields, which is indexed in mongodb
-  requiredFields?: string | string[], // provide fieldNames, that should be required
-  operators?: filterOperatorsOpts | false, // provide filtering fields by operators, eg. $lt, $gt
-                                           // if left empty - provides all operators on indexed fields
-};
-
-// supported operators names in filter `arg`
-export type filterOperatorNames =  'gt' | 'gte' | 'lt' | 'lte' | 'ne' | 'in[]' | 'nin[]';
-export type filterOperatorsOpts = { [fieldName: string]: filterOperatorNames[] | false };
-
-export type sortHelperArgsOpts = {
-  sortTypeName?: string, // type name for `sort`
-};
-
-export type recordHelperArgsOpts = {
-  recordTypeName?: string, // type name for `record`
-  isRequired?: boolean, // set `record` arg as required (wraps in GraphQLNonNull)
-  removeFields?: string[], // provide fieldNames, that should be removed
-  requiredFields?: string[], // provide fieldNames, that should be required
-};
-
-export type limitHelperArgsOpts = {
-  defaultValue?: number, // set your default limit, if it not provided in query (default: 1000)
-};
-```
-
-## Used plugins
-
-### [graphql-compose-connection](https://github.com/graphql-compose/graphql-compose-connection)
-
-This plugin adds `connection` resolver. Build in mechanism allows sort by any unique indexes (not only by id). Also supported compound sorting (by several fields).
-
-Besides standard connection arguments `first`, `last`, `before` and `after`, also added great arguments:
-
-- `filter` arg - for filtering records
-- `sort` arg - for sorting records
-
-This plugin completely follows to [Relay Cursor Connections Specification](https://facebook.github.io/relay/graphql/connections.htm).
-
-### [graphql-compose-pagination](https://github.com/graphql-compose/graphql-compose-pagination)
-
-This plugin adds `pagination` resolver.
+<a href="https://opencollective.com/graphql-compose/sponsor/0/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/0/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-compose/sponsor/1/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/1/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-compose/sponsor/2/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/2/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-compose/sponsor/3/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/3/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-compose/sponsor/4/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/4/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-compose/sponsor/5/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/5/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-compose/sponsor/6/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/6/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-compose/sponsor/7/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/7/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-compose/sponsor/8/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/8/avatar.svg"></a>
+<a href="https://opencollective.com/graphql-compose/sponsor/9/website" target="_blank"><img src="https://opencollective.com/graphql-compose/sponsor/9/avatar.svg"></a>
 
 ## License
 

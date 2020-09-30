@@ -7,13 +7,31 @@ import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNull
 import { Document } from 'mongoose';
 
 export type RecordHelperArgsOpts = {
-  prefix?: string;
-  suffix?: string;
-  isRequired?: boolean;
+  /**
+   * You an remove some fields from type via this option.
+   */
   removeFields?: string[];
+  /**
+   * This option makes provided fieldNames as required
+   */
   requiredFields?: string[];
-  /** Make all fields nullable by default. May be overridden by `requiredFields` property */
+  /**
+   * This option makes all fields nullable by default.
+   * May be overridden by `requiredFields` property
+   */
   allFieldsNullable?: boolean;
+  /**
+   * Provide custom prefix for Type name
+   */
+  prefix?: string;
+  /**
+   * Provide custom suffix for Type name
+   */
+  suffix?: string;
+  /**
+   * Make arg `record` as required if this option is true.
+   */
+  isRequired?: boolean;
 };
 
 // for merging, discriminators merge-able only
