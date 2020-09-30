@@ -7,7 +7,7 @@ describe('Resolver helper `limit` ->', () => {
       expect(args.limit.type).toBe('Int');
     });
     it('should process `opts.defaultValue` arg', () => {
-      expect((limitHelperArgs() as any).limit.defaultValue).toBe(1000);
+      expect((limitHelperArgs() as any).limit.defaultValue).toBe(100);
       expect(
         (limitHelperArgs({
           defaultValue: 333,

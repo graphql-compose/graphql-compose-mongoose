@@ -187,6 +187,6 @@ describe('findMany() ->', () => {
       }`,
     });
     expect(res).toEqual([{ name: 'userName1' }, { name: 'userName2' }]);
-    expect(spyQuery?.options).toEqual({ limit: 1000, sort: { _id: 1, name: 1 } });
+    expect(spyQuery?.options).toEqual({ limit: 100, sort: { _id: 1, name: 1 } });
   });
 });
