@@ -6,29 +6,79 @@ import { resolverFactory } from './resolvers';
 import MongoID from './types/MongoID';
 
 export type TypeConverterInputTypeOpts = {
+  /**
+   * What should be input type name.
+   * By default: baseTypeName + 'Input'
+   */
   name?: string;
+  /**
+   * Provide arbitrary description for generated type.
+   */
   description?: string;
+  /**
+   * You can leave only whitelisted fields in type via this option.
+   * Any other fields will be removed.
+   */
+  onlyFields?: string[];
+  /**
+   * You an remove some fields from type via this option.
+   */
+  removeFields?: string[];
+  /**
+   * This option makes provided fieldNames as required
+   */
+  requiredFields?: string[];
+
+  /** @deprecated */
   fields?: {
+    /** @deprecated use `onlyFields` instead */
     only?: string[];
+    /** @deprecated use `removeFields` instead */
     remove?: string[];
+    /** @deprecated use `requiredFields` instead */
     required?: string[];
   };
 };
 
-export type ComposeMongooseOpts<TContext> = {
+export type ComposeMongooseOpts<TContext = any> = {
+  /**
+   * Which type registry use for generated types.
+   * By default is used global default registry.
+   */
   schemaComposer?: SchemaComposer<TContext>;
+  /**
+   * What should be base type name for generated type from mongoose model.
+   */
   name?: string;
+  /**
+   * Provide arbitrary description for generated type.
+   */
   description?: string;
-  fields?: {
-    only?: string[];
-    // rename?: { [oldName: string]: string },
-    remove?: string[];
-  };
+  /**
+   * You can leave only whitelisted fields in type via this option.
+   * Any other fields will be removed.
+   */
+  onlyFields?: string[];
+  /**
+   * You an remove some fields from type via this option.
+   */
+  removeFields?: string[];
+  /**
+   * You may configure generated InputType
+   */
   inputType?: TypeConverterInputTypeOpts;
   /**
    * You can make fields as NonNull if they have default value in mongoose model.
    */
   defaultsAsNonNull?: boolean;
+
+  /** @deprecated */
+  fields?: {
+    /** @deprecated use `onlyFields` */
+    only?: string[];
+    /** @deprecated use `removeFields` */
+    remove?: string[];
+  };
 };
 
 export type GenerateResolverType<TDoc extends Document, TContext = any> = {
@@ -77,9 +127,7 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
     tc.setDescription(opts.description);
   }
 
-  if (opts.fields) {
-    prepareFields(tc, opts.fields);
-  }
+  prepareFields(tc, opts);
 
   // generate InputObjectType with required fields,
   // before we made fields with default values required too
@@ -135,20 +183,15 @@ function makeFieldsNonNullWithDefaultValues(
 
 export function prepareFields(
   tc: ObjectTypeComposer<any, any>,
-  opts: {
-    only?: string[];
-    remove?: string[];
-  }
+  opts: ComposeMongooseOpts<any> = {}
 ): void {
-  if (Array.isArray(opts.only)) {
-    const onlyFieldNames: string[] = opts.only;
-    const removeFields = Object.keys(tc.getFields()).filter(
-      (fName) => onlyFieldNames.indexOf(fName) === -1
-    );
-    tc.removeField(removeFields);
+  const onlyFields = opts?.onlyFields || opts?.fields?.only;
+  if (onlyFields) {
+    tc.removeOtherFields(onlyFields);
   }
-  if (opts.remove) {
-    tc.removeField(opts.remove);
+  const removeFields = opts?.removeFields || opts?.fields?.remove;
+  if (removeFields) {
+    tc.removeField(removeFields);
   }
 }
 
@@ -166,30 +209,25 @@ export function createInputType(
     inputTypeComposer.setDescription(inputTypeOpts.description);
   }
 
-  if (inputTypeOpts.fields) {
-    prepareInputFields(inputTypeComposer, inputTypeOpts.fields);
-  }
+  prepareInputFields(inputTypeComposer, inputTypeOpts);
 }
 
 export function prepareInputFields(
   inputTypeComposer: InputTypeComposer<any>,
-  inputFieldsOpts: {
-    only?: string[];
-    remove?: string[];
-    required?: string[];
-  }
+  inputTypeOpts: TypeConverterInputTypeOpts = {}
 ): void {
-  if (Array.isArray(inputFieldsOpts.only)) {
-    const onlyFieldNames: string[] = inputFieldsOpts.only;
-    const removeFields = Object.keys(inputTypeComposer.getFields()).filter(
-      (fName) => onlyFieldNames.indexOf(fName) === -1
-    );
+  const onlyFields = inputTypeOpts?.onlyFields || inputTypeOpts?.fields?.only;
+  if (onlyFields) {
+    inputTypeComposer.removeOtherFields(onlyFields);
+  }
+
+  const removeFields = inputTypeOpts?.removeFields || inputTypeOpts?.fields?.remove;
+  if (removeFields) {
     inputTypeComposer.removeField(removeFields);
   }
-  if (inputFieldsOpts.remove) {
-    inputTypeComposer.removeField(inputFieldsOpts.remove);
-  }
-  if (inputFieldsOpts.required) {
-    inputTypeComposer.makeFieldNonNull(inputFieldsOpts.required);
+
+  const requiredFields = inputTypeOpts?.requiredFields || inputTypeOpts?.fields?.required;
+  if (requiredFields) {
+    inputTypeComposer.makeFieldNonNull(requiredFields);
   }
 }

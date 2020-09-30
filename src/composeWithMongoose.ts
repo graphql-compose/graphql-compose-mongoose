@@ -57,9 +57,7 @@ export function composeWithMongoose<TDoc extends Document, TContext = any>(
     tc.setDescription(opts.description);
   }
 
-  if (opts.fields) {
-    prepareFields(tc, opts.fields);
-  }
+  prepareFields(tc, opts);
 
   createInputType(tc, opts.inputType);
 
