@@ -25,6 +25,10 @@ export type ComposeMongooseOpts<TContext> = {
     remove?: string[];
   };
   inputType?: TypeConverterInputTypeOpts;
+  /**
+   * You can make fields as NonNull if they have default value in mongoose model.
+   */
+  defaultsAsNonNull?: boolean;
 };
 
 export type GenerateResolverType<TDoc extends Document, TContext = any> = {
@@ -84,7 +88,9 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
   // but do it AFTER input object type generation
   // NonNull fields !== Required field
   // default values should not affect on that input fields became required
-  makeFieldsNonNullWithDefaultValues(tc);
+  if (opts.defaultsAsNonNull) {
+    makeFieldsNonNullWithDefaultValues(tc);
+  }
 
   tc.makeFieldNonNull('_id');
 

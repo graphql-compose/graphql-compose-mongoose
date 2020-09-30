@@ -32,7 +32,7 @@ interface IUser extends Document {
 }
 
 const UserModel = mongoose.model<IUser>('User', UserSchema);
-const UserTC = composeMongoose(UserModel, { schemaComposer });
+const UserTC = composeMongoose(UserModel, { schemaComposer, defaultsAsNonNull: true });
 
 schemaComposer.Query.addFields({
   userById: UserTC.mongooseResolvers.findById(),
@@ -61,7 +61,7 @@ describe('issue #261 - Non-nullability for mongoose fields that have a default v
     );
   });
 
-  it('UserTC should have non-null fields if default value is provided', () => {
+  it('UserTC should have non-null fields if default value is provided and option `defaultsAsNonNull`', () => {
     expect(UserTC.toSDL({ deep: true, omitScalars: true })).toBe(dedent`
       type User {
         _id: Int!
@@ -77,6 +77,32 @@ describe('issue #261 - Non-nullability for mongoose fields that have a default v
       }
       
       type UserPeriods {
+        from: Float
+        to: Float
+      }
+    `);
+  });
+
+  it('UserTC should not have non-null fields which have default values', () => {
+    const UserWithoutDefaultsTC = composeMongoose(UserModel, {
+      schemaComposer: new SchemaComposer(),
+      name: 'UserWithoutDefaults',
+    });
+    expect(UserWithoutDefaultsTC.toSDL({ deep: true, omitScalars: true })).toBe(dedent`
+      type UserWithoutDefaults {
+        _id: Int!
+        name: String
+        age: Float
+        isActive: Boolean
+        analytics: UserWithoutDefaultsAnalytics
+        periods: [UserWithoutDefaultsPeriods]
+      }
+      
+      type UserWithoutDefaultsAnalytics {
+        isEnabled: Boolean
+      }
+      
+      type UserWithoutDefaultsPeriods {
         from: Float
         to: Float
       }
