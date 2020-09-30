@@ -76,7 +76,16 @@ describe('Resolver helper `sort` ->', () => {
       const args: any = sortHelperArgs(UserTC, UserModel, {
         sortTypeName: 'SortInput',
       });
+      expect(args.sort.type.getTypeName()).toBe('SortInput');
       expect(args.sort.type).toBeInstanceOf(EnumTypeComposer);
+    });
+
+    it('should return sort field as List', () => {
+      const args: any = sortHelperArgs(UserTC, UserModel, {
+        sortTypeName: 'SortInput',
+        multi: true,
+      });
+      expect(args.sort.type.getTypeName()).toBe('[SortInput!]');
     });
   });
 

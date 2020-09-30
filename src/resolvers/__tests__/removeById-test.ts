@@ -3,10 +3,11 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import removeById from '../removeById';
-import GraphQLMongoID from '../../types/mongoid';
+import { removeById } from '../removeById';
+import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -59,17 +60,34 @@ describe('removeById() ->', () => {
     });
 
     it('should rejected with Error if args._id is empty', async () => {
-      const result = removeById(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      const result = removeById(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
+      await expect(result).rejects.toThrow('User.removeById resolver requires args._id value');
     });
 
-    it('should return payload.recordId', async () => {
-      const result = await removeById(UserModel, UserTC).resolve({
-        args: {
-          _id: user.id,
-        },
+    it('should return payload.recordId when it requested', async () => {
+      const result = await testFieldConfig({
+        field: removeById(UserModel, UserTC),
+        args: { _id: user.id },
+        selection: `{
+          recordId
+        }`,
       });
       expect(result.recordId).toBe(user.id);
+    });
+
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = removeById(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('resolver requires args._id'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError('resolver requires args._id');
     });
 
     it('should remove document in database', async () => {
@@ -144,7 +162,7 @@ describe('removeById() ->', () => {
           return record;
         },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow('Denied due context ReadOnly');
       const exist = await UserModel.collection.findOne({ _id: user._id });
       expect(exist.n).toBe(user.name);
     });

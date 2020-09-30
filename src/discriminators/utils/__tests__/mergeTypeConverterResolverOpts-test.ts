@@ -1,12 +1,12 @@
-import type { TypeConverterResolversOpts } from '../../../composeWithMongoose';
 import {
   mergeTypeConverterResolverOpts,
   mergePrimitiveTypeFields,
   mergeMapTypeFields,
   mergeFilterOperatorsOptsMap,
 } from '../mergeTypeConverterResolversOpts';
+import { AllResolversOpts } from 'src/resolvers';
 
-const baseConverterResolverOpts: TypeConverterResolversOpts = {
+const baseConverterResolverOpts: AllResolversOpts = {
   findMany: {
     limit: { defaultValue: 20 },
     // sort: false,
@@ -16,7 +16,7 @@ const baseConverterResolverOpts: TypeConverterResolversOpts = {
       removeFields: ['id', 'dob'],
       operators: {
         one: ['gt', 'gte', 'lt'],
-        two: ['gt', 'gte', 'lt', 'in[]', 'nin[]'],
+        two: ['gt', 'gte', 'lt', 'in', 'nin'],
       },
     },
   },
@@ -33,7 +33,7 @@ const baseConverterResolverOpts: TypeConverterResolversOpts = {
   },
 };
 
-const childConverterResolverOpts: TypeConverterResolversOpts = {
+const childConverterResolverOpts: AllResolversOpts = {
   findMany: {
     limit: { defaultValue: 50 },
     sort: false,
@@ -41,7 +41,7 @@ const childConverterResolverOpts: TypeConverterResolversOpts = {
     filter: {
       removeFields: ['gender', 'dob', 'age'],
       operators: {
-        one: ['gt', 'lte', 'ne', 'in[]', 'nin[]'],
+        one: ['gt', 'lte', 'ne', 'in', 'nin'],
         two: ['gt', 'gte', 'lt', 'lte', 'ne'],
         three: ['gte', 'lt'],
       },
@@ -59,7 +59,7 @@ const childConverterResolverOpts: TypeConverterResolversOpts = {
   },
 };
 
-const expectedConverterResolverOpts: TypeConverterResolversOpts = {
+const expectedConverterResolverOpts: AllResolversOpts = {
   findMany: {
     limit: { defaultValue: 50 },
     sort: false,
@@ -68,8 +68,8 @@ const expectedConverterResolverOpts: TypeConverterResolversOpts = {
       isRequired: true,
       removeFields: ['id', 'dob', 'gender', 'age'],
       operators: {
-        one: ['gt', 'gte', 'lt', 'lte', 'ne', 'in[]', 'nin[]'],
-        two: ['gt', 'gte', 'lt', 'in[]', 'nin[]', 'lte', 'ne'],
+        one: ['gt', 'gte', 'lt', 'lte', 'ne', 'in', 'nin'],
+        two: ['gt', 'gte', 'lt', 'in', 'nin', 'lte', 'ne'],
         three: ['gte', 'lt'],
       },
     },

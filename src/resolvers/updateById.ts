@@ -1,15 +1,32 @@
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { toInputType } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { recordHelperArgs } from './helpers/record';
-import findById from './findById';
+import { recordHelperArgs, RecordHelperArgsOpts } from './helpers/record';
+import { findById } from './findById';
+import { addErrorCatcherField } from './helpers/errorCatcher';
+import type { ExtendedResolveParams } from './index';
+import { validateAndThrow } from './helpers/validate';
+import { PayloadRecordIdHelperOpts, payloadRecordId } from './helpers/payloadRecordId';
 
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+export interface UpdateByIdResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `record` argument. */
+  record?: RecordHelperArgsOpts;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
+}
 
-export default function updateById<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
-): Resolver<TSource, TContext> {
+type TArgs = {
+  _id: any;
+  record: any;
+};
+
+export function updateById<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  opts?: UpdateByIdResolverOpts
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateById() should be instance of Mongoose Model.');
   }
@@ -22,13 +39,10 @@ export default function updateById<TSource = Document, TContext = any>(
 
   const findByIdResolver = findById(model, tc);
 
-  const outputTypeName = `UpdateById${tc.getTypeName()}Payload`;
+  const outputTypeName = `UpdateById${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
-    t.addFields({
-      recordId: {
-        type: 'MongoID',
-        description: 'Updated document ID',
-      },
+    t.setFields({
+      ...payloadRecordId(tc, opts?.recordId),
       record: {
         type: tc,
         description: 'Updated document',
@@ -36,7 +50,7 @@ export default function updateById<TSource = Document, TContext = any>(
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'updateById',
     kind: 'mutation',
     description:
@@ -47,17 +61,18 @@ export default function updateById<TSource = Document, TContext = any>(
       '4) And save it.',
     type: outputType,
     args: {
+      _id: tc.hasField('_id') ? toInputType(tc.getFieldTC('_id')).NonNull : 'MongoID!',
       ...recordHelperArgs(tc, {
+        removeFields: ['_id', 'id'], // pull out `_id` to top-level
         prefix: 'UpdateById',
-        suffix: 'Input',
-        requiredFields: ['_id'],
+        suffix: `${opts?.suffix || ''}Input`,
         isRequired: true,
         allFieldsNullable: true,
-        ...(opts && opts.record),
+        ...opts?.record,
       }),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || {};
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
+      const recordData = resolveParams?.args?.record;
 
       if (!(typeof recordData === 'object')) {
         return Promise.reject(
@@ -65,21 +80,18 @@ export default function updateById<TSource = Document, TContext = any>(
         );
       }
 
-      if (!recordData._id) {
+      if (!resolveParams?.args?._id) {
         return Promise.reject(
-          new Error(`${tc.getTypeName()}.updateById resolver requires args.record._id value`)
+          new Error(`${tc.getTypeName()}.updateById resolver requires args._id value`)
         );
       }
 
-      resolveParams.args._id = recordData._id;
       delete recordData._id;
 
       // We should get all data for document, cause Mongoose model may have hooks/middlewares
       // which required some fields which not in graphql projection
       // So empty projection returns all fields.
-      resolveParams.projection = {};
-
-      let doc = await findByIdResolver.resolve(resolveParams);
+      let doc: TDoc = await findByIdResolver.resolve({ ...resolveParams, projection: {} });
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
@@ -89,17 +101,25 @@ export default function updateById<TSource = Document, TContext = any>(
         throw new Error('Document not found');
       }
 
-      if (recordData) {
-        doc.set(recordData);
-        await doc.save();
+      if (!recordData) {
+        throw new Error(
+          `${tc.getTypeName()}.updateById resolver doesn't receive new data in args.record`
+        );
       }
+
+      doc.set(recordData);
+      await validateAndThrow(doc);
+      await doc.save({ validateBeforeSave: false });
 
       return {
         record: doc,
-        recordId: tc.getRecordIdFn()(doc),
       };
     }) as any,
   });
+
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
+  addErrorCatcherField(resolver);
 
   return resolver;
 }

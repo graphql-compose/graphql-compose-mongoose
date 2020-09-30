@@ -1,19 +1,13 @@
 /* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
-import type { ObjectTypeComposer, InputTypeComposer, SchemaComposer } from 'graphql-compose';
+import type { ObjectTypeComposer, SchemaComposer } from 'graphql-compose';
 import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
-import type { Model } from 'mongoose';
+import type { Model, Document } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
-import * as resolvers from './resolvers';
-import type {
-  FilterHelperArgsOpts,
-  LimitHelperArgsOpts,
-  SortHelperArgsOpts,
-  RecordHelperArgsOpts,
-} from './resolvers/helpers';
-import MongoID from './types/mongoid';
-import type { PaginationResolverOpts } from './resolvers/pagination';
-import type { ConnectionOpts } from './resolvers/connection';
+import { resolverFactory, AllResolversOpts } from './resolvers';
+import MongoID from './types/MongoID';
+import { GraphQLResolveInfo } from 'graphql';
+import { TypeConverterInputTypeOpts, prepareFields, createInputType } from './composeMongoose';
 
 export type ComposeWithMongooseOpts<TContext> = {
   schemaComposer?: SchemaComposer<TContext>;
@@ -25,99 +19,21 @@ export type ComposeWithMongooseOpts<TContext> = {
     remove?: string[];
   };
   inputType?: TypeConverterInputTypeOpts;
-  resolvers?: false | TypeConverterResolversOpts;
+  resolvers?: false | AllResolversOpts;
+  /** You may customize document id */
+  transformRecordId?: TransformRecordIdFn<TContext>;
 };
 
-export type TypeConverterInputTypeOpts = {
-  name?: string;
-  description?: string;
-  fields?: {
-    only?: string[];
-    remove?: string[];
-    required?: string[];
-  };
-};
+export type TransformRecordIdFn<TContext = any> = (
+  source: Document,
+  context: TContext,
+  info: GraphQLResolveInfo
+) => any;
 
-export type TypeConverterResolversOpts = {
-  findById?: false;
-  findByIds?:
-    | false
-    | {
-        limit?: LimitHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-      };
-  findOne?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        skip?: false;
-      };
-  findMany?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        limit?: LimitHelperArgsOpts | false;
-        skip?: false;
-      };
-  updateById?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-      };
-  updateOne?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        skip?: false;
-      };
-  updateMany?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-        limit?: LimitHelperArgsOpts | false;
-        skip?: false;
-      };
-  removeById?: false;
-  removeOne?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-        sort?: SortHelperArgsOpts | false;
-      };
-  removeMany?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-      };
-  createOne?:
-    | false
-    | {
-        record?: RecordHelperArgsOpts | false;
-      };
-  createMany?:
-    | false
-    | {
-        records?: RecordHelperArgsOpts | false;
-      };
-  count?:
-    | false
-    | {
-        filter?: FilterHelperArgsOpts | false;
-      };
-  connection?: ConnectionOpts<any> | false;
-  pagination?: PaginationResolverOpts | false;
-};
-
-export function composeWithMongoose<TSource, TContext>(
-  model: Model<any>,
+export function composeWithMongoose<TDoc extends Document, TContext = any>(
+  model: Model<TDoc>,
   opts: ComposeWithMongooseOpts<TContext> = {}
-): ObjectTypeComposer<TSource, TContext> {
+): ObjectTypeComposer<TDoc, TContext> {
   const m: Model<any> = model;
   const name: string = (opts && opts.name) || m.modelName;
 
@@ -141,11 +57,7 @@ export function composeWithMongoose<TSource, TContext>(
     tc.setDescription(opts.description);
   }
 
-  if (opts.fields) {
-    prepareFields(tc, opts.fields);
-  }
-
-  tc.setRecordIdFn((source) => (source ? `${(source as any)._id}` : ''));
+  prepareFields(tc, opts);
 
   createInputType(tc, opts.inputType);
 
@@ -158,76 +70,14 @@ export function composeWithMongoose<TSource, TContext>(
   return tc;
 }
 
-export function prepareFields(
-  tc: ObjectTypeComposer<any, any>,
-  opts: {
-    only?: string[];
-    remove?: string[];
-  }
-) {
-  if (Array.isArray(opts.only)) {
-    const onlyFieldNames: string[] = opts.only;
-    const removeFields = Object.keys(tc.getFields()).filter(
-      (fName) => onlyFieldNames.indexOf(fName) === -1
-    );
-    tc.removeField(removeFields);
-  }
-  if (opts.remove) {
-    tc.removeField(opts.remove);
-  }
-}
-
-export function prepareInputFields(
-  inputTypeComposer: InputTypeComposer<any>,
-  inputFieldsOpts: {
-    only?: string[];
-    remove?: string[];
-    required?: string[];
-  }
-) {
-  if (Array.isArray(inputFieldsOpts.only)) {
-    const onlyFieldNames: string[] = inputFieldsOpts.only;
-    const removeFields = Object.keys(inputTypeComposer.getFields()).filter(
-      (fName) => onlyFieldNames.indexOf(fName) === -1
-    );
-    inputTypeComposer.removeField(removeFields);
-  }
-  if (inputFieldsOpts.remove) {
-    inputTypeComposer.removeField(inputFieldsOpts.remove);
-  }
-  if (inputFieldsOpts.required) {
-    inputTypeComposer.makeFieldNonNull(inputFieldsOpts.required);
-  }
-}
-
-export function createInputType(
-  tc: ObjectTypeComposer<any, any>,
-  inputTypeOpts: TypeConverterInputTypeOpts = {}
-): void {
-  const inputTypeComposer = tc.getInputTypeComposer();
-
-  if (inputTypeOpts.name) {
-    inputTypeComposer.setTypeName(inputTypeOpts.name);
-  }
-
-  if (inputTypeOpts.description) {
-    inputTypeComposer.setDescription(inputTypeOpts.description);
-  }
-
-  if (inputTypeOpts.fields) {
-    prepareInputFields(inputTypeComposer, inputTypeOpts.fields);
-  }
-}
-
 export function createResolvers(
   model: Model<any>,
   tc: ObjectTypeComposer<any, any>,
-  opts: TypeConverterResolversOpts
+  opts: AllResolversOpts
 ): void {
-  const names = resolvers.getAvailableNames();
-  names.forEach((resolverName) => {
-    if (!{}.hasOwnProperty.call(opts, resolverName) || opts[resolverName] !== false) {
-      const createResolverFn = resolvers[resolverName] as any;
+  (Object.keys(resolverFactory) as any).forEach((resolverName: keyof typeof resolverFactory) => {
+    if (!opts.hasOwnProperty(resolverName) || opts[resolverName] !== false) {
+      const createResolverFn = resolverFactory[resolverName] as any;
       if (typeof createResolverFn === 'function') {
         const resolver = createResolverFn(model, tc, opts[resolverName] || {});
         if (resolver) {

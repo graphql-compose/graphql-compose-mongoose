@@ -1,7 +1,7 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLInt } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
-import count from '../count';
+import { count } from '../count';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
@@ -61,7 +61,7 @@ describe('count() ->', () => {
       const resolver = count(UserModel, UserTC);
       expect(resolver.getArgITC('filter').getFieldITC('contacts').toSDL({ omitDescriptions: true }))
         .toMatchInlineSnapshot(`
-        "input FilterUserContactsInput {
+        "input FilterCountUserContactsInput {
           phones: [String]
           email: String
           skype: String

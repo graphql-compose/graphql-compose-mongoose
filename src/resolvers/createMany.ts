@@ -1,28 +1,28 @@
-import type { ObjectTypeComposer, Resolver } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { recordHelperArgs } from './helpers';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import { recordHelperArgs, RecordHelperArgsOpts } from './helpers';
+import { addErrorCatcherField } from './helpers/errorCatcher';
+import { validateManyAndThrow } from './helpers/validate';
+import { payloadRecordIds, PayloadRecordIdsHelperOpts } from './helpers/payloadRecordId';
 
-async function createSingle(
-  model: Model<any>,
-  recordData: any,
-  resolveParams: ExtendedResolveParams
-) {
-  // eslint-disable-next-line new-cap
-  let doc = new model(recordData);
-  if (resolveParams.beforeRecordMutate) {
-    doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
-    if (!doc) return null;
-  }
-
-  return doc.save();
+export interface CreateManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `records` argument. */
+  records?: RecordHelperArgsOpts;
+  /** Customize payload.recordIds field. If false, then this field will be removed. */
+  recordIds?: PayloadRecordIdsHelperOpts | false;
 }
 
-export default function createMany<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
-): Resolver<TSource, TContext, any> {
+type TArgs = {
+  records: any[];
+};
+
+export function createMany<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  opts?: CreateManyResolverOpts
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver createMany() should be instance of Mongoose Model.');
   }
@@ -44,25 +44,23 @@ export default function createMany<TSource = Document, TContext = any>(
     }
   }
 
-  const outputTypeName = `CreateMany${tc.getTypeName()}Payload`;
+  const outputTypeName = `CreateMany${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
-    t.addFields({
-      recordIds: {
-        type: '[MongoID!]!',
-        description: 'Created document ID',
-      },
+    t.setFields({
+      ...payloadRecordIds(tc, opts?.recordIds),
       records: {
-        type: tc.getTypeNonNull().getTypePlural().getTypeNonNull(),
+        type: tc.NonNull.List,
         description: 'Created documents',
       },
-      createCount: {
+      createdCount: {
         type: 'Int!',
-        description: 'Count of all documents created',
+        description: 'Number of created documents',
+        resolve: (s: any) => s.createdCount || 0,
       },
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'createMany',
     kind: 'mutation',
     description: 'Creates Many documents with mongoose defaults, setters, hooks and validation',
@@ -71,16 +69,16 @@ export default function createMany<TSource = Document, TContext = any>(
       records: {
         type: (recordHelperArgs(tc, {
           prefix: 'CreateMany',
-          suffix: 'Input',
+          suffix: `${opts?.suffix || ''}Input`,
           removeFields: ['id', '_id'],
           isRequired: true,
           requiredFields,
-          ...(opts && opts.records),
+          ...opts?.records,
         }) as any).record.type.List.NonNull,
       },
     },
     resolve: async (resolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.records) || [];
+      const recordData = resolveParams?.args?.records;
 
       if (!Array.isArray(recordData) || recordData.length === 0) {
         throw new Error(
@@ -96,30 +94,29 @@ export default function createMany<TSource = Document, TContext = any>(
         }
       }
 
-      const recordPromises = [];
-      // concurrently create docs
+      const docs = [] as TDoc[];
       for (const record of recordData) {
-        recordPromises.push(createSingle(model, record, resolveParams as ExtendedResolveParams));
-      }
-
-      const results = await Promise.all(recordPromises);
-      const returnObj = {
-        records: [] as any[],
-        recordIds: [] as any[],
-        createCount: 0,
-      };
-
-      for (const doc of results) {
-        if (doc) {
-          returnObj.createCount += 1;
-          returnObj.records.push(doc);
-          returnObj.recordIds.push(doc._id);
+        // eslint-disable-next-line new-cap
+        let doc = new model(record);
+        if (resolveParams.beforeRecordMutate) {
+          doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
         }
+        docs.push(doc);
       }
 
-      return returnObj;
+      await validateManyAndThrow(docs);
+      await model.create(docs as any, { validateBeforeSave: false });
+
+      return {
+        records: docs,
+        createdCount: docs.length,
+      };
     },
   });
+
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
+  addErrorCatcherField(resolver);
 
   return resolver;
 }

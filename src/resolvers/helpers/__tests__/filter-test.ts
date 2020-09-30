@@ -3,17 +3,16 @@ import {
   ObjectTypeComposer,
   InputTypeComposer,
   NonNullComposer,
-  ListComposer,
 } from 'graphql-compose';
 import { filterHelperArgs, filterHelper } from '../filter';
 import { OPERATORS_FIELDNAME } from '../filterOperators';
 import { UserModel } from '../../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../../fieldsConverter';
-import { prepareAliases } from '../aliases';
+import { prepareNestedAliases } from '../aliases';
 
 describe('Resolver helper `filter` ->', () => {
   let UserTC: ObjectTypeComposer<any, any>;
-  const aliases = prepareAliases(UserModel);
+  const aliases = prepareNestedAliases(UserModel.schema);
 
   beforeEach(() => {
     schemaComposer.clear();
@@ -47,17 +46,6 @@ describe('Resolver helper `filter` ->', () => {
         suffix: 'Type',
       });
       expect(args.filter.type).toBeInstanceOf(InputTypeComposer);
-    });
-
-    it('should return filter with field _ids', () => {
-      const args = filterHelperArgs(UserTC, UserModel, {
-        prefix: 'Filter',
-        suffix: 'Type',
-      });
-      const itc = args.filter.type as InputTypeComposer;
-      const ft = itc.getField('_ids').type as ListComposer<any>;
-      expect(ft).toBeInstanceOf(ListComposer);
-      expect(ft.ofType.getTypeName()).toBe('MongoID');
     });
 
     it('should for opts.isRequired=true return GraphQLNonNull', () => {
@@ -167,17 +155,6 @@ describe('Resolver helper `filter` ->', () => {
       };
       filterHelper(resolveParams, aliases);
       expect(spyWhereFn).toBeCalledWith({ n: 'nodkz' });
-    });
-
-    it('should call query.where if args.filter provided with _ids', () => {
-      resolveParams.args = {
-        filter: {
-          age: 30,
-          _ids: [1, 2, 3],
-        },
-      };
-      filterHelper(resolveParams, aliases);
-      expect(spyWhereFn.mock.calls).toEqual([[{ _id: { $in: [1, 2, 3] } }], [{ age: 30 }]]);
     });
 
     it('should convert deep object in args.filter to dotted object', () => {

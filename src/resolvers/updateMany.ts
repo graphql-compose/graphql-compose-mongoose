@@ -10,18 +10,42 @@ import {
   filterHelperArgs,
   sortHelper,
   sortHelperArgs,
-  prepareAliases,
-  replaceAliases,
+  prepareNestedAliases,
+  RecordHelperArgsOpts,
+  FilterHelperArgsOpts,
+  SortHelperArgsOpts,
+  LimitHelperArgsOpts,
 } from './helpers';
 import { toMongoDottedObject } from '../utils/toMongoDottedObject';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper } from './helpers/beforeQueryHelper';
+import { addErrorCatcherField } from './helpers/errorCatcher';
 
-export default function updateMany<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
-): Resolver<TSource, TContext> {
+export interface UpdateManyResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `record` argument. */
+  record?: RecordHelperArgsOpts;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  limit?: LimitHelperArgsOpts | false;
+  skip?: false;
+}
+
+type TArgs = {
+  record: any;
+  filter?: any;
+  limit?: number;
+  skip?: number;
+  sort?: string | string[] | Record<string, any>;
+};
+
+export function updateMany<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  opts?: UpdateManyResolverOpts
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateMany() should be instance of Mongoose Model.');
   }
@@ -31,7 +55,7 @@ export default function updateMany<TSource = Document, TContext = any>(
     );
   }
 
-  const outputTypeName = `UpdateMany${tc.getTypeName()}Payload`;
+  const outputTypeName = `UpdateMany${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
     t.addFields({
       numAffected: {
@@ -41,9 +65,9 @@ export default function updateMany<TSource = Document, TContext = any>(
     });
   });
 
-  const aliases = prepareAliases(model);
+  const aliases = prepareNestedAliases(model.schema);
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'updateMany',
     kind: 'mutation',
     description:
@@ -54,7 +78,7 @@ export default function updateMany<TSource = Document, TContext = any>(
     args: {
       ...recordHelperArgs(tc, {
         prefix: 'UpdateMany',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         removeFields: ['id', '_id'],
         isRequired: true,
         allFieldsNullable: true,
@@ -62,11 +86,11 @@ export default function updateMany<TSource = Document, TContext = any>(
       }),
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterUpdateMany',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortUpdateMany${tc.getTypeName()}Input`,
+        sortTypeName: `SortUpdateMany${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
       ...skipHelperArgs(),
@@ -74,14 +98,13 @@ export default function updateMany<TSource = Document, TContext = any>(
         ...opts?.limit,
       }),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const recordData = (resolveParams.args && resolveParams.args.record) || {};
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
+      const recordData = resolveParams?.args?.record;
 
       if (!(typeof recordData === 'object') || Object.keys(recordData).length === 0) {
         return Promise.reject(
           new Error(
-            `${tc.getTypeName()}.updateMany resolver requires ` +
-              'at least one value in args.record'
+            `${tc.getTypeName()}.updateMany resolver requires at least one value in args.record`
           )
         );
       }
@@ -93,18 +116,18 @@ export default function updateMany<TSource = Document, TContext = any>(
       sortHelper(resolveParams);
       limitHelper(resolveParams);
 
-      resolveParams.query = resolveParams.query.setOptions({ multi: true }); // eslint-disable-line
+      resolveParams.query = resolveParams.query.setOptions({ multi: true });
 
       // @ts-expect-error
       if (resolveParams.query.updateMany) {
         // @ts-expect-error
         resolveParams.query.updateMany({
-          $set: toMongoDottedObject(replaceAliases(recordData, aliases)),
+          $set: toMongoDottedObject(recordData, aliases),
         });
       } else {
         // OLD mongoose
         resolveParams.query.update({
-          $set: toMongoDottedObject(replaceAliases(recordData, aliases)),
+          $set: toMongoDottedObject(recordData, aliases),
         });
       }
 
@@ -120,6 +143,10 @@ export default function updateMany<TSource = Document, TContext = any>(
       throw new Error(JSON.stringify(res));
     }) as any,
   });
+
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
+  addErrorCatcherField(resolver);
 
   return resolver;
 }

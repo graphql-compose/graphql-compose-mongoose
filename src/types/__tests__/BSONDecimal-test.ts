@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Kind } from 'graphql-compose/lib/graphql';
-import GraphQLBSONDecimal from '../bsonDecimal';
+import GraphQLBSONDecimal from '../BSONDecimal';
 
 const Decimal128 = mongoose.Types.Decimal128;
 

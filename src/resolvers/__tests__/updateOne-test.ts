@@ -3,10 +3,10 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import updateOne from '../updateOne';
-import GraphQLMongoID from '../../types/mongoid';
+import { updateOne } from '../updateOne';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -90,13 +90,22 @@ describe('updateOne() ->', () => {
     });
 
     it('should rejected with Error if args.filter is empty', async () => {
-      const result = updateOne(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      const result = updateOne(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
+      await expect(result).rejects.toThrow(
+        'User.updateOne resolver requires at least one value in args.filter'
+      );
     });
 
-    it('should return payload.recordId', async () => {
-      const result = await updateOne(UserModel, UserTC).resolve({
-        args: { filter: { _id: user1.id } },
+    it('should return payload.recordId when it requested', async () => {
+      const result = await testFieldConfig({
+        field: updateOne(UserModel, UserTC),
+        args: { filter: { _id: user1.id }, record: {} },
+        selection: `{
+          recordId
+        }`,
       });
       expect(result.recordId).toBe(user1.id);
     });
@@ -129,21 +138,79 @@ describe('updateOne() ->', () => {
 
     it('should return payload.record', async () => {
       const result = await updateOne(UserModel, UserTC).resolve({
-        args: { filter: { _id: user1.id } },
+        args: { filter: { _id: user1.id }, record: { name: 'abc' } },
       });
       expect(result.record.id).toBe(user1.id);
+    });
+
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = updateOne(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('requires at least one value in args.filter'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError(
+        'requires at least one value in args.filter'
+      );
+    });
+
+    it('should return empty payload.error', async () => {
+      const result = await updateOne(UserModel, UserTC).resolve({
+        args: { filter: { _id: user1.id }, record: { name: 'abc' } },
+      });
+      expect(result.error).toEqual(undefined);
+    });
+
+    it('should return payload.error', async () => {
+      const result = await updateOne(UserModel, UserTC).resolve({
+        args: {
+          filter: { _id: user1.id },
+          record: { valid: 'AlwaysFails' },
+        },
+        projection: {
+          error: true,
+        },
+      });
+
+      expect(result.error.message).toEqual(
+        'User validation failed: valid: this is a validate message'
+      );
+
+      expect(result.error.errors).toEqual([
+        {
+          message: 'this is a validate message',
+          path: 'valid',
+          value: 'AlwaysFails',
+        },
+      ]);
+    });
+
+    it('should throw GraphQLError if client does not request errors field in payload', async () => {
+      await expect(
+        updateOne(UserModel, UserTC).resolve({
+          args: {
+            filter: { _id: user1.id },
+            record: { valid: 'AlwaysFails' },
+          },
+        })
+      ).rejects.toThrowError('User validation failed: valid: this is a validate message');
     });
 
     it('should skip records', async () => {
       const result1 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
+          record: { name: 'abc' },
           skip: 0,
         },
       });
       const result2 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
+          record: { name: 'abc' },
           skip: 1,
         },
       });
@@ -154,12 +221,14 @@ describe('updateOne() ->', () => {
       const result1 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
+          record: { name: 'abc' },
           sort: { _id: 1 },
         },
       });
       const result2 = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { relocation: true },
+          record: { name: 'abc' },
           sort: { _id: -1 },
         },
       });
@@ -170,6 +239,7 @@ describe('updateOne() ->', () => {
       const result = await updateOne(UserModel, UserTC).resolve({
         args: {
           filter: { _id: user1.id },
+          record: { name: 'abc' },
         },
         projection: {
           record: {
@@ -178,13 +248,16 @@ describe('updateOne() ->', () => {
         },
       });
       expect(result.record.id).toBe(user1.id);
-      expect(result.record.name).toBe(user1.name);
+      expect(result.record.name).toBe('abc');
       expect(result.record.gender).toBe(user1.gender);
     });
 
     it('should return mongoose document', async () => {
       const result = await updateOne(UserModel, UserTC).resolve({
-        args: { filter: { _id: user1.id } },
+        args: {
+          filter: { _id: user1.id },
+          record: { name: 'abc' },
+        },
       });
       expect(result.record).toBeInstanceOf(UserModel);
     });
@@ -192,7 +265,10 @@ describe('updateOne() ->', () => {
     it('should call `beforeRecordMutate` method with founded `record`  and `resolveParams` as args', async () => {
       let beforeMutationId;
       const result = await updateOne(UserModel, UserTC).resolve({
-        args: { filter: { _id: user1.id } },
+        args: {
+          filter: { _id: user1.id },
+          record: { name: 'abc' },
+        },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           beforeMutationId = record.id;
@@ -216,7 +292,7 @@ describe('updateOne() ->', () => {
           return record;
         },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow('Denied due context ReadOnly');
       const exist = await UserModel.collection.findOne({ _id: user1._id });
       expect(exist.n).toBe(user1.name);
     });
@@ -248,9 +324,7 @@ describe('updateOne() ->', () => {
     });
 
     it('should have recordId field', () => {
-      const outputType: any = updateOne(UserModel, UserTC).getType();
-      const recordIdField = schemaComposer.createObjectTC(outputType).getFieldConfig('recordId');
-      expect(recordIdField.type).toBe(GraphQLMongoID);
+      expect(updateOne(UserModel, UserTC).getOTC().getFieldTypeName('recordId')).toBe('MongoID');
     });
 
     it('should have record field', () => {

@@ -4,28 +4,47 @@ import {
   InputTypeComposer,
 } from 'graphql-compose';
 import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
+import { Document } from 'mongoose';
 
 export type RecordHelperArgsOpts = {
-  prefix?: string;
-  suffix?: string;
-  isRequired?: boolean;
+  /**
+   * You an remove some fields from type via this option.
+   */
   removeFields?: string[];
+  /**
+   * This option makes provided fieldNames as required
+   */
   requiredFields?: string[];
-  /** Make all fields nullable by default. May be overridden by `requiredFields` property */
+  /**
+   * This option makes all fields nullable by default.
+   * May be overridden by `requiredFields` property
+   */
   allFieldsNullable?: boolean;
+  /**
+   * Provide custom prefix for Type name
+   */
+  prefix?: string;
+  /**
+   * Provide custom suffix for Type name
+   */
+  suffix?: string;
+  /**
+   * Make arg `record` as required if this option is true.
+   */
+  isRequired?: boolean;
 };
 
 // for merging, discriminators merge-able only
-export const getRecordHelperArgsOptsMap = () => ({
+export const getRecordHelperArgsOptsMap = (): Record<string, string> => ({
   isRequired: 'boolean',
   removeFields: 'string[]',
   requiredFields: 'string[]',
 });
 
-export const recordHelperArgs = (
-  tc: ObjectTypeComposer<any, any>,
+export function recordHelperArgs<TDoc extends Document = any>(
+  tc: ObjectTypeComposer<TDoc, any>,
   opts?: RecordHelperArgsOpts
-): ObjectTypeComposerArgumentConfigMapDefinition => {
+): ObjectTypeComposerArgumentConfigMapDefinition<{ record: any }> {
   if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
     throw new Error('First arg for recordHelperArgs() should be instance of ObjectTypeComposer.');
   }
@@ -59,7 +78,7 @@ export const recordHelperArgs = (
 
   return {
     record: {
-      type: opts.isRequired ? recordITC.getTypeNonNull() : recordITC,
+      type: opts.isRequired ? recordITC.NonNull : recordITC,
     },
   };
-};
+}

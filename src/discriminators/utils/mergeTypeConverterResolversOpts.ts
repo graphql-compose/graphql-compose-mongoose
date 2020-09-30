@@ -1,6 +1,7 @@
-import type { TypeConverterResolversOpts } from '../../composeWithMongoose';
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { MergeAbleHelperArgsOpts } from '../../resolvers/helpers';
 import { mergeStringAndStringArraysFields } from './mergeCustomizationOptions';
+import { AllResolversOpts } from 'src/resolvers';
 
 type TypeFieldMap = {
   [fieldName: string]: any;
@@ -31,9 +32,9 @@ export function mergePrimitiveTypeFields(
 export function mergeFilterOperatorsOptsMap(
   baseFilterOperatorField: TypeFieldMap,
   childFilterOperatorField?: TypeFieldMap
-) {
+): TypeFieldMap {
   const baseOptsKeys = Object.keys(baseFilterOperatorField);
-  const baseOptsTypes = {} as Record<string, any>;
+  const baseOptsTypes = {} as TypeFieldMap;
   for (const key of baseOptsKeys) {
     baseOptsTypes[key] = 'string[]';
   }
@@ -49,14 +50,20 @@ export function mergeFilterOperatorsOptsMap(
   return childFilterOperatorField;
 }
 
-export function mergeArraysTypeFields(baseField: any, childField: any, argOptsType: TypeFieldMap) {
+export function mergeArraysTypeFields(
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  baseField: any,
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  childField: any,
+  argOptsType: TypeFieldMap
+): TypeFieldMap {
   let merged = childField !== undefined ? childField : {};
   if (Array.isArray(argOptsType)) {
     for (const argType of argOptsType) {
       if (argType === 'FilterOperatorsOptsMap') {
         merged = mergeFilterOperatorsOptsMap(baseField, merged);
 
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       merged = mergePrimitiveTypeFields(baseField, childField, argType);
@@ -68,18 +75,22 @@ export function mergeArraysTypeFields(baseField: any, childField: any, argOptsTy
   return merged;
 }
 
-export function mergeMapTypeFields(baseField: any, childField: any, argOptsTypes: TypeFieldMap) {
+export function mergeMapTypeFields(
+  baseField: TypeFieldMap,
+  childField: TypeFieldMap | undefined,
+  argOptsTypes: TypeFieldMap
+): TypeFieldMap {
   const merged = childField === undefined ? {} : childField;
 
   if (argOptsTypes !== null && typeof argOptsTypes === 'object') {
     for (const argOptType in argOptsTypes) {
       if (argOptsTypes.hasOwnProperty(argOptType)) {
         if (baseField[argOptType] === undefined) {
-          continue; // eslint-disable-line no-continue
+          continue;
         }
 
         if (childField === undefined) {
-          childField = {}; // eslint-disable-line no-param-reassign
+          childField = {};
         }
 
         if (argOptType === 'FilterOperatorsOptsMap') {
@@ -87,7 +98,7 @@ export function mergeMapTypeFields(baseField: any, childField: any, argOptsTypes
             baseField[argOptType],
             merged[argOptType]
           );
-          continue; // eslint-disable-line no-continue
+          continue;
         }
 
         merged[argOptType] = mergePrimitiveTypeFields(
@@ -115,9 +126,9 @@ export function mergeMapTypeFields(baseField: any, childField: any, argOptsTypes
 }
 
 export function mergeTypeConverterResolverOpts(
-  baseTypeConverterResolverOpts?: TypeConverterResolversOpts | false,
-  childTypeConverterResolverOpts?: TypeConverterResolversOpts | false
-): TypeConverterResolversOpts | false | void {
+  baseTypeConverterResolverOpts?: AllResolversOpts | false,
+  childTypeConverterResolverOpts?: AllResolversOpts | false
+): AllResolversOpts | false | void {
   if (!baseTypeConverterResolverOpts) {
     return childTypeConverterResolverOpts;
   }
@@ -139,13 +150,13 @@ export function mergeTypeConverterResolverOpts(
 
       // e.g. { findMany: ... findById: ... }  baseResolverOpt = findById
       if (baseResolverArgs === undefined) {
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       // if nothing set for child resolver set base
       if (baseResolverArgs === false && childResolverArgs === undefined) {
         mergedTypeConverterResolverOpts[baseResolverOpt] = false;
-        continue; // eslint-disable-line no-continue
+        continue;
       }
 
       // set to empty object in-order to reference
@@ -164,7 +175,7 @@ export function mergeTypeConverterResolverOpts(
 
           // e.g. {limit: ...}  baseResolverArg = limit
           if (baseResolverArgs[baseResolverArg] === undefined) {
-            continue; // eslint-disable-line no-continue
+            continue;
           }
 
           mergedResolverArgs[baseResolverArg] = mergePrimitiveTypeFields(

@@ -1,7 +1,7 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import findOne from '../findOne';
+import { findOne } from '../findOne';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
@@ -98,7 +98,7 @@ describe('findOne() ->', () => {
 
     it('should return document if provided existed id', async () => {
       const result = await findOne(UserModel, UserTC).resolve({
-        args: { id: user1._id },
+        args: { filter: { _id: user1._id } },
       });
       expect(result.name).toBe(user1.name);
     });
@@ -122,14 +122,23 @@ describe('findOne() ->', () => {
 
     it('should return mongoose document', async () => {
       const result = await findOne(UserModel, UserTC).resolve({
-        args: { _id: user1._id },
+        args: { filter: { _id: user1._id } },
       });
       expect(result).toBeInstanceOf(UserModel);
     });
 
+    it('should return lean object with alias support', async () => {
+      const result = await findOne(UserModel, UserTC, { lean: true }).resolve({
+        args: { filter: { _id: user1._id } },
+      });
+      expect(result).not.toBeInstanceOf(UserModel);
+      // should translate aliases fields
+      expect(result).toEqual(expect.objectContaining({ name: 'userName1' }));
+    });
+
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
       const result = await findOne(UserModel, UserTC).resolve({
-        args: { _id: user1._id },
+        args: { filter: { _id: user1._id } },
         beforeQuery(query: any, rp: ExtendedResolveParams) {
           expect(rp.model).toBe(UserModel);
           expect(rp.query).toHaveProperty('exec');

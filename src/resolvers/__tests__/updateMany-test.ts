@@ -2,7 +2,7 @@ import { Query } from 'mongoose';
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { GraphQLInt, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import updateMany from '../updateMany';
+import { updateMany } from '../updateMany';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
@@ -92,8 +92,13 @@ describe('updateMany() ->', () => {
     });
 
     it('should rejected with Error if args.record is empty', async () => {
-      const result = updateMany(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      const result = updateMany(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
+      await expect(result).rejects.toThrow(
+        'User.updateMany resolver requires at least one value in args.record'
+      );
     });
 
     it('should change data via args.record in database', async () => {
@@ -117,6 +122,18 @@ describe('updateMany() ->', () => {
         },
       });
       expect(result.numAffected).toBe(2);
+    });
+
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = updateMany(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('at least one value in args.record'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError('at least one value in args.record');
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {

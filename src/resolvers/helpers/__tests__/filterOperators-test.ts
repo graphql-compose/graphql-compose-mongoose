@@ -1,4 +1,7 @@
+import mongoose from 'mongoose';
 import { schemaComposer, InputTypeComposer } from 'graphql-compose';
+import { composeWithMongoose } from '../../../composeWithMongoose';
+
 import {
   _createOperatorsField,
   addFilterOperators,
@@ -12,6 +15,14 @@ let itc: InputTypeComposer<any>;
 
 beforeEach(() => {
   schemaComposer.clear();
+  schemaComposer.createInputTC({
+    name: 'BillingAddressUserFieldInput',
+    fields: {
+      street: 'String',
+      state: 'String',
+      country: 'String',
+    },
+  });
   itc = schemaComposer.createInputTC({
     name: 'UserFilterInput',
     fields: {
@@ -20,6 +31,7 @@ beforeEach(() => {
       name: 'String',
       age: 'Int',
       skills: ['String'],
+      billingAddress: 'BillingAddressUserFieldInput',
     },
   });
 });
@@ -27,59 +39,138 @@ beforeEach(() => {
 describe('Resolver helper `filter` ->', () => {
   describe('_createOperatorsField()', () => {
     it('should add OPERATORS_FIELDNAME to filterType', () => {
-      _createOperatorsField(itc, 'OperatorsTypeName', UserModel, {});
+      _createOperatorsField(itc, UserModel, {
+        baseTypeName: 'TypeNameOperators',
+      });
       expect(itc.hasField(OPERATORS_FIELDNAME)).toBe(true);
-      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('OperatorsTypeName');
+      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('TypeNameOperators');
     });
-
-    it('should by default have only indexed fields', () => {
-      _createOperatorsField(itc, 'OperatorsTypeName', UserModel, {});
-      const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
-      expect(operatorsTC.getFieldNames()).toEqual(
-        expect.arrayContaining(['name', '_id', 'employment'])
-      );
-      expect(operatorsTC.hasField('age')).toBe(false);
-    });
-
     it('should have only provided fields via options', () => {
-      _createOperatorsField(itc, 'OperatorsTypeName', UserModel, { age: ['lt'] });
+      _createOperatorsField(itc, UserModel, {
+        baseTypeName: 'TypeNameOperators',
+        operators: {
+          age: ['lt'],
+        },
+      });
       const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
       expect(operatorsTC.hasField('age')).toBe(true);
     });
-
     it('should have only provided operators via options for field', () => {
-      _createOperatorsField(itc, 'OperatorsTypeName', UserModel, { age: ['lt', 'gte'] });
+      _createOperatorsField(itc, UserModel, {
+        baseTypeName: 'TypeNameOperators',
+        operators: {
+          age: ['lt', 'gte'],
+        },
+      });
       const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
       const ageTC = operatorsTC.getFieldITC('age');
       expect(ageTC.getFieldNames()).toEqual(expect.arrayContaining(['lt', 'gte']));
     });
+    it('should handle nested fields recursively', () => {
+      _createOperatorsField(itc, UserModel, {
+        baseTypeName: 'TypeNameOperators',
+        operators: {
+          age: ['lt', 'gte'],
+          billingAddress: { country: ['nin'], state: ['in'] },
+        },
+      });
+      const operatorsTC = itc.getFieldITC(OPERATORS_FIELDNAME);
+      const billingAddressTC = operatorsTC.getFieldITC('billingAddress');
 
+      expect(billingAddressTC.getFieldNames()).toEqual(expect.arrayContaining(['country']));
+      const countryBillingAddressTC = billingAddressTC.getFieldITC('country');
+
+      expect(countryBillingAddressTC.getFieldNames()).toEqual(expect.arrayContaining(['nin']));
+
+      expect(billingAddressTC.getFieldNames()).toEqual(expect.arrayContaining(['state']));
+      const stateBillingAddressTC = billingAddressTC.getFieldITC('state');
+      expect(stateBillingAddressTC.getFieldNames()).toEqual(expect.arrayContaining(['in']));
+    });
+
+    it('should not recurse on circular schemas to avoid maximum call stack size exceeded', () => {
+      const PersonSchema = new mongoose.Schema({
+        name: String,
+      });
+      PersonSchema.add({
+        spouse: PersonSchema,
+        friends: [PersonSchema],
+      });
+      const PersonModel = mongoose.model('Person', PersonSchema);
+      const tc = composeWithMongoose(PersonModel);
+      expect(tc.getFieldNames()).toEqual(
+        expect.arrayContaining(['_id', 'name', 'spouse', 'friends'])
+      );
+    });
     it('should reuse existed operatorsType', () => {
       const existedITC = itc.schemaComposer.getOrCreateITC('ExistedType');
-      _createOperatorsField(itc, 'ExistedType', UserModel, {});
+      _createOperatorsField(itc, UserModel, { baseTypeName: 'ExistedType' });
       expect(itc.getFieldType(OPERATORS_FIELDNAME)).toBe(existedITC.getType());
     });
   });
 
   describe('addFilterOperators()', () => {
     it('should add OPERATORS_FIELDNAME via _createOperatorsField()', () => {
-      addFilterOperators(itc, UserModel, {});
+      addFilterOperators(itc, UserModel, { baseTypeName: 'UserFilter', suffix: 'Input' });
       expect(itc.hasField(OPERATORS_FIELDNAME)).toBe(true);
-      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('OperatorsUserFilterInput');
+      expect(itc.getFieldTC(OPERATORS_FIELDNAME).getTypeName()).toBe('UserFilterOperatorsInput');
     });
-
     it('should add OR field', () => {
       addFilterOperators(itc, UserModel, {});
       const fields = itc.getFieldNames();
       expect(fields).toEqual(expect.arrayContaining(['OR', 'name', 'age']));
       expect(itc.getFieldTC('OR').getType()).toBe(itc.getType());
     });
-
     it('should add AND field', () => {
       addFilterOperators(itc, UserModel, {});
       const fields = itc.getFieldNames();
       expect(fields).toEqual(expect.arrayContaining(['AND', 'name', 'age']));
       expect(itc.getFieldTC('AND').getType()).toBe(itc.getType());
+    });
+    it('should respect operators configuration', () => {
+      // onlyIndexed: false by default
+      addFilterOperators(itc, UserModel, { operators: { name: ['exists'] } });
+      const fields = itc.getFieldNames();
+      expect(fields).toEqual(expect.arrayContaining(['name']));
+      expect(itc.hasField('_operators')).toBe(true);
+      expect(itc.getFieldITC('_operators').getFieldNames()).toEqual([
+        '_id',
+        'employment',
+        'name',
+        'billingAddress',
+      ]);
+      expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);
+    });
+    it('should respect operators configuration and allow onlyIndexed', () => {
+      // By default when using onlyIndex, add all indexed fields, then if operators are supplied allow them as well
+      addFilterOperators(itc, UserModel, {
+        baseTypeName: 'User',
+        onlyIndexed: true,
+        operators: { name: ['exists'] },
+      });
+      const fields = itc.getFieldNames();
+      expect(fields).toEqual(expect.arrayContaining(['name']));
+      expect(itc.hasField('_operators')).toBe(true);
+      expect(itc.getFieldITC('_operators').getFieldNames()).toEqual([
+        '_id',
+        'employment',
+        'name',
+        'billingAddress',
+      ]);
+      expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);
+      expect(itc.getFieldITC('_operators').getFieldITC('employment').getFieldNames()).toEqual([
+        'gt',
+        'gte',
+        'lt',
+        'lte',
+        'ne',
+        'in',
+        'nin',
+        'regex',
+        'exists',
+      ]);
+      expect(itc.getFieldITC('_operators').getFields()).toEqual(
+        expect.not.arrayContaining(['age'])
+      );
     });
   });
 
@@ -90,7 +181,18 @@ describe('Resolver helper `filter` ->', () => {
       };
       expect(processFilterOperators(filter)).toEqual({ age: { $gt: 10, $lt: 20 } });
     });
-
+    it('should process nested fields', () => {
+      const filter = {
+        [OPERATORS_FIELDNAME]: {
+          age: { gt: 10, lt: 20 },
+          address: { country: { in: ['US'] } },
+        },
+      };
+      expect(processFilterOperators(filter)).toEqual({
+        age: { $gt: 10, $lt: 20 },
+        address: { country: { $in: ['US'] } },
+      });
+    });
     it('should convert OR query', () => {
       const filter = {
         OR: [
@@ -114,7 +216,6 @@ describe('Resolver helper `filter` ->', () => {
         ],
       });
     });
-
     it('should convert AND query', () => {
       const filter = {
         AND: [
@@ -137,7 +238,6 @@ describe('Resolver helper `filter` ->', () => {
         ],
       });
     });
-
     it('should convert nested AND/OR query', () => {
       const filter = {
         OR: [

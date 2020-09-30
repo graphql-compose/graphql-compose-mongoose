@@ -3,7 +3,7 @@ import {
   ComposeWithMongooseDiscriminatorsOpts,
   DiscriminatorTypeComposer,
 } from './DiscriminatorTypeComposer';
-import { EMCResolvers } from '../resolvers';
+import { resolverFactory } from '../resolvers';
 
 // set the DKey as a query on filter, also project it
 // Also look at it like setting for filters, makes sure to limit
@@ -135,42 +135,44 @@ export function prepareChildResolvers<TSource, TContext>(
   baseDTC: DiscriminatorTypeComposer<TSource, TContext>,
   childTC: ObjectTypeComposer<TSource, TContext>,
   opts: ComposeWithMongooseDiscriminatorsOpts<TContext>
-) {
-  for (const resolverName in EMCResolvers) {
-    if (EMCResolvers.hasOwnProperty(resolverName) && childTC.hasResolver(resolverName)) {
+): void {
+  Object.keys(resolverFactory).forEach((resolverName) => {
+    if (childTC.hasResolver(resolverName)) {
       const resolver = childTC.getResolver(resolverName);
 
       switch (resolverName) {
-        case EMCResolvers.createOne:
+        case 'createOne':
           setQueryDKey(resolver, childTC, baseDTC.getDKey(), 'record');
 
           hideDKey(resolver, childTC, baseDTC.getDKey(), 'record');
           break;
 
-        case EMCResolvers.createMany:
+        case 'createMany':
           setQueryDKey(resolver, childTC, baseDTC.getDKey(), 'records');
 
           hideDKey(resolver, childTC, baseDTC.getDKey(), 'records');
           break;
 
-        case EMCResolvers.updateById:
+        case 'updateById':
           hideDKey(resolver, childTC, baseDTC.getDKey(), 'record');
           break;
 
-        case EMCResolvers.updateOne:
-        case EMCResolvers.updateMany:
+        case 'updateOne':
+        case 'updateMany':
           setQueryDKey(resolver, childTC, baseDTC.getDKey(), 'filter');
 
           hideDKey(resolver, childTC, baseDTC.getDKey(), ['record', 'filter']);
           break;
 
-        case EMCResolvers.findOne:
-        case EMCResolvers.findMany:
-        case EMCResolvers.removeOne:
-        case EMCResolvers.removeMany:
-        case EMCResolvers.count:
-        case EMCResolvers.pagination:
-        case EMCResolvers.connection:
+        case 'findOne':
+        case 'findMany':
+        case 'findOneLean':
+        case 'findManyLean':
+        case 'removeOne':
+        case 'removeMany':
+        case 'count':
+        case 'pagination':
+        case 'connection':
           // limit remove scope to DKey
           setQueryDKey(resolver, childTC, baseDTC.getDKey(), 'filter');
 
@@ -187,5 +189,5 @@ export function prepareChildResolvers<TSource, TContext>(
         'records',
       ]);
     }
-  }
+  });
 }

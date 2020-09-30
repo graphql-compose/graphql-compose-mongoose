@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { isObject } from 'graphql-compose';
+import type { NestedAliasesMap } from '../resolvers/helpers';
 
 const primitives = [Types.ObjectId, Date, String, Number, Boolean, Types.Decimal128];
 const operatorsWithExpression = ['$or', '$and', '$not', '$nor'];
@@ -10,46 +11,69 @@ function isPrimitive(value: any) {
 
 function _toMongoDottedObject(
   obj: any,
+  aliases: NestedAliasesMap | undefined,
   target: Record<string, any> = {},
-  path: string[] = [],
-  filter = false
+  prefix: string = '',
+  collapseArray = false
 ) {
-  if ((!isObject(obj) as any) && !Array.isArray(obj)) return obj;
-  if (isPrimitive(obj)) return obj;
-  const objKeys = Object.keys(obj);
+  if (((!isObject(obj) as any) && !Array.isArray(obj)) || isPrimitive(obj)) {
+    if (prefix) target[prefix] = obj;
+    return obj;
+  }
 
+  const objKeys = Object.keys(obj);
   objKeys.forEach((key) => {
+    let newKey;
+    if (aliases && aliases?.[key]) {
+      const alias = aliases?.[key];
+      let aliasValue;
+      if (typeof alias === 'string') {
+        aliasValue = alias;
+      } else if (isObject(alias)) {
+        aliasValue = alias?.__selfAlias;
+      }
+      newKey = aliasValue || key;
+    } else {
+      newKey = key;
+    }
+
+    if (prefix) {
+      newKey = `${prefix}.${newKey}`;
+    }
+
     if (key.startsWith('$')) {
       let val;
       if (operatorsWithExpression.includes(key)) {
         val = Array.isArray(obj[key])
-          ? obj[key].map((v: any) => _toMongoDottedObject(v, {}, [], filter))
-          : _toMongoDottedObject(obj[key], {}, [], filter);
+          ? obj[key].map((v: any) => _toMongoDottedObject(v, aliases, {}, '', collapseArray))
+          : _toMongoDottedObject(obj[key], aliases, {}, '', collapseArray);
       } else {
         val = obj[key];
       }
-      if (path.length === 0) {
+      if (!prefix) {
         target[key] = val;
       } else {
-        target[path.join('.')] = {
-          ...target[path.join('.')],
+        target[prefix] = {
+          ...target[prefix],
           [key]: val,
         };
       }
     } else if (Object(obj[key]) === obj[key] && !isPrimitive(obj[key])) {
+      const subAliases = aliases?.[key];
       _toMongoDottedObject(
         obj[key],
+        isObject(subAliases) ? subAliases : undefined,
         target,
-        Array.isArray(obj) && filter ? path : path.concat(key),
-        filter
+        Array.isArray(obj) && collapseArray ? prefix : newKey,
+        collapseArray
       );
     } else {
-      target[path.concat(key).join('.')] = obj[key];
+      target[newKey] = obj[key];
     }
   });
 
   if (objKeys.length === 0) {
-    target[path.join('.')] = obj;
+    target[prefix] = obj;
   }
 
   return target;
@@ -67,15 +91,16 @@ function _toMongoDottedObject(
  *   var target = {}; toMongoDottedObject(obj, target)
  *
  * @param {Object} obj source object
+ * @param {Object} aliases nested object with aliases (name which should be replaced)
  * @param {Object} target target object
  * @param {Array} path path array (internal)
  */
 export function toMongoDottedObject(
   obj: Record<string, any>,
-  target: Record<string, any> = {},
-  path: string[] = []
+  aliases?: NestedAliasesMap,
+  target: Record<string, any> = {}
 ): { [dottedPath: string]: any } {
-  return _toMongoDottedObject(obj, target, path);
+  return _toMongoDottedObject(obj, aliases, target, '');
 }
 
 /**
@@ -85,9 +110,9 @@ export function toMongoDottedObject(
  * { a: { b: { $in: [ 1, 2, 3] }}} ->  { 'a.b': { $in: [ 1, 2, 3] } }
  * { a: [ { b: 1 }, { c: 2 }]} -> { 'a.b': 1, 'a.c': 2 }
  * Usage:
- *   var toMongoFilterDottedObject(obj)
+ *   toMongoFilterDottedObject(obj)
  *   or
- *   var target = {}; toMongoFilterDottedObject(obj, target)
+ *   toMongoFilterDottedObject(obj, aliases)
  *
  * @param {Object} obj source object
  * @param {Object} target target object
@@ -95,8 +120,9 @@ export function toMongoDottedObject(
  */
 export function toMongoFilterDottedObject(
   obj: Record<string, any>,
+  aliases?: NestedAliasesMap,
   target: Record<string, any> = {},
-  path: string[] = []
+  prefix: string = ''
 ): { [dottedPath: string]: any } {
-  return _toMongoDottedObject(obj, target, path, true);
+  return _toMongoDottedObject(obj, aliases, target, prefix, true);
 }

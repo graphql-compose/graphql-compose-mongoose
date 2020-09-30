@@ -37,7 +37,7 @@ describe('issue #136 - Mongoose virtuals', () => {
     const recordsTC = CommentTC.getResolver('createMany').getArgITC('records');
     const clonedRecordTC = recordsTC.clone('createManyFilteredInput');
     clonedRecordTC.removeField('links').addFields({ hi: 'String' });
-    updateManyFiltered.extendArg('records', { type: clonedRecordTC.getTypePlural() });
+    updateManyFiltered.extendArg('records', { type: clonedRecordTC.List });
 
     return updateManyFiltered
       .wrapResolve((next) => async (rp) => {
@@ -58,9 +58,9 @@ describe('issue #136 - Mongoose virtuals', () => {
 
     const res = await graphql.graphql({
       schema,
-      source: 'mutation { createManyComments(records: [{ links: ["a"] }]) { createCount } }',
+      source: 'mutation { createManyComments(records: [{ links: ["a"] }]) { createdCount } }',
     });
 
-    expect(res).toEqual({ data: { createManyComments: { createCount: 1 } } });
+    expect(res).toEqual({ data: { createManyComments: { createdCount: 1 } } });
   });
 });

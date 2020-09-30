@@ -1,9 +1,7 @@
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
-import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { PostModel, IPost } from '../../__mocks__/postModel';
-import findById from '../findById';
-import GraphQLMongoID from '../../types/mongoid';
+import { findById } from '../findById';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
@@ -43,10 +41,7 @@ describe('findById() ->', () => {
   describe('Resolver.args', () => {
     it('should have non-null `_id` arg', () => {
       const resolver = findById(UserModel, UserTC);
-      expect(resolver.hasArg('_id')).toBe(true);
-      const argConfig: any = resolver.getArgConfig('_id');
-      expect(argConfig.type).toBeInstanceOf(GraphQLNonNull);
-      expect(argConfig.type.ofType).toBe(GraphQLMongoID);
+      expect(resolver.getArgTypeName('_id')).toBe('MongoID!');
     });
   });
 
@@ -80,11 +75,28 @@ describe('findById() ->', () => {
       expect(result).toBeInstanceOf(UserModel);
     });
 
+    it('should return lean User object', async () => {
+      const result = await findById(UserModel, UserTC, { lean: true }).resolve({
+        args: { _id: user._id },
+      });
+      expect(result).not.toBeInstanceOf(UserModel);
+      // aliases should be translated `User.n` -> `User.name`
+      expect(result).toEqual(expect.objectContaining({ name: 'nodkz' }));
+    });
+
     it('should return mongoose Post document', async () => {
       const result = await findById(PostModel, PostTypeComposer).resolve({
         args: { _id: 1 },
       });
       expect(result).toBeInstanceOf(PostModel);
+    });
+
+    it('should return lean Post object', async () => {
+      const result = await findById(PostModel, PostTypeComposer, { lean: true }).resolve({
+        args: { _id: 1 },
+      });
+      expect(result).not.toBeInstanceOf(PostModel);
+      expect(result).toEqual({ __v: 0, _id: 1, title: 'Post 1' });
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {

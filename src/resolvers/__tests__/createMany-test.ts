@@ -1,12 +1,13 @@
 /* eslint-disable no-param-reassign,func-names */
 
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
-import { GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql-compose/lib/graphql';
+import { GraphQLList, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { mongoose } from '../../__mocks__/mongooseCommon';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../fieldsConverter';
-import createMany from '../createMany';
+import { createMany } from '../createMany';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -58,34 +59,52 @@ describe('createMany() ->', () => {
     });
 
     it('should rejected with Error if args.records is empty', async () => {
-      const result = createMany(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      const result = createMany(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
+      await expect(result).rejects.toThrow(
+        'User.createMany resolver requires args.records to be an Array and must contain at least one record'
+      );
     });
 
     it('should rejected with Error if args.records is not array', async () => {
-      const result = createMany(UserModel, UserTC).resolve({ args: { records: {} } });
-      await expect(result).rejects.toMatchSnapshot();
+      const result = createMany(UserModel, UserTC).resolve({
+        args: {
+          // @ts-expect-error
+          records: {},
+        },
+      });
+      await expect(result).rejects.toThrow(
+        'ser.createMany resolver requires args.records to be an Array and must contain at least one record'
+      );
     });
 
     it('should rejected with Error if args.records is empty array', async () => {
       const result = createMany(UserModel, UserTC).resolve({
         args: { records: [] },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.createMany resolver requires args.records to be an Array and must contain at least one record'
+      );
     });
 
     it('should rejected with Error if args.records is array with empty items', async () => {
       const result = createMany(UserModel, UserTC).resolve({
         args: { records: [{ name: 'fails' }, {}] },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.createMany resolver requires args.records to contain non-empty records, with at least one value'
+      );
     });
 
     it('should return payload.recordIds', async () => {
-      const result = await createMany(UserModel, UserTC).resolve({
-        args: {
-          records: [{ name: 'newName', contacts: { email: 'mail' } }],
-        },
+      const result = await testFieldConfig({
+        field: createMany(UserModel, UserTC),
+        args: { records: [{ name: 'newName', contacts: { email: 'mail' } }] },
+        selection: `{
+          recordIds
+        }`,
       });
       expect(result.recordIds).toBeTruthy();
     });
@@ -98,34 +117,63 @@ describe('createMany() ->', () => {
             { name: 'newName1', contacts: { email: 'mail' } },
           ],
         },
+        projection: { error: true },
       });
-      expect(result.createCount).toBe(2);
+      expect(result.createdCount).toBe(2);
       expect(result.records[0].name).toBe('newName0');
       expect(result.records[1].name).toBe('newName1');
     });
 
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = createMany(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('requires args.records to be an Array'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError(
+        'requires args.records to be an Array'
+      );
+    });
+
     it('should save documents to database', async () => {
       const checkedName = 'nameForMongoDB';
-      const res = await createMany(UserModel, UserTC).resolve({
+      const res = await testFieldConfig({
+        field: createMany(UserModel, UserTC),
         args: {
           records: [
             { name: checkedName, contacts: { email: 'mail' } },
             { name: checkedName, contacts: { email: 'mail' } },
           ],
         },
+        selection: `{
+          records {
+            _id
+          }
+          recordIds
+        }`,
       });
 
-      const docs = await UserModel.collection.find({ _id: { $in: res.recordIds } }).toArray();
+      const docs = await UserModel.collection
+        .find({ _id: { $in: res.recordIds.map((o: string) => new mongoose.Types.ObjectId(o)) } })
+        .toArray();
       expect(docs.length).toBe(2);
       expect(docs[0].n).toBe(checkedName);
       expect(docs[1].n).toBe(checkedName);
     });
 
     it('should return payload.records', async () => {
-      const result = await createMany(UserModel, UserTC).resolve({
-        args: {
-          records: [{ name: 'NewUser', contacts: { email: 'mail' } }],
-        },
+      const result = await testFieldConfig({
+        field: createMany(UserModel, UserTC),
+        args: { records: [{ name: 'newName', contacts: { email: 'mail' } }] },
+        selection: `{
+          records {
+            _id
+          }
+          recordIds
+        }`,
       });
       expect(result.records[0]._id).toBe(result.recordIds[0]);
     });
@@ -133,6 +181,7 @@ describe('createMany() ->', () => {
     it('should return mongoose documents', async () => {
       const result = await createMany(UserModel, UserTC).resolve({
         args: { records: [{ name: 'NewUser', contacts: { email: 'mail' } }] },
+        projection: { error: true },
       });
       expect(result.records[0]).toBeInstanceOf(UserModel);
     });
@@ -145,6 +194,7 @@ describe('createMany() ->', () => {
             { name: 'NewUser1', contacts: { email: 'mail' } },
           ],
         },
+        projection: { error: true },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           record.name = 'OverriddenName';
@@ -182,6 +232,7 @@ describe('createMany() ->', () => {
             { name: 'NewUser1', contacts: { email: 'mail' } },
           ],
         },
+        projection: { error: true },
         context: { ip: '1.1.1.1' },
         beforeRecordMutate: (record: any, rp: ExtendedResolveParams) => {
           record.name = 'OverriddenName';
@@ -215,7 +266,7 @@ describe('createMany() ->', () => {
 
     it('should have records field, NonNull List', () => {
       const resolver = createMany(UserModel, UserTC);
-      expect(resolver.getOTC().getFieldTypeName('records')).toEqual('[User!]!');
+      expect(resolver.getOTC().getFieldTypeName('records')).toEqual('[User!]');
     });
 
     it('should have user.contacts.mail required field', () => {
@@ -225,10 +276,10 @@ describe('createMany() ->', () => {
       );
     });
 
-    it('should have createCount field, Int', () => {
-      const outputType: any = createMany(UserModel, UserTC).getType();
-      const recordField = schemaComposer.createObjectTC(outputType).getFieldConfig('createCount');
-      expect(recordField.type).toEqual(new GraphQLNonNull(GraphQLInt));
+    it('should have createdCount field, Int', () => {
+      expect(createMany(UserModel, UserTC).getOTC().getFieldTypeName('createdCount')).toEqual(
+        'Int!'
+      );
     });
 
     it('should reuse existed outputType', () => {

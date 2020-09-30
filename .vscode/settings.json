@@ -1,9 +1,10 @@
 {
-  "eslint.validate": ["javascript"],
   "javascript.validate.enable": false,
-  "javascript.autoClosingTags": false,
-  "eslint.autoFixOnSave": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": false,
+  "javascript.format.enable": false,
+  "typescript.format.enable": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
-  }
+  },
 }

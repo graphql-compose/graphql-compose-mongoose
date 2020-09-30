@@ -1,39 +1,27 @@
 import type { Document, Model } from 'mongoose';
-import type { ConnectionSortMapOpts as _ConnectionSortMapOpts } from 'graphql-compose-connection';
-import type {
-  Resolver,
-  ObjectTypeComposer,
-  ObjectTypeComposerFieldConfigMap,
-} from 'graphql-compose';
+import {
+  prepareConnectionResolver,
+  ConnectionResolverOpts as _ConnectionResolverOpts,
+  ConnectionTArgs,
+} from 'graphql-compose-connection';
+import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { CountResolverOpts, count } from './count';
+import { FindManyResolverOpts, findMany } from './findMany';
 import { getUniqueIndexes, extendByReversedIndexes, IndexT } from '../utils/getIndexesFromModel';
 
-export type ConnectionOpts<TContext = any> = _ConnectionSortMapOpts & {
-  edgeFields?: ObjectTypeComposerFieldConfigMap<any, TContext>;
-  connectionResolverName?: string;
-  findResolverName?: string;
-  countResolverName?: string;
-  edgeTypeName?: string;
+export type ConnectionResolverOpts<TContext = any> = Omit<
+  _ConnectionResolverOpts<TContext>,
+  'countResolver' | 'findManyResolver'
+> & {
+  countOpts?: CountResolverOpts;
+  findManyOpts?: FindManyResolverOpts;
 };
 
-export default function connection<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: ConnectionOpts<TContext>
-): Resolver<TSource, TContext> | undefined {
-  try {
-    require.resolve('graphql-compose-connection');
-  } catch (e) {
-    return undefined;
-  }
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const prepareConnectionResolver = require('graphql-compose-connection').prepareConnectionResolver;
-
-  if (!prepareConnectionResolver) {
-    throw new Error(
-      'You should update `graphql-compose-connection` package till 3.2.0 version or above'
-    );
-  }
-
+export function connection<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  opts?: ConnectionResolverOpts<TContext>
+): Resolver<TSource, TContext, ConnectionTArgs, TDoc> | undefined {
   const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), {
     reversedFirst: true,
   });
@@ -60,24 +48,14 @@ export default function connection<TSource = Document, TContext = any>(
       },
     };
   });
-  const {
-    connectionResolverName = 'connection',
-    findResolverName = 'findMany',
-    countResolverName = 'count',
-    edgeFields,
-    edgeTypeName,
-    ...sortOptions
-  } = opts || {};
-  return prepareConnectionResolver(tc, {
-    connectionResolverName,
-    findResolverName,
-    countResolverName,
-    sort: {
-      ...sortConfigs,
-      ...sortOptions,
-    },
-    edgeFields,
-    edgeTypeName,
+
+  const { findManyOpts, countOpts, ...restOpts } = opts || {};
+
+  return prepareConnectionResolver<any, any>(tc, {
+    findManyResolver: findMany(model, tc, findManyOpts),
+    countResolver: count(model, tc, countOpts),
+    sort: sortConfigs,
+    ...restOpts,
   });
 }
 

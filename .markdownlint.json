@@ -7,5 +7,6 @@
   "ol-prefix": false,
   "first-line-h1": false,
   "first-heading-h1": false,
-  "no-bare-urls": false
+  "no-bare-urls": false,
+  "blanks-around-lists": false
 }

@@ -1,102 +1,89 @@
 import type { ResolverResolveParams } from 'graphql-compose';
-import type { Query, Model } from 'mongoose';
-import connection from './connection';
-import count from './count';
-import createMany from './createMany';
+import type { Query, Model, Document } from 'mongoose';
+import { count, CountResolverOpts } from './count';
+import { findById, FindByIdResolverOpts } from './findById';
+import { findByIds, FindByIdsResolverOpts } from './findByIds';
+import { findMany, FindManyResolverOpts } from './findMany';
+import { findOne, FindOneResolverOpts } from './findOne';
+import { createMany, CreateManyResolverOpts } from './createMany';
+import { createOne, CreateOneResolverOpts } from './createOne';
+import { updateById, UpdateByIdResolverOpts } from './updateById';
+import { updateMany, UpdateManyResolverOpts } from './updateMany';
+import { updateOne, UpdateOneResolverOpts } from './updateOne';
+import { removeById, RemoveByIdResolverOpts } from './removeById';
+import { removeMany, RemoveManyResolverOpts } from './removeMany';
+import { removeOne, RemoveOneResolverOpts } from './removeOne';
+import { dataLoader, DataLoaderResolverOpts } from './dataLoader';
+import { dataLoaderMany, DataLoaderManyResolverOpts } from './dataLoaderMany';
+import { pagination, PaginationResolverOpts } from './pagination';
+import { connection, ConnectionResolverOpts } from './connection';
 
-import createOne from './createOne';
-
-import findById from './findById';
-import findByIds from './findByIds';
-import findMany from './findMany';
-import findOne from './findOne';
-
-import type {
-  FilterHelperArgsOpts,
-  LimitHelperArgsOpts,
-  RecordHelperArgsOpts,
-  SortHelperArgsOpts,
-} from './helpers';
-
-import pagination from './pagination';
-
-import removeById from './removeById';
-import removeMany from './removeMany';
-import removeOne from './removeOne';
-
-import updateById from './updateById';
-import updateMany from './updateMany';
-import updateOne from './updateOne';
-
-export type GenResolverOpts = {
-  filter?: FilterHelperArgsOpts;
-  sort?: SortHelperArgsOpts;
-  record?: RecordHelperArgsOpts;
-  records?: RecordHelperArgsOpts;
-  limit?: LimitHelperArgsOpts;
+export type AllResolversOpts = {
+  count?: false | CountResolverOpts;
+  findById?: false | FindByIdResolverOpts;
+  findByIds?: false | FindByIdsResolverOpts;
+  findOne?: false | FindOneResolverOpts;
+  findMany?: false | FindManyResolverOpts;
+  dataLoader?: false | DataLoaderResolverOpts;
+  dataLoaderMany?: false | DataLoaderManyResolverOpts;
+  createOne?: false | CreateOneResolverOpts;
+  createMany?: false | CreateManyResolverOpts;
+  updateById?: false | UpdateByIdResolverOpts;
+  updateOne?: false | UpdateOneResolverOpts;
+  updateMany?: false | UpdateManyResolverOpts;
+  removeById?: false | RemoveByIdResolverOpts;
+  removeOne?: false | RemoveOneResolverOpts;
+  removeMany?: false | RemoveManyResolverOpts;
+  connection?: false | ConnectionResolverOpts<any>;
+  pagination?: false | PaginationResolverOpts;
 };
 
-export type ExtendedResolveParams = Partial<ResolverResolveParams<any, any, any>> & {
+export type ExtendedResolveParams<TDoc extends Document = any, TContext = any> = Partial<
+  ResolverResolveParams<TDoc, TContext, any>
+> & {
   query: Query<any>;
   rawQuery: { [optName: string]: any };
-  beforeQuery?: (query: Query<any>, rp: ExtendedResolveParams) => Promise<any>;
-  beforeRecordMutate?: (record: any, rp: ExtendedResolveParams) => Promise<any>;
-  model: Model<any>;
+  beforeQuery?: (query: Query<any>, rp: ExtendedResolveParams<TDoc>) => Promise<any>;
+  beforeRecordMutate?: (record: TDoc, rp: ExtendedResolveParams<TDoc>) => Promise<any>;
+  model: Model<TDoc>;
 };
 
-export {
+export const resolverFactory = {
+  count,
   findById,
   findByIds,
   findOne,
   findMany,
+  dataLoader,
+  dataLoaderMany,
+  createOne,
+  createMany,
   updateById,
   updateOne,
   updateMany,
   removeById,
   removeOne,
   removeMany,
-  createOne,
-  createMany,
-  count,
   pagination,
   connection,
 };
 
-export function getAvailableNames(): (keyof typeof EMCResolvers)[] {
-  return [
-    'findById',
-    'findByIds',
-    'findOne',
-    'findMany',
-    'updateById',
-    'updateOne',
-    'updateMany',
-    'removeById',
-    'removeOne',
-    'removeMany',
-    'createOne',
-    'createMany',
-    'count',
-    'pagination', // should be defined after `findMany` and `count` resolvers
-    'connection', // should be defined after `findMany` and `count` resolvers
-  ];
-}
-
-// Enum MongooseComposeResolvers
-export const EMCResolvers = {
-  findById: 'findById',
-  findByIds: 'findByIds',
-  findOne: 'findOne',
-  findMany: 'findMany',
-  updateById: 'updateById',
-  updateOne: 'updateOne',
-  updateMany: 'updateMany',
-  removeById: 'removeById',
-  removeOne: 'removeOne',
-  removeMany: 'removeMany',
-  createOne: 'createOne',
-  createMany: 'createMany',
-  count: 'count',
-  connection: 'connection',
-  pagination: 'pagination',
+export {
+  CountResolverOpts,
+  FindByIdResolverOpts,
+  FindByIdsResolverOpts,
+  FindManyResolverOpts,
+  FindOneResolverOpts,
+  CreateManyResolverOpts,
+  CreateOneResolverOpts,
+  UpdateByIdResolverOpts,
+  UpdateManyResolverOpts,
+  UpdateOneResolverOpts,
+  RemoveByIdResolverOpts,
+  RemoveManyResolverOpts,
+  RemoveOneResolverOpts,
+  DataLoaderResolverOpts,
+  DataLoaderManyResolverOpts,
+  PaginationResolverOpts,
+  ConnectionResolverOpts,
 };

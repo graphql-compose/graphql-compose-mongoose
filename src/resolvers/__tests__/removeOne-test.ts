@@ -2,10 +2,10 @@
 
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
-import removeOne from '../removeOne';
-import GraphQLMongoID from '../../types/mongoid';
+import { removeOne } from '../removeOne';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -94,18 +94,34 @@ describe('removeOne() ->', () => {
     });
 
     it('should return payload.recordId if record existed in db', async () => {
-      const result = await removeOne(UserModel, UserTC).resolve({
+      const result = await testFieldConfig({
+        field: removeOne(UserModel, UserTC),
         args: { filter: { _id: user1.id } },
+        selection: `{
+          recordId
+        }`,
       });
       expect(result.recordId).toBe(user1.id);
     });
 
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = removeOne(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('requires at least one value in args.filter'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError(
+        'requires at least one value in args.filter'
+      );
+    });
+
     it('should remove document in database', async () => {
-      const checkedName = 'nameForMongoDB';
       await removeOne(UserModel, UserTC).resolve({
         args: {
           filter: { _id: user1.id },
-          input: { name: checkedName },
         },
       });
 
@@ -162,7 +178,9 @@ describe('removeOne() ->', () => {
 
     it('should rejected with Error if args.filter is empty', async () => {
       const result = removeOne(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow(
+        'User.removeOne resolver requires at least one value in args.filter'
+      );
     });
 
     it('should call `beforeRecordMutate` method with founded `record` and `resolveParams` as args', async () => {
@@ -195,7 +213,7 @@ describe('removeOne() ->', () => {
           return record;
         },
       });
-      await expect(result).rejects.toMatchSnapshot();
+      await expect(result).rejects.toThrow('Denied due context ReadOnly');
       const exist = await UserModel.collection.findOne({ _id: user1._id });
       expect(exist.n).toBe(user1.name);
     });
@@ -227,9 +245,7 @@ describe('removeOne() ->', () => {
     });
 
     it('should have recordId field', () => {
-      const outputType: any = removeOne(UserModel, UserTC).getType();
-      const recordIdField = schemaComposer.createObjectTC(outputType).getFieldConfig('recordId');
-      expect(recordIdField.type).toBe(GraphQLMongoID);
+      expect(removeOne(UserModel, UserTC).getOTC().getFieldTypeName('recordId')).toBe('MongoID');
     });
 
     it('should have record field', () => {

@@ -1,14 +1,36 @@
 import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
-import { filterHelperArgs, sortHelperArgs } from './helpers';
-import findOne from './findOne';
-import type { ExtendedResolveParams, GenResolverOpts } from './index';
+import {
+  filterHelperArgs,
+  sortHelperArgs,
+  SortHelperArgsOpts,
+  FilterHelperArgsOpts,
+} from './helpers';
+import { findOne } from './findOne';
+import type { ExtendedResolveParams } from './index';
+import { addErrorCatcherField } from './helpers/errorCatcher';
+import { payloadRecordId, PayloadRecordIdHelperOpts } from './helpers/payloadRecordId';
 
-export default function removeOne<TSource = Document, TContext = any>(
-  model: Model<any>,
-  tc: ObjectTypeComposer<TSource, TContext>,
-  opts?: GenResolverOpts
-): Resolver<TSource, TContext> {
+export interface RemoveOneResolverOpts {
+  /** If you want to generate different resolvers you may avoid Type name collision by adding a suffix to type names */
+  suffix?: string;
+  /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
+  filter?: FilterHelperArgsOpts | false;
+  sort?: SortHelperArgsOpts | false;
+  /** Customize payload.recordId field. If false, then this field will be removed. */
+  recordId?: PayloadRecordIdHelperOpts | false;
+}
+
+type TArgs = {
+  filter?: any;
+  sort?: string | string[] | Record<string, any>;
+};
+
+export function removeOne<TSource = any, TContext = any, TDoc extends Document = any>(
+  model: Model<TDoc>,
+  tc: ObjectTypeComposer<TDoc, TContext>,
+  opts?: RemoveOneResolverOpts
+): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver removeOne() should be instance of Mongoose Model.');
   }
@@ -21,13 +43,10 @@ export default function removeOne<TSource = Document, TContext = any>(
 
   const findOneResolver = findOne(model, tc, opts);
 
-  const outputTypeName = `RemoveOne${tc.getTypeName()}Payload`;
+  const outputTypeName = `RemoveOne${tc.getTypeName()}${opts?.suffix || ''}Payload`;
   const outputType = tc.schemaComposer.getOrCreateOTC(outputTypeName, (t) => {
-    t.addFields({
-      recordId: {
-        type: 'MongoID',
-        description: 'Removed document ID',
-      },
+    t.setFields({
+      ...payloadRecordId(tc, opts?.recordId),
       record: {
         type: tc,
         description: 'Removed document',
@@ -35,7 +54,7 @@ export default function removeOne<TSource = Document, TContext = any>(
     });
   });
 
-  const resolver = tc.schemaComposer.createResolver({
+  const resolver = tc.schemaComposer.createResolver<TSource, TArgs>({
     name: 'removeOne',
     kind: 'mutation',
     description:
@@ -46,16 +65,16 @@ export default function removeOne<TSource = Document, TContext = any>(
     args: {
       ...filterHelperArgs(tc, model, {
         prefix: 'FilterRemoveOne',
-        suffix: 'Input',
+        suffix: `${opts?.suffix || ''}Input`,
         ...opts?.filter,
       }),
       ...sortHelperArgs(tc, model, {
-        sortTypeName: `SortRemoveOne${tc.getTypeName()}Input`,
+        sortTypeName: `SortRemoveOne${tc.getTypeName()}${opts?.suffix || ''}Input`,
         ...opts?.sort,
       }),
     },
-    resolve: (async (resolveParams: ExtendedResolveParams) => {
-      const filterData = (resolveParams.args && resolveParams.args.filter) || {};
+    resolve: (async (resolveParams: ExtendedResolveParams<TDoc>) => {
+      const filterData = resolveParams?.args?.filter;
 
       if (!(typeof filterData === 'object') || Object.keys(filterData).length === 0) {
         return Promise.reject(
@@ -70,7 +89,7 @@ export default function removeOne<TSource = Document, TContext = any>(
       // So empty projection returns all fields.
       resolveParams.projection = {};
 
-      let doc = await findOneResolver.resolve(resolveParams);
+      let doc: TDoc = await findOneResolver.resolve(resolveParams);
 
       if (resolveParams.beforeRecordMutate) {
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
@@ -81,7 +100,6 @@ export default function removeOne<TSource = Document, TContext = any>(
 
         return {
           record: doc,
-          recordId: tc.getRecordIdFn()(doc),
         };
       }
 
@@ -89,5 +107,9 @@ export default function removeOne<TSource = Document, TContext = any>(
     }) as any,
   });
 
-  return resolver as any;
+  // Add `error` field to payload which can catch resolver Error
+  // and return it in mutation payload
+  addErrorCatcherField(resolver);
+
+  return resolver;
 }

@@ -2,10 +2,11 @@
 
 import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
-import createOne from '../createOne';
+import { createOne } from '../createOne';
 import { convertModelToGraphQL } from '../../fieldsConverter';
-import GraphQLMongoID from '../../types/mongoid';
+import GraphQLMongoID from '../../types/MongoID';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -50,15 +51,22 @@ describe('createOne() ->', () => {
     });
 
     it('should rejected with Error if args.record is empty', async () => {
-      const result = createOne(UserModel, UserTC).resolve({ args: {} });
-      await expect(result).rejects.toMatchSnapshot();
+      const result = createOne(UserModel, UserTC).resolve({
+        // @ts-expect-error
+        args: {},
+      });
+      await expect(result).rejects.toThrow(
+        'User.createOne resolver requires at least one value in args.record'
+      );
     });
 
-    it('should return payload.recordId', async () => {
-      const result = await createOne(UserModel, UserTC).resolve({
-        args: {
-          record: { name: 'newName', contacts: { email: 'mail' } },
-        },
+    it('should return payload.recordId when it requested', async () => {
+      const result = await testFieldConfig({
+        field: createOne(UserModel, UserTC),
+        args: { record: { name: 'newName', contacts: { email: 'mail' } } },
+        selection: `{
+          recordId
+        }`,
       });
       expect(result.recordId).toBeTruthy();
     });
@@ -84,13 +92,79 @@ describe('createOne() ->', () => {
       expect(doc.n).toBe(checkedName);
     });
 
-    it('should return payload.record', async () => {
+    it('should return payload.record when it requested', async () => {
+      const result = await testFieldConfig({
+        field: createOne(UserModel, UserTC),
+        args: { record: { name: 'NewUser', contacts: { email: 'mail' } } },
+        selection: `{
+          record {
+            _id
+          }
+          recordId
+        }`,
+      });
+      expect(result.record._id).toBe(result.recordId);
+    });
+
+    it('should return resolver runtime error in payload.error', async () => {
+      const resolver = createOne(UserModel, UserTC);
+      await expect(resolver.resolve({ projection: { error: true } })).resolves.toEqual({
+        error: expect.objectContaining({
+          message: expect.stringContaining('requires at least one value in args'),
+        }),
+      });
+
+      // should throw error if error not requested in graphql query
+      await expect(resolver.resolve({})).rejects.toThrowError(
+        'requires at least one value in args'
+      );
+    });
+
+    it('should return validation error in payload.error', async () => {
       const result = await createOne(UserModel, UserTC).resolve({
         args: {
-          record: { name: 'NewUser', contacts: { email: 'mail' } },
+          record: { valid: 'AlwaysFails', contacts: { email: 'mail' } },
+        },
+        projection: {
+          error: true,
         },
       });
-      expect(result.record.id).toBe(result.recordId);
+      expect(result.error.message).toEqual(
+        'User validation failed: n: Path `n` is required., valid: this is a validate message'
+      );
+      expect(result.error.errors).toEqual([
+        {
+          message: 'Path `n` is required.',
+          path: 'n',
+          value: undefined,
+        },
+        {
+          message: 'this is a validate message',
+          path: 'valid',
+          value: 'AlwaysFails',
+        },
+      ]);
+    });
+
+    it('should throw GraphQLError if client does not request errors field in payload', async () => {
+      await expect(
+        createOne(UserModel, UserTC).resolve({
+          args: {
+            record: { valid: 'AlwaysFails', contacts: { email: 'mail' } },
+          },
+        })
+      ).rejects.toThrowError(
+        'User validation failed: n: Path `n` is required., valid: this is a validate message'
+      );
+    });
+
+    it('should return empty payload.error', async () => {
+      const result = await createOne(UserModel, UserTC).resolve({
+        args: {
+          record: { n: 'foo', contacts: { email: 'mail' } },
+        },
+      });
+      expect(result.error).toEqual(undefined);
     });
 
     it('should return mongoose document', async () => {

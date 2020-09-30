@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import type { Schema, Model } from 'mongoose';
 import type {
   SchemaComposer,
@@ -11,8 +11,8 @@ import type {
 } from 'graphql-compose';
 import { upperFirst } from 'graphql-compose';
 import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
-import GraphQLMongoID from './types/mongoid';
-import GraphQLBSONDecimal from './types/bsonDecimal';
+import GraphQLMongoID from './types/MongoID';
+import GraphQLBSONDecimal from './types/BSONDecimal';
 
 type MongooseFieldT = {
   path?: string;
@@ -24,6 +24,7 @@ type MongooseFieldT = {
   };
   originalRequiredValue?: string | (() => any);
   isRequired?: boolean;
+  defaultValue?: any;
   enumValues?: string[];
   schema?: Schema;
   _index?: { [optionName: string]: any };
@@ -130,11 +131,11 @@ export function getFieldsFromModel(model: Model<any> | MongoosePseudoModelT): Mo
   return fields;
 }
 
-export function convertModelToGraphQL<TSource, TContext>(
-  model: Model<any> | MongoosePseudoModelT,
+export function convertModelToGraphQL<TDoc extends Document, TContext>(
+  model: Model<TDoc> | MongoosePseudoModelT,
   typeName: string,
   schemaComposer: SchemaComposer<TContext>
-): ObjectTypeComposer<TSource, TContext> {
+): ObjectTypeComposer<TDoc, TContext> {
   const sc = schemaComposer;
 
   if (!typeName) {
@@ -146,6 +147,8 @@ export function convertModelToGraphQL<TSource, TContext>(
     return sc.getOTC(model.schema);
   }
 
+  // add type to registry before fields creation
+  // it helps to avoid circuit dependencies, eg. `User { friends: [User] }`
   const typeComposer = sc.getOrCreateOTC(typeName);
   sc.set(model.schema, typeComposer);
   sc.set(typeName, typeComposer);
@@ -167,29 +170,28 @@ export function convertModelToGraphQL<TSource, TContext>(
 
     if (
       mongooseField.isRequired &&
-      // conditional required field in mongoose cannot be NonNulable in GraphQL
+      // conditional required field in mongoose cannot be NonNullable in GraphQL
       typeof mongooseField?.originalRequiredValue !== 'function'
     ) {
       requiredFields.push(fieldName);
     }
 
+    let type = convertFieldToGraphQL(mongooseField, typeName, sc);
+
+    // in mongoose schema we use javascript `Number` object which casted to `Float` type
+    // so in most cases _id field is `Int`
+    if (fieldName === '_id' && type === 'Float') {
+      type = 'Int';
+    }
+
     graphqlFields[fieldName] = {
-      type: convertFieldToGraphQL(mongooseField, typeName, sc),
+      type,
       description: _getFieldDescription(mongooseField),
     };
 
-    if (deriveComplexType(mongooseField) === ComplexTypes.EMBEDDED) {
-      // https://github.com/nodkz/graphql-compose-mongoose/issues/7
-      graphqlFields[fieldName].resolve = (source) => {
-        if (source) {
-          if (source.toObject) {
-            const obj = source.toObject();
-            return obj[fieldName];
-          }
-          return source[fieldName];
-        }
-        return null;
-      };
+    if (mongooseField?.defaultValue !== null && mongooseField?.defaultValue !== undefined) {
+      if (!graphqlFields[fieldName].extensions) graphqlFields[fieldName].extensions = {};
+      (graphqlFields as any)[fieldName].extensions.defaultValue = mongooseField?.defaultValue;
     }
   });
 
@@ -374,7 +376,7 @@ export function enumToGraphQL(
 
     const fields = valueList.reduce((result, value) => {
       const key = value.replace(/[^_a-zA-Z0-9]/g, '_');
-      result[key] = { value }; // eslint-disable-line no-param-reassign
+      result[key] = { value };
       return result;
     }, {} as Record<string, { value: any }>);
     etc.setFields(fields);
