@@ -32,7 +32,7 @@ type TArgs = {
   record: any;
   filter?: any;
   skip?: number;
-  sort?: Record<string, any>;
+  sort?: string | string[] | Record<string, any>;
 };
 
 export function updateOne<TSource = any, TContext = any, TDoc extends Document = any>(

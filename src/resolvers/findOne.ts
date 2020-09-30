@@ -40,7 +40,7 @@ export interface FindOneResolverOpts {
 
 type TArgs = {
   filter?: any;
-  sort?: Record<string, any>;
+  sort?: string | string[] | Record<string, any>;
   skip?: number;
 };
 

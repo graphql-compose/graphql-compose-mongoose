@@ -36,7 +36,7 @@ export interface FindByIdsResolverOpts {
 type TArgs = {
   _ids: any;
   limit?: number;
-  sort?: Record<string, any>;
+  sort?: string | string[] | Record<string, any>;
 };
 
 export function findByIds<TSource = any, TContext = any, TDoc extends Document = any>(

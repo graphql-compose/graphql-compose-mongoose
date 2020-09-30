@@ -1,8 +1,9 @@
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, schemaComposer, ObjectTypeComposer, EnumTypeComposer } from 'graphql-compose';
 import { UserModel, IUser } from '../../__mocks__/userModel';
 import { findMany } from '../findMany';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
+import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -154,5 +155,38 @@ describe('findMany() ->', () => {
       expect(resolver.getArgITC('filter').getFieldTypeName('name')).toBe('String');
       expect(resolver.getArgITC('filter').getFieldTypeName('age')).toBe('Float');
     });
+  });
+
+  it('should support multi sort', async () => {
+    let spyQuery: any;
+    const resolver = findMany(UserModel, UserTC, { sort: { multi: true } }).wrapResolve(
+      (next) => (rp) => {
+        const res = next(rp);
+        spyQuery = rp.query;
+        return res;
+      }
+    );
+
+    expect((resolver.getArgTC('sort') as EnumTypeComposer).getFieldNames()).toEqual(
+      expect.arrayContaining([
+        '_ID_ASC',
+        '_ID_DESC',
+        'NAME_ASC',
+        'NAME_DESC',
+        'NAME__AGE_ASC',
+        'NAME__AGE_DESC',
+      ])
+    );
+    const res = await testFieldConfig({
+      field: resolver,
+      args: {
+        sort: ['_ID_ASC', 'NAME_ASC', '_ID_DESC'],
+      },
+      selection: `{
+        name
+      }`,
+    });
+    expect(res).toEqual([{ name: 'userName1' }, { name: 'userName2' }]);
+    expect(spyQuery?.options).toEqual({ limit: 1000, sort: { _id: 1, name: 1 } });
   });
 });

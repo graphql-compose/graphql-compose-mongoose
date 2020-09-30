@@ -23,7 +23,7 @@ export interface RemoveOneResolverOpts {
 
 type TArgs = {
   filter?: any;
-  sort?: Record<string, any>;
+  sort?: string | string[] | Record<string, any>;
 };
 
 export function removeOne<TSource = any, TContext = any, TDoc extends Document = any>(

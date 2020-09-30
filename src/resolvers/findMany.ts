@@ -46,7 +46,7 @@ type TArgs = {
   filter?: any;
   limit?: number;
   skip?: number;
-  sort?: Record<string, any>;
+  sort?: string | string[] | Record<string, any>;
 };
 
 export function findMany<TSource = any, TContext = any, TDoc extends Document = any>(

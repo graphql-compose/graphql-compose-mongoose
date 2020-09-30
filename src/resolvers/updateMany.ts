@@ -38,7 +38,7 @@ type TArgs = {
   filter?: any;
   limit?: number;
   skip?: number;
-  sort?: string;
+  sort?: string | string[] | Record<string, any>;
 };
 
 export function updateMany<TSource = any, TContext = any, TDoc extends Document = any>(
