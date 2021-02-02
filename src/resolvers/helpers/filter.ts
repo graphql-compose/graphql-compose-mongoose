@@ -11,6 +11,7 @@ import {
 } from './filterOperators';
 import type { NestedAliasesMap } from './aliases';
 import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
+import { mongoose } from 'src/__mocks__/mongooseCommon';
 
 export type FilterHelperArgsOpts = {
   /**
@@ -130,41 +131,52 @@ export function filterHelper(
 ): void {
   const filter = resolveParams.args?.filter;
   if (filter && typeof filter === 'object' && Object.keys(filter).length > 0) {
-    const modelFields = (resolveParams.query as any)?.schema?.paths;
+    const schemaFields = (resolveParams.query as any)?.schema?.paths;
 
     const { _ids, ...filterFields } = filter;
     if (_ids && Array.isArray(_ids)) {
       resolveParams.query = resolveParams.query.where({ _id: { $in: _ids } });
     }
     processFilterOperators(filterFields);
-    const clearedFilter: Record<string, any> = {};
-    Object.keys(filterFields).forEach((key) => {
-      const value = filterFields[key];
-      if (key.startsWith('$')) {
-        clearedFilter[key] = Array.isArray(value)
-          ? value.map((v) => toMongoFilterDottedObject(v, aliases))
-          : toMongoFilterDottedObject(value, aliases);
-      } else if (modelFields[key] || aliases?.[key]) {
-        const alias = aliases?.[key];
-        let newKey;
-        let subAlias: NestedAliasesMap | undefined;
-        if (typeof alias === 'string') {
-          newKey = alias;
-        } else if (isObject(alias)) {
-          subAlias = alias;
-          newKey = alias?.__selfAlias;
-        } else {
-          newKey = key;
-        }
-        toMongoFilterDottedObject(value, subAlias, clearedFilter, newKey);
-      }
-    });
-    if (Object.keys(clearedFilter).length > 0) {
-      resolveParams.query = resolveParams.query.where(clearedFilter);
+    const mongooseFilter = convertFilterFields(filterFields, schemaFields, aliases);
+
+    if (Object.keys(mongooseFilter).length > 0) {
+      resolveParams.query = resolveParams.query.where(mongooseFilter);
     }
   }
 
   if (isObject(resolveParams.rawQuery)) {
     resolveParams.query = resolveParams.query.where(resolveParams.rawQuery);
   }
+}
+
+function convertFilterFields(
+  filterFields: Record<string, any>,
+  schemaFields: { [key: string]: mongoose.SchemaType },
+  aliases?: NestedAliasesMap
+) {
+  const clearedFilter: Record<string, any> = {};
+  Object.keys(filterFields).forEach((key) => {
+    const value = filterFields[key];
+    if (key.startsWith('$')) {
+      clearedFilter[key] = Array.isArray(value)
+        ? value.map((v) => toMongoFilterDottedObject(v, aliases))
+        : toMongoFilterDottedObject(value, aliases);
+    } else if (schemaFields[key] || aliases?.[key] || isObject(value)) {
+      const alias = aliases?.[key];
+      let newKey;
+      let subAlias: NestedAliasesMap | undefined;
+      if (typeof alias === 'string') {
+        newKey = alias;
+      } else if (isObject(alias)) {
+        subAlias = alias;
+        newKey = alias?.__selfAlias;
+      } else {
+        newKey = key;
+      }
+      toMongoFilterDottedObject(value, subAlias, clearedFilter, newKey);
+    }
+  });
+
+  return clearedFilter;
 }
