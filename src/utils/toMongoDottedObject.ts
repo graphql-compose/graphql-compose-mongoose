@@ -10,12 +10,12 @@ function isPrimitive(value: any) {
 }
 
 function _toMongoDottedObject(
-  obj: any,
+  obj: Record<string, any>,
   aliases: NestedAliasesMap | undefined,
   target: Record<string, any> = {},
   prefix: string = '',
   collapseArray = false
-) {
+): { [dottedPath: string]: any } {
   if (((!isObject(obj) as any) && !Array.isArray(obj)) || isPrimitive(obj)) {
     if (prefix) target[prefix] = obj;
     return obj;
