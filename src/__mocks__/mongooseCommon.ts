@@ -7,8 +7,6 @@ const { Schema, Types } = mongoose;
 
 mongoose.Promise = Promise;
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-
 const originalConnect = mongoose.connect;
 mongoose.createConnection = (async () => {
   const mongoServer = new MongoMemoryServer();
