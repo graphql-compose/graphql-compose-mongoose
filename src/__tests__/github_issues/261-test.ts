@@ -134,7 +134,7 @@ describe('issue #261 - Non-nullability for mongoose fields that have a default v
       analytics: { isEnabled: false },
       isActive: false,
       name: 'User',
-      periods: [],
+      periods: expect.anything(),
     });
   });
 });
