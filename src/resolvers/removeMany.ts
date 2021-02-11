@@ -83,9 +83,7 @@ export function removeMany<TSource = any, TContext = any, TDoc extends Document 
       resolveParams.model = model;
       filterHelper(resolveParams, aliases);
 
-      // @ts-expect-error
       if (resolveParams.query.deleteMany) {
-        // @ts-expect-error
         resolveParams.query = resolveParams.query.deleteMany();
       } else {
         // old mongoose

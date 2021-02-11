@@ -41,9 +41,9 @@ export type AllResolversOpts = {
 export type ExtendedResolveParams<TDoc extends Document = any, TContext = any> = Partial<
   ResolverResolveParams<TDoc, TContext, any>
 > & {
-  query: Query<any>;
+  query: Query<any, any>;
   rawQuery: { [optName: string]: any };
-  beforeQuery?: (query: Query<any>, rp: ExtendedResolveParams<TDoc>) => Promise<any>;
+  beforeQuery?: (query: Query<any, any>, rp: ExtendedResolveParams<TDoc>) => Promise<any>;
   beforeRecordMutate?: (record: TDoc, rp: ExtendedResolveParams<TDoc>) => Promise<any>;
   model: Model<TDoc>;
 };

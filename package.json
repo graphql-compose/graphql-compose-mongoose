@@ -35,7 +35,6 @@
   "devDependencies": {
     "@types/graphql": "14.5.0",
     "@types/jest": "26.0.15",
-    "@types/mongoose": "5.10.1",
     "@typescript-eslint/eslint-plugin": "4.8.1",
     "@typescript-eslint/parser": "4.8.1",
     "eslint": "7.14.0",
@@ -46,8 +45,8 @@
     "graphql": "15.4.0",
     "graphql-compose": "7.22.1",
     "jest": "26.6.3",
-    "mongodb-memory-server": "6.9.2",
-    "mongoose": "5.10.15",
+    "mongodb-memory-server": "6.9.3",
+    "mongoose": "5.11.15",
     "prettier": "2.2.0",
     "request": "2.88.2",
     "rimraf": "3.0.2",

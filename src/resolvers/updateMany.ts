@@ -118,9 +118,7 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
 
       resolveParams.query = resolveParams.query.setOptions({ multi: true });
 
-      // @ts-expect-error
       if (resolveParams.query.updateMany) {
-        // @ts-expect-error
         resolveParams.query.updateMany({
           $set: toMongoDottedObject(recordData, aliases),
         });
