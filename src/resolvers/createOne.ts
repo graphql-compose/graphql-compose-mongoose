@@ -13,6 +13,8 @@ export interface CreateOneResolverOpts {
   record?: RecordHelperArgsOpts;
   /** Customize payload.recordId field. If false, then this field will be removed. */
   recordId?: PayloadRecordIdHelperOpts | false;
+  /** Customize payload.error field. If true, then this field will be removed. */
+  disableErrorField?: boolean;
 }
 
 type TArgs = {
@@ -95,9 +97,11 @@ export function createOne<TSource = any, TContext = any, TDoc extends Document =
     }) as any,
   });
 
-  // Add `error` field to payload which can catch resolver Error
-  // and return it in mutation payload
-  addErrorCatcherField(resolver);
+  if (!opts?.disableErrorField) {
+    // Add `error` field to payload which can catch resolver Error
+    // and return it in mutation payload
+    addErrorCatcherField(resolver);
+  }
 
   return resolver;
 }

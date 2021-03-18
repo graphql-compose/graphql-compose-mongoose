@@ -409,6 +409,8 @@ interface CreateManyResolverOpts {
   records?: RecordHelperArgsOpts;
   /** Customize payload.recordIds field. If false, then this field will be removed. */
   recordIds?: PayloadRecordIdsHelperOpts | false;
+  /** Customize payload.error field. If true, then this field will be removed. */
+  disableErrorField?: boolean;
 }
 ```
 
@@ -422,6 +424,8 @@ interface CreateOneResolverOpts {
   record?: RecordHelperArgsOpts;
   /** Customize payload.recordId field. If false, then this field will be removed. */
   recordId?: PayloadRecordIdHelperOpts | false;
+  /** Customize payload.error field. If true, then this field will be removed. */
+  disableErrorField?: boolean;
 }
 ```
 
@@ -573,6 +577,8 @@ interface RemoveByIdResolverOpts {
   suffix?: string;
   /** Customize payload.recordId field. If false, then this field will be removed. */
   recordId?: PayloadRecordIdHelperOpts | false;
+  /** Customize payload.error field. If true, then this field will be removed. */
+  disableErrorField?: boolean;
 }
 ```
 
@@ -585,6 +591,8 @@ interface RemoveManyResolverOpts {
   /** Customize input-type for `filter` argument. If `false` then arg will be removed. */
   filter?: FilterHelperArgsOpts | false;
   limit?: LimitHelperArgsOpts | false;
+  /** Customize payload.error field. If true, then this field will be removed. */
+  disableErrorField?: boolean;
 }
 ```
 
@@ -599,6 +607,8 @@ interface RemoveOneResolverOpts {
   sort?: SortHelperArgsOpts | false;
   /** Customize payload.recordId field. If false, then this field will be removed. */
   recordId?: PayloadRecordIdHelperOpts | false;
+  /** Customize payload.error field. If true, then this field will be removed. */
+  disableErrorField?: boolean;
 }
 ```
 
@@ -612,6 +622,8 @@ interface UpdateByIdResolverOpts {
   record?: RecordHelperArgsOpts;
   /** Customize payload.recordId field. If false, then this field will be removed. */
   recordId?: PayloadRecordIdHelperOpts | false;
+  /** Customize payload.error field. If true, then this field will be removed. */
+  disableErrorField?: boolean;
 }
 ```
 
@@ -628,6 +640,8 @@ interface UpdateManyResolverOpts {
   sort?: SortHelperArgsOpts | false;
   limit?: LimitHelperArgsOpts | false;
   skip?: false;
+  /** Customize payload.error field. If true, then this field will be removed. */
+  disableErrorField?: boolean;
 }
 ```
 
@@ -645,6 +659,8 @@ interface UpdateOneResolverOpts {
   skip?: false;
   /** Customize payload.recordId field. If false, then this field will be removed. */
   recordId?: PayloadRecordIdHelperOpts | false;
+  /** Customize payload.error field. If true, then this field will be removed. */
+  disableErrorField?: boolean;
 }
 ```
 
