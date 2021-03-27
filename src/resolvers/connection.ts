@@ -21,7 +21,7 @@ export function connection<TSource = any, TContext = any, TDoc extends Document 
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext>,
   opts?: ConnectionResolverOpts<TContext>
-): Resolver<TSource, TContext, ConnectionTArgs, TDoc> | undefined {
+): Resolver<TSource, TContext, ConnectionTArgs, TDoc> {
   const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), {
     reversedFirst: true,
   });
