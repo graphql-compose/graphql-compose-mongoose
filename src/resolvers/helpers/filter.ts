@@ -162,7 +162,11 @@ function convertFilterFields(
       clearedFilter[key] = Array.isArray(value)
         ? value.map((v) => toMongoFilterDottedObject(v, aliases))
         : toMongoFilterDottedObject(value, aliases);
-    } else if (schemaFields[key] || aliases?.[key] || isObject(value)) {
+    } else if (
+      schemaFields[key] ||
+      aliases?.[key] ||
+      isNestedFilterField(key, value, schemaFields)
+    ) {
       const alias = aliases?.[key];
       let newKey;
       let subAlias: NestedAliasesMap | undefined;
@@ -179,4 +183,14 @@ function convertFilterFields(
   });
 
   return clearedFilter;
+}
+
+function isNestedFilterField(
+  key: string,
+  value: any,
+  schemaFields: { [key: string]: mongoose.SchemaType }
+): boolean {
+  if (!isObject(value)) return false;
+
+  return Object.keys(schemaFields).some((dottedPath) => dottedPath.startsWith(`${key}.`));
 }
