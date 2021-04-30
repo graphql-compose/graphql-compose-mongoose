@@ -36,14 +36,12 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
         case 'findMany':
         case 'findByIds':
           resolver.setType(baseTC.getDInterface().List);
-          // @ts-expect-error
           resolver.projection[baseTC.getDKey()] = 1;
           break;
 
         case 'findById':
         case 'findOne':
           resolver.setType(baseTC.getDInterface());
-          // @ts-expect-error
           resolver.projection[baseTC.getDKey()] = 1;
           break;
 
