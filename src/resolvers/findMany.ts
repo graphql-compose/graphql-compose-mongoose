@@ -1,4 +1,4 @@
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
   limitHelper,
@@ -58,7 +58,7 @@ export function findMany<TSource = any, TContext = any, TDoc extends Document = 
     throw new Error('First arg for Resolver findMany() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+  if (!tc || !(tc instanceof ObjectTypeComposer)) {
     throw new Error('Second arg for Resolver findMany() should be instance of ObjectTypeComposer.');
   }
 
@@ -66,7 +66,7 @@ export function findMany<TSource = any, TContext = any, TDoc extends Document = 
   const aliasesReverse = prepareAliasesReverse(model.schema);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
-    type: tc.NonNull.List.NonNull,
+    type: tc.schemaComposer.getAnyTC(tc.getTypeName()).NonNull.List.NonNull,
     name: 'findMany',
     kind: 'query',
     args: {

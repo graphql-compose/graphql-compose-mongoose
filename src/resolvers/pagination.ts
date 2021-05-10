@@ -1,4 +1,4 @@
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
   preparePaginationResolver,

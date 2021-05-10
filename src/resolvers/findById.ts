@@ -1,5 +1,4 @@
-import { toInputType } from 'graphql-compose';
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer, toInputType } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
   projectionHelper,
@@ -9,6 +8,7 @@ import {
 } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper, beforeQueryHelperLean } from './helpers/beforeQueryHelper';
+// import { EDiscriminatorTypeComposer } from '../enhancedDiscriminators';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface FindByIdResolverOpts {
@@ -39,15 +39,17 @@ export function findById<TSource = any, TContext = any, TDoc extends Document = 
     throw new Error('First arg for Resolver findById() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+  if (!tc || !(tc instanceof ObjectTypeComposer)) {
     throw new Error('Second arg for Resolver findById() should be instance of ObjectTypeComposer.');
   }
 
   const aliases = prepareNestedAliases(model.schema);
   const aliasesReverse = prepareAliasesReverse(model.schema);
 
+  // const typeTC = tc instanceof EDiscriminatorTypeComposer ? tc.getDInterface() : tc;
+
   return tc.schemaComposer.createResolver<TSource, TArgs>({
-    type: tc,
+    type: tc.getTypeName(),
     name: 'findById',
     kind: 'query',
     args: {

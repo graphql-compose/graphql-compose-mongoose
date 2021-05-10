@@ -1,5 +1,4 @@
-import { toInputType } from 'graphql-compose';
-import { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer, toInputType } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs, RecordHelperArgsOpts } from './helpers/record';
 import { findById } from './findById';
@@ -33,7 +32,7 @@ export function updateById<TSource = any, TContext = any, TDoc extends Document 
     throw new Error('First arg for Resolver updateById() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+  if (!tc || !(tc instanceof ObjectTypeComposer)) {
     throw new Error(
       'Second arg for Resolver updateById() should be instance of ObjectTypeComposer.'
     );

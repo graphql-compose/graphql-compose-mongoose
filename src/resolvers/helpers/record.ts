@@ -45,7 +45,7 @@ export function recordHelperArgs<TDoc extends Document = any>(
   tc: ObjectTypeComposer<TDoc, any>,
   opts?: RecordHelperArgsOpts
 ): ObjectTypeComposerArgumentConfigMapDefinition<{ record: any }> {
-  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+  if (!tc || !(tc instanceof ObjectTypeComposer)) {
     throw new Error('First arg for recordHelperArgs() should be instance of ObjectTypeComposer.');
   }
 
