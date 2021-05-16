@@ -13,8 +13,8 @@ import type { ExtendedResolveParams } from '../index';
 
 export type SortHelperArgsOpts = {
   /**
-   * Allow sort by several fields.
-   * This makes arg as array of sort values.
+   * Allow sort arg to be an array of enum values. Example [AGE_DESC, NAME_ASC, _ID_ASC].
+   * Note enum values will only ever be generated for *indexed fields*.
    */
   multi?: boolean;
   /**
