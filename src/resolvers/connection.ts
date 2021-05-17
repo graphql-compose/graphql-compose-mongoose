@@ -12,7 +12,7 @@ import { getUniqueIndexes, extendByReversedIndexes, IndexT } from '../utils/getI
 
 /**
  * Allows customization of the generated `connection` resolver.
- * 
+ *
  * It is based on the `ConnectionResolverOpts` from: https://github.com/graphql-compose/graphql-compose-connection
  * With the following changes:
  * - `sort` prop is optional - when not provided derived from existing model indexes
