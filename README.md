@@ -376,7 +376,8 @@ UserTC.mongooseResolvers.findMany(opts);
 
 ```ts
 type ConnectionResolverOpts<TContext = any> = {
-  sort: ConnectionSortMapOpts;
+  /** See below **/
+  sort?: ConnectionSortMapOpts;
   name?: string;
   defaultLimit?: number | undefined;
   edgeTypeName?: string;
@@ -387,6 +388,15 @@ type ConnectionResolverOpts<TContext = any> = {
   findManyOpts?: FindManyResolverOpts;
 }
 ```
+
+The `countOpts` and `findManyOpts` props would be used to customize the internally created `findMany` and `count` resolver factories used by the connection resolver.
+If not provided the default configuration for each of the resolver factories is assumed.
+
+The `sort` prop is optional. When provided it is used to customize the sorting behaviour of the connection. When not provided, the sorting configuration is derived from the existing indexes on the model.
+
+Please refer to the documentation of the [graphql-compose-connection](https://github.com/graphql-compose/graphql-compose-connection) plugin for more details on the sorting customization parameter.
+
+
 
 ### `count(opts?: CountResolverOpts)`
 

@@ -7,6 +7,13 @@ import { count } from '../count';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 
+jest.mock('../findMany', () => ({
+  findMany: jest.fn((...args) => jest.requireActual('../findMany').findMany(...args)),
+}));
+jest.mock('../count', () => ({
+  count: jest.fn((...args) => jest.requireActual('../count').count(...args)),
+}));
+
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
 
@@ -111,8 +118,6 @@ describe('connection() resolver', () => {
     beforeEach(() => {
       schemaComposer.clear();
       UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
-      UserTC.setResolver('findMany', findMany(UserModel, UserTC));
-      UserTC.setResolver('count', count(UserModel, UserTC));
     });
 
     let user1: IUser;
@@ -287,20 +292,23 @@ describe('connection() resolver', () => {
         expect(result).toHaveProperty('edges.0.node', { overrides: true });
       });
 
-      it('should return mongoose documents for custom resolvers from opts', async () => {
+      it('should use internal resolver custom opts', async () => {
         schemaComposer.clear();
         UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
-        UserTC.setResolver('customFindMany', findMany(UserModel, UserTC));
-        UserTC.setResolver('customCount', count(UserModel, UserTC));
+        const mockCountOpts = { suffix: 'ABC' };
+        const mockFindManyOpts = { suffix: 'DEF' };
         const resolver = connection(UserModel, UserTC, {
-          findResolverName: 'customFindMany',
-          countResolverName: 'customCount',
+          countOpts: mockCountOpts,
+          findManyOpts: mockFindManyOpts,
         } as any);
         if (!resolver) throw new Error('Connection resolver is undefined');
 
-        const result = await resolver.resolve({ args: { first: 20 } });
-        expect(result.edges[0].node).toBeInstanceOf(UserModel);
-        expect(result.edges[1].node).toBeInstanceOf(UserModel);
+        expect(count).toHaveBeenCalledWith(expect.anything(), expect.anything(), mockCountOpts);
+        expect(findMany).toHaveBeenCalledWith(
+          expect.anything(),
+          expect.anything(),
+          mockFindManyOpts
+        );
       });
     });
   });
