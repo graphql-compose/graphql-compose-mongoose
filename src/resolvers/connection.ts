@@ -2,6 +2,7 @@ import type { Document, Model } from 'mongoose';
 import {
   prepareConnectionResolver,
   ConnectionResolverOpts as _ConnectionResolverOpts,
+  ConnectionSortMapOpts as _ConnectionSortMapOpts,
   ConnectionTArgs,
 } from 'graphql-compose-connection';
 import { Resolver, ObjectTypeComposer } from 'graphql-compose';
@@ -9,12 +10,22 @@ import { CountResolverOpts, count } from './count';
 import { FindManyResolverOpts, findMany } from './findMany';
 import { getUniqueIndexes, extendByReversedIndexes, IndexT } from '../utils/getIndexesFromModel';
 
+/**
+ * Allows customization of the generated `connection` resolver.
+ *
+ * It is based on the `ConnectionResolverOpts` from: https://github.com/graphql-compose/graphql-compose-connection
+ * With the following changes:
+ * - `sort` prop is optional - when not provided derived from existing model indexes
+ * - `findManyResolver` prop is removed - use the optional `findManyOpts` to customize the internally created `findMany` resolver
+ * - `countResolver` prop is removed - use the optional `countOpts` to customize the internally created `count` resolver
+ */
 export type ConnectionResolverOpts<TContext = any> = Omit<
   _ConnectionResolverOpts<TContext>,
-  'countResolver' | 'findManyResolver'
+  'countResolver' | 'findManyResolver' | 'sort'
 > & {
   countOpts?: CountResolverOpts;
   findManyOpts?: FindManyResolverOpts;
+  sort?: _ConnectionSortMapOpts;
 };
 
 export function connection<TSource = any, TContext = any, TDoc extends Document = any>(
