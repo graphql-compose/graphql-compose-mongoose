@@ -2,7 +2,7 @@
 
 import mongoose, { Document } from 'mongoose';
 import type { Schema, Model } from 'mongoose';
-import type {
+import {
   SchemaComposer,
   ObjectTypeComposer,
   EnumTypeComposer,
@@ -13,6 +13,11 @@ import { upperFirst } from 'graphql-compose';
 import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
 import GraphQLMongoID from './types/MongoID';
 import GraphQLBSONDecimal from './types/BSONDecimal';
+import {
+  convertModelToGraphQLWithDiscriminators,
+  EDiscriminatorTypeComposer,
+} from './enhancedDiscriminators';
+import { ComposeMongooseOpts } from './composeMongoose';
 
 type MongooseFieldT = {
   path?: string;
@@ -134,7 +139,8 @@ export function getFieldsFromModel(model: Model<any> | MongoosePseudoModelT): Mo
 export function convertModelToGraphQL<TDoc extends Document, TContext>(
   model: Model<TDoc> | MongoosePseudoModelT,
   typeName: string,
-  schemaComposer: SchemaComposer<TContext>
+  schemaComposer: SchemaComposer<TContext>,
+  opts: ComposeMongooseOpts<TContext> = {}
 ): ObjectTypeComposer<TDoc, TContext> {
   const sc = schemaComposer;
 
@@ -147,8 +153,10 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
     return sc.getOTC(model.schema);
   }
 
-  // add type to registry before fields creation
-  // it helps to avoid circuit dependencies, eg. `User { friends: [User] }`
+  if (opts.includeBaseDiscriminators) {
+    return convertModelToGraphQLWithDiscriminators(model, typeName, sc, opts);
+  }
+
   const typeComposer = sc.getOrCreateOTC(typeName);
   sc.set(model.schema, typeComposer);
   sc.set(typeName, typeComposer);
@@ -176,12 +184,20 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
       requiredFields.push(fieldName);
     }
 
-    let type = convertFieldToGraphQL(mongooseField, typeName, sc);
+    let type = convertFieldToGraphQL(mongooseField, typeName, sc, opts);
 
     // in mongoose schema we use javascript `Number` object which casted to `Float` type
     // so in most cases _id field is `Int`
     if (fieldName === '_id' && type === 'Float') {
       type = 'Int';
+    }
+
+    let trueType = type;
+    if (trueType instanceof Array) {
+      trueType = trueType[0];
+    }
+    if (trueType instanceof EDiscriminatorTypeComposer) {
+      type = type instanceof Array ? [trueType.getDInterface()] : trueType.getDInterface();
     }
 
     graphqlFields[fieldName] = {
@@ -203,7 +219,8 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
 export function convertSchemaToGraphQL(
   schema: Schema<any>,
   typeName: string,
-  schemaComposer: SchemaComposer<any>
+  schemaComposer: SchemaComposer<any>,
+  opts: ComposeMongooseOpts<any> = {}
 ): ObjectTypeComposer<any, any> {
   const sc = schemaComposer;
 
@@ -215,7 +232,7 @@ export function convertSchemaToGraphQL(
     return sc.getOTC(schema);
   }
 
-  const tc = convertModelToGraphQL({ schema }, typeName, sc);
+  const tc = convertModelToGraphQL({ schema }, typeName, sc, opts);
   // also generate InputType
   tc.getInputTypeComposer();
 
@@ -226,7 +243,8 @@ export function convertSchemaToGraphQL(
 export function convertFieldToGraphQL(
   field: MongooseFieldT,
   prefix: string = '',
-  schemaComposer: SchemaComposer<any>
+  schemaComposer: SchemaComposer<any>,
+  opts: ComposeMongooseOpts<any> = {}
 ): ComposeOutputTypeDefinition<any> {
   if (!schemaComposer.has('MongoID')) {
     schemaComposer.add(GraphQLMongoID);
@@ -237,15 +255,15 @@ export function convertFieldToGraphQL(
     case ComplexTypes.SCALAR:
       return scalarToGraphQL(field);
     case ComplexTypes.ARRAY:
-      return arrayToGraphQL(field, prefix, schemaComposer);
+      return arrayToGraphQL(field, prefix, schemaComposer, opts);
     case ComplexTypes.EMBEDDED:
-      return embeddedToGraphQL(field, prefix, schemaComposer);
+      return embeddedToGraphQL(field, prefix, schemaComposer, opts);
     case ComplexTypes.ENUM:
       return enumToGraphQL(field, prefix, schemaComposer);
     case ComplexTypes.REFERENCE:
       return referenceToGraphQL(field);
     case ComplexTypes.DOCUMENT_ARRAY:
-      return documentArrayToGraphQL(field, prefix, schemaComposer);
+      return documentArrayToGraphQL(field, prefix, schemaComposer, opts);
     case ComplexTypes.MIXED:
       return 'JSON';
     case ComplexTypes.DECIMAL:
@@ -316,7 +334,8 @@ export function scalarToGraphQL(field: MongooseFieldT): ComposeScalarType {
 export function arrayToGraphQL(
   field: MongooseFieldT,
   prefix: string = '',
-  schemaComposer: SchemaComposer<any>
+  schemaComposer: SchemaComposer<any>,
+  opts: ComposeMongooseOpts<any> = {}
 ): ComposeOutputTypeDefinition<any> {
   if (!field || !field.caster) {
     throw new Error(
@@ -327,14 +346,17 @@ export function arrayToGraphQL(
 
   const unwrappedField = { ...field.caster };
 
-  const outputType: any = convertFieldToGraphQL(unwrappedField, prefix, schemaComposer);
+  opts.includeBaseDiscriminators = opts.includeNestedDiscriminators; // workaround to avoid recursive loop on convertModel and support nested discrim fields
+
+  const outputType: any = convertFieldToGraphQL(unwrappedField, prefix, schemaComposer, opts);
   return [outputType];
 }
 
 export function embeddedToGraphQL(
   field: MongooseFieldT,
   prefix: string = '',
-  schemaComposer: SchemaComposer<any>
+  schemaComposer: SchemaComposer<any>,
+  opts: ComposeMongooseOpts<any> = {}
 ): ObjectTypeComposer<any, any> {
   const fieldName = _getFieldName(field);
   const fieldType = _getFieldType(field);
@@ -351,8 +373,9 @@ export function embeddedToGraphQL(
     throw new Error(`Mongoose field '${prefix}.${fieldName}' should have 'schema' property`);
   }
 
+  opts.includeBaseDiscriminators = opts.includeNestedDiscriminators; // workaround to avoid recursive loop on convertModel and support nested discrim fields
   const typeName = `${prefix}${upperFirst(fieldName)}`;
-  return convertSchemaToGraphQL(fieldSchema, typeName, schemaComposer);
+  return convertSchemaToGraphQL(fieldSchema, typeName, schemaComposer, opts);
 }
 
 export function enumToGraphQL(
@@ -386,7 +409,8 @@ export function enumToGraphQL(
 export function documentArrayToGraphQL(
   field: MongooseFieldT,
   prefix: string = '',
-  schemaComposer: SchemaComposer<any>
+  schemaComposer: SchemaComposer<any>,
+  opts: ComposeMongooseOpts<any> = {}
 ): [ObjectTypeComposer<any, any>] {
   if (!(field instanceof mongoose.Schema.Types.DocumentArray) && !field?.schema?.paths) {
     throw new Error(
@@ -397,7 +421,8 @@ export function documentArrayToGraphQL(
 
   const typeName = `${prefix}${upperFirst(_getFieldName(field))}`;
 
-  const tc = convertModelToGraphQL(field as any, typeName, schemaComposer);
+  opts.includeBaseDiscriminators = opts.includeNestedDiscriminators; // workaround to avoid recursive loop on convertModel and support nested discrim fields
+  const tc = convertModelToGraphQL(field as any, typeName, schemaComposer, opts);
 
   return [tc];
 }
