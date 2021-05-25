@@ -4,6 +4,7 @@ import {
   Extensions,
   InterfaceTypeComposer,
   ObjectTypeComposer,
+  ObjectTypeComposerFieldConfig,
   ObjectTypeComposerFieldConfigDefinition,
   SchemaComposer,
 } from 'graphql-compose';
@@ -40,6 +41,7 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
 > {
   discriminatorKey: string = '';
   discrimTCs: { [key: string]: ObjectTypeComposer<any, TContext> } = {};
+  BaseTC: ObjectTypeComposer<TSource, TContext>;
   DInputObject: ObjectTypeComposer<TSource, TContext>;
   DInterface: InterfaceTypeComposer<TSource, TContext>;
   opts: ComposeMongooseDiscriminatorsOpts<TContext> = {};
@@ -49,6 +51,7 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
     super(gqType, schemaComposer);
     this.DInterface = schemaComposer.getOrCreateIFTC(`${gqType.name}Interface`);
     this.DInputObject = schemaComposer.getOrCreateOTC(`${gqType.name}Input`);
+    this.BaseTC = schemaComposer.getOrCreateOTC(`${gqType.name}BaseTC`);
     return this;
   }
 
@@ -87,6 +90,7 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
         'A custom discriminator key must be set on the model options in mongoose for discriminator behaviour to function correctly'
       );
     }
+    baseDTC.BaseTC = baseTC;
     baseDTC.DInterface = baseDTC._buildDiscriminatedInterface(model, baseTC);
     baseDTC.DInterface.setInputTypeComposer(baseDTC.DInputObject.getInputTypeComposer());
     baseDTC.setInputTypeComposer(baseDTC.DInputObject.getInputTypeComposer());
@@ -133,21 +137,16 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
       // TODO - Review when Input Unions/similar are accepted into the graphQL spec and supported by graphql-js
       // SEE - https://github.com/graphql/graphql-spec/blob/main/rfcs/InputUnion.md
       const discrimFields = discrimTC.getFields();
+
+      // add each field to Input Object TC
       Object.keys(discrimFields).forEach((fieldName) => {
         const field = discrimFields[fieldName];
-
-        // if another discrimTC has already defined the field (not from original TC)
-        if (this.DInputObject.hasField(fieldName) && !baseTC.hasField(fieldName)) {
-          this.DInputObject.setField(fieldName, `JSON`);
-        } else {
-          (this.DInputObject as ObjectTypeComposer<any, any>).setField(fieldName, field);
-        }
+        this._addFieldToInputOTC(fieldName, field);
       });
+
       this.DInputObject.makeFieldNullable(
         discrimTC.getFieldNames().filter((field) => !baseTC.hasField(field))
       );
-      // there may be issues for discriminated types with overlapping fields, the last validation req will overwrite prior one
-      // mitigation attempted by setting type to any on filed which appears in multiple implementations
       discrimTC.makeFieldNonNull('_id');
 
       // also set fields on master TC so it will have all possibilities for input workaround
@@ -163,6 +162,20 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
     });
 
     return interfaceTC;
+  }
+
+  _addFieldToInputOTC(
+    fieldName: string,
+    field: ObjectTypeComposerFieldConfig<any, any, any>
+  ): void {
+    // if another discrimTC has already defined the field (not from original TC)
+    if (this.DInputObject.hasField(fieldName) && !this.BaseTC.hasField(fieldName)) {
+      this.DInputObject.setField(fieldName, `JSON`);
+    } else {
+      (this.DInputObject as ObjectTypeComposer<any, any>).setField(fieldName, field);
+    }
+    // there may be issues for discriminated types with overlapping fields, the last validation req will overwrite prior one
+    // mitigation attempted by setting type to any on filed which appears in multiple implementations
   }
 
   getDKey(): string {
