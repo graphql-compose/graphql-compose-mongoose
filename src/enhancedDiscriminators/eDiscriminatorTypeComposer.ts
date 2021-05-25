@@ -10,7 +10,7 @@ import {
 } from 'graphql-compose';
 import mongoose, { Document, Model } from 'mongoose';
 import { convertModelToGraphQL, MongoosePseudoModelT } from '../fieldsConverter';
-import { composeMongoose, ComposeMongooseOpts } from '../composeMongoose';
+import { composeMongoose, ComposeMongooseOpts, GenerateResolverType } from '../composeMongoose';
 
 export function convertModelToGraphQLWithDiscriminators<TDoc extends Document, TContext>(
   model: Model<TDoc> | MongoosePseudoModelT,
@@ -40,7 +40,12 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
   TContext
 > {
   discriminatorKey: string = '';
-  discrimTCs: { [key: string]: ObjectTypeComposer<any, TContext> } = {};
+  discrimTCs: {
+    [key: string]: ObjectTypeComposer<any, TContext> & {
+      mongooseResolvers: GenerateResolverType<any, TContext>;
+    };
+  } = {};
+
   BaseTC: ObjectTypeComposer<TSource, TContext>;
   DInputObject: ObjectTypeComposer<TSource, TContext>;
   DInterface: InterfaceTypeComposer<TSource, TContext>;
