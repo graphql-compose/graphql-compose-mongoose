@@ -52,7 +52,7 @@ export function createOne<TSource = any, TContext = any, TDoc extends Document =
     t.setFields({
       ...payloadRecordId(tc, opts?.recordId),
       record: {
-        type: tc,
+        type: tc.getTypeName(),
         description: 'Created document',
       },
     });

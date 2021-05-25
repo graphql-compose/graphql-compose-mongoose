@@ -40,7 +40,7 @@ export function removeById<TSource = any, TContext = any, TDoc extends Document 
     t.setFields({
       ...payloadRecordId(tc, opts?.recordId),
       record: {
-        type: tc,
+        type: tc.getTypeName(),
         description: 'Removed document',
       },
     });
