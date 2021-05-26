@@ -6,7 +6,7 @@ import {
   GenerateResolverType,
 } from '../../composeMongoose';
 import { EDiscriminatorTypeComposer } from '../eDiscriminatorTypeComposer';
-import { Document, Model, Schema } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
 const defaultDKey = 'type';
 const { CharacterModel } = getCharacterModels(defaultDKey);
@@ -80,15 +80,13 @@ describe('EDiscriminatorTypeComposer', () => {
 
   describe('createFromModel errors', () => {
     it('should throw an error if it is called with no discriminators present', () => {
+      const fakeModel = mongoose.model(
+        'fakeModelEDiscrim',
+        new Schema({ test: String, thingy: Boolean })
+      );
+
       const errorCall = () =>
-        EDiscriminatorTypeComposer.createFromModel(
-          {
-            schema: new Schema({ test: String, thingy: Boolean }),
-          },
-          'noDiscrimType',
-          schemaComposer,
-          {}
-        );
+        EDiscriminatorTypeComposer.createFromModel(fakeModel, 'noDiscrimType', schemaComposer, {});
 
       expect(errorCall).toThrowError('Discriminators should be present to use this function');
     });
