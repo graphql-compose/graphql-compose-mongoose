@@ -122,6 +122,20 @@ describe('EDiscriminatorTypeComposer', () => {
     });
   });
 
+  describe('Get Discriminator TCs', () => {
+    it('returns discrimTCs with mongooseResolvers present', () => {
+      Object.values(baseDTC.getDiscriminatorTCs()).forEach((discimTC) => {
+        expect(discimTC).toHaveProperty('mongooseResolvers');
+      });
+    });
+    it('returns empty object with mongooseResolvers missing', () => {
+      (baseDTC.discrimTCs[Object.keys(baseDTC.discrimTCs)[0]] as any).mongooseResolvers = undefined;
+      Object.values(baseDTC.getDiscriminatorTCs()).forEach((discimTC) => {
+        expect(discimTC).toHaveProperty('mongooseResolvers');
+      });
+    });
+  });
+
   describe('Overridden eDTC Class Methods', () => {
     describe('Set Field', () => {
       it('updates field on all child TCs', () => {

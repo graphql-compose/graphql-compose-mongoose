@@ -218,7 +218,7 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
       mongooseResolvers: GenerateResolverType<any, TContext>;
     };
   } {
-    // check if mongooseResolvers are present
+    // check if mongooseResolvers are present (assume on one = on all)
     if ((this.discrimTCs[Object.keys(this.discrimTCs)[0]] as any).mongooseResolvers) {
       return this.discrimTCs as any;
     } else {
