@@ -199,8 +199,6 @@ describe('EDiscriminatorTypeComposer', () => {
           .filter((field) => field !== 'toKeep');
         baseDTC.removeOtherFields('toKeep');
 
-        console.log(otherFields);
-
         otherFields.forEach((removedField) => {
           expect(baseDTC.hasField(removedField)).toBeFalsy();
           expect(DInterface.hasField(removedField)).toBeFalsy();
@@ -216,7 +214,6 @@ describe('EDiscriminatorTypeComposer', () => {
       it('reorders fields on all child TCs', () => {
         const fieldOrder = ['_id', 'appearsIn', 'friends', 'kind', 'type'];
         const fieldOrderString = fieldOrder.join('');
-        console.log(fieldOrderString);
 
         baseDTC.reorderFields(fieldOrder);
 
@@ -225,6 +222,36 @@ describe('EDiscriminatorTypeComposer', () => {
         expect(DInputObject.getFieldNames().join('').startsWith(fieldOrderString)).toBeTruthy();
         Object.values(baseDTC.discrimTCs).forEach((dTC) => {
           expect(dTC.getFieldNames().join('').startsWith(fieldOrderString)).toBeTruthy();
+        });
+      });
+    });
+
+    describe('Make Fields Nullable/Non-null', () => {
+      it('makes a nullable field non-null', () => {
+        baseDTC.addFields({ initialNullable: 'String' });
+        expect(baseDTC.isFieldNonNull('initialNullable')).toBeFalsy();
+
+        baseDTC.makeFieldNonNull('initialNullable');
+
+        expect(baseDTC.isFieldNonNull('initialNullable')).toBeTruthy();
+        expect(DInterface.isFieldNonNull('initialNullable')).toBeTruthy();
+        expect(DInputObject.isFieldNonNull('initialNullable')).toBeTruthy();
+        Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+          expect(dTC.isFieldNonNull('initialNullable')).toBeTruthy();
+        });
+      });
+
+      it('makes a non-null field nullable', () => {
+        baseDTC.addFields({ initialNonNull: 'String!' });
+        expect(baseDTC.isFieldNonNull('initialNonNull')).toBeTruthy();
+
+        baseDTC.makeFieldNullable('initialNonNull');
+
+        expect(baseDTC.isFieldNonNull('initialNonNull')).toBeFalsy();
+        expect(DInterface.isFieldNonNull('initialNonNull')).toBeFalsy();
+        expect(DInputObject.isFieldNonNull('initialNonNull')).toBeFalsy();
+        Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+          expect(dTC.isFieldNonNull('initialNonNull')).toBeFalsy();
         });
       });
     });

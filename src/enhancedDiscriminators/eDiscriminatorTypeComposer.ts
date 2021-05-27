@@ -308,4 +308,28 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
 
     return this;
   }
+
+  makeFieldNonNull(fieldNameOrArray: string | Array<string>): this {
+    super.makeFieldNonNull(fieldNameOrArray);
+    this.getDInterface().makeFieldNonNull(fieldNameOrArray);
+    this.getDInputObject().makeFieldNonNull(fieldNameOrArray);
+
+    for (const discrimTC in this.discrimTCs) {
+      this.discrimTCs[discrimTC].makeFieldNonNull(fieldNameOrArray);
+    }
+
+    return this;
+  }
+
+  makeFieldNullable(fieldNameOrArray: string | Array<string>): this {
+    super.makeFieldNullable(fieldNameOrArray);
+    this.getDInterface().makeFieldNullable(fieldNameOrArray);
+    this.getDInputObject().makeFieldNullable(fieldNameOrArray);
+
+    for (const discrimTC in this.discrimTCs) {
+      this.discrimTCs[discrimTC].makeFieldNullable(fieldNameOrArray);
+    }
+
+    return this;
+  }
 }
