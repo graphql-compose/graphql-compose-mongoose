@@ -37,11 +37,9 @@ describe('DiscriminatorTypeComposer', () => {
     it('should have field names synced with the baseTC', () => {
       expect(baseDTC.getFieldNames()).toEqual(Object.keys(baseDTC.getDInterface().getFields()));
 
-      beforeAll(() => {
-        baseDTC.addFields({
-          field1: 'String',
-          field2: 'String',
-        });
+      baseDTC.addFields({
+        field1: 'String',
+        field2: 'String',
       });
 
       expect(baseDTC.getFieldNames()).toEqual(Object.keys(baseDTC.getDInterface().getFields()));

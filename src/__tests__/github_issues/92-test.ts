@@ -2,9 +2,6 @@ import { schemaComposer, graphql } from 'graphql-compose';
 import { composeWithMongoose } from '../../index';
 import { UserModel } from '../../__mocks__/userModel';
 
-// May require additional time for downloading MongoDB binaries
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
 

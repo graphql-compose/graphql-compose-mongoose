@@ -2,9 +2,6 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { composeWithMongoose } from '../../index';
 
-// May require additional time for downloading MongoDB binaries
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-
 let mongoServer: MongoMemoryServer;
 beforeAll(async () => {
   mongoServer = new MongoMemoryServer();
