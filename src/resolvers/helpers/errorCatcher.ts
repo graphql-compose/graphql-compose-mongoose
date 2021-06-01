@@ -1,5 +1,5 @@
 import { Resolver } from 'graphql-compose';
-import { getErrorInterface, MongoError, ValidationError } from '../../errors';
+import { getErrorInterface, ValidationError } from '../../errors';
 import { GraphQLError } from 'graphql-compose/lib/graphql';
 
 /**
@@ -33,7 +33,7 @@ export function addErrorCatcherField(resolver: Resolver<any, any, any>): void {
           message: e.message,
           errors: e.errors,
         };
-      } else if (e instanceof MongoError) {
+      } else if (e?.constructor.name === 'MongoError') {
         error = {
           name: 'MongoError',
           message: e.message,
