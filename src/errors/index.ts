@@ -1,9 +1,9 @@
 import type { InterfaceTypeComposer, SchemaComposer } from 'graphql-compose';
-import { MongoError, getMongoErrorOTC } from './MongoError';
+import { getMongoErrorOTC } from './MongoError';
 import { ValidationError, getValidationErrorOTC } from './ValidationError';
 import { RuntimeError, getRuntimeErrorOTC } from './RuntimeError';
 
-export { MongoError, ValidationError, RuntimeError };
+export { ValidationError, RuntimeError };
 
 export function getErrorInterface(schemaComposer: SchemaComposer<any>): InterfaceTypeComposer {
   const ErrorInterface = schemaComposer.getOrCreateIFTC('ErrorInterface', (iftc) => {
