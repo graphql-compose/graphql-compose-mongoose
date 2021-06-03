@@ -98,7 +98,7 @@ const LanguagesSchema = new mongoose.Schema({
   language: String,
   skill: {
     type: String,
-    enum: [ 'basic', 'fluent', 'native' ],
+    enum: ['basic', 'fluent', 'native'],
   },
 });
 
@@ -127,7 +127,6 @@ const UserSchema = new mongoose.Schema({
   },
 });
 const User = mongoose.model('User', UserSchema);
-
 
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity, described below
@@ -165,32 +164,42 @@ schemaComposer.Mutation.addFields({
 });
 
 // STEP 4: BUILD GraphQL SCHEMA OBJECT
-const graphqlSchema = schemaComposer.buildSchema();
-export default graphqlSchema;
+const schema = schemaComposer.buildSchema();
+export default schema;
 
 // STEP 5: DEMO USE OF GraphQL SCHEMA OBJECT
 // Just a demo, normally you'd pass schema object to server such as Apollo server.
-(async() => {
+import { graphql } from 'graphql';
+
+(async () => {
   await mongoose.connect('mongodb://localhost:27017/test');
   await mongoose.connection.dropDatabase();
-  await User.insertMany([
-    { name: 'alice', age: 29, ln: [{ langauge: 'english', skill: 'fluent' }], gender: 'female' },
-    { name: 'bob', age: 30, ln: [{ langauge: 'english', skill: 'basic' }], gender: 'male' },
-    { name: 'maria', age: 31, ln: [{ langauge: 'russian', skill: 'fluent' }], gender: 'female' },
-  ]);
-  graphql(
-    graphqlSchema, 'query { userMany { _id name } }').then((response) => {
-    console.log(response.data.userMany);
-    const bob = response.data.userMany.find(u => u.name === 'bob');
-    graphql(graphqlSchema, `query { userById(_id:"${bob._id}") { name } }`).then((response) => {
-      console.log(response);
-    });
-    graphql(
-      graphqlSchema,
-      `mutation { userUpdateOne(record: { name: "bill" }, filter: {_id:"${bob._id}"} ) { record { name } } }`).then((response) => {
-      console.dir(response, { depth: 5 });
-    });
+
+  await User.create({ name: 'alice', age: 29, gender: 'female' });
+  await User.create({ name: 'maria', age: 31, gender: 'female' });
+  const bob = await User.create({ name: 'bob', age: 30, gender: 'male' });
+
+  const response1 = await graphql({
+    schema,
+    source: 'query { userMany { _id name } }',
   });
+  console.dir(response1, { depth: 5 });
+
+  const response2 = await graphql({
+    schema,
+    source: 'query($id: MongoID!) { userById(_id: $id) { _id name } }',
+    variableValues: { id: bob._id },
+  });
+  console.dir(response2, { depth: 5 });
+
+  const response3 = await graphql({
+    schema,
+    source: 'mutation($id: MongoID!, $name: String) { userUpdateOne(filter: {_id: $id}, record: { name: $name }) { record { _id name } } }',
+    variableValues: { id: bob._id, name: 'bill' },
+  });
+  console.dir(response3, { depth: 5 });
+
+  mongoose.disconnect();
 })();
 ```
 
