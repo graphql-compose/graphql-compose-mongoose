@@ -133,7 +133,7 @@ const User = mongoose.model('User', UserSchema);
 const customizationOptions = {}; // left it empty for simplicity, described below
 const UserTC = composeMongoose(User, customizationOptions);
 
-// STEP 3: Add needed CRUD User operations to the GraphQL Schema
+// STEP 3: ADD NEEDED CRUD USER OPERATIONS TO THE GraphQL SCHEMA
 // via graphql-compose it will be much much easier, with less typing
 schemaComposer.Query.addFields({
   userById: UserTC.mongooseResolvers.findById(),
@@ -164,8 +164,34 @@ schemaComposer.Mutation.addFields({
   userRemoveMany: UserTC.mongooseResolvers.removeMany(),
 });
 
+// STEP 4: BUILD GraphQL SCHEMA OBJECT
 const graphqlSchema = schemaComposer.buildSchema();
 export default graphqlSchema;
+
+// STEP 5: DEMO USE OF GraphQL SCHEMA OBJECT
+// Just a demo, normally you'd pass schema object to server such as Apollo server.
+(async() => {
+  await mongoose.connect('mongodb://localhost:27017/test');
+  await mongoose.connection.dropDatabase();
+  await User.insertMany([
+    { name: 'alice', age: 29, ln: [{ langauge: 'english', skill: 'fluent' }], gender: 'female' },
+    { name: 'bob', age: 30, ln: [{ langauge: 'english', skill: 'basic' }], gender: 'male' },
+    { name: 'maria', age: 31, ln: [{ langauge: 'russian', skill: 'fluent' }], gender: 'female' },
+  ]);
+  graphql(
+    graphqlSchema, 'query { userMany { _id name } }').then((response) => {
+    console.log(response.data.userMany);
+    const bob = response.data.userMany.find(u => u.name === 'bob');
+    graphql(graphqlSchema, `query { userById(_id:"${bob._id}") { name } }`).then((response) => {
+      console.log(response);
+    });
+    graphql(
+      graphqlSchema,
+      `mutation { userUpdateOne(record: { name: "bill" }, filter: {_id:"${bob._id}"} ) { record { name } } }`).then((response) => {
+      console.dir(response, { depth: 5 });
+    });
+  });
+})();
 ```
 
 That's all!
