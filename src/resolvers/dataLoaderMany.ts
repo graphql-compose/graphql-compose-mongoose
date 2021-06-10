@@ -51,7 +51,7 @@ export function dataLoaderMany<TSource = any, TContext = any, TDoc extends Docum
   const aliasesReverse = prepareAliasesReverse(model.schema);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
-    type: tc.schemaComposer.getAnyTC(tc.getTypeName()).List.NonNull,
+    type: '[' + tc.getTypeName() + ']!',
     name: 'dataLoaderMany',
     kind: 'query',
     args: {

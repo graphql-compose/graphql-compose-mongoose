@@ -69,16 +69,14 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
     type: outputType,
     args: {
       records: {
-        type: (
-          recordHelperArgs(tc, {
-            prefix: 'CreateMany',
-            suffix: `${opts?.suffix || ''}Input`,
-            removeFields: ['id', '_id'],
-            isRequired: true,
-            requiredFields,
-            ...opts?.records,
-          }) as any
-        ).record.type.List.NonNull,
+        type: (recordHelperArgs(tc, {
+          prefix: 'CreateMany',
+          suffix: `${opts?.suffix || ''}Input`,
+          removeFields: ['id', '_id'],
+          isRequired: true,
+          requiredFields,
+          ...opts?.records,
+        }) as any).record.type.List.NonNull,
       },
     },
     resolve: async (resolveParams) => {
