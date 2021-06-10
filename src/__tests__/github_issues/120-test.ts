@@ -17,9 +17,6 @@ afterAll(() => {
   mongoServer.stop();
 });
 
-// May require additional time for downloading MongoDB binaries
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-
 describe('issue #120 - check `connection` resolver with last/before', () => {
   const RecordSchema = new mongoose.Schema({ id: String, title: String });
   const Record = mongoose.model('Record', RecordSchema);

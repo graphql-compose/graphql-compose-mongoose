@@ -33,9 +33,11 @@ export const CharacterObject = {
 const CharacterSchema = new Schema(CharacterObject);
 const ACharacterSchema = new Schema({ ...CharacterObject });
 
-export function getCharacterModels(
-  DKey: string
-): { CharacterModel: Model<any>; PersonModel: Model<any>; DroidModel: Model<any> } {
+export function getCharacterModels(DKey: string): {
+  CharacterModel: Model<any>;
+  PersonModel: Model<any>;
+  DroidModel: Model<any>;
+} {
   CharacterSchema.set('discriminatorKey', DKey);
 
   const CharacterModel: Model<any> = mongoose.models.Character

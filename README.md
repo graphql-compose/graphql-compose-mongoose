@@ -98,7 +98,7 @@ const LanguagesSchema = new mongoose.Schema({
   language: String,
   skill: {
     type: String,
-    enum: [ 'basic', 'fluent', 'native' ],
+    enum: ['basic', 'fluent', 'native'],
   },
 });
 
@@ -128,12 +128,11 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', UserSchema);
 
-
 // STEP 2: CONVERT MONGOOSE MODEL TO GraphQL PIECES
 const customizationOptions = {}; // left it empty for simplicity, described below
 const UserTC = composeMongoose(User, customizationOptions);
 
-// STEP 3: Add needed CRUD User operations to the GraphQL Schema
+// STEP 3: ADD NEEDED CRUD USER OPERATIONS TO THE GraphQL SCHEMA
 // via graphql-compose it will be much much easier, with less typing
 schemaComposer.Query.addFields({
   userById: UserTC.mongooseResolvers.findById(),
@@ -164,8 +163,44 @@ schemaComposer.Mutation.addFields({
   userRemoveMany: UserTC.mongooseResolvers.removeMany(),
 });
 
-const graphqlSchema = schemaComposer.buildSchema();
-export default graphqlSchema;
+// STEP 4: BUILD GraphQL SCHEMA OBJECT
+const schema = schemaComposer.buildSchema();
+export default schema;
+
+// STEP 5: DEMO USE OF GraphQL SCHEMA OBJECT
+// Just a demo, normally you'd pass schema object to server such as Apollo server.
+import { graphql } from 'graphql';
+
+(async () => {
+  await mongoose.connect('mongodb://localhost:27017/test');
+  await mongoose.connection.dropDatabase();
+
+  await User.create({ name: 'alice', age: 29, gender: 'female' });
+  await User.create({ name: 'maria', age: 31, gender: 'female' });
+  const bob = await User.create({ name: 'bob', age: 30, gender: 'male' });
+
+  const response1 = await graphql({
+    schema,
+    source: 'query { userMany { _id name } }',
+  });
+  console.dir(response1, { depth: 5 });
+
+  const response2 = await graphql({
+    schema,
+    source: 'query($id: MongoID!) { userById(_id: $id) { _id name } }',
+    variableValues: { id: bob._id },
+  });
+  console.dir(response2, { depth: 5 });
+
+  const response3 = await graphql({
+    schema,
+    source: 'mutation($id: MongoID!, $name: String) { userUpdateOne(filter: {_id: $id}, record: { name: $name }) { record { _id name } } }',
+    variableValues: { id: bob._id, name: 'bill' },
+  });
+  console.dir(response3, { depth: 5 });
+
+  mongoose.disconnect();
+})();
 ```
 
 That's all!

@@ -16,9 +16,6 @@ afterAll(() => {
   mongoServer.stop();
 });
 
-// May require additional time for downloading MongoDB binaries
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-
 describe('issue #78 - Mongoose and Discriminators', () => {
   const options = { discriminatorKey: 'kind' };
 

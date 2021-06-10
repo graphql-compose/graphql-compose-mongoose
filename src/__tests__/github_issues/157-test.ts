@@ -18,11 +18,8 @@ afterAll(() => {
   mongoServer.stop();
 });
 
-// May require additional time for downloading MongoDB binaries
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-
 describe('issue #157 - Optional enum error', () => {
-  const Visit = mongoose.model(
+  const Visit = mongoose.model<any>(
     'visit',
     new mongoose.Schema({
       url: { type: String, required: true },

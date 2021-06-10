@@ -17,9 +17,6 @@ afterAll(() => {
   mongoServer.stop();
 });
 
-// May require additional time for downloading MongoDB binaries
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
-
 describe('issue #128 - OR/AND filter args not working with some other filter args', () => {
   const RecordSchema = new mongoose.Schema({
     id: String,
