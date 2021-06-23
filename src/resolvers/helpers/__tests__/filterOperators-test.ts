@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
-import { schemaComposer, InputTypeComposer } from 'graphql-compose';
+import { schemaComposer, InputTypeComposer, SchemaComposer, graphql } from 'graphql-compose';
 import { composeWithMongoose } from '../../../composeWithMongoose';
+import { composeMongoose } from '../../../composeMongoose';
 
 import {
   _createOperatorsField,
@@ -269,6 +270,70 @@ describe('Resolver helper `filter` ->', () => {
           },
         ],
       });
+    });
+  });
+
+  describe('integration tests', () => {
+    it('should not throw error: must define one or more fields', async () => {
+      const OrderDetailsSchema = new mongoose.Schema(
+        {
+          productID: Number,
+          unitPrice: Number,
+          quantity: Number,
+          discount: Number,
+        },
+        {
+          _id: false,
+        }
+      );
+
+      const OrderSchema = new mongoose.Schema(
+        {
+          orderID: {
+            type: Number,
+            description: 'Order unique ID',
+            unique: true,
+          },
+          customerID: String,
+          employeeID: Number,
+          orderDate: Date,
+          requiredDate: Date,
+          shippedDate: Date,
+          shipVia: Number,
+          freight: Number,
+          shipName: String,
+          details: {
+            type: [OrderDetailsSchema],
+            index: true,
+            description: 'List of ordered products',
+          },
+        },
+        {
+          collection: 'northwind_orders',
+        }
+      );
+
+      const OrderModel = mongoose.model<any>('Order', OrderSchema);
+
+      const OrderTC = composeMongoose(OrderModel);
+
+      const orderFindOneResolver = OrderTC.mongooseResolvers.findOne();
+
+      const sc = new SchemaComposer();
+      sc.Query.addFields({
+        order: orderFindOneResolver,
+      });
+
+      const schema = sc.buildSchema();
+
+      const res = await graphql.graphql({
+        schema,
+        source: `{ __typename }`,
+      });
+
+      expect(res?.errors?.[0]?.message).not.toBe(
+        'Input Object type FilterFindOneOrderDetailsOperatorsInput must define one or more fields.'
+      );
     });
   });
 });

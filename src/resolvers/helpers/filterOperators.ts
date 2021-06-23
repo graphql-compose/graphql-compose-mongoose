@@ -1,12 +1,5 @@
-import {
-  getNamedType,
-  GraphQLInputObjectType,
-  GraphQLScalarType,
-  GraphQLEnumType,
-  GraphQLString,
-} from 'graphql-compose/lib/graphql';
 import type { Model } from 'mongoose';
-import { InputTypeComposer, inspect } from 'graphql-compose';
+import { EnumTypeComposer, InputTypeComposer, inspect, ScalarTypeComposer } from 'graphql-compose';
 import type { InputTypeComposerFieldConfigAsObjectDefinition } from 'graphql-compose';
 
 import { upperFirst, getIndexesFromModel } from '../../utils';
@@ -89,24 +82,23 @@ export function _availableOperatorsFields(
     : availableOperators;
 
   operators.forEach((operatorName: string) => {
-    // unwrap from GraphQLNonNull and GraphQLList, if present
-    const fieldType = getNamedType(itc.getFieldType(fieldName));
+    const fieldTC = itc.getFieldTC(fieldName);
 
-    if (fieldType) {
+    if (fieldTC) {
       if (['in', 'nin', 'in[]', 'nin[]'].includes(operatorName)) {
         // wrap with GraphQLList, if operator required this with `[]`
         const newName = operatorName.slice(-2) === '[]' ? operatorName.slice(0, -2) : operatorName;
-        fields[newName] = { type: [fieldType] as any };
+        fields[newName] = { type: [fieldTC] };
       } else {
         if (operatorName === 'exists') {
           fields[operatorName] = { type: 'Boolean' };
         } else if (operatorName === 'regex') {
           // Only for fields with type String allow regex operator
-          if (fieldType === GraphQLString) {
+          if (fieldTC.getTypeName() === 'String') {
             fields[operatorName] = { type: GraphQLRegExpAsString };
           }
         } else {
-          fields[operatorName] = { type: fieldType as any };
+          fields[operatorName] = { type: fieldTC };
         }
       }
     }
@@ -148,15 +140,14 @@ export function _recurseSchema(
     }
 
     const fieldTC = sourceITC.getFieldTC(fieldName);
-    const fieldType = fieldTC.getType();
 
     // prevent infinite recursion
-    if (sourceITC.getType() === fieldType) return;
+    if (sourceITC === fieldTC) return;
 
     const baseTypeName = `${opts.baseTypeName}${upperFirst(fieldName)}`;
     const inputFieldTypeName = `${opts.prefix || ''}${baseTypeName}${opts.suffix || ''}`;
 
-    if (fieldType instanceof GraphQLScalarType || fieldType instanceof GraphQLEnumType) {
+    if (fieldTC instanceof ScalarTypeComposer || fieldTC instanceof EnumTypeComposer) {
       if (
         fieldOperatorsConfig &&
         !Array.isArray(fieldOperatorsConfig) &&
@@ -181,7 +172,7 @@ export function _recurseSchema(
           [fieldName]: fieldOperatorsITC,
         });
       }
-    } else if (fieldType instanceof GraphQLInputObjectType) {
+    } else if (fieldTC instanceof InputTypeComposer) {
       const fieldOperatorsITC = schemaComposer.createInputTC(inputFieldTypeName);
       _recurseSchema(
         fieldOperatorsITC,
@@ -194,9 +185,12 @@ export function _recurseSchema(
         indexedFields,
         fieldPath
       );
-      inputITC.addFields({
-        [fieldName]: fieldOperatorsITC,
-      });
+
+      if (fieldOperatorsITC.getFieldNames().length > 0) {
+        inputITC.addFields({
+          [fieldName]: fieldOperatorsITC,
+        });
+      }
     }
   });
 }
