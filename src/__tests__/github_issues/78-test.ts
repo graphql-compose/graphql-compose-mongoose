@@ -5,9 +5,8 @@ import { composeWithMongoose } from '../../index';
 
 let mongoServer: MongoMemoryServer;
 beforeAll(async () => {
-  mongoServer = new MongoMemoryServer();
-  await mongoServer.start();
-  const mongoUri = await mongoServer.getUri();
+  mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
   await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 });
 

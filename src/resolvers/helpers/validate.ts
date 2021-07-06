@@ -28,7 +28,7 @@ export async function validateDoc(doc: Document): Promise<ValidationsWithMessage
         message: validations.message,
         errors: Object.keys(validations.errors).map((key) => {
           // transform object to array[{ path, message, value }, {}, ...]
-          const { message, value } = validations.errors[key];
+          const { message, value } = validations.errors[key] as any;
           return {
             path: key,
             message,
