@@ -9,9 +9,8 @@ mongoose.Promise = Promise;
 
 const originalConnect = mongoose.connect;
 mongoose.createConnection = (async () => {
-  const mongoServer = new MongoMemoryServer();
-
-  const mongoUri = await mongoServer.getUri(true);
+  const mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
 
   // originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true }); // mongoose 4
   originalConnect.bind(mongoose)(mongoUri, {
