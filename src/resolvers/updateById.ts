@@ -1,5 +1,5 @@
 import { toInputType } from 'graphql-compose';
-import { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs, RecordHelperArgsOpts } from './helpers/record';
 import { findById } from './findById';
@@ -26,7 +26,7 @@ type TArgs = {
 
 export function updateById<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>,
+  tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: UpdateByIdResolverOpts
 ): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {

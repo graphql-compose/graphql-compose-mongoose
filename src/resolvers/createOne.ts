@@ -1,4 +1,4 @@
-import { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs, RecordHelperArgsOpts } from './helpers';
 import type { ExtendedResolveParams } from './index';
@@ -23,7 +23,7 @@ type TArgs = {
 
 export function createOne<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>,
+  tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: CreateOneResolverOpts
 ): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {

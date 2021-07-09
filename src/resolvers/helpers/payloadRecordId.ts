@@ -1,5 +1,6 @@
 import {
   ObjectTypeComposer,
+  InterfaceTypeComposer,
   ComposeOutputTypeDefinition,
   ObjectTypeComposerFieldConfigMapDefinition,
   toInputType,
@@ -13,7 +14,7 @@ export type PayloadRecordIdHelperOpts = {
 };
 
 export function payloadRecordId<TSource = any, TContext = any>(
-  tc: ObjectTypeComposer<TSource, TContext>,
+  tc: ObjectTypeComposer<TSource, TContext> | InterfaceTypeComposer<TSource, TContext>,
   opts?: PayloadRecordIdHelperOpts | false
 ): ObjectTypeComposerFieldConfigMapDefinition<TSource, TContext> | null {
   if (opts === false) return null;
@@ -39,7 +40,7 @@ export type PayloadRecordIdsHelperOpts = {
 };
 
 export function payloadRecordIds<TSource = any, TContext = any>(
-  tc: ObjectTypeComposer<TSource, TContext>,
+  tc: ObjectTypeComposer<TSource, TContext> | InterfaceTypeComposer<TSource, TContext>,
   opts?: PayloadRecordIdHelperOpts | false
 ): ObjectTypeComposerFieldConfigMapDefinition<TSource, TContext> | null {
   if (opts === false) return null;

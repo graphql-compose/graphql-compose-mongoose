@@ -25,15 +25,15 @@
   "homepage": "https://github.com/graphql-compose/graphql-compose-mongoose",
   "dependencies": {
     "dataloader": "^2.0.0",
-    "graphql-compose-connection": "8.2.0",
-    "graphql-compose-pagination": "8.2.0"
+    "graphql-compose-connection": "8.2.1",
+    "graphql-compose-pagination": "8.2.1"
   },
   "peerDependencies": {
     "graphql-compose": "^7.21.4 || ^8.0.0 || ^9.0.0",
     "mongoose": "^5.0.0 || ^4.4.0"
   },
   "devDependencies": {
-    "@types/jest": "26.0.23",
+    "@types/jest": "26.0.24",
     "@typescript-eslint/eslint-plugin": "4.28.2",
     "@typescript-eslint/parser": "4.28.2",
     "eslint": "7.30.0",
@@ -44,7 +44,7 @@
     "graphql": "15.5.1",
     "graphql-compose": "9.0.1",
     "jest": "27.0.6",
-    "mongodb-memory-server": "7.1.0",
+    "mongodb-memory-server": "7.2.0",
     "mongoose": "5.13.2",
     "prettier": "2.3.2",
     "request": "2.88.2",

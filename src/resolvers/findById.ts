@@ -1,5 +1,5 @@
 import { toInputType } from 'graphql-compose';
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
   projectionHelper,
@@ -32,7 +32,7 @@ type TArgs = {
 
 export function findById<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>,
+  tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: FindByIdResolverOpts
 ): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {

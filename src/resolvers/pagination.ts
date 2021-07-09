@@ -1,4 +1,4 @@
-import type { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
   preparePaginationResolver,
@@ -18,7 +18,7 @@ export type PaginationResolverOpts = Omit<
 
 export function pagination<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>,
+  tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: PaginationResolverOpts
 ): Resolver<TSource, TContext, PaginationTArgs, TDoc> {
   const { countOpts, findManyOpts, ...restOpts } = opts || {};

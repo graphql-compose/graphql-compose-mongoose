@@ -1,4 +1,4 @@
-import { ObjectTypeComposer, Resolver } from 'graphql-compose';
+import { ObjectTypeComposer, InterfaceTypeComposer, Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { recordHelperArgs, RecordHelperArgsOpts } from './helpers';
 import { addErrorCatcherField } from './helpers/errorCatcher';
@@ -22,7 +22,7 @@ type TArgs = {
 
 export function createMany<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>,
+  tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: CreateManyResolverOpts
 ): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {

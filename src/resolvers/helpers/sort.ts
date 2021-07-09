@@ -4,6 +4,7 @@ import type { Model, Document } from 'mongoose';
 import {
   ObjectTypeComposerArgumentConfigMapDefinition,
   ObjectTypeComposer,
+  InterfaceTypeComposer,
   SchemaComposer,
   EnumTypeComposer,
   isObject,
@@ -24,7 +25,7 @@ export type SortHelperArgsOpts = {
 };
 
 export function sortHelperArgs<TDoc extends Document = any>(
-  tc: ObjectTypeComposer<TDoc, any>,
+  tc: ObjectTypeComposer<TDoc, any> | InterfaceTypeComposer<TDoc, any>,
   model: Model<TDoc>,
   opts?: SortHelperArgsOpts
 ): ObjectTypeComposerArgumentConfigMapDefinition<{ sort: any }> {

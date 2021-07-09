@@ -1,6 +1,10 @@
 /* eslint-disable no-use-before-define */
 
-import { ObjectTypeComposer, ObjectTypeComposerArgumentConfigMap } from 'graphql-compose';
+import {
+  ObjectTypeComposer,
+  InterfaceTypeComposer,
+  ObjectTypeComposerArgumentConfigMap,
+} from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
@@ -62,7 +66,7 @@ export const getFilterHelperArgOptsMap = (): Record<string, string | string[]> =
 });
 
 export function filterHelperArgs<TDoc extends Document = any>(
-  typeComposer: ObjectTypeComposer<TDoc, any>,
+  typeComposer: ObjectTypeComposer<TDoc, any> | InterfaceTypeComposer<TDoc, any>,
   model: Model<TDoc>,
   opts?: FilterHelperArgsOpts
 ): ObjectTypeComposerArgumentConfigMap<{ filter: any }> {
