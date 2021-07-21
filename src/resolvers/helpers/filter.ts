@@ -4,6 +4,7 @@ import {
   ObjectTypeComposer,
   InterfaceTypeComposer,
   ObjectTypeComposerArgumentConfigMap,
+  InputTypeComposer,
 } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
@@ -102,24 +103,30 @@ export function filterHelperArgs<TDoc extends Document = any>(
 
   const { prefix, suffix } = opts;
   const filterTypeName: string = `${prefix}${typeComposer.getTypeName()}${suffix}`;
-  const itc = typeComposer.getInputTypeComposer().clone(filterTypeName);
 
-  makeFieldsRecursiveNullable(itc, { prefix, suffix });
+  let itc;
+  if (typeComposer.schemaComposer.hasInstance(filterTypeName, InputTypeComposer)) {
+    itc = typeComposer.schemaComposer.getITC(filterTypeName);
+  } else {
+    itc = typeComposer.getInputTypeComposer().clone(filterTypeName);
 
-  itc.removeField(removeFields);
+    makeFieldsRecursiveNullable(itc, { prefix, suffix });
 
-  if (opts.requiredFields) {
-    itc.makeFieldNonNull(opts.requiredFields);
+    itc.removeField(removeFields);
+
+    if (opts.requiredFields) {
+      itc.makeFieldNonNull(opts.requiredFields);
+    }
+
+    if (itc.getFieldNames().length === 0) {
+      return {} as any;
+    }
+
+    if (!opts.baseTypeName) {
+      opts.baseTypeName = typeComposer.getTypeName();
+    }
+    addFilterOperators(itc, model, opts);
   }
-
-  if (itc.getFieldNames().length === 0) {
-    return {} as any;
-  }
-
-  if (!opts.baseTypeName) {
-    opts.baseTypeName = typeComposer.getTypeName();
-  }
-  addFilterOperators(itc, model, opts);
 
   return {
     filter: {
