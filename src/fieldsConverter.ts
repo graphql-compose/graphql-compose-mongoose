@@ -189,6 +189,12 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
       description: _getFieldDescription(mongooseField),
     };
 
+    if (mongooseField?.schema && (mongooseField as any)?.$isSingleNested) {
+      graphqlFields[fieldName].extensions = {
+        isSingleNestedMongooseSchema: true,
+      };
+    }
+
     if (mongooseField?.defaultValue !== null && mongooseField?.defaultValue !== undefined) {
       if (!graphqlFields[fieldName].extensions) graphqlFields[fieldName].extensions = {};
       (graphqlFields as any)[fieldName].extensions.defaultValue = mongooseField?.defaultValue;
