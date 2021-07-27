@@ -173,6 +173,12 @@ function makeFieldsNonNullWithDefaultValues(
     const fc = tc.getField(fieldName);
     // traverse nested Object types
     if (fc.type instanceof ObjectTypeComposer) {
+      if (fc.extensions?.isSingleNestedMongooseSchema) {
+        // sub-Schema breaks the "recursive default value assignation" behavior
+        // @see https://github.com/graphql-compose/graphql-compose-mongoose/issues/358
+        return;
+      }
+
       makeFieldsNonNullWithDefaultValues(fc.type);
       if (fc.type.getExtension('hasFieldsWithDefaultValue')) {
         tc.makeFieldNonNull(fieldName);

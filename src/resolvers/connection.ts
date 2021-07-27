@@ -24,6 +24,8 @@ export type ConnectionResolverOpts<TContext = any> = Omit<
   _ConnectionResolverOpts<TContext>,
   'countResolver' | 'findManyResolver' | 'sort'
 > & {
+  findManyResolver?: Resolver;
+  countResolver?: Resolver;
   countOpts?: CountResolverOpts;
   findManyOpts?: FindManyResolverOpts;
   sort?: _ConnectionSortMapOpts;
@@ -61,11 +63,11 @@ export function connection<TSource = any, TContext = any, TDoc extends Document 
     };
   });
 
-  const { findManyOpts, countOpts, ...restOpts } = opts || {};
+  const { findManyOpts, countOpts, findManyResolver, countResolver, ...restOpts } = opts || {};
 
   return prepareConnectionResolver<any, any>(tc, {
-    findManyResolver: findMany(model, tc, findManyOpts),
-    countResolver: count(model, tc, countOpts),
+    findManyResolver: findManyResolver || findMany(model, tc, findManyOpts),
+    countResolver: countResolver || count(model, tc, countOpts),
     sort: sortConfigs,
     ...restOpts,
   });

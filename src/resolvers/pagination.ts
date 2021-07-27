@@ -13,6 +13,8 @@ export type PaginationResolverOpts = Omit<
   _PaginationResolverOpts,
   'countResolver' | 'findManyResolver'
 > & {
+  findManyResolver?: Resolver;
+  countResolver?: Resolver;
   countOpts?: CountResolverOpts;
   findManyOpts?: FindManyResolverOpts;
 };
@@ -22,10 +24,10 @@ export function pagination<TSource = any, TContext = any, TDoc extends Document 
   tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: PaginationResolverOpts
 ): Resolver<TSource, TContext, PaginationTArgs, TDoc> {
-  const { countOpts, findManyOpts, ...restOpts } = opts || {};
+  const { countOpts, findManyOpts, findManyResolver, countResolver, ...restOpts } = opts || {};
   const resolver = preparePaginationResolver<any, any>(tc, {
-    findManyResolver: findMany(model, tc, findManyOpts),
-    countResolver: count(model, tc, countOpts),
+    findManyResolver: findManyResolver || findMany(model, tc, findManyOpts),
+    countResolver: countResolver || count(model, tc, countOpts),
     ...restOpts,
   });
   return resolver;
