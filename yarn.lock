@@ -1015,10 +1015,10 @@
   dependencies:
     "@types/istanbul-lib-report" "*"
 
-"@types/jest@26.0.23":
-  version "26.0.23"
-  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-26.0.23.tgz#a1b7eab3c503b80451d019efb588ec63522ee4e7"
-  integrity sha512-ZHLmWMJ9jJ9PTiT58juykZpL7KjwJywFN3Rr2pTSkyQfydf/rk22yS7W8p5DaVUMQ2BQC7oYiU3FjbTM/mYrOA==
+"@types/jest@26.0.24":
+  version "26.0.24"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-26.0.24.tgz#943d11976b16739185913a1936e0de0c4a7d595a"
+  integrity sha512-E/X5Vib8BWqZNRlDxj9vYXhsDwPYbPINqKF9BsnSoon4RQ0D9moEuLD8txgyypFLH7J4+Lho9Nr/c8H0Fi+17w==
   dependencies:
     jest-diff "^26.0.0"
     pretty-format "^26.0.0"
@@ -3382,15 +3382,15 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
-graphql-compose-connection@8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-8.2.0.tgz#0046c4b161823b549efdd99a208d665624edb086"
-  integrity sha512-41tMBvYruKsGFiR9e3JuLLplq5EoB6Y8CbVPx2KA4rfKAG5MLnY3kl64QPZALK9yzOxPVfN3AFPK1whWgm20CQ==
+graphql-compose-connection@8.2.1:
+  version "8.2.1"
+  resolved "https://registry.yarnpkg.com/graphql-compose-connection/-/graphql-compose-connection-8.2.1.tgz#ca78363f4f94a209e31d9dc8905de2e26bcb8b81"
+  integrity sha512-75QOx1HusfkLzDlF+RMGoC0UowbZ2R7/xFRIMfbQf1gc6eeRqiGmTWFxHaUYk2WjTAB4dGO7p/gllfwqO0W/TA==
 
-graphql-compose-pagination@8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/graphql-compose-pagination/-/graphql-compose-pagination-8.2.0.tgz#8fb28b54c794a9ed541c810791323c95dddc3288"
-  integrity sha512-qKJr+zeTgU1LASL3+LzKAk4Wu9PNyomPl/hxaJzLlPQSY3s9RfogYr369/OrazINCoJ9xNqORV3fRwkQWhLK3g==
+graphql-compose-pagination@8.2.1:
+  version "8.2.1"
+  resolved "https://registry.yarnpkg.com/graphql-compose-pagination/-/graphql-compose-pagination-8.2.1.tgz#cd1e8637a1b3d9246378e222200204412c5a863e"
+  integrity sha512-jV+nD76MWLugNO2M2xRt1yXw7VWF7XpRZri4WhMFUgRuqRMVx4k9yna0QEKo70SDKsGkC+2YUbSWdf8V8TQVWQ==
 
 graphql-compose@9.0.1:
   version "9.0.1"
@@ -5225,10 +5225,10 @@ modify-values@^1.0.0:
   resolved "https://registry.yarnpkg.com/modify-values/-/modify-values-1.0.1.tgz#b3939fa605546474e3e3e3c63d64bd43b4ee6022"
   integrity sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==
 
-mongodb-memory-server-core@7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/mongodb-memory-server-core/-/mongodb-memory-server-core-7.1.0.tgz#1b147ab12b18bb3b9426a2ac38782aeb8e9566e1"
-  integrity sha512-tSnffPiC1HrHMW+OA9b6g14MFPq/fXfnHOQPPlPtcjK+dM7tAWhzw1eOSKz0aye4xMiS3+ko37xdmpC/B7R4cA==
+mongodb-memory-server-core@7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server-core/-/mongodb-memory-server-core-7.2.0.tgz#c7c403b729b861df3b4989224bb9cbbbcec5e618"
+  integrity sha512-GCdCaVIVipxHW5PrhhVXZIVgfa4Rht+95RwRdSFXp9MwZaGqAU+aUlcRJkE02RSdITvI6dHmXG3X+Uz7yB1ChA==
   dependencies:
     "@types/tmp" "^0.2.0"
     async-mutex "^0.3.0"
@@ -5248,12 +5248,12 @@ mongodb-memory-server-core@7.1.0:
     uuid "^8.3.1"
     yauzl "^2.10.0"
 
-mongodb-memory-server@7.1.0:
-  version "7.1.0"
-  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-7.1.0.tgz#f85a189275cd84fe9d2cf669250207ea9e4c06da"
-  integrity sha512-czAM0HmvHqki4/TOqGhi0MCeM+PpIWxKwcPJVxZhIoQ2lyAVI4zdv8ACwGB8Nj3nrGWV1vQUd2PJmTcY0Q8WYQ==
+mongodb-memory-server@7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-7.2.0.tgz#b425b0014841d1d18134de8e08e6d3c6affa13e9"
+  integrity sha512-bTVzkHwNgEQHt8pRZF8Fca96eghd/72RHn0kEsnYjf0XjY5Vvg8/PvxOEWRd4Oa15tUJ6rW5eMsQhRfb1FPCFg==
   dependencies:
-    mongodb-memory-server-core "7.1.0"
+    mongodb-memory-server-core "7.2.0"
     tslib "^2.3.0"
 
 mongodb@3.6.8:

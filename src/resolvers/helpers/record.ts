@@ -1,5 +1,6 @@
 import {
   ObjectTypeComposer,
+  InterfaceTypeComposer,
   ObjectTypeComposerArgumentConfigMapDefinition,
   InputTypeComposer,
 } from 'graphql-compose';
@@ -42,10 +43,10 @@ export const getRecordHelperArgsOptsMap = (): Record<string, string> => ({
 });
 
 export function recordHelperArgs<TDoc extends Document = any>(
-  tc: ObjectTypeComposer<TDoc, any>,
+  tc: ObjectTypeComposer<TDoc, any> | InterfaceTypeComposer<TDoc, any>,
   opts?: RecordHelperArgsOpts
 ): ObjectTypeComposerArgumentConfigMapDefinition<{ record: any }> {
-  if (!tc || !(tc instanceof ObjectTypeComposer)) {
+  if (!tc || !(tc instanceof ObjectTypeComposer || tc instanceof InterfaceTypeComposer)) {
     throw new Error('First arg for recordHelperArgs() should be instance of ObjectTypeComposer.');
   }
 

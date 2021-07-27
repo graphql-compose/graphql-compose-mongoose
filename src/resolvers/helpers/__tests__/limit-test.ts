@@ -9,11 +9,9 @@ describe('Resolver helper `limit` ->', () => {
     it('should process `opts.defaultValue` arg', () => {
       expect((limitHelperArgs() as any).limit.defaultValue).toBe(100);
       expect(
-        (
-          limitHelperArgs({
-            defaultValue: 333,
-          }) as any
-        ).limit.defaultValue
+        (limitHelperArgs({
+          defaultValue: 333,
+        }) as any).limit.defaultValue
       ).toBe(333);
     });
   });

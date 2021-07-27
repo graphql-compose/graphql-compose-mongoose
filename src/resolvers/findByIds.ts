@@ -1,4 +1,5 @@
-import { Resolver, ObjectTypeComposer, toInputType } from 'graphql-compose';
+import { toInputType, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import type { Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
   limitHelper,
@@ -40,14 +41,14 @@ type TArgs = {
 
 export function findByIds<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>,
+  tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: FindByIdsResolverOpts
 ): Resolver<TSource, TContext, TArgs, TDoc> {
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver findByIds() should be instance of Mongoose Model.');
   }
 
-  if (!tc || !(tc instanceof ObjectTypeComposer)) {
+  if (!tc || !(tc instanceof ObjectTypeComposer || tc instanceof InterfaceTypeComposer)) {
     throw new Error(
       'Second arg for Resolver findByIds() should be instance of ObjectTypeComposer.'
     );

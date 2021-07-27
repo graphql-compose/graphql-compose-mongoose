@@ -1,3 +1,4 @@
+import { ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
 import type { Document, Model } from 'mongoose';
 import {
   prepareConnectionResolver,
@@ -5,7 +6,7 @@ import {
   ConnectionSortMapOpts as _ConnectionSortMapOpts,
   ConnectionTArgs,
 } from 'graphql-compose-connection';
-import { Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { Resolver } from 'graphql-compose';
 import { CountResolverOpts, count } from './count';
 import { FindManyResolverOpts, findMany } from './findMany';
 import { getUniqueIndexes, extendByReversedIndexes, IndexT } from '../utils/getIndexesFromModel';
@@ -30,7 +31,7 @@ export type ConnectionResolverOpts<TContext = any> = Omit<
 
 export function connection<TSource = any, TContext = any, TDoc extends Document = any>(
   model: Model<TDoc>,
-  tc: ObjectTypeComposer<TDoc, TContext>,
+  tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: ConnectionResolverOpts<TContext>
 ): Resolver<TSource, TContext, ConnectionTArgs, TDoc> {
   const uniqueIndexes = extendByReversedIndexes(getUniqueIndexes(model), {
