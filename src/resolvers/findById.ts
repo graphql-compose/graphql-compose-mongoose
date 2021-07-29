@@ -50,7 +50,7 @@ export function findById<TSource = any, TContext = any, TDoc extends Document = 
   // const typeTC = tc instanceof EDiscriminatorTypeComposer ? tc.getDInterface() : tc;
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
-    type: tc.getTypeName(),
+    type: tc,
     name: 'findById',
     kind: 'query',
     args: {

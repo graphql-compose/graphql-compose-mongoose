@@ -62,7 +62,7 @@ export function findOne<TSource = any, TContext = any, TDoc extends Document = a
   const aliasesReverse = prepareAliasesReverse(model.schema);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
-    type: tc.getTypeName(),
+    type: tc,
     name: 'findOne',
     kind: 'query',
     args: {

@@ -50,7 +50,7 @@ export function dataLoader<TSource = any, TContext = any, TDoc extends Document 
   const aliasesReverse = prepareAliasesReverse(model.schema);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
-    type: tc.getTypeName(),
+    type: tc,
     name: 'dataLoader',
     kind: 'query',
     args: {

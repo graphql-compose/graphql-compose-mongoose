@@ -59,7 +59,7 @@ export function updateOne<TSource = any, TContext = any, TDoc extends Document =
     t.setFields({
       ...payloadRecordId(tc, opts?.recordId),
       record: {
-        type: tc.getTypeName(),
+        type: tc,
         description: 'Updated document',
       },
     });

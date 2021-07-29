@@ -51,7 +51,7 @@ export function removeOne<TSource = any, TContext = any, TDoc extends Document =
     t.setFields({
       ...payloadRecordId(tc, opts?.recordId),
       record: {
-        type: tc.getTypeName(),
+        type: tc,
         description: 'Removed document',
       },
     });

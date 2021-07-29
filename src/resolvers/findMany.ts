@@ -67,7 +67,7 @@ export function findMany<TSource = any, TContext = any, TDoc extends Document = 
   const aliasesReverse = prepareAliasesReverse(model.schema);
 
   return tc.schemaComposer.createResolver<TSource, TArgs>({
-    type: '[' + tc.getTypeName() + '!]!',
+    type: tc.NonNull.List.NonNull,
     name: 'findMany',
     kind: 'query',
     args: {
