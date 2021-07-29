@@ -1,4 +1,5 @@
-import { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import type { Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import type { ExtendedResolveParams } from './index';
 import {
@@ -45,7 +46,7 @@ export function updateOne<TSource = any, TContext = any, TDoc extends Document =
   if (!model || !model.modelName || !model.schema) {
     throw new Error('First arg for Resolver updateOne() should be instance of Mongoose Model.');
   }
-  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+  if (!tc || !(tc instanceof ObjectTypeComposer || tc instanceof InterfaceTypeComposer)) {
     throw new Error(
       'Second arg for Resolver updateOne() should be instance of ObjectTypeComposer.'
     );

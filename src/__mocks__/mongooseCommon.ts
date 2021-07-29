@@ -10,7 +10,7 @@ mongoose.Promise = Promise;
 const originalConnect = mongoose.connect;
 mongoose.createConnection = (async () => {
   const mongoServer = await MongoMemoryServer.create();
-  const mongoUri = mongoServer.getUri();
+  const mongoUri = await mongoServer.getUri();
 
   // originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true }); // mongoose 4
   originalConnect.bind(mongoose)(mongoUri, {

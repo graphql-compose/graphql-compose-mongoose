@@ -14,7 +14,7 @@ let user2: IUser;
 
 beforeEach(async () => {
   schemaComposer.clear();
-  UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+  UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
 
   await UserModel.deleteMany({});
 

@@ -9,7 +9,7 @@ describe('Resolver helper `sort` ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
   });
 
   describe('getSortTypeFromModel()', () => {

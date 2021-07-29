@@ -1,3 +1,4 @@
+import { ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
 import type { Document, Model } from 'mongoose';
 import {
   prepareConnectionResolver,
@@ -5,7 +6,7 @@ import {
   ConnectionSortMapOpts as _ConnectionSortMapOpts,
   ConnectionTArgs,
 } from 'graphql-compose-connection';
-import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import type { Resolver } from 'graphql-compose';
 import { CountResolverOpts, count } from './count';
 import { FindManyResolverOpts, findMany } from './findMany';
 import { getUniqueIndexes, extendByReversedIndexes, IndexT } from '../utils/getIndexesFromModel';

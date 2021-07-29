@@ -33,7 +33,9 @@ export const CharacterObject = {
 const CharacterSchema = new Schema(CharacterObject);
 const ACharacterSchema = new Schema({ ...CharacterObject });
 
-export function getCharacterModels(DKey: string): {
+export function getCharacterModels(
+  DKey: string
+): {
   CharacterModel: Model<any>;
   PersonModel: Model<any>;
   DroidModel: Model<any>;

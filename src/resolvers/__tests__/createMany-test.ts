@@ -17,7 +17,7 @@ describe('createMany() ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
     UserTC.setRecordIdFn((source) => (source ? `${source._id}` : ''));
   });
 
@@ -222,7 +222,11 @@ describe('createMany() ->', () => {
 
       const ClonedUserModel = mongoose.model('UserClone', ClonedUserSchema);
 
-      const ClonedUserTC = convertModelToGraphQL(ClonedUserModel, 'UserClone', schemaComposer);
+      const ClonedUserTC = convertModelToGraphQL(
+        ClonedUserModel,
+        'UserClone',
+        schemaComposer
+      ) as ObjectTypeComposer;
       ClonedUserTC.setRecordIdFn((source: any) => (source ? `${source._id}` : ''));
 
       const result = await createMany(ClonedUserModel, ClonedUserTC).resolve({

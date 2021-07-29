@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define, no-param-reassign, global-require */
 
-import type { ObjectTypeComposer, SchemaComposer } from 'graphql-compose';
-import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
+import type { SchemaComposer } from 'graphql-compose';
+import { ObjectTypeComposer, schemaComposer as globalSchemaComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
 import { resolverFactory, AllResolversOpts } from './resolvers';
@@ -52,6 +52,13 @@ export function composeWithMongoose<TDoc extends Document, TContext = any>(
   }
 
   const tc = convertModelToGraphQL(m, name, sc);
+
+  if (!(tc instanceof ObjectTypeComposer)) {
+    // should be impossible I hope
+    throw new Error(
+      'composeWithMongoose does not support discriminator mode, use composeMongoose or composeWithMongooseDiscriminators instead'
+    );
+  }
 
   if (opts.description) {
     tc.setDescription(opts.description);

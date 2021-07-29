@@ -117,7 +117,7 @@ describe('connection() resolver', () => {
 
     beforeEach(() => {
       schemaComposer.clear();
-      UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+      UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
     });
 
     let user1: IUser;
@@ -294,7 +294,7 @@ describe('connection() resolver', () => {
 
       it('should use internal resolver custom opts', async () => {
         schemaComposer.clear();
-        UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+        UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
         const mockCountOpts = { suffix: 'ABC' };
         const mockFindManyOpts = { suffix: 'DEF' };
         const resolver = connection(UserModel, UserTC, {

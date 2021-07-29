@@ -9,6 +9,7 @@ module.exports = {
     useJSXTextNode: true,
     project: [path.resolve(__dirname, 'tsconfig.json')],
   },
+  root: true,
   rules: {
     'no-underscore-dangle': 0,
     'arrow-body-style': 0,

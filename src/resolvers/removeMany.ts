@@ -1,4 +1,5 @@
-import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import type { Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
   filterHelperArgs,
@@ -35,7 +36,7 @@ export function removeMany<TSource = any, TContext = any, TDoc extends Document 
     throw new Error('First arg for Resolver removeMany() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+  if (!tc || !(tc instanceof ObjectTypeComposer || tc instanceof InterfaceTypeComposer)) {
     throw new Error(
       'Second arg for Resolver removeMany() should be instance of ObjectTypeComposer.'
     );

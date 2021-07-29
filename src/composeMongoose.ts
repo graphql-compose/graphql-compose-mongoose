@@ -1,6 +1,12 @@
-import type { SchemaComposer, Resolver, InputTypeComposer } from 'graphql-compose';
+import type {
+  SchemaComposer,
+  Resolver,
+  InputTypeComposer,
+  InterfaceTypeComposer,
+} from 'graphql-compose';
 import { schemaComposer as globalSchemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
+import { EDiscriminatorTypeComposer } from './enhancedDiscriminators';
 import { convertModelToGraphQL } from './fieldsConverter';
 import { resolverFactory } from './resolvers';
 import MongoID from './types/MongoID';
@@ -71,6 +77,15 @@ export type ComposeMongooseOpts<TContext = any> = {
    * You can make fields as NonNull if they have default value in mongoose model.
    */
   defaultsAsNonNull?: boolean;
+  /**
+   * Support discriminators on base models
+   */
+  includeBaseDiscriminators?: boolean;
+  /**
+   * EXPERIMENTAL - Support discriminated fields on nested fields
+   * May not work as expected on input types for mutations
+   */
+  includeNestedDiscriminators?: boolean;
 
   /** @deprecated */
   fields?: {
@@ -101,7 +116,7 @@ export type GenerateResolverType<TDoc extends Document, TContext = any> = {
 export function composeMongoose<TDoc extends Document, TContext = any>(
   model: Model<TDoc>,
   opts: ComposeMongooseOpts<TContext> = {}
-): ObjectTypeComposer<TDoc, TContext> & {
+): (ObjectTypeComposer<TDoc, TContext> | EDiscriminatorTypeComposer<TDoc, TContext>) & {
   mongooseResolvers: GenerateResolverType<TDoc, TContext>;
 } {
   const m: Model<any> = model;
@@ -121,7 +136,7 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
     sc.delete(m.schema);
   }
 
-  const tc = convertModelToGraphQL(m, name, sc);
+  const tc = convertModelToGraphQL(m, name, sc, { ...opts });
 
   if (opts.description) {
     tc.setDescription(opts.description);
@@ -152,7 +167,7 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
 }
 
 function makeFieldsNonNullWithDefaultValues(
-  tc: ObjectTypeComposer,
+  tc: ObjectTypeComposer | InterfaceTypeComposer,
   alreadyWorked = new Set()
 ): void {
   if (alreadyWorked.has(tc)) return;
@@ -188,7 +203,7 @@ function makeFieldsNonNullWithDefaultValues(
 }
 
 export function prepareFields(
-  tc: ObjectTypeComposer<any, any>,
+  tc: ObjectTypeComposer<any, any> | InterfaceTypeComposer<any, any>,
   opts: ComposeMongooseOpts<any> = {}
 ): void {
   const onlyFields = opts?.onlyFields || opts?.fields?.only;
@@ -202,7 +217,7 @@ export function prepareFields(
 }
 
 export function createInputType(
-  tc: ObjectTypeComposer<any, any>,
+  tc: ObjectTypeComposer<any, any> | InterfaceTypeComposer<any, any>,
   inputTypeOpts: TypeConverterInputTypeOpts = {}
 ): void {
   const inputTypeComposer = tc.getInputTypeComposer();

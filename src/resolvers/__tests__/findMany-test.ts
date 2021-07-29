@@ -13,7 +13,7 @@ describe('findMany() ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
   });
 
   let user1: IUser;

@@ -1,5 +1,5 @@
-import { toInputType } from 'graphql-compose';
-import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import { toInputType, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
+import type { Resolver } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import {
   projectionHelper,
@@ -42,7 +42,7 @@ export function dataLoaderMany<TSource = any, TContext = any, TDoc extends Docum
     );
   }
 
-  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+  if (!tc || !(tc instanceof ObjectTypeComposer || tc instanceof InterfaceTypeComposer)) {
     throw new Error(
       'Second arg for Resolver dataLoaderMany() should be instance of ObjectTypeComposer.'
     );

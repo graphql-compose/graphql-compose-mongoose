@@ -29,7 +29,7 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
     throw new Error('First arg for Resolver createMany() should be instance of Mongoose Model.');
   }
 
-  if (!tc || tc.constructor.name !== 'ObjectTypeComposer') {
+  if (!tc || !(tc instanceof ObjectTypeComposer || tc instanceof InterfaceTypeComposer)) {
     throw new Error(
       'Second arg for Resolver createMany() should be instance of ObjectTypeComposer.'
     );
@@ -69,16 +69,14 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
     type: outputType,
     args: {
       records: {
-        type: (
-          recordHelperArgs(tc, {
-            prefix: 'CreateMany',
-            suffix: `${opts?.suffix || ''}Input`,
-            removeFields: ['id', '_id'],
-            isRequired: true,
-            requiredFields,
-            ...opts?.records,
-          }) as any
-        ).record.type.List.NonNull,
+        type: (recordHelperArgs(tc, {
+          prefix: 'CreateMany',
+          suffix: `${opts?.suffix || ''}Input`,
+          removeFields: ['id', '_id'],
+          isRequired: true,
+          requiredFields,
+          ...opts?.records,
+        }) as any).record.type.List.NonNull,
       },
     },
     resolve: async (resolveParams) => {

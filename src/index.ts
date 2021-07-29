@@ -7,4 +7,5 @@ export * from './composeWithMongooseDiscriminators';
 export * from './fieldsConverter';
 export * from './resolvers';
 export * from './errors';
+export * from './enhancedDiscriminators';
 export { GraphQLMongoID, GraphQLBSONDecimal };

@@ -76,7 +76,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
           });
           break;
 
-        case 'connection':
+        case 'connection': {
           const edgesTC = resolver
             .getOTC()
             .getFieldOTC('edges')
@@ -91,6 +91,7 @@ export function prepareBaseResolvers(baseTC: DiscriminatorTypeComposer<any, any>
 
           resolver.getOTC().setField('edges', edgesTC.NonNull.List.NonNull);
           break;
+        }
 
         default:
       }
