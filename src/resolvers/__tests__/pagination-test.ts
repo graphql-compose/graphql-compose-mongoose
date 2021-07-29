@@ -14,7 +14,7 @@ describe('pagination() ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
     UserTC.setResolver('findMany', findMany(UserModel, UserTC));
     UserTC.setResolver('count', count(UserModel, UserTC));
   });

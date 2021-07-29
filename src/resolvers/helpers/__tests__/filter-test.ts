@@ -16,7 +16,7 @@ describe('Resolver helper `filter` ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
   });
 
   describe('filterHelperArgs()', () => {

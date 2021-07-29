@@ -8,15 +8,13 @@ import {
   EnumTypeComposer,
   ComposeOutputTypeDefinition,
   ObjectTypeComposerFieldConfigAsObjectDefinition,
+  InterfaceTypeComposer,
 } from 'graphql-compose';
 import { upperFirst } from 'graphql-compose';
 import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
 import GraphQLMongoID from './types/MongoID';
 import GraphQLBSONDecimal from './types/BSONDecimal';
-import {
-  convertModelToGraphQLWithDiscriminators,
-  EDiscriminatorTypeComposer,
-} from './enhancedDiscriminators';
+import { convertModelToGraphQLWithDiscriminators } from './enhancedDiscriminators';
 import { ComposeMongooseOpts } from './composeMongoose';
 
 type MongooseFieldT = {
@@ -141,7 +139,7 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
   typeName: string,
   schemaComposer: SchemaComposer<TContext>,
   opts: ComposeMongooseOpts<TContext> = {}
-): ObjectTypeComposer<TDoc, TContext> {
+): InterfaceTypeComposer<TDoc, TContext> | ObjectTypeComposer<TDoc, TContext> {
   const sc = schemaComposer;
 
   if (!typeName) {
@@ -192,14 +190,6 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
       type = 'Int';
     }
 
-    let trueType = type;
-    if (trueType instanceof Array) {
-      trueType = trueType[0];
-    }
-    if (trueType instanceof EDiscriminatorTypeComposer) {
-      type = type instanceof Array ? [trueType.getDInterface()] : trueType.getDInterface();
-    }
-
     graphqlFields[fieldName] = {
       type,
       description: _getFieldDescription(mongooseField),
@@ -227,7 +217,7 @@ export function convertSchemaToGraphQL(
   typeName: string,
   schemaComposer: SchemaComposer<any>,
   opts: ComposeMongooseOpts<any> = {}
-): ObjectTypeComposer<any, any> {
+): ObjectTypeComposer<any, any> | InterfaceTypeComposer<any, any> {
   const sc = schemaComposer;
 
   if (!typeName) {
@@ -363,7 +353,7 @@ export function embeddedToGraphQL(
   prefix: string = '',
   schemaComposer: SchemaComposer<any>,
   opts: ComposeMongooseOpts<any> = {}
-): ObjectTypeComposer<any, any> {
+): ObjectTypeComposer<any, any> | InterfaceTypeComposer<any, any> {
   const fieldName = _getFieldName(field);
   const fieldType = _getFieldType(field);
 
@@ -417,7 +407,7 @@ export function documentArrayToGraphQL(
   prefix: string = '',
   schemaComposer: SchemaComposer<any>,
   opts: ComposeMongooseOpts<any> = {}
-): [ObjectTypeComposer<any, any>] {
+): [ObjectTypeComposer<any, any> | InterfaceTypeComposer<any, any>] {
   if (!(field instanceof mongoose.Schema.Types.DocumentArray) && !field?.schema?.paths) {
     throw new Error(
       'You provide incorrect mongoose field to `documentArrayToGraphQL()`. ' +

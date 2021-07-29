@@ -1,4 +1,4 @@
-import { schemaComposer, graphql } from 'graphql-compose';
+import { schemaComposer, graphql, ObjectTypeComposer } from 'graphql-compose';
 import { composeMongoose } from '../../index';
 import { mongoose } from '../../__mocks__/mongooseCommon';
 import { Document } from 'mongoose';
@@ -27,6 +27,10 @@ const PostModel = mongoose.model<IPost>('Post', PostSchema);
 
 const UserTC = composeMongoose(UserModel);
 const PostTC = composeMongoose(PostModel);
+
+if (!(UserTC instanceof ObjectTypeComposer) || !(PostTC instanceof ObjectTypeComposer)) {
+  throw new Error('TCs should return ObjectTypeComposers');
+}
 
 PostTC.addRelation('author', {
   resolver: UserTC.mongooseResolvers.dataLoader({

@@ -1,4 +1,4 @@
-import { GraphQLObjectType } from 'graphql';
+import { GraphQLInterfaceType } from 'graphql';
 import {
   EnumTypeComposer,
   Extensions,
@@ -18,7 +18,7 @@ export function convertModelToGraphQLWithDiscriminators<TDoc extends Document, T
   typeName: string,
   schemaComposer: SchemaComposer<TContext>,
   opts: ComposeMongooseOpts<any> = {}
-): ObjectTypeComposer<TDoc, TContext> {
+): ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext> {
   const sc = schemaComposer;
 
   // workaround to avoid recursive loop on convertModel and support nested discrim fields, will be set true in nested fields
@@ -36,7 +36,7 @@ export interface ComposeMongooseDiscriminatorsOpts<TContext> extends ComposeMong
   reorderFields?: boolean | string[]; // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
 }
 
-export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComposer<
+export class EDiscriminatorTypeComposer<TSource, TContext> extends InterfaceTypeComposer<
   TSource,
   TContext
 > {
@@ -49,17 +49,14 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
       | ObjectTypeComposer<any, TContext>;
   } = {};
 
-  BaseTC: ObjectTypeComposer<TSource, TContext>;
   DInputObject: ObjectTypeComposer<TSource, TContext>;
-  DInterface: InterfaceTypeComposer<TSource, TContext>;
   opts: ComposeMongooseDiscriminatorsOpts<TContext> = {};
   DKeyETC?: EnumTypeComposer<TContext>;
 
-  constructor(gqType: GraphQLObjectType, schemaComposer: SchemaComposer<TContext>) {
+  constructor(gqType: GraphQLInterfaceType, schemaComposer: SchemaComposer<TContext>) {
     super(gqType, schemaComposer);
-    this.DInterface = schemaComposer.getOrCreateIFTC(`${gqType.name}Interface`);
+
     this.DInputObject = schemaComposer.getOrCreateOTC(`${gqType.name}Input`);
-    this.BaseTC = schemaComposer.getOrCreateOTC(`${gqType.name}BaseTC`);
     return this;
   }
 
@@ -85,44 +82,51 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
       ...opts,
     };
 
-    const baseTC = convertModelToGraphQL(model, typeName, schemaComposer, opts);
-    const baseDTC = new EDiscriminatorTypeComposer(baseTC.getType(), schemaComposer);
+    const baseTC = convertModelToGraphQL(
+      model,
+      `${typeName}BaseOTC`,
+      schemaComposer,
+      opts
+    ) as ObjectTypeComposer;
 
-    // copy data from baseTC to baseDTC
-    baseTC.clone(baseDTC as ObjectTypeComposer<any, any>);
+    const eDTC = new EDiscriminatorTypeComposer(
+      new GraphQLInterfaceType({
+        name: typeName,
+        fields: () => ({}),
+      }),
+      schemaComposer
+    );
 
-    baseDTC.opts = { ...opts };
-    baseDTC.discriminatorKey = (model as any).schema.get('discriminatorKey') || '__t';
-    if (baseDTC.discriminatorKey === '__t') {
+    eDTC.opts = { ...opts };
+    eDTC.discriminatorKey = (model as any).schema.get('discriminatorKey') || '__t';
+    if (eDTC.discriminatorKey === '__t') {
       throw Error(
         'A custom discriminator key must be set on the model options in mongoose for discriminator behaviour to function correctly'
       );
     }
-    baseDTC.BaseTC = baseTC;
-    baseDTC.DInterface = baseDTC._buildDiscriminatedInterface(model, baseTC);
-    baseDTC.DInterface.setInputTypeComposer(baseDTC.DInputObject.getInputTypeComposer());
-    baseDTC.setInputTypeComposer(baseDTC.DInputObject.getInputTypeComposer());
+    eDTC._buildDiscriminatedInterface(model, baseTC);
+    eDTC.setInputTypeComposer(eDTC.DInputObject.getInputTypeComposer());
 
-    // baseDTC.setInterfaces([baseDTC.DInterface]);
-    baseDTC._gqcInputTypeComposer = baseDTC.DInputObject._gqcInputTypeComposer;
-    baseDTC.DInterface._gqcInputTypeComposer = baseDTC.DInputObject._gqcInputTypeComposer;
+    // eDTC.setInterfaces([eDTC.DInterface]);
+    eDTC._gqcInputTypeComposer = eDTC.DInputObject._gqcInputTypeComposer;
 
-    // reorderFields(baseDTC, baseDTC.opts.reorderFields, baseDTC.discriminatorKey);
-    baseDTC.schemaComposer.addSchemaMustHaveType(baseDTC as any);
+    // reorderFields(eDTC, eDTC.opts.reorderFields, eDTC.discriminatorKey);
+    eDTC.schemaComposer.addSchemaMustHaveType(eDTC as any);
 
     // prepare Base Resolvers
-    // prepareBaseResolvers(baseDTC);
+    // prepareBaseResolvers(eDTC);
 
-    return baseDTC as any;
+    // cleanup baseTC
+    schemaComposer.delete(baseTC.getTypeName());
+    return eDTC as any;
   }
 
   _buildDiscriminatedInterface(
     model: Model<any, any>,
     baseTC: ObjectTypeComposer<any, TContext>
-  ): InterfaceTypeComposer<TSource, TContext> {
-    const interfaceTC = this.DInterface;
-    interfaceTC.removeOtherFields('');
-    interfaceTC.setFields(baseTC.getFields());
+  ): EDiscriminatorTypeComposer<TSource, TContext> {
+    this.removeOtherFields('');
+    this.setFields(baseTC.getFields());
     this.DInputObject.setFields(baseTC.getFields());
 
     const discriminators = model.discriminators || model.schema.discriminators;
@@ -140,21 +144,21 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
 
       const discrimType = discriminators[key];
 
-      const discrimTC =
-        discrimType instanceof Schema
-          ? convertModelToGraphQL(
-              { schema: discrimType },
-              this.getTypeName() + key,
-              schemaComposer,
-              {
-                ...this.opts,
-                name: this.getTypeName() + key,
-              }
-            )
-          : composeMongoose(discrimType as Model<any>, {
+      // help why instanceof Schema not work??
+      const discrimTC = ((discrimType as any)?.__proto__?.constructor.name === 'Schema'
+        ? convertModelToGraphQL(
+            { schema: discrimType as Schema },
+            this.getTypeName() + key,
+            schemaComposer,
+            {
               ...this.opts,
               name: this.getTypeName() + key,
-            });
+            }
+          )
+        : composeMongoose(discrimType as Model<any>, {
+            ...this.opts,
+            name: this.getTypeName() + key,
+          })) as ObjectTypeComposer;
 
       // base OTC used for input schema must hold all child TC fields in the most loose way (so all types are accepted)
       // more detailed type checks are done on input object by mongoose itself
@@ -172,15 +176,15 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
         discrimTC.getFieldNames().filter((field) => !baseTC.hasField(field))
       );
 
-      // also set fields on master TC so it will have all possibilities for input workaround
+      this.addTypeResolver(discrimTC, (obj: any) => obj[this.discriminatorKey] === key);
 
-      interfaceTC.addTypeResolver(discrimTC, (obj: any) => obj[this.discriminatorKey] === key);
+      // also set fields on master TC so it will have all possibilities for input workaround
 
       // add TC to discrimTCs
       this.discrimTCs[key] = discrimTC;
     });
 
-    return interfaceTC;
+    return this;
   }
 
   _addFieldToInputOTC(
@@ -188,7 +192,7 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
     field: ObjectTypeComposerFieldConfig<any, any, any>
   ): void {
     // if another discrimTC has already defined the field (not from original TC)
-    if (this.DInputObject.hasField(fieldName) && !this.BaseTC.hasField(fieldName)) {
+    if (this.DInputObject.hasField(fieldName) && !this.hasField(fieldName)) {
       this.DInputObject.setField(fieldName, `JSON`);
     } else {
       (this.DInputObject as ObjectTypeComposer<any, any>).setField(fieldName, field);
@@ -204,10 +208,6 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
   // getDKeyETC(): EnumTypeComposer<TContext> {
   //   return this.DKeyETC as any;
   // }
-
-  getDInterface(): InterfaceTypeComposer<TSource, TContext> {
-    return this.DInterface as any;
-  }
 
   getDInputObject(): ObjectTypeComposer<TSource, TContext> {
     return this.DInputObject as any;
@@ -227,9 +227,6 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
   }
 
   // OVERRIDES
-  getTypeName(): string {
-    return this.DInterface.getTypeName();
-  }
 
   setField(
     fieldName: string,
@@ -237,7 +234,6 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
   ): this {
     super.setField(fieldName, fieldConfig);
     this.getDInputObject().setField(fieldName, fieldConfig);
-    this.getDInterface().setField(fieldName, fieldConfig);
 
     for (const discrimTC in this.discrimTCs) {
       this.discrimTCs[discrimTC].setField(fieldName, fieldConfig);
@@ -249,7 +245,6 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
   setExtensions(extensions: Extensions): this {
     super.setExtensions(extensions);
     this.getDInputObject().setExtensions(extensions);
-    this.getDInterface().setExtensions(extensions);
 
     for (const discrimTC in this.discrimTCs) {
       this.discrimTCs[discrimTC].setExtensions(extensions);
@@ -261,7 +256,6 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
   setDescription(description: string): this {
     super.setDescription(description);
     this.getDInputObject().setDescription(description);
-    this.getDInterface().setDescription(description);
 
     return this;
   }
@@ -269,7 +263,6 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
   removeField(fieldNameOrArray: string | Array<string>): this {
     super.removeField(fieldNameOrArray);
     this.getDInputObject().removeField(fieldNameOrArray);
-    this.getDInterface().removeField(fieldNameOrArray);
 
     for (const discrimTC in this.discrimTCs) {
       this.discrimTCs[discrimTC].removeField(fieldNameOrArray);
@@ -282,13 +275,12 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
     // get field names to delete from child TCs, so their unique fields are preserved
     const keepFieldNames =
       fieldNameOrArray instanceof Array ? fieldNameOrArray : [fieldNameOrArray];
-    const fieldNamesToDelete = this.DInterface.getFieldNames().filter(
+    const fieldNamesToDelete = this.getFieldNames().filter(
       (field) => !keepFieldNames.includes(field)
     );
 
     super.removeField(fieldNamesToDelete);
     this.getDInputObject().removeField(fieldNamesToDelete);
-    this.getDInterface().removeOtherFields(fieldNameOrArray);
 
     for (const discrimTC in this.discrimTCs) {
       this.discrimTCs[discrimTC].removeField(fieldNamesToDelete);
@@ -299,7 +291,6 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
 
   reorderFields(names: string[]): this {
     super.reorderFields(names);
-    this.getDInterface().reorderFields(names);
     this.getDInputObject().reorderFields(names);
 
     for (const discrimTC in this.discrimTCs) {
@@ -311,7 +302,6 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
 
   makeFieldNonNull(fieldNameOrArray: string | Array<string>): this {
     super.makeFieldNonNull(fieldNameOrArray);
-    this.getDInterface().makeFieldNonNull(fieldNameOrArray);
     this.getDInputObject().makeFieldNonNull(fieldNameOrArray);
 
     for (const discrimTC in this.discrimTCs) {
@@ -323,7 +313,6 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeCom
 
   makeFieldNullable(fieldNameOrArray: string | Array<string>): this {
     super.makeFieldNullable(fieldNameOrArray);
-    this.getDInterface().makeFieldNullable(fieldNameOrArray);
     this.getDInputObject().makeFieldNullable(fieldNameOrArray);
 
     for (const discrimTC in this.discrimTCs) {

@@ -1,4 +1,9 @@
-import type { SchemaComposer, Resolver, InputTypeComposer } from 'graphql-compose';
+import type {
+  SchemaComposer,
+  Resolver,
+  InputTypeComposer,
+  InterfaceTypeComposer,
+} from 'graphql-compose';
 import { schemaComposer as globalSchemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import type { Model, Document } from 'mongoose';
 import { EDiscriminatorTypeComposer } from './enhancedDiscriminators';
@@ -162,7 +167,7 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
 }
 
 function makeFieldsNonNullWithDefaultValues(
-  tc: ObjectTypeComposer,
+  tc: ObjectTypeComposer | InterfaceTypeComposer,
   alreadyWorked = new Set()
 ): void {
   if (alreadyWorked.has(tc)) return;
@@ -198,7 +203,7 @@ function makeFieldsNonNullWithDefaultValues(
 }
 
 export function prepareFields(
-  tc: ObjectTypeComposer<any, any>,
+  tc: ObjectTypeComposer<any, any> | InterfaceTypeComposer<any, any>,
   opts: ComposeMongooseOpts<any> = {}
 ): void {
   const onlyFields = opts?.onlyFields || opts?.fields?.only;
@@ -212,7 +217,7 @@ export function prepareFields(
 }
 
 export function createInputType(
-  tc: ObjectTypeComposer<any, any>,
+  tc: ObjectTypeComposer<any, any> | InterfaceTypeComposer<any, any>,
   inputTypeOpts: TypeConverterInputTypeOpts = {}
 ): void {
   const inputTypeComposer = tc.getInputTypeComposer();

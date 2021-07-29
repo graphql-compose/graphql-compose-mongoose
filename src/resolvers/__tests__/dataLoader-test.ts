@@ -19,8 +19,12 @@ describe('dataLoader() ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
-    PostTypeComposer = convertModelToGraphQL(PostModel, 'Post', schemaComposer);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
+    PostTypeComposer = convertModelToGraphQL(
+      PostModel,
+      'Post',
+      schemaComposer
+    ) as ObjectTypeComposer;
   });
 
   let user: IUser;

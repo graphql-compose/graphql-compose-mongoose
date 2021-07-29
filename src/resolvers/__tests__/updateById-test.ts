@@ -17,7 +17,7 @@ describe('updateById() ->', () => {
 
   beforeEach(() => {
     schemaComposer.clear();
-    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer);
+    UserTC = convertModelToGraphQL(UserModel, 'User', schemaComposer) as ObjectTypeComposer;
     UserTC.setRecordIdFn((source) => (source ? `${source._id}` : ''));
   });
 

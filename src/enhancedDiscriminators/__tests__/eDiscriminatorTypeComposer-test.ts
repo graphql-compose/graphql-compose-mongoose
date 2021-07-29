@@ -30,32 +30,30 @@ const composeMongoose = <TDoc extends Document, TContext = any>(
   return generatedTC;
 };
 
-let baseDTC: EDiscriminatorTypeComposer<any, any>;
-let DInterface: InterfaceTypeComposer<any, any>;
+let eDTC: EDiscriminatorTypeComposer<any, any>;
 let DInputObject: ObjectTypeComposer<any, any>;
 
 beforeEach(() => {
-  baseDTC = composeMongoose(CharacterModel);
-  DInterface = schemaComposer.getIFTC(baseDTC.getTypeName());
-  DInputObject = baseDTC.getDInputObject();
+  eDTC = composeMongoose(CharacterModel);
+  DInputObject = eDTC.getDInputObject();
 });
 
 afterEach(() => {
-  baseDTC.schemaComposer.clear();
+  eDTC.schemaComposer.clear();
 });
 
 describe('EDiscriminatorTypeComposer', () => {
-  it('has an interface object DInterface as the type name', () => {
-    expect(baseDTC.getDInterface()).toEqual(schemaComposer.getAnyTC(baseDTC.getTypeName()));
-  });
-
   it('throws an error when default (__t) discriminator key is set', () => {
-    baseDTC.schemaComposer.clear();
+    eDTC.schemaComposer.clear();
     const { CharacterModel: noDKeyModel } = getCharacterModels(undefined, 'noDKeyCharacter');
     const errorCall = () => composeMongoose(noDKeyModel);
     expect(errorCall).toThrowError(
       'A custom discriminator key must be set on the model options in mongoose for discriminator behaviour to function correctly'
     );
+  });
+
+  it('should have type resolvers for discriminated models', () => {
+    expect(eDTC.getTypeResolverNames()).toHaveLength(2);
   });
 
   it('should not be used on models without discriminators', () => {
@@ -66,15 +64,11 @@ describe('EDiscriminatorTypeComposer', () => {
 
   describe('Custom Getters', () => {
     test('getting discriminator key', () => {
-      expect(baseDTC.getDKey()).toEqual(defaultDKey);
-    });
-
-    test('getting discriminator interface', () => {
-      expect(baseDTC.getDInterface()).toBe(DInterface);
+      expect(eDTC.getDKey()).toEqual(defaultDKey);
     });
 
     test('getting discriminator input object TC', () => {
-      expect(baseDTC.getDInputObject()).toBe(DInputObject);
+      expect(eDTC.getDInputObject()).toBe(DInputObject);
     });
   });
 
@@ -102,9 +96,9 @@ describe('EDiscriminatorTypeComposer', () => {
     });
   });
 
-  describe('DInterface', () => {
+  describe('eDTC', () => {
     it('shares field names with base model used to compose it', () => {
-      expect(DInterface.getFieldNames()).toEqual(
+      expect(eDTC.getFieldNames()).toEqual(
         expect.arrayContaining(
           Object.keys(CharacterModel.schema.paths).filter((x) => !x.startsWith('__'))
         )
@@ -112,25 +106,23 @@ describe('EDiscriminatorTypeComposer', () => {
     });
 
     it('should be an instance of InterfaceTypeComposer', () => {
-      expect(DInterface instanceof InterfaceTypeComposer).toBeTruthy();
+      expect(eDTC instanceof InterfaceTypeComposer).toBeTruthy();
     });
 
     it('should have the input TC from DInputObject as input TC', () => {
-      expect(DInterface.getInputTypeComposer()).toEqual(
-        baseDTC.getDInputObject().getInputTypeComposer()
-      );
+      expect(eDTC.getInputTypeComposer()).toEqual(eDTC.getDInputObject().getInputTypeComposer());
     });
   });
 
   describe('Get Discriminator TCs', () => {
     it('returns discrimTCs with mongooseResolvers present', () => {
-      Object.values(baseDTC.getDiscriminatorTCs()).forEach((discimTC) => {
+      Object.values(eDTC.getDiscriminatorTCs()).forEach((discimTC) => {
         expect(discimTC).toHaveProperty('mongooseResolvers');
       });
     });
     it('returns empty object with mongooseResolvers missing', () => {
-      (baseDTC.discrimTCs[Object.keys(baseDTC.discrimTCs)[0]] as any).mongooseResolvers = undefined;
-      Object.values(baseDTC.getDiscriminatorTCs()).forEach((discimTC) => {
+      (eDTC.discrimTCs[Object.keys(eDTC.discrimTCs)[0]] as any).mongooseResolvers = undefined;
+      Object.values(eDTC.getDiscriminatorTCs()).forEach((discimTC) => {
         expect(discimTC).toHaveProperty('mongooseResolvers');
       });
     });
@@ -139,18 +131,17 @@ describe('EDiscriminatorTypeComposer', () => {
   describe('Overridden eDTC Class Methods', () => {
     describe('Set Field', () => {
       it('updates field on all child TCs', () => {
-        baseDTC.setField('newField', 'String');
-        expect(baseDTC.hasField('newField')).toBeTruthy();
-        expect(DInterface.hasField('newField')).toBeTruthy();
+        eDTC.setField('newField', 'String');
+        expect(eDTC.hasField('newField')).toBeTruthy();
         expect(DInputObject.hasField('newField')).toBeTruthy();
-        Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+        Object.values(eDTC.discrimTCs).forEach((dTC) => {
           expect(dTC.hasField('newField')).toBeTruthy();
         });
       });
 
       it('updates input TC when field is added', () => {
-        baseDTC.setField('inputField', 'String');
-        expect(schemaComposer.getIFTC(baseDTC.getTypeName()).getInputTypeComposer()).toEqual(
+        eDTC.setField('inputField', 'String');
+        expect(schemaComposer.getIFTC(eDTC.getTypeName()).getInputTypeComposer()).toEqual(
           DInputObject.getInputTypeComposer()
         );
       });
@@ -158,11 +149,10 @@ describe('EDiscriminatorTypeComposer', () => {
 
     describe('Set Extensions', () => {
       it('updates field on all child TCs', () => {
-        baseDTC.setExtensions({ newField: 'testExtension' });
-        expect(baseDTC.hasExtension('newField')).toBeTruthy();
-        expect(DInterface.hasExtension('newField')).toBeTruthy();
+        eDTC.setExtensions({ newField: 'testExtension' });
+        expect(eDTC.hasExtension('newField')).toBeTruthy();
         expect(DInputObject.hasExtension('newField')).toBeTruthy();
-        Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+        Object.values(eDTC.discrimTCs).forEach((dTC) => {
           expect(dTC.hasExtension('newField')).toBeTruthy();
         });
       });
@@ -170,20 +160,18 @@ describe('EDiscriminatorTypeComposer', () => {
 
     describe('Remove Field', () => {
       it('deletes field on all child TCs', () => {
-        baseDTC.addFields({ toDelete: 'String' });
+        eDTC.addFields({ toDelete: 'String' });
         // check field added
-        expect(baseDTC.hasField('toDelete')).toBeTruthy();
-        expect(DInterface.hasField('toDelete')).toBeTruthy();
+        expect(eDTC.hasField('toDelete')).toBeTruthy();
         expect(DInputObject.hasField('toDelete')).toBeTruthy();
-        Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+        Object.values(eDTC.discrimTCs).forEach((dTC) => {
           expect(dTC.hasField('toDelete')).toBeTruthy();
         });
 
-        baseDTC.removeField('toDelete');
-        expect(baseDTC.hasField('toDelete')).toBeFalsy();
-        expect(DInterface.hasField('toDelete')).toBeFalsy();
+        eDTC.removeField('toDelete');
+        expect(eDTC.hasField('toDelete')).toBeFalsy();
         expect(DInputObject.hasField('toDelete')).toBeFalsy();
-        Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+        Object.values(eDTC.discrimTCs).forEach((dTC) => {
           expect(dTC.hasField('toDelete')).toBeFalsy();
         });
       });
@@ -191,19 +179,15 @@ describe('EDiscriminatorTypeComposer', () => {
 
     describe('Remove Other Fields', () => {
       it('removes all other fields from base TC from all child TCs', () => {
-        baseDTC.addFields({ toKeep: 'String' });
+        eDTC.addFields({ toKeep: 'String' });
 
-        const otherFields = baseDTC
-          .getDInterface()
-          .getFieldNames()
-          .filter((field) => field !== 'toKeep');
-        baseDTC.removeOtherFields('toKeep');
+        const otherFields = eDTC.getFieldNames().filter((field) => field !== 'toKeep');
+        eDTC.removeOtherFields('toKeep');
 
         otherFields.forEach((removedField) => {
-          expect(baseDTC.hasField(removedField)).toBeFalsy();
-          expect(DInterface.hasField(removedField)).toBeFalsy();
+          expect(eDTC.hasField(removedField)).toBeFalsy();
           expect(DInputObject.hasField(removedField)).toBeFalsy();
-          Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+          Object.values(eDTC.discrimTCs).forEach((dTC) => {
             expect(dTC.hasField(removedField)).toBeFalsy();
           });
         });
@@ -215,12 +199,11 @@ describe('EDiscriminatorTypeComposer', () => {
         const fieldOrder = ['_id', 'appearsIn', 'friends', 'kind', 'type'];
         const fieldOrderString = fieldOrder.join('');
 
-        baseDTC.reorderFields(fieldOrder);
+        eDTC.reorderFields(fieldOrder);
 
-        expect(baseDTC.getFieldNames().join('').startsWith(fieldOrderString)).toBeTruthy();
-        expect(DInterface.getFieldNames().join('').startsWith(fieldOrderString)).toBeTruthy();
+        expect(eDTC.getFieldNames().join('').startsWith(fieldOrderString)).toBeTruthy();
         expect(DInputObject.getFieldNames().join('').startsWith(fieldOrderString)).toBeTruthy();
-        Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+        Object.values(eDTC.discrimTCs).forEach((dTC) => {
           expect(dTC.getFieldNames().join('').startsWith(fieldOrderString)).toBeTruthy();
         });
       });
@@ -228,29 +211,27 @@ describe('EDiscriminatorTypeComposer', () => {
 
     describe('Make Fields Nullable/Non-null', () => {
       it('makes a nullable field non-null', () => {
-        baseDTC.addFields({ initialNullable: 'String' });
-        expect(baseDTC.isFieldNonNull('initialNullable')).toBeFalsy();
+        eDTC.addFields({ initialNullable: 'String' });
+        expect(eDTC.isFieldNonNull('initialNullable')).toBeFalsy();
 
-        baseDTC.makeFieldNonNull('initialNullable');
+        eDTC.makeFieldNonNull('initialNullable');
 
-        expect(baseDTC.isFieldNonNull('initialNullable')).toBeTruthy();
-        expect(DInterface.isFieldNonNull('initialNullable')).toBeTruthy();
+        expect(eDTC.isFieldNonNull('initialNullable')).toBeTruthy();
         expect(DInputObject.isFieldNonNull('initialNullable')).toBeTruthy();
-        Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+        Object.values(eDTC.discrimTCs).forEach((dTC) => {
           expect(dTC.isFieldNonNull('initialNullable')).toBeTruthy();
         });
       });
 
       it('makes a non-null field nullable', () => {
-        baseDTC.addFields({ initialNonNull: 'String!' });
-        expect(baseDTC.isFieldNonNull('initialNonNull')).toBeTruthy();
+        eDTC.addFields({ initialNonNull: 'String!' });
+        expect(eDTC.isFieldNonNull('initialNonNull')).toBeTruthy();
 
-        baseDTC.makeFieldNullable('initialNonNull');
+        eDTC.makeFieldNullable('initialNonNull');
 
-        expect(baseDTC.isFieldNonNull('initialNonNull')).toBeFalsy();
-        expect(DInterface.isFieldNonNull('initialNonNull')).toBeFalsy();
+        expect(eDTC.isFieldNonNull('initialNonNull')).toBeFalsy();
         expect(DInputObject.isFieldNonNull('initialNonNull')).toBeFalsy();
-        Object.values(baseDTC.discrimTCs).forEach((dTC) => {
+        Object.values(eDTC.discrimTCs).forEach((dTC) => {
           expect(dTC.isFieldNonNull('initialNonNull')).toBeFalsy();
         });
       });

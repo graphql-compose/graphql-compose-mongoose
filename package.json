@@ -42,7 +42,7 @@
     "eslint-plugin-import": "2.23.4",
     "eslint-plugin-prettier": "3.4.0",
     "graphql": "15.5.1",
-    "graphql-compose": "9.0.1",
+    "graphql-compose": "9.0.2",
     "jest": "27.0.6",
     "mongodb-memory-server": "7.3.2",
     "mongoose": "5.13.3",

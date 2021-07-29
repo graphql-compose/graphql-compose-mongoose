@@ -71,8 +71,12 @@ export function filterHelperArgs<TDoc extends Document = any>(
   model: Model<TDoc>,
   opts?: FilterHelperArgsOpts
 ): ObjectTypeComposerArgumentConfigMap<{ filter: any }> {
-  if (!(typeComposer instanceof ObjectTypeComposer)) {
-    throw new Error('First arg for filterHelperArgs() should be instance of ObjectTypeComposer.');
+  if (
+    !(typeComposer instanceof ObjectTypeComposer || typeComposer instanceof InterfaceTypeComposer)
+  ) {
+    throw new Error(
+      'First arg for filterHelperArgs() should be instance of ObjectTypeComposer or InterfaceTypeComposer.'
+    );
   }
 
   if (!model || !model.modelName || !model.schema) {
