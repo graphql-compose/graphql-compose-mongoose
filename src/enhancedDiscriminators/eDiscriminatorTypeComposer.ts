@@ -89,6 +89,7 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends InterfaceType
       opts
     ) as ObjectTypeComposer;
 
+    // create new enhanced discriminator TC
     const eDTC = new EDiscriminatorTypeComposer(
       new GraphQLInterfaceType({
         name: typeName,
@@ -104,17 +105,15 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends InterfaceType
         'A custom discriminator key must be set on the model options in mongoose for discriminator behaviour to function correctly'
       );
     }
-    eDTC._buildDiscriminatedInterface(model, baseTC);
-    eDTC.setInputTypeComposer(eDTC.DInputObject.getInputTypeComposer());
 
-    // eDTC.setInterfaces([eDTC.DInterface]);
+    eDTC._buildDiscriminatedInterface(model, baseTC);
+
+    // set input to custom OTC since IFTCs are not supported in graphQL as inputs
+    eDTC.setInputTypeComposer(eDTC.DInputObject.getInputTypeComposer());
     eDTC._gqcInputTypeComposer = eDTC.DInputObject._gqcInputTypeComposer;
 
     // reorderFields(eDTC, eDTC.opts.reorderFields, eDTC.discriminatorKey);
     eDTC.schemaComposer.addSchemaMustHaveType(eDTC as any);
-
-    // prepare Base Resolvers
-    // prepareBaseResolvers(eDTC);
 
     // cleanup baseTC
     schemaComposer.delete(baseTC.getTypeName());
@@ -125,8 +124,7 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends InterfaceType
     model: Model<any, any>,
     baseTC: ObjectTypeComposer<any, TContext>
   ): EDiscriminatorTypeComposer<TSource, TContext> {
-    this.removeOtherFields('');
-    this.setFields(baseTC.getFields());
+    this.setFields(baseTC.getFields()); // should be overriden at internal setField call?
     this.DInputObject.setFields(baseTC.getFields());
 
     const discriminators = model.discriminators || model.schema.discriminators;
@@ -172,6 +170,7 @@ export class EDiscriminatorTypeComposer<TSource, TContext> extends InterfaceType
         this._addFieldToInputOTC(fieldName, field);
       });
 
+      // make field optional on input if not from baseTC, since we cannot specify individual union types, but rather must produce an input object type that can accept all union types at once
       this.DInputObject.makeFieldNullable(
         discrimTC.getFieldNames().filter((field) => !baseTC.hasField(field))
       );
