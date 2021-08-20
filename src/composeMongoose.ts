@@ -98,12 +98,17 @@ export type GenerateResolverType<TDoc extends Document, TContext = any> = {
     : any;
 };
 
+export type ObjectTypeComposerWithMongooseResolvers<
+  TDoc extends Document,
+  TContext = any
+> = ObjectTypeComposer<TDoc, TContext> & {
+  mongooseResolvers: GenerateResolverType<TDoc, TContext>;
+};
+
 export function composeMongoose<TDoc extends Document, TContext = any>(
   model: Model<TDoc>,
   opts: ComposeMongooseOpts<TContext> = {}
-): ObjectTypeComposer<TDoc, TContext> & {
-  mongooseResolvers: GenerateResolverType<TDoc, TContext>;
-} {
+): ObjectTypeComposerWithMongooseResolvers<TDoc, TContext> {
   const m: Model<any> = model;
   const name: string = (opts && opts.name) || m.modelName;
 
