@@ -1,10 +1,10 @@
 import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import type { Model } from 'mongoose';
 import { ComposeWithMongooseDiscriminatorsOpts, DiscriminatorTypeComposer } from './discriminators';
 
 export * from './discriminators';
 
-export function composeWithMongooseDiscriminators<TDoc extends Document, TContext = any>(
+export function composeWithMongooseDiscriminators<TDoc, TContext = any>(
   baseModel: Model<TDoc>,
   opts?: ComposeWithMongooseDiscriminatorsOpts<TContext>
 ): DiscriminatorTypeComposer<TDoc, TContext> {
