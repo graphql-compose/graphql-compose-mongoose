@@ -49,6 +49,7 @@ This is a plugin for [graphql-compose](https://github.com/graphql-compose/graphq
   - [How to build nesting/relations?](#how-to-build-nestingrelations)
   - [Reusing the same mongoose Schema in embedded object fields](#reusing-the-same-mongoose-schema-in-embedded-object-fields)
   - [Access and modify mongoose doc before save](#access-and-modify-mongoose-doc-before-save)
+  - [How can I restrict access to certain fields or documents?](#how-can-i-restrict-access-to-certain-fields-or-documents)
   - [How can I push/pop or add/remove values to arrays?](#how-can-i-pushpop-or-addremove-values-to-arrays)
   - [Is it possible to use several schemas?](#is-it-possible-to-use-several-schemas)
   - [Embedded documents has `_id` field and you don't need it?](#embedded-documents-has-_id-field-and-you-dont-need-it)
@@ -1045,6 +1046,65 @@ schemaComposer.Mutation.addFields({
   }),
 });
 ```
+
+### How can I restrict access to certain fields or documents?
+
+This library allows modifying the query before it is executed using the `beforeQuery` hook. This lets us prevent certain fields or documents from being read. Here's an example of restricting access to specific fields:
+
+```ts
+schemaComposer.Query.addFields({
+  userOne: UserTC.mongooseResolvers.findOne().wrapResolve((next) => (rp) => {
+    const { role } = rp.context;
+
+    rp.beforeQuery = (query: Query<unknown, unknown>) => {
+      if (role === 'admin') {
+        // Don't change the projection and still allow all fields to be read
+      } else if (role === 'moderator') {
+        // Only allow the name, age, and gender fields to be read
+        query.projection({ name: 1, age: 1, gender: 1 });
+      } else if (role === 'public') {
+        // Only allow the name field to be read
+        query.projection({ name: 1 });
+      }
+    };
+
+    return next(rp);
+  }),
+});
+```
+
+Note that fields that are sometimes restricted should not be marked as required in the mongoose schema. Otherwise, when you query them you will get a "Cannot return null for non-nullable field" error because the database query didn't return a value for the field.
+
+You can also use `beforeQuery` to hide certain documents from the query. Here's an example:
+
+```ts
+schemaComposer.Query.addFields({
+  postMany: PostTC.mongooseResolvers.findMany().wrapResolve((next) => (rp) => {
+    const { userId } = rp.context;
+
+    rp.beforeQuery = (query: Query<unknown, unknown>) => {
+      // Only allow users to see their own posts
+      query.where('authorId', userId);
+    };
+
+    return next(rp);
+  }),
+});
+```
+
+Both of these examples require putting extra data in the resolver context. Here's how to attach context data in Apollo Server:
+
+```ts
+const server = new ApolloServer({
+  schema: schemaComposer.buildSchema(),
+  context() {
+    // This role should actually come from a JWT or something
+    return { role: 'admin' };
+  },
+});
+```
+
+Other GraphQL servers are likely similar.
 
 ### How can I push/pop or add/remove values to arrays?
 
