@@ -31,10 +31,10 @@ export type TransformRecordIdFn<TContext = any> = (
 ) => any;
 
 export function composeWithMongoose<TDoc extends Document, TContext = any>(
-  model: Model<TDoc>,
+  model: Model<any>,
   opts: ComposeWithMongooseOpts<TContext> = {}
 ): ObjectTypeComposer<TDoc, TContext> {
-  const m: Model<any> = model;
+  const m = model as Model<any>;
   const name: string = (opts && opts.name) || m.modelName;
 
   const sc = opts.schemaComposer || globalSchemaComposer;

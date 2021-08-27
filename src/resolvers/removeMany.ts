@@ -94,12 +94,17 @@ export function removeMany<TSource = any, TContext = any, TDoc extends Document 
 
       const res = await beforeQueryHelper(resolveParams);
 
-      if (res.ok) {
-        // mongoose 5
+      if (res.deletedCount) {
+        // mongoose v6
+        return {
+          numAffected: res.deletedCount,
+        };
+      } else if (res.ok) {
+        // mongoose v5
         return {
           numAffected: res.n,
         };
-      } else if (res.result && res.result.ok) {
+      } else if (res?.result?.ok) {
         // mongoose 4
         return {
           numAffected: res.result.n,

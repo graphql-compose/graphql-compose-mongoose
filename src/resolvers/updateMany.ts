@@ -133,7 +133,12 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
 
       const res = await beforeQueryHelper(resolveParams);
 
-      if (res.ok) {
+      if (res.modifiedCount || res.acknowledged) {
+        // mongoose v6
+        return {
+          numAffected: res.modifiedCount,
+        };
+      } else if (res.ok) {
         return {
           numAffected: res.n || res.nModified,
         };

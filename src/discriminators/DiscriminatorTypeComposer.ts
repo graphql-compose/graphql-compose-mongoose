@@ -181,7 +181,7 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
     this.schemaComposer.addSchemaMustHaveType(childTC);
     this.childTCs.push(childTC);
 
-    return childTC;
+    return childTC as any;
   }
 
   setFields(fields: ObjectTypeComposerFieldConfigMapDefinition<any, any>): this {

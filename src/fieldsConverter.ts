@@ -47,6 +47,11 @@ export enum ComplexTypes {
   DECIMAL = 'DECIMAL',
 }
 
+// In mongoose@6 Embedded type was renamed to Subdocument
+// So keep backward compatibility with old mongoose versions
+const SubdocumentTypeClass =
+  (mongoose.Schema.Types as any)?.Embedded || (mongoose.Schema.Types as any).Subdocument;
+
 function _getFieldName(field: MongooseFieldT): string {
   return field.path || '__unknownField__';
 }
@@ -278,7 +283,7 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypes {
     (fieldType === 'Array' && field?.schema?.paths)
   ) {
     return ComplexTypes.DOCUMENT_ARRAY;
-  } else if (field instanceof mongoose.Schema.Types.Embedded || fieldType === 'Embedded') {
+  } else if (field instanceof SubdocumentTypeClass || fieldType === 'Embedded') {
     return ComplexTypes.EMBEDDED;
   } else if (field instanceof mongoose.Schema.Types.Array || field?.caster?.instance) {
     return ComplexTypes.ARRAY;
