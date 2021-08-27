@@ -99,8 +99,8 @@ describe('nested projections with aliases - issue #271', () => {
     expect(book?.author?.age).toEqual(115);
     expect(book?.toObject({ virtuals: true })).toEqual({
       _id: 1,
-      a: { ag: 115, age: 115, id: null },
-      author: { ag: 115, age: 115, id: null },
+      a: expect.objectContaining({ ag: 115, age: 115 }),
+      author: expect.objectContaining({ ag: 115, age: 115 }),
       id: '1',
       pageCount: 1168,
       pc: 1168,

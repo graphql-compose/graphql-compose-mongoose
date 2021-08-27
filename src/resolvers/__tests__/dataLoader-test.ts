@@ -161,7 +161,7 @@ describe('dataLoader() ->', () => {
       ...resolveParams,
     });
 
-    const nonExistedId = mongoose.Types.ObjectId('5cefda4616156200084e5170');
+    const nonExistedId = new mongoose.Types.ObjectId('5cefda4616156200084e5170');
     const resultPromise5 = resolver.resolve({
       args: { _id: nonExistedId },
       ...resolveParams,

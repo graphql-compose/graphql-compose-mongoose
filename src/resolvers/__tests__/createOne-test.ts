@@ -89,7 +89,7 @@ describe('createOne() ->', () => {
       });
 
       const doc = await UserModel.collection.findOne({ _id: res.record._id });
-      expect(doc.n).toBe(checkedName);
+      expect(doc?.n).toBe(checkedName);
     });
 
     it('should return payload.record when it requested', async () => {

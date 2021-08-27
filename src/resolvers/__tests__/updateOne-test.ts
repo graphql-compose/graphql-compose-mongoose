@@ -294,7 +294,7 @@ describe('updateOne() ->', () => {
       });
       await expect(result).rejects.toThrow('Denied due context ReadOnly');
       const exist = await UserModel.collection.findOne({ _id: user1._id });
-      expect(exist.n).toBe(user1.name);
+      expect(exist?.n).toBe(user1.name);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
