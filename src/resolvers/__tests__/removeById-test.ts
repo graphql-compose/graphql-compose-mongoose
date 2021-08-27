@@ -164,7 +164,7 @@ describe('removeById() ->', () => {
       });
       await expect(result).rejects.toThrow('Denied due context ReadOnly');
       const exist = await UserModel.collection.findOne({ _id: user._id });
-      expect(exist.n).toBe(user.name);
+      expect(exist?.n).toBe(user.name);
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
@@ -180,14 +180,14 @@ describe('removeById() ->', () => {
         beforeQuery(query: any, rp: ExtendedResolveParams) {
           expect(rp.model).toBe(UserModel);
           expect(rp.query).toHaveProperty('exec');
-          return query.where({ _id: user._id, canDelete: false });
+          return query.where({ _id: user._id, gender: 'some' });
         },
       };
 
       const result = await removeById(UserModel, UserTC).resolve(resolveParams);
 
       expect(mongooseActions).toEqual([
-        ['users', 'findOne', { _id: user._id, canDelete: false }, { projection: {} }],
+        ['users', 'findOne', { _id: user._id, gender: 'some' }, { projection: {} }],
       ]);
 
       expect(result).toBeNull();

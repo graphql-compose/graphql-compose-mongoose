@@ -165,7 +165,9 @@ describe('integration tests', () => {
         schema,
         '{ user(_id: "100000000000000000000000") { rawData } }'
       );
-      expect(Object.keys(res.data.user.rawData)).toMatchSnapshot('projection from all fields');
+      expect(Object.keys(res.data.user.rawData).sort()).toMatchSnapshot(
+        'projection from all fields'
+      );
     });
   });
 });
