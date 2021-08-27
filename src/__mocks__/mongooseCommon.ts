@@ -13,11 +13,14 @@ mongoose.createConnection = (async () => {
   const mongoUri = mongoServer.getUri();
 
   // originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true }); // mongoose 4
-  originalConnect.bind(mongoose)(mongoUri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  }); // mongoose 5
+  originalConnect.bind(mongoose)(
+    mongoUri,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    } as any /* for tests compatibility with mongoose v5 & v6 */
+  ); // mongoose 5
+  // originalConnect.bind(mongoose)(mongoUri, {}); // mongoose 6
 
   mongoose.connection.on('error', (e) => {
     if (e.message.code === 'ETIMEDOUT') {
