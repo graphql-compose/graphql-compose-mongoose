@@ -21,7 +21,7 @@ type TArgs = {
 };
 
 export function createMany<TSource = any, TContext = any, TDoc extends Document = any>(
-  model: Model<TDoc>,
+  model: Model<any>,
   tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: CreateManyResolverOpts
 ): Resolver<TSource, TContext, TArgs, TDoc> {
