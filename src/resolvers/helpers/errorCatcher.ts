@@ -25,7 +25,7 @@ export function addErrorCatcherField(resolver: Resolver<any, any, any>): void {
     try {
       const res = await childResolve(rp);
       return res;
-    } catch (e) {
+    } catch (e: any) {
       let error;
       if (e instanceof ValidationError) {
         error = {
