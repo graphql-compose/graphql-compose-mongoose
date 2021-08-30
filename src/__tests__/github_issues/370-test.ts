@@ -69,7 +69,7 @@ describe('issue #370 - addRelation: projection not working as expected ', () => 
     const result = await graphql.graphql({
       schema,
       source: `query {
-          users {
+          users(sort: _ID_ASC) {
             firstName
             organizations {
               title
