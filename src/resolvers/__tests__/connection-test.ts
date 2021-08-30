@@ -236,41 +236,22 @@ describe('connection() resolver', () => {
       });
 
       it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
-        const mongooseActions: any[] = [];
-
-        UserModel.base.set('debug', function debugMongoose(...args: any) {
-          mongooseActions.push(args);
-        });
-
+        expect.assertions(4);
+        let extendedQuery: Query<any, any>;
         const resolver = connection(UserModel, UserTC);
-
-        if (!resolver) {
-          throw new Error('resolver is undefined');
-        }
-
         const result = await resolver.resolve({
           args: {},
           beforeQuery: (query: any, rp: ExtendedResolveParams) => {
             expect(query).toBeInstanceOf(Query);
             expect(rp.model).toBe(UserModel);
             // modify query before execution
-            return query.where({ _id: user1.id }).limit(1989);
+            extendedQuery = query.where({ _id: user1.id }).limit(1989);
+            return extendedQuery;
           },
         });
 
-        expect(mongooseActions).toEqual([
-          [
-            'users',
-            'find',
-            { _id: user1._id },
-            {
-              limit: 1989,
-              projection: {},
-            },
-          ],
-        ]);
-
         expect(result.edges).toHaveLength(1);
+        expect(result.edges[0].node._id.toString()).toEqual(user1.id.toString());
       });
 
       it('should override result with `beforeQuery`', async () => {

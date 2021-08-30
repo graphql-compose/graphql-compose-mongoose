@@ -111,7 +111,7 @@ describe('issue #141 - createOne with custom id (not MongoId)', () => {
       _id: { type: ComplexIdSchema },
       name: { type: String, required: true },
     });
-    const ComplexModel = mongoose.model('Complex', ComplexSchema);
+    const ComplexModel = mongoose.model<any>('Complex', ComplexSchema);
     const ComplexTC = composeMongoose(ComplexModel);
 
     expect(ComplexTC.getFieldTypeName('_id')).toBe('Complex_id!');
