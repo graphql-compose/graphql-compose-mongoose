@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema({
     },
   ],
 });
-const UserModel = mongoose.model('User', UserSchema);
+const UserModel = mongoose.model<any>('User', UserSchema);
 const UserTC = composeMongoose(UserModel, { schemaComposer });
 
 const OrganizationSchema = new mongoose.Schema({
@@ -29,7 +29,7 @@ const OrganizationSchema = new mongoose.Schema({
     required: true,
   },
 });
-const OrganizationModel = mongoose.model('Organization', OrganizationSchema);
+const OrganizationModel = mongoose.model<any>('Organization', OrganizationSchema);
 const OrganizationTC = composeMongoose(OrganizationModel, { schemaComposer });
 
 UserTC.addRelation('organizations', {

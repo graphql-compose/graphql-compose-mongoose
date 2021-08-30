@@ -15,8 +15,8 @@ const WithoutSubSchema = new mongoose.Schema({
   },
 });
 
-const WithSubModel = mongoose.model('WithSubModel', WithSubSchema);
-const WithoutSubModel = mongoose.model('WithoutSubModel', WithoutSubSchema);
+const WithSubModel = mongoose.model<any>('WithSubModel', WithSubSchema);
+const WithoutSubModel = mongoose.model<any>('WithoutSubModel', WithoutSubSchema);
 
 describe('defaultsAsNonNull falsely reports non-nullability for subdocuments that have a Schema  - issue #358', () => {
   it('with sub schema', async () => {

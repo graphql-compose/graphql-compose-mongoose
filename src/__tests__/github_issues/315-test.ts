@@ -12,7 +12,7 @@ const BookSchema = new mongoose.Schema({
   date: { type: Date },
 });
 
-const BookModel = mongoose.model('Book', BookSchema);
+const BookModel = mongoose.model<any>('Book', BookSchema);
 
 const BookTC = composeMongoose(BookModel, { schemaComposer });
 const booksFindMany = BookTC.mongooseResolvers.findMany().addFilterArg({
