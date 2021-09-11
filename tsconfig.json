@@ -9,6 +9,7 @@
     "declarationMap": true,
     "removeComments": true,
     "strict": true,
+    "skipLibCheck": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
