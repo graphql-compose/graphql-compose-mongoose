@@ -77,7 +77,7 @@ describe('issue #377 - Missing fields from projection in addRelation', () => {
       contextValue: {},
       source: `
         {
-          previsitMany {
+          previsitMany(sort: _ID_ASC) {
             name
             project {
               name
