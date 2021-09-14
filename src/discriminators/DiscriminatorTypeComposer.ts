@@ -86,8 +86,8 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
   ): DiscriminatorTypeComposer<TSrc, TCtx> {
     if (!baseModel || !baseModel.discriminators) {
       throw Error(
-        'Discriminator Key not Set, have you already registered discriminators on your base model? ' + 
-        'Otherwise, use composeWithMongoose for Normal Collections'
+        'Discriminator Key not Set, have you already registered discriminators on your base model? ' +
+          'Otherwise, use composeWithMongoose for Normal Collections'
       );
     }
 
