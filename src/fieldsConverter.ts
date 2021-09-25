@@ -386,7 +386,14 @@ export function enumToGraphQL(
     if (desc) etc.setDescription(desc);
 
     const fields = valueList.reduce((result, value) => {
-      const key = value.replace(/[^_a-zA-Z0-9]/g, '_');
+      let key
+      if (value === null) {
+        key = 'NULL'
+      } else if (value === '') {
+        key = 'EMPTY_STRING'
+      } else {
+        key = value.replace(/[^_a-zA-Z0-9]/g, '_').replace(/(^[0-9])(.*)/g, 'a_$1$2')
+      }
       result[key] = { value };
       return result;
     }, {} as Record<string, { value: any }>);
