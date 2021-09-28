@@ -220,6 +220,21 @@ describe('fieldConverter', () => {
       const ocEnum = enumToGraphQL(modelFields.oc, '', schemaComposer);
       expect(ocEnum.getFieldNames()).toEqual(['ocpp1_6', 'ocpp2_0']);
     });
+
+    it('should work with EMPTY_STRING & NULL', () => {
+      const model = mongoose.model(
+        'EnumTestEmpty',
+        new mongoose.Schema({
+          some: {
+            type: String,
+            enum: ['', null, 'val1'],
+          },
+        })
+      );
+      const modelFields = getFieldsFromModel(model);
+      const SomeEnum = enumToGraphQL(modelFields.some, '', schemaComposer);
+      expect(SomeEnum.getFieldNames()).toEqual(['EMPTY_STRING', 'NULL', 'val1']);
+    });
   });
 
   describe('embeddedToGraphQL()', () => {
