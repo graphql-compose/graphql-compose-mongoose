@@ -386,13 +386,13 @@ export function enumToGraphQL(
     if (desc) etc.setDescription(desc);
 
     const fields = valueList.reduce((result, value) => {
-      let key
+      let key;
       if (value === null) {
-        key = 'NULL'
+        key = 'NULL';
       } else if (value === '') {
-        key = 'EMPTY_STRING'
+        key = 'EMPTY_STRING';
       } else {
-        key = value.replace(/[^_a-zA-Z0-9]/g, '_').replace(/(^[0-9])(.*)/g, 'a_$1$2')
+        key = value.replace(/[^_a-zA-Z0-9]/g, '_').replace(/(^[0-9])(.*)/g, 'a_$1$2');
       }
       result[key] = { value };
       return result;
