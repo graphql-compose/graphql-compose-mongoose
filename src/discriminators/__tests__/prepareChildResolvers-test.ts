@@ -1,6 +1,7 @@
 import { schemaComposer, ObjectTypeComposer } from 'graphql-compose';
 import { composeWithMongooseDiscriminators } from '../../composeWithMongooseDiscriminators';
 import { getCharacterModels } from '../__mocks__/characterModels';
+import { OPERATORS_FIELDNAME } from '../../resolvers/helpers/filterOperators';
 
 const DKeyFieldName = 'type';
 const { CharacterModel, PersonModel } = getCharacterModels(DKeyFieldName);
@@ -115,6 +116,23 @@ describe('prepareChildResolvers()', () => {
       expect(baseDTC.getResolver('createOne').getArgITC('record').getFieldType('kind')).toEqual(
         PersonTC.getResolver('createOne').getArgITC('record').getFieldType('kind')
       );
+    });
+
+    it('should not copy base _operations to child', () => {
+      expect(
+        baseDTC
+          .getResolver('findMany')
+          .getArgITC('filter')
+          .getField(OPERATORS_FIELDNAME)
+          .type.getTypeName()
+      ).toEqual('FilterFindManyCharacterOperatorsInput');
+
+      expect(
+        PersonTC.getResolver('findMany')
+          .getArgITC('filter')
+          .getField(OPERATORS_FIELDNAME)
+          .type.getTypeName()
+      ).toEqual('FilterFindManyPersonOperatorsInput');
     });
   });
 });
