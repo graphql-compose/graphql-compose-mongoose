@@ -1,4 +1,4 @@
-import type { InterfaceTypeComposer, SchemaComposer } from 'graphql-compose';
+import { graphqlVersion, InterfaceTypeComposer, SchemaComposer } from 'graphql-compose';
 import { getMongoErrorOTC } from './MongoError';
 import { ValidationError, getValidationErrorOTC } from './ValidationError';
 import { RuntimeError, getRuntimeErrorOTC } from './RuntimeError';
@@ -26,9 +26,18 @@ export function getErrorInterface(schemaComposer: SchemaComposer<any>): Interfac
     schemaComposer.addSchemaMustHaveType(MongoErrorOTC);
     schemaComposer.addSchemaMustHaveType(RuntimeErrorOTC);
 
-    const ValidationErrorType = ValidationErrorOTC.getType();
-    const MongoErrorType = MongoErrorOTC.getType();
-    const RuntimeErrorType = RuntimeErrorOTC.getType();
+    let ValidationErrorType: any;
+    let MongoErrorType: any;
+    let RuntimeErrorType: any;
+    if (graphqlVersion >= 16) {
+      ValidationErrorType = ValidationErrorOTC.getTypeName();
+      MongoErrorType = MongoErrorOTC.getTypeName();
+      RuntimeErrorType = RuntimeErrorOTC.getTypeName();
+    } else {
+      ValidationErrorType = ValidationErrorOTC.getType();
+      MongoErrorType = MongoErrorOTC.getType();
+      RuntimeErrorType = RuntimeErrorOTC.getType();
+    }
 
     iftc.setResolveType((value) => {
       switch (value?.name) {

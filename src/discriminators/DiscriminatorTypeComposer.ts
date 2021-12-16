@@ -7,6 +7,7 @@ import {
   ObjectTypeComposerFieldConfigDefinition,
   ObjectTypeComposerFieldConfigMapDefinition,
   ObjectTypeComposerFieldConfigAsObjectDefinition,
+  graphqlVersion,
 } from 'graphql-compose';
 import type { Model } from 'mongoose';
 import { composeWithMongoose, ComposeWithMongooseOpts } from '../composeWithMongoose';
@@ -144,11 +145,21 @@ export class DiscriminatorTypeComposer<TSource, TContext> extends ObjectTypeComp
         const childDName = value[baseTC.getDKey()];
 
         if (childDName) {
-          return baseTC.schemaComposer.getOTC(childDName).getType();
+          if (graphqlVersion >= 16) {
+            // in GraphQL v16 we must return TypeName
+            return childDName;
+          } else {
+            // in GraphQL below v16 we must return ObjectType
+            return baseTC.schemaComposer.getOTC(childDName).getType();
+          }
         }
 
         // as fallback return BaseModelTC
-        return baseTC.schemaComposer.getOTC(baseTC.getTypeName()).getType();
+        if (graphqlVersion >= 16) {
+          return baseTC.getTypeName();
+        } else {
+          return baseTC.schemaComposer.getOTC(baseTC.getTypeName()).getType();
+        }
       },
       fields: interfaceFields as any,
     });
