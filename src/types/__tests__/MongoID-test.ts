@@ -44,7 +44,7 @@ describe('GraphQLMongoID', () => {
       const ast = {
         kind: Kind.STRING,
         value: '5a0d77aa7e65a808ad249000',
-      };
+      } as any;
       const id: any = GraphQLMongoID.parseLiteral(ast, {});
       expect(id).toEqual('5a0d77aa7e65a808ad249000');
     });

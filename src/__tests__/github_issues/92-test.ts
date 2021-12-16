@@ -23,9 +23,9 @@ describe('issue #92 - How to verify the fields?', () => {
   const schema = schemaComposer.buildSchema();
 
   it('correct request', async () => {
-    const result: any = await graphql.graphql(
+    const result: any = await graphql.graphql({
       schema,
-      `
+      source: `
           mutation {
             addUser(record: { name: "User1", age: 30, contacts: { email: "1@1.com" } }) {
               record {
@@ -34,15 +34,15 @@ describe('issue #92 - How to verify the fields?', () => {
               }
             }
           }
-        `
-    );
+        `,
+    });
     expect(result).toEqual({ data: { addUser: { record: { age: 30, name: 'User1' } } } });
   });
 
   it('wrong request', async () => {
-    const result: any = await graphql.graphql(
+    const result: any = await graphql.graphql({
       schema,
-      `
+      source: `
           mutation {
             addUser(record: { name: "User1", age: 10, contacts: { email: "1@1.com" } }) {
               record {
@@ -51,8 +51,8 @@ describe('issue #92 - How to verify the fields?', () => {
               }
             }
           }
-        `
-    );
+        `,
+    });
     expect(result).toEqual({ data: { addUser: null }, errors: expect.anything() });
     expect(result.errors[0].message).toBe('You are too young');
   });

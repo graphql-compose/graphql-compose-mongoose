@@ -44,7 +44,7 @@ describe('GraphQLBSONDecimal', () => {
       const ast = {
         kind: Kind.STRING,
         value: '90000000000000000000000000000000.09',
-      };
+      } as any;
       const amount: any = GraphQLBSONDecimal.parseLiteral(ast, {});
       expect(amount).toBeInstanceOf(Decimal128);
       expect(amount.toString()).toEqual('90000000000000000000000000000000.09');

@@ -15,7 +15,7 @@ function parseStringWithRegExp(str: string): RegExp {
 
 const GraphQLRegExpAsString = new GraphQLScalarType({
   name: 'RegExpAsString',
-  specifiedByUrl: 'http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf',
+  specifiedByURL: 'http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf',
   description:
     'The string representation of JavaScript regexp. You may provide it with flags "/^abc.*/i" or without flags like "^abc.*". More info about RegExp characters and flags: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions',
   serialize: String,

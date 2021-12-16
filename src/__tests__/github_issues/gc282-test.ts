@@ -65,17 +65,17 @@ afterAll(() => EventModel.base.disconnect());
 describe('graphql-compose/issue #282 - Filter nested array by string', () => {
   it('correct request', async () => {
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           eventMany(filter: { subjects: ["notMetaValue"] }) {
             message
             meta {
               subjects
             }
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({
       data: { eventMany: [{ message: 'event2', meta: { subjects: ['notMetaValue'] } }] },
     });

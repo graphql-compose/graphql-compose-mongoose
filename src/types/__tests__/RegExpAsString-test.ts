@@ -37,13 +37,13 @@ describe('GraphQLRegExpAsString', () => {
       const ast = {
         kind: Kind.STRING,
         value: '^Abc$',
-      };
+      } as any;
       expect(GraphQLRegExpAsString.parseLiteral(ast, {})).toEqual(/^Abc$/);
 
       const ast2 = {
         kind: Kind.STRING,
         value: '/^Abc$/gm',
-      };
+      } as any;
       expect(GraphQLRegExpAsString.parseLiteral(ast2, {})).toEqual(/^Abc$/gm);
     });
 

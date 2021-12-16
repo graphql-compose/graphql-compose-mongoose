@@ -39,7 +39,7 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
   const requiredFields = [];
   for (const field in tree) {
     if (tree.hasOwnProperty(field)) {
-      const fieldOptions = tree[field];
+      const fieldOptions = tree[field] as any;
       if (fieldOptions.required && typeof fieldOptions.required !== 'function') {
         requiredFields.push(field);
       }

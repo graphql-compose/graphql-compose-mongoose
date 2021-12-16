@@ -37,16 +37,16 @@ describe('issue #93', () => {
       contacts: { email: '3@3.com' },
     });
 
-    const res = await graphql.graphql(
+    const res = await graphql.graphql({
       schema,
-      `
+      source: `
         {
           users(filter: { OR: [{ age: 301 }, { AND: [{ gender: male }, { age: 302 }] }] }) {
             name
           }
         }
-      `
-    );
+      `,
+    });
     expect(res).toEqual({ data: { users: [{ name: 'User301' }, { name: 'User302' }] } });
   });
 });

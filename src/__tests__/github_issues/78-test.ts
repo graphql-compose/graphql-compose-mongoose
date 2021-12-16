@@ -44,9 +44,9 @@ describe('issue #78 - Mongoose and Discriminators', () => {
       types: [EventTC.getType(), ClickedLinkEventTC.getType()],
       resolveType: (value) => {
         if (value.kind === 'ClickedLinkEvent') {
-          return ClickedLinkEventTC.getType();
+          return ClickedLinkEventTC.getTypeName();
         }
-        return EventTC.getType();
+        return EventTC.getTypeName();
       },
     });
 
@@ -64,21 +64,21 @@ describe('issue #78 - Mongoose and Discriminators', () => {
     });
     const schema = schemaComposer.buildSchema();
 
-    const res = await graphql.graphql(
+    const res = await graphql.graphql({
       schema,
-      `{
-    eventFindMany {
-        __typename
-        ... on GenericEvent {
-        refId
+      source: `{
+        eventFindMany {
+            __typename
+            ... on GenericEvent {
+            refId
+            }
+            ... on ClickedLinkEvent {
+            refId
+            url
+            }
         }
-        ... on ClickedLinkEvent {
-        refId
-        url
-        }
-    }
-    }`
-    );
+      }`,
+    });
 
     expect(res).toEqual({
       data: {

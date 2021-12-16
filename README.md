@@ -293,9 +293,9 @@ Variable Namings
 
   describe('createOne', () => {
     it('should create child document without specifying DKey', async () => {
-      const res = await graphql.graphql(
+      const res = await graphql.graphql({
         schema,
-        `mutation CreateCharacters {
+        source: `mutation CreateCharacters {
           droidCreate(record: {name: "Queue XL", modelNumber: 360 }) {
             record {
               __typename

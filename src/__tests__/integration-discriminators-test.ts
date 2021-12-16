@@ -41,9 +41,9 @@ describe('#78 Mongoose and Discriminators', () => {
 
     const schema = schemaComposer.buildSchema();
 
-    const res = await graphql.graphql(
+    const res = await graphql.graphql({
       schema,
-      `{
+      source: `{
         eventFindMany {
           __typename
           ... on Event {
@@ -55,8 +55,8 @@ describe('#78 Mongoose and Discriminators', () => {
             url
           }
         }
-      }`
-    );
+      }`,
+    });
 
     expect(res).toEqual({
       data: {
@@ -141,9 +141,9 @@ describe('depicting other Enhancements to resolvers', () => {
   describe('baseResolvers Enhancements', () => {
     describe('createOne', () => {
       it('should create base document with DKey provided, generic fields', async () => {
-        const res = await graphql.graphql(
+        const res = await graphql.graphql({
           schema,
-          `mutation CreateCharacters {
+          source: `mutation CreateCharacters {
             droidCreate: characterCreate(record: {name: "Queue XL", type: Droid }) {
               record {
                 __typename
@@ -159,8 +159,8 @@ describe('depicting other Enhancements to resolvers', () => {
                 name
               }
             }
-          }`
-        );
+          }`,
+        });
 
         expect(res).toEqual({
           data: {
@@ -179,9 +179,9 @@ describe('depicting other Enhancements to resolvers', () => {
   describe('childResolvers Enhancements', () => {
     describe('createOne', () => {
       it('should create child document without specifying DKey', async () => {
-        const res = await graphql.graphql(
+        const res = await graphql.graphql({
           schema,
-          `mutation CreateCharacters {
+          source: `mutation CreateCharacters {
             droidCreate(record: {name: "Queue XL", modelNumber: 360 }) {
               record {
                 __typename
@@ -199,8 +199,8 @@ describe('depicting other Enhancements to resolvers', () => {
                 dob
               }
             }
-          }`
-        );
+          }`,
+        });
 
         expect(res).toEqual({
           data: {

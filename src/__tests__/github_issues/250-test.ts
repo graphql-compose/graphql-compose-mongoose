@@ -43,62 +43,62 @@ const schema = schemaComposer.buildSchema();
 describe('issue #250 - Adds support for nested `_operators`, add `exists`, `regex` operators', () => {
   it('check `exist` operator', async () => {
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           findMany(filter: { _operators: { gender: { exists: true } } }) {
             name
             gender
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({ data: { findMany: [{ gender: 'male', name: 'BBBBB' }] } });
   });
 
   it('check nested `exist` operator', async () => {
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           findMany(filter: { _operators: { contacts: { skype: { exists: true } } } }) {
             name
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({ data: { findMany: [{ name: 'BBBBB' }] } });
   });
 
   it('check `regex` operator', async () => {
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           findMany(filter: { _operators: { name: { regex: "^AA|CC.*" } } }) {
             name
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({ data: { findMany: [{ name: 'AAAAA' }, { name: 'CCCCC' }] } });
   });
 
   it('check nested `regex` operator', async () => {
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           findMany(filter: { _operators: { contacts: { email: { regex: "/3.COM/i" } } } }) {
             name
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({ data: { findMany: [{ name: 'CCCCC' }] } });
   });
 
   it('check combined nested `regex` operator', async () => {
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           findMany(
             filter: { OR: [
               { _operators: { contacts: { email: { regex: "/3.COM/i" } } } },
@@ -107,8 +107,8 @@ describe('issue #250 - Adds support for nested `_operators`, add `exists`, `rege
           ) {
             name
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({ data: { findMany: [{ name: 'BBBBB' }, { name: 'CCCCC' }] } });
   });
 });

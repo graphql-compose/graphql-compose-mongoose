@@ -50,51 +50,51 @@ describe('issue #219 - Authorization using wrapResolve', () => {
     });
     const schema = schemaComposer.buildSchema();
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           findUser(filter: { name: "AAAAA" }) {
             name
             age
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({ data: { findUser: null } });
 
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           findUser(filter: { name: "BBBBB" }) {
             name
             age
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({ data: { findUser: { age: 20, name: 'BBBBB' } } });
 
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           findUser(filter: { name: "CACHED" }) {
             name
             age
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({ data: { findUser: { age: 99, name: 'CACHED' } } });
 
     expect(
-      await graphql.graphql(
+      await graphql.graphql({
         schema,
-        `query {
+        source: `query {
           findUser(filter: { name: "ERROR" }) {
             name
             age
           }
-        }`
-      )
+        }`,
+      })
     ).toEqual({ data: { findUser: null }, errors: [new Error('Wrong arg!')] });
   });
 });

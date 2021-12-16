@@ -24,20 +24,20 @@ describe('integration tests', () => {
         contacts: { email: 'mail' },
       });
       await user.save();
-      const result: any = await graphql(
+      const result: any = await graphql({
         schema,
-        `{
-        user(_id: "${user._id}") {
-          name
-          subDoc {
-            field1
-            field2 {
-              field21
+        source: `{
+          user(_id: "${user._id}") {
+            name
+            subDoc {
+              field1
+              field2 {
+                field21
+              }
             }
           }
-        }
-      }`
-      );
+        }`,
+      });
 
       expect(result.data.user).toEqual({
         name: 'Test empty subDoc',
@@ -67,20 +67,20 @@ describe('integration tests', () => {
         subDoc: { field2: { field21: 'ok' } },
       });
       await user2.save();
-      const result2: any = await graphql(
+      const result2: any = await graphql({
         schema,
-        `{
-        user(_id: "${user2._id}") {
-          name
-          subDoc {
-            field1
-            field2 {
-              field21
+        source: `{
+          user(_id: "${user2._id}") {
+            name
+            subDoc {
+              field1
+              field2 {
+                field21
+              }
             }
           }
-        }
-      }`
-      );
+        }`,
+      });
 
       expect(result2.data.user).toEqual({
         name: 'Test non empty subDoc',
@@ -115,13 +115,13 @@ describe('integration tests', () => {
       });
       const schema = schemaComposer.buildSchema();
 
-      const query = `{
+      const source = `{
         user(_id: "${user._id}") {
           name
           someDynamic
         }
       }`;
-      const result: any = await graphql(schema, query);
+      const result: any = await graphql({ schema, source });
       expect(result.data.user.name).toBe(user.name);
       expect(result.data.user.someDynamic).toEqual(user.someDynamic);
     });
@@ -156,15 +156,18 @@ describe('integration tests', () => {
     });
 
     it('should request only fields from query', async () => {
-      const res = await graphql(schema, '{ user(_id: "100000000000000000000000") { name } }');
+      const res = await graphql({
+        schema,
+        source: '{ user(_id: "100000000000000000000000") { name } }',
+      });
       expect(res).toMatchSnapshot('projection from query fields');
     });
 
     it('should request all fields to rawData field', async () => {
-      const res: any = await graphql(
+      const res: any = await graphql({
         schema,
-        '{ user(_id: "100000000000000000000000") { rawData } }'
-      );
+        source: '{ user(_id: "100000000000000000000000") { rawData } }',
+      });
       expect(Object.keys(res.data.user.rawData).sort()).toMatchSnapshot(
         'projection from all fields'
       );
