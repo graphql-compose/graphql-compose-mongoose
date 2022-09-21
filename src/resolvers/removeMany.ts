@@ -94,7 +94,7 @@ export function removeMany<TSource = any, TContext = any, TDoc extends Document 
 
       const res = await beforeQueryHelper(resolveParams);
 
-      if (res.deletedCount) {
+      if (typeof res.deletedCount === 'number') {
         // mongoose v6
         return {
           numAffected: res.deletedCount,
