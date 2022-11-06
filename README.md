@@ -357,7 +357,7 @@ type ComposeMongooseOpts = {
    */
   onlyFields?: string[];
   /**
-   * You an remove some fields from type via this option.
+   * You can remove some fields from type via this option.
    */
   removeFields?: string[];
   /**
@@ -390,7 +390,7 @@ type TypeConverterInputTypeOpts = {
    */
   onlyFields?: string[];
   /**
-   * You an remove some fields from type via this option.
+   * You can remove some fields from type via this option.
    */
   removeFields?: string[];
   /**
@@ -723,7 +723,7 @@ type FilterHelperArgsOpts = {
    */
   onlyIndexed?: boolean;
   /**
-   * You an remove some fields from type via this option.
+   * You can remove some fields from type via this option.
    */
   removeFields?: string | string[];
   /**
@@ -792,7 +792,7 @@ type SortHelperArgsOpts = {
 ```ts
 type RecordHelperArgsOpts = {
   /**
-   * You an remove some fields from type via this option.
+   * You can remove some fields from type via this option.
    */
   removeFields?: string[];
   /**
