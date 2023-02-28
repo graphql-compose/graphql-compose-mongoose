@@ -7,105 +7,140 @@ const schemaComposer = new SchemaComposer<{ req: any }>();
 
 // mongoose.set('debug', true);
 
-const UserSchema = new Schema(
+export interface Profile {
+  _id: string;
+  emailAddress: string;
+  name: string;
+}
+
+type ProfileDocType = Profile & mongoose.Document;
+const ProfileSchema = new Schema<ProfileDocType>(
   {
+    _id: {
+      type: String,
+      required: true,
+    },
+    emailAddress: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     name: {
       type: String,
       required: true,
       trim: true,
     },
-    orgId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Org',
-      required: true,
-      set: function (this: any, newOrgId: any) {
-        // temporarily store previous org so
-        // assignment to new org will work.
-        this._prevOrg = this.orgId;
-        return newOrgId;
-      },
-    },
-  },
-  {
-    collection: 'users',
-    timestamps: {
-      createdAt: 'created',
-      updatedAt: 'modified',
-    },
   }
 );
-const UserModel = mongoose.model<any>('User', UserSchema);
-const UserTC = composeMongoose(UserModel, { schemaComposer });
+const ProfileModel = mongoose.model<ProfileDocType>('Profile', ProfileSchema);
+composeMongoose<ProfileDocType>(ProfileModel, { schemaComposer });
 
-const OrgSchema = new Schema(
+const PublicProfileTC = composeMongoose<ProfileDocType>(ProfileModel, {
+  name: "PublicProfile",
+  onlyFields: ["_id", "name"],
+  schemaComposer
+});
+
+interface Org {
+  _id: string;
+  name: string;
+  ownerId?: string;
+}
+
+type OrgDocType = Org & mongoose.Document;
+const OrgSchema = new Schema<OrgDocType>(
   {
+    _id: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
       trim: true,
       unique: true,
     },
-    Users: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
+    ownerId: String,
   },
-  {
-    collection: 'orgs',
-    timestamps: {
-      createdAt: 'created',
-      updatedAt: 'modified',
-    },
-  }
 );
-const OrgModel = mongoose.model<any>('Org', OrgSchema);
-const OrgTC = composeMongoose(OrgModel, { schemaComposer });
+const OrgModel = mongoose.model<OrgDocType>('Org', OrgSchema);
+const OrgTC = composeMongoose<OrgDocType>(OrgModel, { schemaComposer });
 
-UserTC.addRelation('org', {
-  resolver: () => OrgTC.mongooseResolvers.findById(),
+OrgTC.addRelation('owner', {
+  resolver: () => PublicProfileTC.mongooseResolvers.findById({ lean: true }),
   prepareArgs: {
     // Define the args passed to the resolver (eg what the _id value should be)
     // Source is the filter passed to the user query
-    _id: (source) => {
-      // console.log(source);
-      return source.orgId;
+    _id: (org) => {
+      // console.log(org);
+      return org.ownerId;
     },
   },
-  projection: { orgId: true }, // Additional fields from UserSchema we need to pass to the Org resolver
+  projection: { ownerId: 1 }, // Additional fields from UserSchema we need to pass to the Org resolver
 });
 
 schemaComposer.Query.addFields({
-  users: UserTC.mongooseResolvers.findMany(),
+  orgFindOne: OrgTC.mongooseResolvers.findOne({
+    lean: true,
+    filter: {
+      onlyIndexed: true,
+    },
+  }),
+  orgs: OrgTC.mongooseResolvers.findMany(),
 });
 
 const schema = schemaComposer.buildSchema();
 
 beforeAll(async () => {
   await OrgModel.base.createConnection();
-  const orgs = await OrgModel.create([
-    { name: 'Organization1' },
-    { name: 'Organization2' },
-    { name: 'Organization3' },
-  ]);
-  await UserModel.create([
-    { name: 'User1', orgId: orgs[1]._id },
-    { name: 'User2', orgId: orgs[2]._id },
+  const profiles = [
+    { _id: "1", emailAddress: "user1@example.com", name: 'User1' },
+    { _id: "2", emailAddress: "user2@example.com", name: 'User2' },
+  ];
+  await ProfileModel.create(profiles);
+  await OrgModel.create([
+    { _id: "1", name: 'Organization1' },
+    { _id: "2", name: 'Organization2', ownerId: profiles[0]._id },
+    { _id: "3", name: 'Organization3', ownerId: profiles[1]._id },
   ]);
 });
 afterAll(() => {
   OrgModel.base.disconnect();
 });
 
-describe('issue #376 - Projection not being added to query in relation', () => {
+describe('issue #376 - Projection not being added to query in relation with findOne', () => {
+  it('check', async () => {
+    const result = await graphql.graphql({
+      schema,
+      source: `query($filter: FilterFindOneOrgInput) {
+          orgFindOne(filter: $filter) {
+            name
+            owner {
+              name
+            }
+          }
+        }`,
+      variableValues: {
+        _id: "2",
+      },
+    });
+    expect(result).toEqual({
+      data: {
+        orgFindOne:
+          { name: 'Organization2', owner: { name: 'User1' } },
+      },
+    });
+  });
+});
+
+describe('issue #376 - Projection IS added to query in relation with findMany', () => {
   it('check', async () => {
     const result = await graphql.graphql({
       schema,
       source: `query {
-          users(sort: _ID_ASC) {
+          orgs {
             name
-            org {
+            owner {
               name
             }
           }
@@ -113,9 +148,10 @@ describe('issue #376 - Projection not being added to query in relation', () => {
     });
     expect(result).toEqual({
       data: {
-        users: [
-          { name: 'User1', org: { name: 'Organization2' } },
-          { name: 'User2', org: { name: 'Organization3' } },
+        orgs: [
+          { name: 'Organization1', owner: null },
+          { name: 'Organization2', owner: { name: 'User1' } },
+          { name: 'Organization3', owner: { name: 'User2' } },
         ],
       },
     });
