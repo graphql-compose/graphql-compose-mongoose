@@ -74,7 +74,11 @@ export function removeById<TSource = any, TContext = any, TDoc extends Document 
         doc = await resolveParams.beforeRecordMutate(doc, resolveParams);
       }
       if (doc) {
-        await doc.remove();
+        if ('remove' in doc && typeof doc.remove === 'function' && !doc.remove.length) {
+          await doc.remove();
+        } else {
+          await doc.deleteOne();
+        }
 
         return {
           record: doc,

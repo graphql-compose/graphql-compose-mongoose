@@ -11,9 +11,9 @@ const FIELD = 'test_field';
 interface TestOperationOpts {
   schemaComposer: SchemaComposer<any>;
   operation: string;
-  variables?: Record<string, any>;
+  variables?: any;
   source?: Record<string, any>;
-  context?: Record<string, any>;
+  context?: any;
 }
 
 async function testOperation(opts: TestOperationOpts): Promise<ExecutionResult> {
@@ -73,7 +73,7 @@ export async function testFieldConfig<TSource = any, TContext = any, TArgs = any
 
 function _getArgsForQuery(
   fc: ObjectTypeComposerFieldConfigAsObjectDefinition<any, any, any> | Resolver<any, any, any>,
-  variables: Record<string, any> = {},
+  variables: any = {},
   schemaComposer?: SchemaComposer<any>
 ): {
   queryVars: string;
