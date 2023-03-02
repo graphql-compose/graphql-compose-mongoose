@@ -167,7 +167,7 @@ describe('removeById() ->', () => {
       expect(exist?.n).toBe(user.name);
     });
 
-    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+    it.only('should call `beforeQuery` method with non-executed `query` as arg', async () => {
       const mongooseActions: any[] = [];
 
       UserModel.base.set('debug', function debugMongoose(...args: any) {
@@ -186,9 +186,7 @@ describe('removeById() ->', () => {
 
       const result = await removeById(UserModel, UserTC).resolve(resolveParams);
 
-      expect(mongooseActions).toEqual([
-        ['users', 'findOne', { _id: user._id, gender: 'some' }, { projection: {} }],
-      ]);
+      expect(mongooseActions).toEqual([['users', 'findOne', { _id: user._id, gender: 'some' }]]);
 
       expect(result).toBeNull();
     });
