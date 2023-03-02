@@ -30,7 +30,7 @@
   },
   "peerDependencies": {
     "graphql-compose": "^7.21.4 || ^8.0.0 || ^9.0.0",
-    "mongoose": "^6.0.0 || ^5.0.0 || ^4.4.0"
+    "mongoose": "^7.0.0 || ^6.0.0 || ^5.0.0 || ^4.4.0"
   },
   "devDependencies": {
     "@types/jest": "27.0.3",
