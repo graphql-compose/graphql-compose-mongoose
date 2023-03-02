@@ -289,7 +289,7 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypes {
     return ComplexTypes.ARRAY;
   } else if (field instanceof mongoose.Schema.Types.Mixed) {
     return ComplexTypes.MIXED;
-  } else if (fieldType === 'ObjectID') {
+  } else if (fieldType === 'ObjectID' || fieldType === 'ObjectId') {
     return ComplexTypes.REFERENCE;
   } else if (fieldType === 'Decimal128') {
     return ComplexTypes.DECIMAL;
@@ -317,6 +317,7 @@ export function scalarToGraphQL(field: MongooseFieldT): ComposeScalarType {
       return 'Buffer';
     case 'Boolean':
       return 'Boolean';
+    case 'ObjectId':
     case 'ObjectID':
       return 'MongoID';
     default:

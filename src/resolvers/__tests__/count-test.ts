@@ -4,6 +4,7 @@ import { UserModel } from '../../__mocks__/userModel';
 import { count } from '../count';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
+import { version } from 'mongoose';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -102,21 +103,21 @@ describe('count() ->', () => {
         beforeQuery: (query: any, rp: ExtendedResolveParams) => {
           expect(query).toHaveProperty('exec');
           expect(rp.model).toBe(UserModel);
-
           // modify query before execution
           return query.limit(1);
         },
       });
-
       expect(mongooseActions).toEqual([
         [
           'users',
           'countDocuments',
           {},
-          {
-            limit: 1,
-          },
-        ],
+          version.startsWith('7')
+            ? undefined
+            : {
+                limit: 1,
+              },
+        ].filter(Boolean),
       ]);
 
       expect(result).toBe(1);

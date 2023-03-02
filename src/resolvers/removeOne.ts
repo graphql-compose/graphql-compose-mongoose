@@ -98,8 +98,11 @@ export function removeOne<TSource = any, TContext = any, TDoc extends Document =
       }
 
       if (doc) {
-        await doc.remove();
-
+        if ('remove' in doc && typeof doc.remove === 'function' && !doc.remove.length) {
+          await doc.remove();
+        } else {
+          await doc.deleteOne();
+        }
         return {
           record: doc,
         };

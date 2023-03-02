@@ -86,14 +86,14 @@ export type GenerateResolverType<TDoc extends Document, TContext = any> = {
   // because first two args will be attached via bind() method at runtime:
   //   count = count.bind(undefined, model, tc);
   [resolver in keyof typeof resolverFactory]: <TSource = any>(
-    opts?: Parameters<typeof resolverFactory[resolver]>[2]
+    opts?: Parameters<(typeof resolverFactory)[resolver]>[2]
   ) => // Also we should patch generics of the returned Resolver
   //   attach TContext TDoc from the code which will bind at runtime
   //   and allow user to attach TSource via generic at call
   // For this case we are using `extends infer` construction
   //   it helps to extract any Generic from existed method
   //   and then construct new combined return type
-  typeof resolverFactory[resolver] extends (...args: any) => Resolver<any, any, infer TArgs, any>
+  (typeof resolverFactory)[resolver] extends (...args: any) => Resolver<any, any, infer TArgs, any>
     ? Resolver<TSource, TContext, TArgs, TDoc>
     : any;
 };

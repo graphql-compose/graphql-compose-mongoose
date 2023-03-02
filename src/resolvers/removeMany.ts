@@ -89,7 +89,15 @@ export function removeMany<TSource = any, TContext = any, TDoc extends Document 
         resolveParams.query = resolveParams.query.deleteMany();
       } else {
         // old mongoose
-        resolveParams.query = resolveParams.query.remove();
+        if (
+          'remove' in resolveParams.query &&
+          typeof resolveParams.query.remove === 'function' &&
+          !resolveParams.query.remove.length
+        ) {
+          resolveParams.query = resolveParams.query.remove();
+        } else {
+          resolveParams.query = resolveParams.query.deleteOne();
+        }
       }
 
       const res = await beforeQueryHelper(resolveParams);

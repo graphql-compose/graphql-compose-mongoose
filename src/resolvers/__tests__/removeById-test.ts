@@ -8,6 +8,7 @@ import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 import { testFieldConfig } from '../../utils/testHelpers';
+import { version } from 'mongoose';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -187,7 +188,12 @@ describe('removeById() ->', () => {
       const result = await removeById(UserModel, UserTC).resolve(resolveParams);
 
       expect(mongooseActions).toEqual([
-        ['users', 'findOne', { _id: user._id, gender: 'some' }, { projection: {} }],
+        [
+          'users',
+          'findOne',
+          { _id: user._id, gender: 'some' },
+          version.startsWith('7') ? undefined : { projection: {} },
+        ].filter(Boolean),
       ]);
 
       expect(result).toBeNull();
