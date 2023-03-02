@@ -168,7 +168,7 @@ describe('removeById() ->', () => {
       expect(exist?.n).toBe(user.name);
     });
 
-    it.only('should call `beforeQuery` method with non-executed `query` as arg', async () => {
+    it('should call `beforeQuery` method with non-executed `query` as arg', async () => {
       const mongooseActions: any[] = [];
 
       UserModel.base.set('debug', function debugMongoose(...args: any) {
