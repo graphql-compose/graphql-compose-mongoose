@@ -21,7 +21,7 @@ export type ValidationsWithMessage = {
 
 export async function validateDoc(doc: Document): Promise<ValidationsWithMessage | null> {
   const validations: MongooseError.ValidationError | null = await new Promise((resolve) => {
-    MongooseVersion.startsWith('7') ? doc.validate().then(resolve) : doc.validate(resolve as any);
+    return MongooseVersion.startsWith('7') ? doc.validate().then(resolve) : doc.validate(resolve as any);
   });
 
   return validations?.errors
