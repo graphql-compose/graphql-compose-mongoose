@@ -57,7 +57,7 @@
     "prepare": "tsc -p ./tsconfig.build.json",
     "build": "rimraf lib && tsc -p ./tsconfig.build.json",
     "watch": "jest --watch",
-    "coverage": "jest count-test",
+    "coverage": "jest --coverage --maxWorkers 4",
     "lint": "yarn eslint && yarn tscheck",
     "eslint": "eslint --ext .ts ./src",
     "tscheck": "tsc --noEmit",
