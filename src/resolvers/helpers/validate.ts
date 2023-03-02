@@ -1,5 +1,6 @@
-import type { Error as MongooseError, version as MongooseVersion } from 'mongoose';
+import type { Error as MongooseError } from 'mongoose';
 import type { Document } from 'mongoose';
+import { version as MongooseVersion } from 'mongoose';
 import { ValidationError } from '../../errors';
 
 export type ValidationErrorData = {
