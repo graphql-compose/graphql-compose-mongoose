@@ -20,11 +20,9 @@ export type ValidationsWithMessage = {
 };
 
 export async function validateDoc(doc: Document): Promise<ValidationsWithMessage | null> {
-  const validations: MongooseError.ValidationError | null = await new Promise((resolve) => {
-    return MongooseVersion.startsWith('7')
-      ? doc.validate().then(() => resolve(null))
-      : doc.validate(resolve as any);
-  });
+  const validations: MongooseError.ValidationError | null = MongooseVersion.startsWith('7')
+    ? doc.validateSync()
+    : await new Promise((resolve) => doc.validate(resolve as any));
 
   return validations?.errors
     ? {
