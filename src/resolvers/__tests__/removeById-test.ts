@@ -193,7 +193,7 @@ describe('removeById() ->', () => {
           'findOne',
           { _id: user._id, gender: 'some' },
           version.startsWith('7') ? undefined : { projection: {} },
-        ],
+        ].filter(Boolean),
       ]);
 
       expect(result).toBeNull();
