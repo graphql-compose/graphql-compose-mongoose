@@ -65,6 +65,7 @@
     "link": "yarn build && yarn link graphql-compose && yarn link graphql-compose-connection && yarn link graphql-compose-pagination && yarn link mongoose && yarn link",
     "unlink": "rimraf node_modules && yarn install",
     "semantic-release": "semantic-release",
-    "test-prev-vers": "yarn add mongoose@5.13.8 --dev --ignore-scripts && yarn coverage && git checkout HEAD -- package.json yarn.lock"
+    "test-prev-vers-6": "yarn add mongoose@6.1.2 --dev --ignore-scripts && yarn coverage && git checkout HEAD -- package.json yarn.lock",
+    "test-prev-vers-5": "yarn add mongoose@5.13.8 --dev --ignore-scripts && yarn coverage && git checkout HEAD -- package.json yarn.lock"
   }
 }
