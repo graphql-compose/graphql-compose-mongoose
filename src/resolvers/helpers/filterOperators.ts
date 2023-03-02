@@ -18,7 +18,7 @@ export const availableOperators = [
   'exists',
 ] as const;
 
-export type AllowedOperatorsName = typeof availableOperators[number];
+export type AllowedOperatorsName = (typeof availableOperators)[number];
 
 /**
  * Customize operators filtering or disable it at all.
