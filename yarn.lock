@@ -1953,10 +1953,10 @@ bson@^4.7.0:
   dependencies:
     buffer "^5.6.0"
 
-bson@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/bson/-/bson-5.0.1.tgz#4cd3eeeabf6652ef0d6ab600f9a18212d39baac3"
-  integrity sha512-y09gBGusgHtinMon/GVbv1J6FrXhnr/+6hqLlSmEFzkz6PodqF6TxjyvfvY3AfO+oG1mgUtbC86xSbOlwvM62Q==
+bson@^5.3.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/bson/-/bson-5.4.0.tgz#0eea77276d490953ad8616b483298dbff07384c6"
+  integrity sha512-WRZ5SQI5GfUuKnPTNmAYPiKIof3ORXAF4IRU5UcgmivNIon01rWQlw5RUH954dpu8yGL8T59YShVddIPaU/gFA==
 
 buffer-crc32@~0.2.3:
   version "0.2.13"
@@ -3954,12 +3954,12 @@ mongodb-memory-server@8.11.5:
     mongodb-memory-server-core "8.11.5"
     tslib "^2.4.1"
 
-mongodb@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-5.1.0.tgz#e551f9e496777bde9173e51d16c163ab2c805b9d"
-  integrity sha512-qgKb7y+EI90y4weY3z5+lIgm8wmexbonz0GalHkSElQXVKtRuwqXuhXKccyvIjXCJVy9qPV82zsinY0W1FBnJw==
+mongodb@5.6.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-5.6.0.tgz#caff5278341bfc0f1ef6f394bb403d207de03d1e"
+  integrity sha512-z8qVs9NfobHJm6uzK56XBZF8XwM9H294iRnB7wNjF0SnY93si5HPziIJn+qqvUR5QOff/4L0gCD6SShdR/GtVQ==
   dependencies:
-    bson "^5.0.1"
+    bson "^5.3.0"
     mongodb-connection-string-url "^2.6.0"
     socks "^2.7.1"
   optionalDependencies:
@@ -3977,14 +3977,14 @@ mongodb@^4.13.0:
     "@aws-sdk/credential-providers" "^3.186.0"
     saslprep "^1.0.3"
 
-mongoose@7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-7.0.0.tgz#4b1394fdd56fcf0d6e78c7be9768edcc3254cc26"
-  integrity sha512-U0YPURDld+k/nvvSG1mRClQSjZMRXwQKSU5yb9PslRnOmVz0UlBD7SjSnjUuGT0yk+7BH+kJNimsKqMxYAKkMA==
+mongoose@7.3.3:
+  version "7.3.3"
+  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-7.3.3.tgz#4e9cce706d3c5628998f59875c5c2d60ee0c6d9c"
+  integrity sha512-g4NrRGIUEUYLeScaSChQR8i4Dlk9lR0UJzkK3r6TPJyqJ6ZWdRVP3oXfOG9Yn+hNeKcCJKfVEHo+jsU1rh3YTA==
   dependencies:
-    bson "^5.0.1"
+    bson "^5.3.0"
     kareem "2.5.1"
-    mongodb "5.1.0"
+    mongodb "5.6.0"
     mpath "0.9.0"
     mquery "5.0.0"
     ms "2.1.3"
