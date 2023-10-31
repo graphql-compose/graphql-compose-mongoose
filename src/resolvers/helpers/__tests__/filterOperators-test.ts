@@ -137,12 +137,13 @@ describe('Resolver helper `filter` ->', () => {
         '_id',
         'employment',
         'name',
+        'age',
         'billingAddress',
       ]);
       expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);
     });
     it('should respect operators configuration and allow onlyIndexed', () => {
-      // By default when using onlyIndex, add all indexed fields, then if operators are supplied allow them as well
+      // By default, when using onlyIndex, add all indexed fields, then if operators are supplied allow them as well
       addFilterOperators(itc, UserModel, {
         baseTypeName: 'User',
         onlyIndexed: true,
@@ -155,6 +156,7 @@ describe('Resolver helper `filter` ->', () => {
         '_id',
         'employment',
         'name',
+        'age',
         'billingAddress',
       ]);
       expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);

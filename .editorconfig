@@ -1,0 +1,57 @@
+root = true
+
+[*]
+charset = utf-8
+max_line_length = 120
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[{Makefile, makefile}]
+indent_style = tab
+
+[*.go]
+indent_style = tab
+
+[*.proto]
+indent_size = 2
+
+[*.swift]
+indent_size = 4
+
+[*.tmpl]
+indent_size = 2
+
+[{*.js, *.ts, *.jsx, *.tsx}]
+indent_size = 2
+
+[*.html]
+indent_size = 2
+
+[*.bat]
+end_of_line = crlf
+
+[*.{json, yml, yaml}]
+indent_size = 2
+
+[.{babelrc, eslintrc}]
+indent_size = 2
+
+[{Fastfile, .buckconfig, BUCK}]
+indent_size = 2
+
+[*.diff]
+indent_size = 1
+
+[*.m]
+indent_size = 1
+indent_style = space
+
+[*.java]
+indent_size = 4
+indent_style = space
+
+[*.md]
+trim_trailing_whitespace = false
