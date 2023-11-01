@@ -40,10 +40,6 @@ jobs:
         run: yarn test-prev-vers-6
         env:
           CI: true
-      - name: Testing with previous mongoose versions 5
-        run: yarn test-prev-vers-5
-        env:
-          CI: true
       - name: Send codecov.io stats
         if: matrix.node-version == '18.x'
         run: bash <(curl -s https://codecov.io/bash) || echo ''
