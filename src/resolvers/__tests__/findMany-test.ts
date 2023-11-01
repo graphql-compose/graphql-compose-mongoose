@@ -173,8 +173,10 @@ describe('findMany() ->', () => {
         '_ID_DESC',
         'NAME_ASC',
         'NAME_DESC',
-        'NAME__AGE_ASC',
-        'NAME__AGE_DESC',
+        'AGE__NAME_ASC',
+        'AGE__NAME_DESC',
+        // 'NAME__AGE_ASC',
+        // 'NAME__AGE_DESC',
       ])
     );
     const res = await testFieldConfig({

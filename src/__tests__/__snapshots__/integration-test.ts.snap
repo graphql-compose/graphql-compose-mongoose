@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`integration tests projection should request all fields to rawData field: projection from all fields 1`] = `
-Array [
+[
   "__v",
   "_id",
   "age",
@@ -24,9 +24,9 @@ Array [
 `;
 
 exports[`integration tests projection should request only fields from query: projection from query fields 1`] = `
-Object {
-  "data": Object {
-    "user": Object {
+{
+  "data": {
+    "user": {
       "name": "Name",
     },
   },
