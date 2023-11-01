@@ -100,7 +100,7 @@ export type GenerateResolverType<TDoc extends Document, TContext = any> = {
 
 export type ObjectTypeComposerWithMongooseResolvers<
   TDoc extends Document,
-  TContext = any
+  TContext = any,
 > = ObjectTypeComposer<TDoc, TContext> & {
   mongooseResolvers: GenerateResolverType<TDoc, TContext>;
 };

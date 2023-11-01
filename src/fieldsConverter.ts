@@ -1,13 +1,13 @@
 /* eslint-disable no-use-before-define */
 
+import type { Model, Schema } from 'mongoose';
 import mongoose, { Document } from 'mongoose';
-import type { Schema, Model } from 'mongoose';
 import type {
-  SchemaComposer,
-  ObjectTypeComposer,
-  EnumTypeComposer,
   ComposeOutputTypeDefinition,
+  EnumTypeComposer,
+  ObjectTypeComposer,
   ObjectTypeComposerFieldConfigAsObjectDefinition,
+  SchemaComposer,
 } from 'graphql-compose';
 import { upperFirst } from 'graphql-compose';
 import type { GraphQLScalarType } from 'graphql-compose/lib/graphql';
@@ -386,18 +386,21 @@ export function enumToGraphQL(
     const desc = _getFieldDescription(field);
     if (desc) etc.setDescription(desc);
 
-    const fields = valueList.reduce((result, value) => {
-      let key;
-      if (value === null) {
-        key = 'NULL';
-      } else if (value === '') {
-        key = 'EMPTY_STRING';
-      } else {
-        key = value.replace(/[^_a-zA-Z0-9]/g, '_').replace(/(^[0-9])(.*)/g, 'a_$1$2');
-      }
-      result[key] = { value };
-      return result;
-    }, {} as Record<string, { value: any }>);
+    const fields = valueList.reduce(
+      (result, value) => {
+        let key;
+        if (value === null) {
+          key = 'NULL';
+        } else if (value === '') {
+          key = 'EMPTY_STRING';
+        } else {
+          key = value.replace(/[^_a-zA-Z0-9]/g, '_').replace(/(^[0-9])(.*)/g, 'a_$1$2');
+        }
+        result[key] = { value };
+        return result;
+      },
+      {} as Record<string, { value: any }>
+    );
     etc.setFields(fields);
   });
 }
