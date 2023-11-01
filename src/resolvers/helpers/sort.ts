@@ -1,15 +1,15 @@
 /* eslint-disable no-use-before-define */
 
-import type { Model, Document } from 'mongoose';
+import type { Document, Model } from 'mongoose';
 import {
-  ObjectTypeComposerArgumentConfigMapDefinition,
-  ObjectTypeComposer,
-  InterfaceTypeComposer,
-  SchemaComposer,
   EnumTypeComposer,
+  InterfaceTypeComposer,
   isObject,
+  ObjectTypeComposer,
+  ObjectTypeComposerArgumentConfigMapDefinition,
+  SchemaComposer,
 } from 'graphql-compose';
-import { getIndexesFromModel, extendByReversedIndexes } from '../../utils/getIndexesFromModel';
+import { extendByReversedIndexes, getIndexesFromModel } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
 
 export type SortHelperArgsOpts = {

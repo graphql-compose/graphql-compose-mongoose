@@ -39,7 +39,8 @@ export function getIndexesFromModel(
   // scan all fields on index presence [MONGOOSE FIELDS LEVEL INDEX]
   Object.keys(mongooseModel.schema.paths).forEach((name) => {
     if ((mongooseModel.schema.paths[name] as any)._index) {
-      indexedFields.push({ [name]: 1 }); // ASC by default
+      const aliasOrName = mongooseModel.schema.paths[name]?.options?.alias || name;
+      indexedFields.push({ [aliasOrName]: 1 }); // ASC by default
     }
   });
 
@@ -56,14 +57,19 @@ export function getIndexesFromModel(
           // extract partial indexes from compound index
           // { name: 1, age: 1, salary: 1} -> [{name:1}, {name:1, age:1}, {name:1, age:1, salary:1}]
           Object.keys(idxFields).forEach((fieldName: any) => {
-            partialIndexes[fieldName] = idxFields[fieldName];
+            const alias = mongooseModel.schema.paths[fieldName]?.options?.alias;
+            const aliasOrName = alias || fieldName;
+            partialIndexes[aliasOrName] = idxFields[fieldName];
             indexedFields.push({ ...partialIndexes });
+            // push aliases on it's own index if its compound
+            if (alias) {
+              indexedFields.push({ [aliasOrName]: idxFields[fieldName] });
+            }
           });
         }
       }
     });
   }
-
   // filter duplicates
   const tmp: string[] = [];
   const result = indexedFields.filter((val) => {
@@ -149,10 +155,11 @@ export function getIndexedFieldNamesForGraphQL(model: Model<any>): string[] {
   const fieldNames: string[] = [];
   indexes.forEach((indexData) => {
     const keys = Object.keys(indexData);
-    const clearedName = keys[0].replace(/[^_a-zA-Z0-9]/i, '__');
-    fieldNames.push(clearedName);
+    for (let i = 0; i < keys.length; i++) {
+      const clearedName = keys[i].replace(/[^_a-zA-Z0-9]/i, '__');
+      fieldNames.push(clearedName);
+    }
   });
-
   // filter duplicates
   const uniqueNames: string[] = [];
   const result = fieldNames.filter((val) => {

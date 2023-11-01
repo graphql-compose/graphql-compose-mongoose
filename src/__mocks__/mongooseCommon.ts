@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign, no-console */
 
-import mongoose, {version as MongooseVersion} from 'mongoose';
+import mongoose, { version as MongooseVersion } from 'mongoose';
 import MongoMemoryServer from 'mongodb-memory-server-core';
 
 const { Schema, Types } = mongoose;
@@ -15,10 +15,12 @@ mongoose.createConnection = (async () => {
   // originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true }); // mongoose 4
   originalConnect.bind(mongoose)(
     mongoUri,
-    Number(MongooseVersion.charAt(0)) > 7 ? {} : {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    } as any /* for tests compatibility with mongoose v5 & v6 */
+    Number(MongooseVersion[0]) > 7
+      ? {}
+      : ({
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        } as any) /* for tests compatibility with mongoose v5 & v6 */
   ); // mongoose 5
   // originalConnect.bind(mongoose)(mongoUri, {}); // mongoose 6
 
