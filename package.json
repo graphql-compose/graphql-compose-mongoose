@@ -45,7 +45,7 @@
     "graphql-compose": "9.0.10",
     "jest": "29.7.0",
     "mongodb-memory-server": "9.0.1",
-    "mongoose": "meabed/mongoose#fix-index-alias",
+    "mongoose": "8.0.0",
     "prettier": "3.0.3",
     "request": "2.88.2",
     "rimraf": "5.0.5",
