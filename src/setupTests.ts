@@ -1,5 +1,6 @@
 import { patchMongooseSchemaIndex } from './utils/patchMongoose';
+import { beforeAll } from '@jest/globals';
 
-global.beforeAll(() => {
+beforeAll(() => {
   patchMongooseSchemaIndex();
 });
