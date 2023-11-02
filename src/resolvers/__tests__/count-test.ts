@@ -112,7 +112,7 @@ describe('count() ->', () => {
           'users',
           'countDocuments',
           {},
-          Number(version[0]) > 6
+          Number(version[0]) === 7
             ? undefined
             : {
                 limit: 1,
