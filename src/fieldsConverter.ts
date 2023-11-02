@@ -47,7 +47,7 @@ export enum ComplexTypes {
   DECIMAL = 'DECIMAL',
 }
 
-// In mongoose@6 Embedded type was renamed to Subdocument
+// In mongoose@6 Embedded type was renamed to Sub-document
 // So keep backward compatibility with old mongoose versions
 const SubdocumentTypeClass =
   (mongoose.Schema.Types as any)?.Embedded || (mongoose.Schema.Types as any).Subdocument;

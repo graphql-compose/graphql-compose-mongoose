@@ -137,7 +137,6 @@ describe('Resolver helper `filter` ->', () => {
         '_id',
         'employment',
         'name',
-        'age',
         'billingAddress',
       ]);
       expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);
@@ -156,7 +155,6 @@ describe('Resolver helper `filter` ->', () => {
         '_id',
         'employment',
         'name',
-        'age',
         'billingAddress',
       ]);
       expect(itc.getFieldITC('_operators').getFieldITC('name').getFieldNames()).toEqual(['exists']);

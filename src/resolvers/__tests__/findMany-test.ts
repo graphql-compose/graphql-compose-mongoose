@@ -7,7 +7,6 @@ import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
-
 describe('findMany() ->', () => {
   let UserTC: ObjectTypeComposer;
 
@@ -173,10 +172,8 @@ describe('findMany() ->', () => {
         '_ID_DESC',
         'NAME_ASC',
         'NAME_DESC',
-        'AGE__NAME_ASC',
-        'AGE__NAME_DESC',
-        // 'NAME__AGE_ASC',
-        // 'NAME__AGE_DESC',
+        'NAME__AGE_ASC',
+        'NAME__AGE_DESC',
       ])
     );
     const res = await testFieldConfig({

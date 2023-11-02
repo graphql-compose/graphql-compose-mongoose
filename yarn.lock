@@ -3498,10 +3498,9 @@ mongodb@^5.9.0:
   optionalDependencies:
     "@mongodb-js/saslprep" "^1.1.0"
 
-mongoose@8.0.0:
+mongoose@meabed/mongoose#fix-index-alias:
   version "8.0.0"
-  resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-8.0.0.tgz#f14175eebfaf5256855d7cbd58bf862819b3fd12"
-  integrity sha512-PzwkLgm1Jhj0NQdgGfnFsu0QP9V1sBFgbavEgh/IPAUzKAagzvEhuaBuAQOQGjczVWnpIU9tBqyd02cOTgsPlA==
+  resolved "https://codeload.github.com/meabed/mongoose/tar.gz/a506cc4d78b471d5d1c5d33d399c061e60ea46b4"
   dependencies:
     bson "^6.2.0"
     kareem "2.5.1"
