@@ -192,7 +192,7 @@ describe('removeById() ->', () => {
           'users',
           'findOne',
           { _id: user._id, gender: 'some' },
-          Number(version[0]) == 8 ? {} : Number(version[0]) <= 6 ? undefined : { projection: {} },
+          Number(version[0]) >= 7 ? {} : { projection: {} },
         ].filter(Boolean),
       ]);
 
