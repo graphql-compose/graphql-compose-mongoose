@@ -1,7 +1,9 @@
 /* eslint-disable no-param-reassign, no-console */
 
-import mongoose, { version as MongooseVersion } from 'mongoose';
+import mongoose, { version } from 'mongoose';
 import MongoMemoryServer from 'mongodb-memory-server-core';
+
+const versionNumber = Number(version.charAt(0));
 
 const { Schema, Types } = mongoose;
 
@@ -15,7 +17,7 @@ mongoose.createConnection = (async () => {
   // originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true }); // mongoose 4
   originalConnect.bind(mongoose)(
     mongoUri,
-    Number(MongooseVersion[0]) > 7
+    versionNumber > 7
       ? {}
       : ({
           useNewUrlParser: true,

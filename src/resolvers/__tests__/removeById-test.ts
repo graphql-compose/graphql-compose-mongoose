@@ -10,6 +10,8 @@ import { ExtendedResolveParams } from '..';
 import { testFieldConfig } from '../../utils/testHelpers';
 import { version } from 'mongoose';
 
+const versionNumber = Number(version.charAt(0));
+
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
 
@@ -192,7 +194,7 @@ describe('removeById() ->', () => {
           'users',
           'findOne',
           { _id: user._id, gender: 'some' },
-          Number(version[0]) >= 7 ? {} : { projection: {} },
+          versionNumber >= 7 ? {} : { projection: {} },
         ].filter(Boolean),
       ]);
 

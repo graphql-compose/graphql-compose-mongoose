@@ -1,7 +1,8 @@
-import type { Error as MongooseError } from 'mongoose';
-import type { Document } from 'mongoose';
-import { version as MongooseVersion } from 'mongoose';
+import type { Document, Error as MongooseError } from 'mongoose';
+import { version } from 'mongoose';
 import { ValidationError } from '../../errors';
+
+const versionNumber = Number(version.charAt(0));
 
 export type ValidationErrorData = {
   path: string;
@@ -21,7 +22,7 @@ export type ValidationsWithMessage = {
 
 export async function validateDoc(doc: Document): Promise<ValidationsWithMessage | null> {
   const validations: MongooseError.ValidationError | null =
-    Number(MongooseVersion[0]) >= 7
+    versionNumber >= 7
       ? doc.validateSync()
       : await new Promise((resolve) => doc.validate(resolve as any));
 
