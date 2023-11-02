@@ -1,9 +1,7 @@
 /* eslint-disable no-param-reassign, no-console */
 
-import mongoose, { version } from 'mongoose';
+import mongoose from 'mongoose';
 import MongoMemoryServer from 'mongodb-memory-server-core';
-
-const versionNumber = Number(version.charAt(0));
 
 const { Schema, Types } = mongoose;
 
@@ -14,17 +12,7 @@ mongoose.createConnection = (async () => {
   const mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
 
-  // originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true }); // mongoose 4
-  originalConnect.bind(mongoose)(
-    mongoUri,
-    versionNumber > 7
-      ? {}
-      : ({
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        } as any) /* for tests compatibility with mongoose v5 & v6 */
-  ); // mongoose 5
-  // originalConnect.bind(mongoose)(mongoUri, {}); // mongoose 6
+  originalConnect.bind(mongoose)(mongoUri, {});
 
   mongoose.connection.on('error', (e) => {
     if (e.message.code === 'ETIMEDOUT') {
