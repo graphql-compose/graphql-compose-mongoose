@@ -39,6 +39,7 @@ describe('Resolver helper `sort` ->', () => {
       const enumNames = etc.getFieldNames();
       expect(enumNames).toEqual(expect.arrayContaining(['_ID_ASC', '_ID_DESC']));
 
+      // should have ASC criteria for mongoose
       const complexASC = etc.getField('NAME__AGE_ASC');
       expect(complexASC.value).toEqual({ name: 1, age: -1 });
 
