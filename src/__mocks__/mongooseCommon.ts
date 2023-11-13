@@ -2,14 +2,29 @@
 
 import mongoose from 'mongoose';
 import MongoMemoryServer from 'mongodb-memory-server-core';
+import net, { AddressInfo } from 'net';
 
 const { Schema, Types } = mongoose;
 
 mongoose.Promise = Promise;
 
+async function getPortFree() {
+  return new Promise<number>((res) => {
+    const srv = net.createServer();
+    srv.listen(0, () => {
+      const port = (srv.address() as AddressInfo).port;
+      srv.close(() => res(port));
+    });
+  });
+}
+
 const originalConnect = mongoose.connect;
 mongoose.createConnection = (async () => {
-  const mongoServer = await MongoMemoryServer.create();
+  const mongoServer = await MongoMemoryServer.create({
+    instance: {
+      port: await getPortFree(),
+    },
+  });
   const mongoUri = mongoServer.getUri();
 
   originalConnect.bind(mongoose)(mongoUri, {});
