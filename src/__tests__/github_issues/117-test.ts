@@ -1,10 +1,15 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { composeWithMongoose } from '../../index';
+import { getPortFree } from '../../__mocks__/mongooseCommon';
 
 let mongoServer: MongoMemoryServer;
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
+  mongoServer = await MongoMemoryServer.create({
+    instance: {
+      port: await getPortFree(),
+    },
+  });
   const mongoUri = mongoServer.getUri();
   await mongoose.connect(
     mongoUri,

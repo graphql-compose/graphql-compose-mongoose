@@ -8,7 +8,7 @@ const { Schema, Types } = mongoose;
 
 mongoose.Promise = Promise;
 
-async function getPortFree() {
+export async function getPortFree() {
   return new Promise<number>((res) => {
     const srv = net.createServer();
     srv.listen(0, () => {

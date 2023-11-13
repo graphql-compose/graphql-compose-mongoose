@@ -2,10 +2,15 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { schemaComposer, graphql } from 'graphql-compose';
 import { composeWithMongoose } from '../../index';
+import { getPortFree } from '../../__mocks__/mongooseCommon';
 
 let mongoServer: MongoMemoryServer;
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
+  mongoServer = await MongoMemoryServer.create({
+    instance: {
+      port: await getPortFree(),
+    },
+  });
   const mongoUri = mongoServer.getUri();
   await mongoose.connect(
     mongoUri,
@@ -49,9 +54,9 @@ describe("issue #248 - payloads' errors", () => {
     const res = await graphql.graphql({
       schema,
       source: `
-        mutation { 
-          createOne(record: { name: "John", someStrangeField: "Test" }) { 
-            record { 
+        mutation {
+          createOne(record: { name: "John", someStrangeField: "Test" }) {
+            record {
               name
             }
             error {
@@ -94,9 +99,9 @@ describe("issue #248 - payloads' errors", () => {
     const res = await graphql.graphql({
       schema,
       source: `
-        mutation { 
-          createOne(record: { name: "John", someStrangeField: "Test" }) { 
-            record { 
+        mutation {
+          createOne(record: { name: "John", someStrangeField: "Test" }) {
+            record {
               name
             }
           }
@@ -131,9 +136,9 @@ describe("issue #248 - payloads' errors", () => {
     const res = await graphql.graphql({
       schema,
       source: `
-        mutation { 
-          createMany(records: [{ name: "Ok"}, { name: "John", someStrangeField: "Test" }]) { 
-            records { 
+        mutation {
+          createMany(records: [{ name: "Ok"}, { name: "John", someStrangeField: "Test" }]) {
+            records {
               name
             }
             error {
@@ -178,9 +183,9 @@ describe("issue #248 - payloads' errors", () => {
     const res = await graphql.graphql({
       schema,
       source: `
-        mutation { 
-          createMany(records: [{ name: "Ok"}, { name: "John", someStrangeField: "Test" }]) { 
-            records { 
+        mutation {
+          createMany(records: [{ name: "Ok"}, { name: "John", someStrangeField: "Test" }]) {
+            records {
               name
             }
           }
