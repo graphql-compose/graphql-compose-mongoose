@@ -126,6 +126,7 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
         });
       } else {
         // OLD mongoose
+        // @ts-ignore
         resolveParams.query.update({
           $set: toMongoDottedObject(recordData, aliases),
         });

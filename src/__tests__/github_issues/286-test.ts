@@ -40,13 +40,13 @@ describe('issue #286 - Allow to provide `disableErrorField` option for mutation 
     });
     expect(resolver.getTypeComposer().toSDL()).toMatchInlineSnapshot(`
       "type CreateManyUserPayload {
-        \\"\\"\\"Documents IDs\\"\\"\\"
+        """Documents IDs"""
         recordIds: [Int!]!
 
-        \\"\\"\\"Created documents\\"\\"\\"
+        """Created documents"""
         records: [User!]
 
-        \\"\\"\\"Number of created documents\\"\\"\\"
+        """Number of created documents"""
         createdCount: Int!
       }"
     `);
@@ -58,10 +58,10 @@ describe('issue #286 - Allow to provide `disableErrorField` option for mutation 
     });
     expect(resolver.getTypeComposer().toSDL()).toMatchInlineSnapshot(`
       "type CreateOneUserPayload {
-        \\"\\"\\"Document ID\\"\\"\\"
+        """Document ID"""
         recordId: Int
 
-        \\"\\"\\"Created document\\"\\"\\"
+        """Created document"""
         record: User
       }"
     `);
@@ -73,10 +73,10 @@ describe('issue #286 - Allow to provide `disableErrorField` option for mutation 
     });
     expect(resolver.getTypeComposer().toSDL()).toMatchInlineSnapshot(`
       "type RemoveByIdUserPayload {
-        \\"\\"\\"Document ID\\"\\"\\"
+        """Document ID"""
         recordId: Int
 
-        \\"\\"\\"Removed document\\"\\"\\"
+        """Removed document"""
         record: User
       }"
     `);
@@ -88,7 +88,7 @@ describe('issue #286 - Allow to provide `disableErrorField` option for mutation 
     });
     expect(resolver.getTypeComposer().toSDL()).toMatchInlineSnapshot(`
       "type RemoveManyUserPayload {
-        \\"\\"\\"Affected documents number\\"\\"\\"
+        """Affected documents number"""
         numAffected: Int
       }"
     `);
@@ -100,10 +100,10 @@ describe('issue #286 - Allow to provide `disableErrorField` option for mutation 
     });
     expect(resolver.getTypeComposer().toSDL()).toMatchInlineSnapshot(`
       "type RemoveOneUserPayload {
-        \\"\\"\\"Document ID\\"\\"\\"
+        """Document ID"""
         recordId: Int
 
-        \\"\\"\\"Removed document\\"\\"\\"
+        """Removed document"""
         record: User
       }"
     `);
@@ -115,10 +115,10 @@ describe('issue #286 - Allow to provide `disableErrorField` option for mutation 
     });
     expect(resolver.getTypeComposer().toSDL()).toMatchInlineSnapshot(`
       "type UpdateByIdUserPayload {
-        \\"\\"\\"Document ID\\"\\"\\"
+        """Document ID"""
         recordId: Int
 
-        \\"\\"\\"Updated document\\"\\"\\"
+        """Updated document"""
         record: User
       }"
     `);
@@ -130,7 +130,7 @@ describe('issue #286 - Allow to provide `disableErrorField` option for mutation 
     });
     expect(resolver.getTypeComposer().toSDL()).toMatchInlineSnapshot(`
       "type UpdateManyUserPayload {
-        \\"\\"\\"Affected documents number\\"\\"\\"
+        """Affected documents number"""
         numAffected: Int
       }"
     `);
@@ -142,10 +142,10 @@ describe('issue #286 - Allow to provide `disableErrorField` option for mutation 
     });
     expect(resolver.getTypeComposer().toSDL()).toMatchInlineSnapshot(`
       "type UpdateOneUserPayload {
-        \\"\\"\\"Document ID\\"\\"\\"
+        """Document ID"""
         recordId: Int
 
-        \\"\\"\\"Updated document\\"\\"\\"
+        """Updated document"""
         record: User
       }"
     `);

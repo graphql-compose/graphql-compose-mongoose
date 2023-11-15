@@ -13,17 +13,17 @@ jobs:
       contents: write
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [16.x, 18.x, 20.x]
     steps:
       - run: echo "🎉 The job was triggered by a ${{ github.event_name }} event."
-      - uses: styfle/cancel-workflow-action@0.11.0
+      - uses: styfle/cancel-workflow-action@0.12.0
         with:
           workflow_id: nodejs.yml
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: FranzDiebold/github-env-vars-action@v2
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install node_modules
@@ -32,16 +32,16 @@ jobs:
         run: yarn test
         env:
           CI: true
+      - name: Testing with previous mongoose versions 7
+        run: yarn test-prev-vers-7
+        env:
+          CI: true
       - name: Testing with previous mongoose versions 6
         run: yarn test-prev-vers-6
         env:
           CI: true
-      - name: Testing with previous mongoose versions 5
-        run: yarn test-prev-vers-5
-        env:
-          CI: true
       - name: Send codecov.io stats
-        if: matrix.node-version == '14.x'
+        if: matrix.node-version == '18.x'
         run: bash <(curl -s https://codecov.io/bash) || echo ''
 
   publish:
@@ -52,11 +52,11 @@ jobs:
       packages: write
       contents: write
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 14
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
         with:
-          node-version: 14.x
+          node-version: 18.x
       - name: Install node_modules
         run: yarn install
       - name: Build

@@ -38,7 +38,7 @@ describe('issue #268 - Allow to provide `suffix` option for resolvers configs', 
     const createOne1 = UserTC.mongooseResolvers.createOne();
     expect(createOne1.getTypeName()).toBe('CreateOneUserPayload');
     expect(createOne1.getArgITC('record').toSDL()).toMatchInlineSnapshot(`
-      "\\"\\"\\"\\"\\"\\"
+      """""""
       input CreateOneUserInput {
         name: String!
         age: Float
@@ -53,7 +53,7 @@ describe('issue #268 - Allow to provide `suffix` option for resolvers configs', 
     });
     expect(createOne2.getTypeName()).toBe('CreateOneUserShortPayload');
     expect(createOne2.getArgITC('record').toSDL()).toMatchInlineSnapshot(`
-      "\\"\\"\\"\\"\\"\\"
+      """""""
       input CreateOneUserShortInput {
         _id: Int
         name: String!

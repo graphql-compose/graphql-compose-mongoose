@@ -1,6 +1,6 @@
-import type { SchemaComposer, Resolver, InputTypeComposer } from 'graphql-compose';
-import { schemaComposer as globalSchemaComposer, ObjectTypeComposer } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import type { InputTypeComposer, Resolver, SchemaComposer } from 'graphql-compose';
+import { ObjectTypeComposer, schemaComposer as globalSchemaComposer } from 'graphql-compose';
+import type { Document, Model } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
 import { resolverFactory } from './resolvers';
 import MongoID from './types/MongoID';
@@ -100,7 +100,7 @@ export type GenerateResolverType<TDoc extends Document, TContext = any> = {
 
 export type ObjectTypeComposerWithMongooseResolvers<
   TDoc extends Document,
-  TContext = any
+  TContext = any,
 > = ObjectTypeComposer<TDoc, TContext> & {
   mongooseResolvers: GenerateResolverType<TDoc, TContext>;
 };
@@ -120,6 +120,7 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
       `You try to generate GraphQL Type with name ${name} from mongoose model but this type already exists in SchemaComposer. Please choose another type name "composeWithMongoose(model, { name: 'NewTypeName' })", or reuse existed type "schemaComposer.getOTC('TypeName')", or remove type from SchemaComposer before calling composeWithMongoose method "schemaComposer.delete('TypeName')".`
     );
   }
+
   if (sc.has(m.schema)) {
     // looks like you want to generate new TypeComposer from model
     // so remove cached model (which is used for cross-reference types)

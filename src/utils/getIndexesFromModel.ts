@@ -1,4 +1,5 @@
 import type { Model } from 'mongoose';
+import { prepareAliasesReverse } from '../resolvers/helpers/aliases';
 
 export type getIndexesFromModelOpts = {
   extractCompound?: boolean; // true by default
@@ -36,10 +37,13 @@ export function getIndexesFromModel(
     indexedFields.push({ _id: 1 });
   }
 
+  const reversedAliases = prepareAliasesReverse(mongooseModel.schema);
+
   // scan all fields on index presence [MONGOOSE FIELDS LEVEL INDEX]
   Object.keys(mongooseModel.schema.paths).forEach((name) => {
     if ((mongooseModel.schema.paths[name] as any)._index) {
-      indexedFields.push({ [name]: 1 }); // ASC by default
+      const fieldName = (reversedAliases && reversedAliases[name]) || name;
+      indexedFields.push({ [fieldName]: 1 }); // ASC by default
     }
   });
 
@@ -55,15 +59,15 @@ export function getIndexesFromModel(
         } else {
           // extract partial indexes from compound index
           // { name: 1, age: 1, salary: 1} -> [{name:1}, {name:1, age:1}, {name:1, age:1, salary:1}]
-          Object.keys(idxFields).forEach((fieldName: any) => {
-            partialIndexes[fieldName] = idxFields[fieldName];
+          Object.keys(idxFields).forEach((name: any) => {
+            const fieldName = (reversedAliases && reversedAliases[name]) || name;
+            partialIndexes[fieldName] = idxFields[name];
             indexedFields.push({ ...partialIndexes });
           });
         }
       }
     });
   }
-
   // filter duplicates
   const tmp: string[] = [];
   const result = indexedFields.filter((val) => {
@@ -152,7 +156,6 @@ export function getIndexedFieldNamesForGraphQL(model: Model<any>): string[] {
     const clearedName = keys[0].replace(/[^_a-zA-Z0-9]/i, '__');
     fieldNames.push(clearedName);
   });
-
   // filter duplicates
   const uniqueNames: string[] = [];
   const result = fieldNames.filter((val) => {

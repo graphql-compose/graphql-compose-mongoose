@@ -51,8 +51,8 @@ export function payloadRecordIds<TSource = any, TContext = any>(
       type: opts?.type
         ? opts.type
         : tc.hasField('_id')
-        ? toInputType(tc.getFieldTC('_id')).NonNull.List.NonNull
-        : '[MongoID!]!',
+          ? toInputType(tc.getFieldTC('_id')).NonNull.List.NonNull
+          : '[MongoID!]!',
       resolve: (source, _, context) => {
         const docs = (source as any)?.records;
         if (opts?.fn) {

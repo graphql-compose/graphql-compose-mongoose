@@ -1,5 +1,5 @@
-import { Resolver, schemaComposer, ObjectTypeComposer, EnumTypeComposer } from 'graphql-compose';
-import { UserModel, IUser } from '../../__mocks__/userModel';
+import { EnumTypeComposer, ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
+import { IUser, UserModel } from '../../__mocks__/userModel';
 import { findMany } from '../findMany';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
@@ -7,7 +7,6 @@ import { testFieldConfig } from '../../utils/testHelpers';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
-
 describe('findMany() ->', () => {
   let UserTC: ObjectTypeComposer;
 

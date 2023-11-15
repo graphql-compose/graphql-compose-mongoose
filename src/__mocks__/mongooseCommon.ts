@@ -2,25 +2,32 @@
 
 import mongoose from 'mongoose';
 import MongoMemoryServer from 'mongodb-memory-server-core';
+import net, { AddressInfo } from 'net';
 
 const { Schema, Types } = mongoose;
 
 mongoose.Promise = Promise;
 
+export async function getPortFree() {
+  return new Promise<number>((res) => {
+    const srv = net.createServer();
+    srv.listen(0, () => {
+      const port = (srv.address() as AddressInfo).port;
+      srv.close(() => res(port));
+    });
+  });
+}
+
 const originalConnect = mongoose.connect;
 mongoose.createConnection = (async () => {
-  const mongoServer = await MongoMemoryServer.create();
+  const mongoServer = await MongoMemoryServer.create({
+    instance: {
+      port: await getPortFree(),
+    },
+  });
   const mongoUri = mongoServer.getUri();
 
-  // originalConnect.bind(mongoose)(mongoUri, { useMongoClient: true }); // mongoose 4
-  originalConnect.bind(mongoose)(
-    mongoUri,
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    } as any /* for tests compatibility with mongoose v5 & v6 */
-  ); // mongoose 5
-  // originalConnect.bind(mongoose)(mongoUri, {}); // mongoose 6
+  originalConnect.bind(mongoose)(mongoUri, {});
 
   mongoose.connection.on('error', (e) => {
     if (e.message.code === 'ETIMEDOUT') {

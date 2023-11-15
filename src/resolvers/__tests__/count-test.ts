@@ -1,10 +1,9 @@
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLInt } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../../__mocks__/userModel';
 import { count } from '../count';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
-import { version } from 'mongoose';
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -112,11 +111,9 @@ describe('count() ->', () => {
           'users',
           'countDocuments',
           {},
-          version.startsWith('7')
-            ? undefined
-            : {
-                limit: 1,
-              },
+          {
+            limit: 1,
+          },
         ].filter(Boolean),
       ]);
 

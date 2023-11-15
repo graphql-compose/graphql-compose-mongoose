@@ -1,14 +1,16 @@
 /* eslint-disable no-param-reassign */
 
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
-import { UserModel, IUser } from '../../__mocks__/userModel';
+import { IUser, UserModel } from '../../__mocks__/userModel';
 import { removeById } from '../removeById';
 import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
 import { testFieldConfig } from '../../utils/testHelpers';
 import { version } from 'mongoose';
+
+const versionNumber = Number(version.charAt(0));
 
 beforeAll(() => UserModel.base.createConnection());
 afterAll(() => UserModel.base.disconnect());
@@ -192,7 +194,7 @@ describe('removeById() ->', () => {
           'users',
           'findOne',
           { _id: user._id, gender: 'some' },
-          version.startsWith('7') ? undefined : { projection: {} },
+          versionNumber >= 7 ? {} : { projection: {} },
         ].filter(Boolean),
       ]);
 

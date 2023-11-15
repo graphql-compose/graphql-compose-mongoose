@@ -1,5 +1,5 @@
-import { EnumTypeComposer, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
-import { sortHelperArgs, sortHelper, getSortTypeFromModel } from '../sort';
+import { EnumTypeComposer, ObjectTypeComposer, schemaComposer } from 'graphql-compose';
+import { getSortTypeFromModel, sortHelper, sortHelperArgs } from '../sort';
 import { UserModel } from '../../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../../fieldsConverter';
 import { getIndexesFromModel } from '../../../utils';
