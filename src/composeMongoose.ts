@@ -4,7 +4,6 @@ import type { Document, Model } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
 import { resolverFactory } from './resolvers';
 import MongoID from './types/MongoID';
-import { patchMongooseSchemaIndex } from './utils/patchMongoose';
 
 export type TypeConverterInputTypeOpts = {
   /**
@@ -121,7 +120,6 @@ export function composeMongoose<TDoc extends Document, TContext = any>(
       `You try to generate GraphQL Type with name ${name} from mongoose model but this type already exists in SchemaComposer. Please choose another type name "composeWithMongoose(model, { name: 'NewTypeName' })", or reuse existed type "schemaComposer.getOTC('TypeName')", or remove type from SchemaComposer before calling composeWithMongoose method "schemaComposer.delete('TypeName')".`
     );
   }
-  patchMongooseSchemaIndex();
 
   if (sc.has(m.schema)) {
     // looks like you want to generate new TypeComposer from model

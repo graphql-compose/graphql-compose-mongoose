@@ -139,7 +139,7 @@ const UserSchema = new Schema(
 );
 
 UserSchema.set('autoIndex', false);
-UserSchema.index({ name: 1, age: -1 });
+UserSchema.index({ n: 1, age: -1 });
 
 // eslint-disable-next-line
 UserSchema.virtual('nameVirtual').get(function (this: any) {

@@ -90,7 +90,7 @@ describe('Resolver helper `filter` ->', () => {
       const itc = args.filter.type as InputTypeComposer;
       expect(itc.hasField('_id')).toBe(true);
       expect(itc.hasField('name')).toBe(true);
-      expect(itc.hasField('age')).toBe(true);
+      expect(itc.hasField('age')).toBe(false);
       expect(itc.hasField('gender')).toBe(false);
     });
 
@@ -104,7 +104,7 @@ describe('Resolver helper `filter` ->', () => {
       const itc = args.filter.type as InputTypeComposer;
       expect(itc.hasField('_id')).toBe(true);
       expect(itc.hasField('name')).toBe(false);
-      expect(itc.hasField('age')).toBe(true);
+      expect(itc.hasField('age')).toBe(false);
       expect(itc.hasField('gender')).toBe(false);
     });
 

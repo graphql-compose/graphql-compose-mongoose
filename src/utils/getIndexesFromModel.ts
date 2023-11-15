@@ -1,4 +1,5 @@
 import type { Model } from 'mongoose';
+import { prepareAliasesReverse } from '../resolvers/helpers/aliases';
 
 export type getIndexesFromModelOpts = {
   extractCompound?: boolean; // true by default
@@ -36,11 +37,13 @@ export function getIndexesFromModel(
     indexedFields.push({ _id: 1 });
   }
 
+  const reversedAliases = prepareAliasesReverse(mongooseModel.schema);
+
   // scan all fields on index presence [MONGOOSE FIELDS LEVEL INDEX]
   Object.keys(mongooseModel.schema.paths).forEach((name) => {
     if ((mongooseModel.schema.paths[name] as any)._index) {
-      const aliasOrName = mongooseModel.schema.paths[name]?.options?.alias || name;
-      indexedFields.push({ [aliasOrName]: 1 }); // ASC by default
+      const fieldName = (reversedAliases && reversedAliases[name]) || name;
+      indexedFields.push({ [fieldName]: 1 }); // ASC by default
     }
   });
 
@@ -56,15 +59,10 @@ export function getIndexesFromModel(
         } else {
           // extract partial indexes from compound index
           // { name: 1, age: 1, salary: 1} -> [{name:1}, {name:1, age:1}, {name:1, age:1, salary:1}]
-          Object.keys(idxFields).forEach((fieldName: any) => {
-            const alias = mongooseModel.schema.paths[fieldName]?.options?.alias;
-            const aliasOrName = alias || fieldName;
-            partialIndexes[aliasOrName] = idxFields[fieldName];
+          Object.keys(idxFields).forEach((name: any) => {
+            const fieldName = (reversedAliases && reversedAliases[name]) || name;
+            partialIndexes[fieldName] = idxFields[name];
             indexedFields.push({ ...partialIndexes });
-            // push aliases on it's own index if its compound
-            if (alias) {
-              indexedFields.push({ [aliasOrName]: idxFields[fieldName] });
-            }
           });
         }
       }
@@ -155,10 +153,8 @@ export function getIndexedFieldNamesForGraphQL(model: Model<any>): string[] {
   const fieldNames: string[] = [];
   indexes.forEach((indexData) => {
     const keys = Object.keys(indexData);
-    for (let i = 0; i < keys.length; i++) {
-      const clearedName = keys[i].replace(/[^_a-zA-Z0-9]/i, '__');
-      fieldNames.push(clearedName);
-    }
+    const clearedName = keys[0].replace(/[^_a-zA-Z0-9]/i, '__');
+    fieldNames.push(clearedName);
   });
   // filter duplicates
   const uniqueNames: string[] = [];
