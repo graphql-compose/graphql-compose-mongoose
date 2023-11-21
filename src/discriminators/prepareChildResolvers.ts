@@ -4,6 +4,7 @@ import {
   DiscriminatorTypeComposer,
 } from './DiscriminatorTypeComposer';
 import { resolverFactory } from '../resolvers';
+import { OPERATORS_FIELDNAME } from '../resolvers/helpers/filterOperators';
 
 // set the DKey as a query on filter, also project it
 // Also look at it like setting for filters, makes sure to limit
@@ -85,7 +86,10 @@ function copyResolverArgTypes<TSource, TContext>(
         const baseResolverArgTCFields = baseResolverArgTC.getFieldNames();
 
         for (const baseArgField of baseResolverArgTCFields) {
-          if (childResolverArgTC.hasField(baseArgField) && baseArgField !== '_id') {
+          if (
+            childResolverArgTC.hasField(baseArgField) &&
+            ['_id', OPERATORS_FIELDNAME, 'OR', 'AND'].indexOf(baseArgField) === -1
+          ) {
             childResolverArgTC.extendField(baseArgField, {
               type: baseResolverArgTC.getField(baseArgField).type,
             });

@@ -11,10 +11,13 @@ afterAll(() => mongoose.disconnect());
 describe('#78 Mongoose and Discriminators', () => {
   const options = { discriminatorKey: 'kind' };
 
-  const eventSchema = new mongoose.Schema({ refId: String }, options);
+  const eventSchema = new mongoose.Schema(
+    { refId: String, name: { type: String, index: true } },
+    options
+  );
   const Event = mongoose.model('Event', eventSchema);
 
-  const clickedLinkSchema = new mongoose.Schema({ url: String });
+  const clickedLinkSchema = new mongoose.Schema({ url: { type: String, index: true } }, options);
   const ClickedLinkEvent = Event.discriminator('ClickedLinkEvent', clickedLinkSchema);
 
   const EventTC = composeWithMongooseDiscriminators(Event);
@@ -23,13 +26,48 @@ describe('#78 Mongoose and Discriminators', () => {
   afterAll(() => Event.deleteMany({}));
 
   it('creating Types from models', () => {
-    expect(EventTC.getFieldNames()).toEqual(['_id', 'kind', 'refId']);
-    expect(ClickedLinkEventTC.getFieldNames()).toEqual(['_id', 'kind', 'refId', 'url']);
+    expect(EventTC.getFieldNames()).toEqual(['_id', 'kind', 'refId', 'name']);
+    expect(ClickedLinkEventTC.getFieldNames()).toEqual(['_id', 'kind', 'refId', 'name', 'url']);
+  });
+
+  it('perform filter operation on a child model', async () => {
+    // let's check graphql response
+    await Event.deleteMany({});
+    await Event.create({ refId: 'aaa', name: 'aName' });
+    await Event.create({ refId: 'bbb', name: 'bName' });
+    await ClickedLinkEvent.create({ refId: 'ccc', name: 'cName', url: 'url1' });
+    await ClickedLinkEvent.create({ refId: 'ddd', name: 'dName', url: 'url2' });
+
+    schemaComposer.Query.addFields({
+      clickedLinkEventFindMany: ClickedLinkEventTC.getResolver('findMany'),
+    });
+
+    const schema = schemaComposer.buildSchema();
+
+    const res = await graphql.graphql(
+      schema,
+      `{
+        clickedLinkEventFindMany( filter: { AND: [ { _operators: { url: { in: [ "url1", "url2" ] } } }, { name: "dName" } ] }) {
+          __typename
+          refId
+          name
+          url
+        }
+      }`
+    );
+
+    expect(res).toEqual({
+      data: {
+        clickedLinkEventFindMany: [
+          { __typename: 'ClickedLinkEvent', refId: 'ddd', name: 'dName', url: 'url2' },
+        ],
+      },
+    });
   });
 
   it('manually override resolver output type for findMany', async () => {
     // let's check graphql response
-
+    await Event.deleteMany({});
     await Event.create({ refId: 'aaa' });
     await Event.create({ refId: 'bbb' });
     await ClickedLinkEvent.create({ refId: 'ccc', url: 'url1' });
