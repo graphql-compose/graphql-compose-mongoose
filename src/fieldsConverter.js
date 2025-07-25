@@ -279,6 +279,8 @@ export function scalarToGraphQL(field: MongooseFieldT): ComposeScalarType {
       return 'Boolean';
     case 'ObjectID':
       return 'MongoID';
+    case 'ObjectId':
+      return 'MongoID';
     default:
       return 'JSON';
   }
