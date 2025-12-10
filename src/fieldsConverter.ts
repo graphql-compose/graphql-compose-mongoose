@@ -184,7 +184,7 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
 
     let type = convertFieldToGraphQL(mongooseField, typeName, sc);
 
-    // in mongoose schema we use javascript `Number` object which casted to `Float` type
+    // in mongoose schema we use JavaScript `Number` object which cast to `Float` type
     // so in most cases _id field is `Int`
     if (fieldName === '_id' && type === 'Float') {
       type = 'Int';
