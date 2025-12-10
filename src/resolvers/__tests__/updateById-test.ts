@@ -104,7 +104,7 @@ describe('updateById() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrowError('requires args.record');
+      await expect(resolver.resolve({})).rejects.toThrow('requires args.record');
     });
 
     it('should return empty payload.error', async () => {
@@ -148,7 +148,7 @@ describe('updateById() ->', () => {
             record: { name: 'some name', valid: 'AlwaysFails' },
           },
         })
-      ).rejects.toThrowError('User validation failed: valid: this is a validate message');
+      ).rejects.toThrow('User validation failed: valid: this is a validate message');
     });
 
     it('should change data via args.record in model', async () => {

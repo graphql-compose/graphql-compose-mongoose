@@ -152,7 +152,7 @@ describe('updateOne() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrowError(
+      await expect(resolver.resolve({})).rejects.toThrow(
         'requires at least one value in args.filter'
       );
     });
@@ -196,7 +196,7 @@ describe('updateOne() ->', () => {
             record: { valid: 'AlwaysFails' },
           },
         })
-      ).rejects.toThrowError('User validation failed: valid: this is a validate message');
+      ).rejects.toThrow('User validation failed: valid: this is a validate message');
     });
 
     it('should skip records', async () => {

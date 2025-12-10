@@ -25,7 +25,7 @@ describe('Resolver helper `filter` ->', () => {
         const wrongArgs: any = [{}];
         // @ts-expect-error
         filterHelperArgs(...wrongArgs);
-      }).toThrowError('should be instance of ObjectTypeComposer');
+      }).toThrow('should be instance of ObjectTypeComposer');
     });
 
     it('should throw error if second arg is not MongooseModel', () => {
@@ -33,11 +33,11 @@ describe('Resolver helper `filter` ->', () => {
         const wrongArgs: any = [UserTC, {}];
         // @ts-expect-error
         filterHelperArgs(...wrongArgs);
-      }).toThrowError('should be instance of MongooseModel');
+      }).toThrow('should be instance of MongooseModel');
     });
 
     it('should throw error if `opts` is not provided', () => {
-      expect(() => filterHelperArgs(UserTC, UserModel)).toThrowError('provide non-empty options');
+      expect(() => filterHelperArgs(UserTC, UserModel)).toThrow('provide non-empty options');
     });
 
     it('should return filter field', () => {

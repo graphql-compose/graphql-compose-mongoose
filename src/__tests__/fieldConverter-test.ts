@@ -38,12 +38,12 @@ describe('fieldConverter', () => {
         const wrongArgs: any = [{ a: 1 }];
         // @ts-expect-error
         getFieldsFromModel(...wrongArgs);
-      }).toThrowError(/incorrect mongoose model/);
+      }).toThrow(/incorrect mongoose model/);
       expect(() => {
         const wrongArgs: any = [{ schema: {} }];
         // @ts-expect-error
         getFieldsFromModel(...wrongArgs);
-      }).toThrowError(/incorrect mongoose model/);
+      }).toThrow(/incorrect mongoose model/);
     });
   });
 
@@ -54,25 +54,25 @@ describe('fieldConverter', () => {
         const wrongArgs: any = [];
         // @ts-expect-error
         deriveComplexType(...wrongArgs);
-      }).toThrowError(err);
+      }).toThrow(err);
       expect(() => {
         const wrongArgs = [123];
         // @ts-expect-error
         deriveComplexType(...wrongArgs);
-      }).toThrowError(err);
+      }).toThrow(err);
       expect(() => {
         const wrongArgs = [{ a: 1 }];
         // @ts-expect-error
         deriveComplexType(...wrongArgs);
-      }).toThrowError(err);
+      }).toThrow(err);
       expect(() => {
         const wrongArgs = [{ path: 'name' }];
         // @ts-expect-error
         deriveComplexType(...wrongArgs);
-      }).toThrowError(err);
+      }).toThrow(err);
       expect(() => {
         deriveComplexType({ path: 'name', instance: 'Abc' });
-      }).not.toThrowError(err);
+      }).not.toThrow(err);
     });
 
     it('should derive DOCUMENT_ARRAY', () => {

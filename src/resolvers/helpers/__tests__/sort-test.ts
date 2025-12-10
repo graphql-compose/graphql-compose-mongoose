@@ -55,7 +55,7 @@ describe('Resolver helper `sort` ->', () => {
         const wrongArgs: any = [{}];
         // @ts-expect-error
         sortHelperArgs(...wrongArgs);
-      }).toThrowError('should be instance of ObjectTypeComposer');
+      }).toThrow('should be instance of ObjectTypeComposer');
     });
 
     it('should throw error if second arg is not Mongoose model', () => {
@@ -63,11 +63,11 @@ describe('Resolver helper `sort` ->', () => {
         const wrongArgs: any = [UserTC, {}];
         // @ts-expect-error
         sortHelperArgs(...wrongArgs);
-      }).toThrowError('should be instance of Mongoose Model');
+      }).toThrow('should be instance of Mongoose Model');
     });
 
     it('should throw error if `sortTypeName` not provided in opts', () => {
-      expect(() => sortHelperArgs(UserTC, UserModel)).toThrowError(
+      expect(() => sortHelperArgs(UserTC, UserModel)).toThrow(
         'provide non-empty `sortTypeName`'
       );
     });

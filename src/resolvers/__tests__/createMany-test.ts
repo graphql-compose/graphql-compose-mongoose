@@ -133,7 +133,7 @@ describe('createMany() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrowError(
+      await expect(resolver.resolve({})).rejects.toThrow(
         'requires args.records to be an Array'
       );
     });
@@ -214,10 +214,9 @@ describe('createMany() ->', () => {
       schemaComposer.clear();
       const ClonedUserSchema = UserModel.schema.clone();
 
-      ClonedUserSchema.pre<IUser>('save', function (next) {
+      ClonedUserSchema.pre<IUser>('save', function () {
         this.name = 'ChangedAgain';
         this.age = 18;
-        return next();
       });
 
       const ClonedUserModel = mongoose.model('UserClone', ClonedUserSchema);

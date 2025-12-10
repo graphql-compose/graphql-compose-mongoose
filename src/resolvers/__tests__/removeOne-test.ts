@@ -113,7 +113,7 @@ describe('removeOne() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrowError(
+      await expect(resolver.resolve({})).rejects.toThrow(
         'requires at least one value in args.filter'
       );
     });

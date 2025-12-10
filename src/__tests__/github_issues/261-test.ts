@@ -20,7 +20,7 @@ const UserSchema = new mongoose.Schema({
   },
   periods: [{ from: Number, to: Number, _id: false }],
 });
-interface IUser extends Document {
+interface IUser extends Document<number> {
   _id: number;
   name: string;
   age?: number;
@@ -71,11 +71,11 @@ describe('issue #261 - Non-nullability for mongoose fields that have a default v
         analytics: UserAnalytics!
         periods: [UserPeriods]!
       }
-      
+
       type UserAnalytics {
         isEnabled: Boolean!
       }
-      
+
       type UserPeriods {
         from: Float
         to: Float
@@ -97,11 +97,11 @@ describe('issue #261 - Non-nullability for mongoose fields that have a default v
         analytics: UserWithoutDefaultsAnalytics
         periods: [UserWithoutDefaultsPeriods]
       }
-      
+
       type UserWithoutDefaultsAnalytics {
         isEnabled: Boolean
       }
-      
+
       type UserWithoutDefaultsPeriods {
         from: Float
         to: Float
@@ -122,9 +122,9 @@ describe('issue #261 - Non-nullability for mongoose fields that have a default v
           analytics {
             isEnabled
           }
-          periods { 
-            from 
-            to 
+          periods {
+            from
+            to
           }
         }`,
       })

@@ -90,7 +90,7 @@ describe('removeById() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrowError('resolver requires args._id');
+      await expect(resolver.resolve({})).rejects.toThrow('resolver requires args._id');
     });
 
     it('should remove document in database', async () => {

@@ -147,6 +147,7 @@ UserSchema.virtual('nameVirtual').get(function (this: any) {
 });
 
 export interface IUser extends Document {
+  id: any;
   _id: any;
   name?: string;
   age?: number;
