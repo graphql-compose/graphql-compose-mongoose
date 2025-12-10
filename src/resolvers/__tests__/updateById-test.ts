@@ -1,8 +1,6 @@
-/* eslint-disable no-param-reassign */
-
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
-import { UserModel, IUser } from '../../__mocks__/userModel';
+import { IUser, UserModel } from '../../__mocks__/userModel';
 import { updateById } from '../updateById';
 import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';

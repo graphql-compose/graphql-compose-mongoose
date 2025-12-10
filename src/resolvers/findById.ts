@@ -1,16 +1,15 @@
+import type { InterfaceTypeComposer, ObjectTypeComposer, Resolver } from 'graphql-compose';
 import { toInputType } from 'graphql-compose';
-import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
-import type { Model, HydratedDocument } from 'mongoose';
+import type { HydratedDocument, Model } from 'mongoose';
 import {
-  projectionHelper,
-  prepareNestedAliases,
   prepareAliasesReverse,
+  prepareNestedAliases,
+  projectionHelper,
   replaceAliases,
 } from './helpers';
 import type { ExtendedResolveParams } from './index';
 import { beforeQueryHelper, beforeQueryHelperLean } from './helpers/beforeQueryHelper';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface FindByIdResolverOpts {
   /**
    * Enabling the lean option tells Mongoose to skip instantiating

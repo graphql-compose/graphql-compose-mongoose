@@ -1,5 +1,3 @@
-/* eslint-disable no-use-before-define */
-
 import type { HydratedDocument, Model } from 'mongoose';
 import {
   EnumTypeComposer,

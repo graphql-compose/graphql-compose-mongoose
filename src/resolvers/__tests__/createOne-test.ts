@@ -1,6 +1,4 @@
-/* eslint-disable no-param-reassign */
-
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { UserModel } from '../../__mocks__/userModel';
 import { createOne } from '../createOne';
 import { convertModelToGraphQL } from '../../fieldsConverter';
@@ -115,9 +113,7 @@ describe('createOne() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrow(
-        'requires at least one value in args'
-      );
+      await expect(resolver.resolve({})).rejects.toThrow('requires at least one value in args');
     });
 
     it('should return validation error in payload.error', async () => {

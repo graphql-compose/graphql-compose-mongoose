@@ -1,20 +1,18 @@
-/* eslint-disable no-unused-expressions, no-template-curly-in-string */
-
 import { EnumTypeComposer, schemaComposer, SchemaComposer } from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel';
 import { mongoose } from '../__mocks__/mongooseCommon';
 import {
-  deriveComplexType,
-  getFieldsFromModel,
-  convertFieldToGraphQL,
-  ComplexTypes,
-  scalarToGraphQL,
   arrayToGraphQL,
+  ComplexTypes,
+  convertFieldToGraphQL,
+  convertModelToGraphQL,
+  deriveComplexType,
+  documentArrayToGraphQL,
   embeddedToGraphQL,
   enumToGraphQL,
-  documentArrayToGraphQL,
+  getFieldsFromModel,
   referenceToGraphQL,
-  convertModelToGraphQL,
+  scalarToGraphQL,
 } from '../fieldsConverter';
 import GraphQLMongoID from '../types/MongoID';
 import GraphQLBSONDecimal from '../types/BSONDecimal';

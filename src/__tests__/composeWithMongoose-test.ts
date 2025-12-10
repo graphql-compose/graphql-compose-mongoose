@@ -1,7 +1,5 @@
-/* eslint-disable no-unused-expressions */
-
 import mongoose from 'mongoose';
-import { ObjectTypeComposer, InputTypeComposer, schemaComposer } from 'graphql-compose';
+import { InputTypeComposer, ObjectTypeComposer, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { UserModel } from '../__mocks__/userModel';
 import { composeWithMongoose } from '../composeWithMongoose';

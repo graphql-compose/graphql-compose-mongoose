@@ -16,7 +16,7 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules:": true,
+    "isolatedModules": true,
     "lib": ["es2017", "esnext.asynciterable"],
     "types": ["node", "jest"],
     "baseUrl": ".",

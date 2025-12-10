@@ -1,6 +1,4 @@
-/* eslint-disable no-param-reassign */
-
-import { schemaComposer, graphql } from 'graphql-compose';
+import { graphql, schemaComposer } from 'graphql-compose';
 import { composeWithMongoose } from '../../index';
 import { UserModel } from '../../__mocks__/userModel';
 

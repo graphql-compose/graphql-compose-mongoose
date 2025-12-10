@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign, no-console */
-
 import mongoose from 'mongoose';
 import MongoMemoryServer from 'mongodb-memory-server-core';
 import net, { AddressInfo } from 'net';

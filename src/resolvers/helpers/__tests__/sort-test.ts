@@ -67,9 +67,7 @@ describe('Resolver helper `sort` ->', () => {
     });
 
     it('should throw error if `sortTypeName` not provided in opts', () => {
-      expect(() => sortHelperArgs(UserTC, UserModel)).toThrow(
-        'provide non-empty `sortTypeName`'
-      );
+      expect(() => sortHelperArgs(UserTC, UserModel)).toThrow('provide non-empty `sortTypeName`');
     });
 
     it('should return sort field', () => {

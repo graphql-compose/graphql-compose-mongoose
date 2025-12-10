@@ -1,7 +1,5 @@
-/* eslint-disable no-param-reassign */
-
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
-import { UserModel, IUser } from '../../__mocks__/userModel';
+import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
+import { IUser, UserModel } from '../../__mocks__/userModel';
 import { removeOne } from '../removeOne';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';

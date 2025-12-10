@@ -1,17 +1,15 @@
-/* eslint-disable no-use-before-define */
-
 import {
-  ObjectTypeComposer,
-  InterfaceTypeComposer,
-  ObjectTypeComposerArgumentConfigMap,
   InputTypeComposer,
+  InterfaceTypeComposer,
+  ObjectTypeComposer,
+  ObjectTypeComposerArgumentConfigMap,
 } from 'graphql-compose';
-import type { Model, HydratedDocument } from 'mongoose';
-import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
+import type { HydratedDocument, Model } from 'mongoose';
+import { getIndexedFieldNamesForGraphQL, isObject, toMongoFilterDottedObject } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
 import {
-  FieldsOperatorsConfig,
   addFilterOperators,
+  FieldsOperatorsConfig,
   processFilterOperators,
 } from './filterOperators';
 import type { NestedAliasesMap } from './aliases';

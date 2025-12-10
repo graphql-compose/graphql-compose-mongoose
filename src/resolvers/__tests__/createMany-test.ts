@@ -1,9 +1,7 @@
-/* eslint-disable no-param-reassign,func-names */
-
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLList, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { mongoose } from '../../__mocks__/mongooseCommon';
-import { UserModel, IUser } from '../../__mocks__/userModel';
+import { IUser, UserModel } from '../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { createMany } from '../createMany';
 import { ExtendedResolveParams } from '..';
@@ -133,9 +131,7 @@ describe('createMany() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrow(
-        'requires args.records to be an Array'
-      );
+      await expect(resolver.resolve({})).rejects.toThrow('requires args.records to be an Array');
     });
 
     it('should save documents to database', async () => {

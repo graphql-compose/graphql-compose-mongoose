@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { composeWithMongoose } from '../../index';

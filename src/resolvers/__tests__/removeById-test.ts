@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-
 import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { IUser, UserModel } from '../../__mocks__/userModel';

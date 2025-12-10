@@ -1,5 +1,3 @@
-/* eslint-disable no-use-before-define */
-
 import type { Model, Schema } from 'mongoose';
 import mongoose, { Document } from 'mongoose';
 import type {

@@ -1,4 +1,4 @@
-import type { ResolverResolveParams, Resolver, ObjectTypeComposer } from 'graphql-compose';
+import type { ObjectTypeComposer, Resolver, ResolverResolveParams } from 'graphql-compose';
 import {
   ComposeWithMongooseDiscriminatorsOpts,
   DiscriminatorTypeComposer,
@@ -35,7 +35,6 @@ function setQueryDKey<TSource, TContext>(
       }
 
       resolve.projection[DKey] = 1;
-      /* eslint no-param-reassign: 1 */
 
       return next(resolve);
     });
