@@ -387,7 +387,7 @@ export function enumToGraphQL(
     const desc = _getFieldDescription(field);
     if (desc) etc.setDescription(desc);
 
-    const fields = valueList.reduce(
+    const fields = valueList?.reduce(
       (result, value) => {
         let key;
         if (value === null) {
