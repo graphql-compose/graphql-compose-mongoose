@@ -26,7 +26,7 @@ type MongooseFieldT = {
   originalRequiredValue?: string | (() => any);
   isRequired?: boolean;
   defaultValue?: any;
-  enumValues?: string[];
+  enumValues?: string[] | number[];
   schema?: Schema;
   _index?: { [optionName: string]: any };
 };
@@ -69,7 +69,7 @@ function _getFieldDescription(field: MongooseFieldT): string | undefined {
   return undefined;
 }
 
-function _getFieldEnums(field: MongooseFieldT): string[] | undefined {
+function _getFieldEnums(field: MongooseFieldT): string[] | number[] | undefined {
   if (field.enumValues && field.enumValues.length > 0) {
     return field.enumValues;
   }
@@ -394,6 +394,8 @@ export function enumToGraphQL(
           key = 'NULL';
         } else if (value === '') {
           key = 'EMPTY_STRING';
+        } else if (typeof value === 'number') {
+          key = value;
         } else {
           key = value
             ?.toString()
