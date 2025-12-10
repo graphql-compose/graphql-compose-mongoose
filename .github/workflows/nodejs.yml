@@ -32,6 +32,10 @@ jobs:
         run: yarn test
         env:
           CI: true
+      - name: Testing with previous mongoose versions 8
+        run: yarn test-prev-vers-8
+        env:
+          CI: true
       - name: Testing with previous mongoose versions 7
         run: yarn test-prev-vers-7
         env:
