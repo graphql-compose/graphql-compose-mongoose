@@ -116,6 +116,14 @@ describe('fieldConverter', () => {
     it('should derive MIXED mongoose type', () => {
       expect(deriveComplexType(fields.someDynamic)).toBe(ComplexTypes.MIXED);
     });
+
+    it('should derive Number mongoose type', () => {
+      expect(deriveComplexType(fields.numTest)).toBe(ComplexTypes.SCALAR);
+    });
+
+    it('should derive Enum Number mongoose type', () => {
+      expect(deriveComplexType(fields.statusCode)).toBe(ComplexTypes.SCALAR);
+    });
   });
 
   describe('convertFieldToGraphQL()', () => {
@@ -162,6 +170,17 @@ describe('fieldConverter', () => {
       expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('BSONDecimal');
       expect(schemaComposer.has('BSONDecimal')).toBeTruthy();
       expect(schemaComposer.get('BSONDecimal').getType()).toBe(GraphQLBSONDecimal);
+    });
+
+    it('should use Scalar[float] for Enum Numbers', () => {
+      schemaComposer.clear();
+      expect(schemaComposer.has('statusCode')).toBeFalsy();
+      const mongooseField = {
+        path: 'statusCode',
+        instance: 'Number',
+        enumValues: [1, 2, 3],
+      };
+      expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('Float');
     });
   });
 

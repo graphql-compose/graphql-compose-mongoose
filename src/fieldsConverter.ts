@@ -294,6 +294,8 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypes {
     return ComplexTypes.REFERENCE;
   } else if (fieldType === 'Decimal128') {
     return ComplexTypes.DECIMAL;
+  } else if (fieldType === 'Number') {
+    return ComplexTypes.SCALAR;
   }
 
   const enums = _getFieldEnums(field);
@@ -394,8 +396,6 @@ export function enumToGraphQL(
           key = 'NULL';
         } else if (value === '') {
           key = 'EMPTY_STRING';
-        } else if (typeof value === 'number') {
-          key = value;
         } else {
           key = value
             ?.toString()
