@@ -1,6 +1,6 @@
 {
   "name": "@area51ai/graphql-compose-mongoose",
-  "version": "10.0.7",
+  "version": "10.0.8",
   "description": "Plugin for `graphql-compose` which derive a graphql types from a mongoose model.",
   "license": "MIT",
   "files": [
