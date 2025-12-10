@@ -395,7 +395,7 @@ export function enumToGraphQL(
         } else if (value === '') {
           key = 'EMPTY_STRING';
         } else {
-          if (typeof value.toString === 'function') {
+          if (typeof value?.replace === 'function') {
             key = value?.replace(/[^_a-zA-Z0-9]/g, '_')?.replace(/(^[0-9])(.*)/g, 'a_$1$2');
           } else {
             key = value;
