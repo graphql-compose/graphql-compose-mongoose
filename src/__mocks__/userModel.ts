@@ -1,8 +1,10 @@
-import { mongoose, Schema } from './mongooseCommon';
+import mongoose, { Document, Schema } from 'mongoose';
 import ContactsSchema from './contactsSchema';
 import enumEmployment from './enumEmployment';
 import LanguageSchema from './languageSchema';
-import { Document } from 'mongoose';
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { bsonType } from 'bson';
 
 const UserSchema = new Schema(
   {
@@ -36,7 +38,7 @@ const UserSchema = new Schema(
       description: 'Full years',
       required() {
         // in graphql this field should be Nullable
-        return (this as any).name === 'Something special';
+        return this.name === 'Something special';
       },
     },
 
@@ -146,8 +148,8 @@ UserSchema.virtual('nameVirtual').get(function (this: any) {
 });
 
 export interface IUser extends Document {
-  id: any;
-  _id: any;
+  id: mongoose.Types.ObjectId;
+  n?: string;
   name?: string;
   age?: number;
   gender?: string;
@@ -158,6 +160,7 @@ export interface IUser extends Document {
     email: string;
     skype?: string;
   };
+  salary?: mongoose.Types.Decimal128;
 }
 
 const UserModel = mongoose.model<IUser>('User', UserSchema);

@@ -1,7 +1,7 @@
 import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLList, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { mongoose } from '../../__mocks__/mongooseCommon';
-import { IUser, UserModel } from '../../__mocks__/userModel';
+import { IUser, UserModel, UserSchema } from '../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { createMany } from '../createMany';
 import { ExtendedResolveParams } from '..';
@@ -208,9 +208,9 @@ describe('createMany() ->', () => {
 
     it('should execute hooks on save', async () => {
       schemaComposer.clear();
-      const ClonedUserSchema = UserModel.schema.clone();
+      const ClonedUserSchema: typeof UserSchema = UserModel.schema.clone();
 
-      ClonedUserSchema.pre<IUser>('save', function () {
+      ClonedUserSchema.pre<IUser>('save', function (this: IUser) {
         this.name = 'ChangedAgain';
         this.age = 18;
       });

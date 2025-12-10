@@ -69,7 +69,7 @@ export const resolverFactory = {
   connection,
 };
 
-export {
+export type {
   CountResolverOpts,
   FindByIdResolverOpts,
   FindByIdsResolverOpts,

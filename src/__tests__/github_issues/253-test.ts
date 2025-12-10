@@ -9,12 +9,14 @@ const CarSchema = new Schema(
   { s: { type: Number, required: true, alias: 'speed' }, aaa: SubCarSchema },
   { discriminatorKey: 't' }
 );
+
 const Car = mongoose.model('Car', CarSchema);
 
 const TimeMachineSchema = new Schema(
   { f: { type: Number, required: true, alias: 'fluxCompensatorVersion' } },
   { discriminatorKey: 't' }
 );
+
 const TimeMachine = Car.discriminator('TimeMachine', TimeMachineSchema);
 
 const CarDTC = composeWithMongooseDiscriminators(Car);
@@ -29,8 +31,11 @@ schemaComposer.Query.addFields({
 beforeAll(async () => {
   await mongoose.createConnection();
   // todo find away to get the alias types?
-  await TimeMachine.create({ speed: 300, fluxCompensatorVersion: 5 });
+  // await TimeMachine.create({ speed: 300, fluxCompensatorVersion: 5 });
+  const o = new TimeMachine({ speed: 300, fluxCompensatorVersion: 5 });
+  await o.save();
 });
+
 afterAll(() => mongoose.disconnect());
 
 describe('issue #253 - Consider aliases from discriminators during preparation', () => {
