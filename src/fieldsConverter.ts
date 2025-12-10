@@ -17,7 +17,10 @@ import GraphQLBSONDecimal from './types/BSONDecimal';
 type MongooseFieldT = {
   path?: string;
   instance: string;
+  // mongoose 8
   caster?: any;
+  // mongoose 9
+  embeddedSchemaType?: any;
   options?: {
     description?: string;
     alias?: string;
@@ -330,14 +333,14 @@ export function arrayToGraphQL(
   prefix: string = '',
   schemaComposer: SchemaComposer<any>
 ): ComposeOutputTypeDefinition<any> {
-  if (!field || !field.caster) {
+  if (!field || (!field.caster && !field.embeddedSchemaType)) {
     throw new Error(
       'You provide incorrect mongoose field to `arrayToGraphQL()`. ' +
         'Correct field should contain `caster` property.'
     );
   }
 
-  const unwrappedField = { ...field.caster };
+  const unwrappedField = { ...(field.caster || field.embeddedSchemaType) } as MongooseFieldT;
 
   const outputType: any = convertFieldToGraphQL(unwrappedField, prefix, schemaComposer);
   return [outputType];

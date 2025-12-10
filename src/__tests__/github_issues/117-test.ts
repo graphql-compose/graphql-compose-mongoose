@@ -60,7 +60,7 @@ describe('issue #117', () => {
 
     const player1 = await PlayerModel.create({ name: '1', surname: '1', sex: 'm' });
     const player2 = await PlayerModel.create({ name: '2', surname: '2', sex: 'f' });
-    const game = await GameModel.create({ players: [player1, player2] });
+    const game = await GameModel.create({ players: [player1._id, player2._id] });
 
     const id = game._id;
     const g1 = await GameModel.findOne({ _id: id }).populate('players');

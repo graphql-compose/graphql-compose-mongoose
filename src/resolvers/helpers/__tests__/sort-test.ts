@@ -111,7 +111,7 @@ describe('Resolver helper `sort` ->', () => {
       const sortValue = { _id: 1 };
       resolveParams.args = { sort: sortValue };
       sortHelper(resolveParams);
-      expect(spyFn).toBeCalledWith(sortValue);
+      expect(spyFn).toHaveBeenCalledWith(sortValue);
     });
   });
 });

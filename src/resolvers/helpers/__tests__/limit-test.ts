@@ -33,17 +33,17 @@ describe('Resolver helper `limit` ->', () => {
 
     it('should not call query.limit if args.limit is empty', () => {
       limitHelper(resolveParams);
-      expect(spyFn).not.toBeCalled();
+      expect(spyFn).not.toHaveBeenCalled();
     });
     it('should call query.limit if args.limit is provided', () => {
       resolveParams.args = { limit: 333 };
       limitHelper(resolveParams);
-      expect(spyFn).toBeCalledWith(333);
+      expect(spyFn).toHaveBeenCalledWith(333);
     });
     it('should convert string to int in args.limit', () => {
       resolveParams.args = { limit: '444' };
       limitHelper(resolveParams);
-      expect(spyFn).toBeCalledWith(444);
+      expect(spyFn).toHaveBeenCalledWith(444);
     });
   });
 });
