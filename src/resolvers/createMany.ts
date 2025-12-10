@@ -1,5 +1,5 @@
-import { ObjectTypeComposer, InterfaceTypeComposer, Resolver } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import { InterfaceTypeComposer, ObjectTypeComposer, Resolver } from 'graphql-compose';
+import type { Document, Model } from 'mongoose';
 import { recordHelperArgs, RecordHelperArgsOpts } from './helpers';
 import { addErrorCatcherField } from './helpers/errorCatcher';
 import { validateManyAndThrow } from './helpers/validate';
@@ -100,7 +100,6 @@ export function createMany<TSource = any, TContext = any, TDoc extends Document 
 
       const docs = [] as TDoc[];
       for (const record of recordData) {
-        // eslint-disable-next-line new-cap
         let doc = new model(record);
         if (resolveParams.beforeRecordMutate) {
           doc = await resolveParams.beforeRecordMutate(doc, resolveParams);

@@ -43,7 +43,6 @@ export function mergeFilterOperatorsOptsMap(
     childFilterOperatorField,
     baseOptsTypes
   );
-  /* eslint-enable */
 
   return childFilterOperatorField;
 }

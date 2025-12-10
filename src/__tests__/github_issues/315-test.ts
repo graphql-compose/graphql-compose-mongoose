@@ -24,7 +24,7 @@ const booksFindMany = BookTC.mongooseResolvers.findMany().addFilterArg({
       $gte: value,
       ...(rawQuery.date && typeof rawQuery.date != 'object'
         ? { $eq: rawQuery.date }
-        : rawQuery.date ?? {}),
+        : (rawQuery.date ?? {})),
     };
   },
 });
