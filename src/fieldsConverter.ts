@@ -26,7 +26,7 @@ type MongooseFieldT = {
   originalRequiredValue?: string | (() => any);
   isRequired?: boolean;
   defaultValue?: any;
-  enumValues?: string[];
+  enumValues?: string[] | number[];
   schema?: Schema;
   _index?: { [optionName: string]: any };
 };
@@ -69,7 +69,7 @@ function _getFieldDescription(field: MongooseFieldT): string | undefined {
   return undefined;
 }
 
-function _getFieldEnums(field: MongooseFieldT): string[] | undefined {
+function _getFieldEnums(field: MongooseFieldT): string[] | number[] | undefined {
   if (field.enumValues && field.enumValues.length > 0) {
     return field.enumValues;
   }
@@ -294,6 +294,8 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypes {
     return ComplexTypes.REFERENCE;
   } else if (fieldType === 'Decimal128') {
     return ComplexTypes.DECIMAL;
+  } else if (fieldType === 'Number') {
+    return ComplexTypes.SCALAR;
   }
 
   const enums = _getFieldEnums(field);

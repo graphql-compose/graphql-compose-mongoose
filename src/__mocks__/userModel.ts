@@ -130,6 +130,18 @@ const UserSchema = new Schema(
       ],
     },
 
+    statusCode: {
+      type: Number,
+      enum: Object.values({
+        ACTIVE: 1,
+        INACTIVE: 2,
+      }),
+    },
+
+    numTest: {
+      type: Number,
+    },
+
     // createdAt, created via option `timestamp: true` (see bottom)
     // updatedAt, created via option `timestamp: true` (see bottom)
   },
