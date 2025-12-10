@@ -28,6 +28,7 @@ schemaComposer.Query.addFields({
 
 beforeAll(async () => {
   await mongoose.createConnection();
+  // todo find away to get the alias types?
   await TimeMachine.create({ speed: 300, fluxCompensatorVersion: 5 });
 });
 afterAll(() => mongoose.disconnect());
