@@ -6,7 +6,7 @@ import {
   ObjectTypeComposerArgumentConfigMap,
   InputTypeComposer,
 } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import type { Model, HydratedDocument } from 'mongoose';
 import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
 import {
@@ -66,7 +66,7 @@ export const getFilterHelperArgOptsMap = (): Record<string, string | string[]> =
   removeFields: ['string', 'string[]'],
 });
 
-export function filterHelperArgs<TDoc extends Document = any>(
+export function filterHelperArgs<TDoc extends HydratedDocument<any> = any>(
   typeComposer: ObjectTypeComposer<TDoc, any> | InterfaceTypeComposer<TDoc, any>,
   model: Model<TDoc>,
   opts?: FilterHelperArgsOpts

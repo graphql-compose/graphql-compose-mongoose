@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 
-import type { Document, Model } from 'mongoose';
+import type { HydratedDocument, Model } from 'mongoose';
 import {
   EnumTypeComposer,
   InterfaceTypeComposer,
@@ -24,7 +24,7 @@ export type SortHelperArgsOpts = {
   sortTypeName?: string;
 };
 
-export function sortHelperArgs<TDoc extends Document = any>(
+export function sortHelperArgs<TDoc extends HydratedDocument<any> = any>(
   tc: ObjectTypeComposer<TDoc, any> | InterfaceTypeComposer<TDoc, any>,
   model: Model<TDoc>,
   opts?: SortHelperArgsOpts

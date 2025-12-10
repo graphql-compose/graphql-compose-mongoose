@@ -1,5 +1,5 @@
 import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import type { Model, HydratedDocument } from 'mongoose';
 import {
   skipHelper,
   skipHelperArgs,
@@ -44,7 +44,7 @@ type TArgs = {
   skip?: number;
 };
 
-export function findOne<TSource = any, TContext = any, TDoc extends Document = any>(
+export function findOne<TSource = any, TContext = any, TDoc extends HydratedDocument<any> = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: FindOneResolverOpts

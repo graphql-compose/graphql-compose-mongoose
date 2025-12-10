@@ -1,5 +1,5 @@
 import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import type { Model, HydratedDocument } from 'mongoose';
 import {
   filterHelper,
   filterHelperArgs,
@@ -20,7 +20,7 @@ type TArgs = {
   filter?: any;
 };
 
-export function count<TSource = any, TContext = any, TDoc extends Document = any>(
+export function count<TSource = any, TContext = any, TDoc extends HydratedDocument<any> = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: CountResolverOpts
@@ -56,6 +56,7 @@ export function count<TSource = any, TContext = any, TDoc extends Document = any
         return beforeQueryHelper(resolveParams);
       } else {
         // mongoose 5 and below
+        // @ts-ignore
         resolveParams.query.count();
         return beforeQueryHelper(resolveParams);
       }

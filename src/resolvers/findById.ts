@@ -1,6 +1,6 @@
 import { toInputType } from 'graphql-compose';
 import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import type { Model, HydratedDocument } from 'mongoose';
 import {
   projectionHelper,
   prepareNestedAliases,
@@ -30,7 +30,7 @@ type TArgs = {
   _id: any;
 };
 
-export function findById<TSource = any, TContext = any, TDoc extends Document = any>(
+export function findById<TSource = any, TContext = any, TDoc extends HydratedDocument<any> = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: FindByIdResolverOpts
