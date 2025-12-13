@@ -1,8 +1,6 @@
-/* eslint-disable no-await-in-loop */
-
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { schemaComposer, graphql } from 'graphql-compose';
+import { graphql, schemaComposer } from 'graphql-compose';
 import { composeWithMongoose } from '../../index';
 import { getPortFree } from '../../__mocks__/mongooseCommon';
 
@@ -49,7 +47,7 @@ describe('issue #136 - Mongoose virtuals', () => {
 
     return updateManyFiltered
       .wrapResolve((next) => async (rp) => {
-        console.log(rp.args); // eslint-disable-line
+        console.log(rp.args);
         return next(rp);
       })
       .debug();

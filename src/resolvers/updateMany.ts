@@ -1,20 +1,20 @@
-import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import type { InterfaceTypeComposer, ObjectTypeComposer, Resolver } from 'graphql-compose';
+import type { Document, Model } from 'mongoose';
 import {
-  limitHelper,
-  limitHelperArgs,
-  skipHelper,
-  skipHelperArgs,
-  recordHelperArgs,
   filterHelper,
   filterHelperArgs,
+  FilterHelperArgsOpts,
+  limitHelper,
+  limitHelperArgs,
+  LimitHelperArgsOpts,
+  prepareNestedAliases,
+  recordHelperArgs,
+  RecordHelperArgsOpts,
+  skipHelper,
+  skipHelperArgs,
   sortHelper,
   sortHelperArgs,
-  prepareNestedAliases,
-  RecordHelperArgsOpts,
-  FilterHelperArgsOpts,
   SortHelperArgsOpts,
-  LimitHelperArgsOpts,
 } from './helpers';
 import { toMongoDottedObject } from '../utils/toMongoDottedObject';
 import type { ExtendedResolveParams } from './index';
@@ -121,9 +121,12 @@ export function updateMany<TSource = any, TContext = any, TDoc extends Document 
       resolveParams.query = resolveParams.query.setOptions({ multi: true });
 
       if (resolveParams.query.updateMany) {
-        resolveParams.query.updateMany({
-          $set: toMongoDottedObject(recordData, aliases),
-        });
+        resolveParams.query.updateMany(
+          {},
+          {
+            $set: toMongoDottedObject(recordData, aliases),
+          }
+        );
       } else {
         // OLD mongoose
         // @ts-ignore

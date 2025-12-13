@@ -17,8 +17,9 @@ import { prepareBaseResolvers } from './prepareBaseResolvers';
 import { reorderFields } from './utils/reorderFields';
 import { GraphQLFieldConfig, GraphQLObjectType } from 'graphql-compose/lib/graphql';
 
-export interface ComposeWithMongooseDiscriminatorsOpts<TContext>
-  extends ComposeWithMongooseOpts<TContext> {
+export interface ComposeWithMongooseDiscriminatorsOpts<
+  TContext,
+> extends ComposeWithMongooseOpts<TContext> {
   reorderFields?: boolean | string[]; // true order: _id, DKey, DInterfaceFields, DiscriminatorFields
 }
 

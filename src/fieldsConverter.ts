@@ -1,5 +1,3 @@
-/* eslint-disable no-use-before-define */
-
 import type { Model, Schema } from 'mongoose';
 import mongoose, { Document } from 'mongoose';
 import type {
@@ -17,7 +15,10 @@ import GraphQLBSONDecimal from './types/BSONDecimal';
 type MongooseFieldT = {
   path?: string;
   instance: string;
+  // mongoose 8
   caster?: any;
+  // mongoose 9
+  embeddedSchemaType?: any;
   options?: {
     description?: string;
     alias?: string;
@@ -25,7 +26,7 @@ type MongooseFieldT = {
   originalRequiredValue?: string | (() => any);
   isRequired?: boolean;
   defaultValue?: any;
-  enumValues?: string[];
+  enumValues?: string[] | number[];
   schema?: Schema;
   _index?: { [optionName: string]: any };
 };
@@ -68,7 +69,7 @@ function _getFieldDescription(field: MongooseFieldT): string | undefined {
   return undefined;
 }
 
-function _getFieldEnums(field: MongooseFieldT): string[] | undefined {
+function _getFieldEnums(field: MongooseFieldT): string[] | number[] | undefined {
   if (field.enumValues && field.enumValues.length > 0) {
     return field.enumValues;
   }
@@ -183,7 +184,7 @@ export function convertModelToGraphQL<TDoc extends Document, TContext>(
 
     let type = convertFieldToGraphQL(mongooseField, typeName, sc);
 
-    // in mongoose schema we use javascript `Number` object which casted to `Float` type
+    // in mongoose schema we use JavaScript `Number` object which cast to `Float` type
     // so in most cases _id field is `Int`
     if (fieldName === '_id' && type === 'Float') {
       type = 'Int';
@@ -293,6 +294,8 @@ export function deriveComplexType(field: MongooseFieldT): ComplexTypes {
     return ComplexTypes.REFERENCE;
   } else if (fieldType === 'Decimal128') {
     return ComplexTypes.DECIMAL;
+  } else if (fieldType === 'Number') {
+    return ComplexTypes.SCALAR;
   }
 
   const enums = _getFieldEnums(field);
@@ -330,14 +333,14 @@ export function arrayToGraphQL(
   prefix: string = '',
   schemaComposer: SchemaComposer<any>
 ): ComposeOutputTypeDefinition<any> {
-  if (!field || !field.caster) {
+  if (!field || (!field.caster && !field.embeddedSchemaType)) {
     throw new Error(
       'You provide incorrect mongoose field to `arrayToGraphQL()`. ' +
         'Correct field should contain `caster` property.'
     );
   }
 
-  const unwrappedField = { ...field.caster };
+  const unwrappedField = { ...(field.caster || field.embeddedSchemaType) } as MongooseFieldT;
 
   const outputType: any = convertFieldToGraphQL(unwrappedField, prefix, schemaComposer);
   return [outputType];
@@ -386,7 +389,7 @@ export function enumToGraphQL(
     const desc = _getFieldDescription(field);
     if (desc) etc.setDescription(desc);
 
-    const fields = valueList.reduce(
+    const fields = valueList?.reduce(
       (result, value) => {
         let key;
         if (value === null) {
@@ -394,7 +397,10 @@ export function enumToGraphQL(
         } else if (value === '') {
           key = 'EMPTY_STRING';
         } else {
-          key = value.replace(/[^_a-zA-Z0-9]/g, '_').replace(/(^[0-9])(.*)/g, 'a_$1$2');
+          key = value
+            ?.toString()
+            ?.replace(/[^_a-zA-Z0-9]/g, '_')
+            ?.replace(/(^[0-9])(.*)/g, 'a_$1$2');
         }
         result[key] = { value };
         return result;

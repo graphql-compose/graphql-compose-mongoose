@@ -1,8 +1,10 @@
-import { mongoose, Schema } from './mongooseCommon';
+import mongoose, { Document, Schema } from 'mongoose';
 import ContactsSchema from './contactsSchema';
 import enumEmployment from './enumEmployment';
 import LanguageSchema from './languageSchema';
-import { Document } from 'mongoose';
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { bsonType } from 'bson';
 
 const UserSchema = new Schema(
   {
@@ -36,7 +38,7 @@ const UserSchema = new Schema(
       description: 'Full years',
       required() {
         // in graphql this field should be Nullable
-        return (this as any).name === 'Something special';
+        return this.name === 'Something special';
       },
     },
 
@@ -128,6 +130,18 @@ const UserSchema = new Schema(
       ],
     },
 
+    statusCode: {
+      type: Number,
+      enum: Object.values({
+        ACTIVE: 1,
+        INACTIVE: 2,
+      }),
+    },
+
+    numTest: {
+      type: Number,
+    },
+
     // createdAt, created via option `timestamp: true` (see bottom)
     // updatedAt, created via option `timestamp: true` (see bottom)
   },
@@ -141,13 +155,13 @@ const UserSchema = new Schema(
 UserSchema.set('autoIndex', false);
 UserSchema.index({ n: 1, age: -1 });
 
-// eslint-disable-next-line
 UserSchema.virtual('nameVirtual').get(function (this: any) {
   return `VirtualFieldValue${this._id}`;
 });
 
 export interface IUser extends Document {
-  _id: any;
+  id: mongoose.Types.ObjectId;
+  n?: string;
   name?: string;
   age?: number;
   gender?: string;
@@ -158,6 +172,7 @@ export interface IUser extends Document {
     email: string;
     skype?: string;
   };
+  salary?: mongoose.Types.Decimal128;
 }
 
 const UserModel = mongoose.model<IUser>('User', UserSchema);

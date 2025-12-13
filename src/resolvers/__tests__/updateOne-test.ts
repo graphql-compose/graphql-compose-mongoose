@@ -1,8 +1,6 @@
-/* eslint-disable no-param-reassign */
-
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
-import { UserModel, IUser } from '../../__mocks__/userModel';
+import { IUser, UserModel } from '../../__mocks__/userModel';
 import { updateOne } from '../updateOne';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { ExtendedResolveParams } from '..';
@@ -152,7 +150,7 @@ describe('updateOne() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrowError(
+      await expect(resolver.resolve({})).rejects.toThrow(
         'requires at least one value in args.filter'
       );
     });
@@ -196,7 +194,7 @@ describe('updateOne() ->', () => {
             record: { valid: 'AlwaysFails' },
           },
         })
-      ).rejects.toThrowError('User validation failed: valid: this is a validate message');
+      ).rejects.toThrow('User validation failed: valid: this is a validate message');
     });
 
     it('should skip records', async () => {

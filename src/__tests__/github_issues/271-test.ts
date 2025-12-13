@@ -29,8 +29,7 @@ interface IAuthor {
   isAlive: boolean;
 }
 
-interface IBook extends Document {
-  _id: number;
+interface IBook extends Document<number> {
   title: string;
   author: IAuthor;
   pageCount?: number;
@@ -158,7 +157,7 @@ describe('nested projections with aliases - issue #271', () => {
         query {
           booksMany {
             bookSize
-            author { 
+            author {
               isAbove100
             }
           }

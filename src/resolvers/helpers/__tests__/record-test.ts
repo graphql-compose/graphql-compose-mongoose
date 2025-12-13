@@ -18,7 +18,7 @@ describe('Resolver helper `record` ->', () => {
 
   describe('recordHelperArgs()', () => {
     it('should throw error if provided empty opts', () => {
-      expect(() => recordHelperArgs(UserTC)).toThrowError('provide non-empty options');
+      expect(() => recordHelperArgs(UserTC)).toThrow('provide non-empty options');
     });
 
     it('should return input field', () => {

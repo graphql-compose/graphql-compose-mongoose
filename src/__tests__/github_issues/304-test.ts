@@ -42,9 +42,9 @@ beforeAll(async () => {
   await OrderModel.base.createConnection();
   await OrderModel.create([
     { orderStatus: 'PAID', inbound: { timeStamp: null } },
-    { orderStatus: 'PAID', inbound: { timeStamp: 123 } },
+    { orderStatus: 'PAID', inbound: { timeStamp: new Date(123) } },
     { orderStatus: 'UNPAID', inbound: { timeStamp: null } },
-    { orderStatus: 'UNPAID', inbound: { timeStamp: 456 } },
+    { orderStatus: 'UNPAID', inbound: { timeStamp: new Date(456) } },
   ]);
 });
 afterAll(() => {

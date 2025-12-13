@@ -1,20 +1,18 @@
-/* eslint-disable no-unused-expressions, no-template-curly-in-string */
-
 import { EnumTypeComposer, schemaComposer, SchemaComposer } from 'graphql-compose';
 import { UserModel } from '../__mocks__/userModel';
 import { mongoose } from '../__mocks__/mongooseCommon';
 import {
-  deriveComplexType,
-  getFieldsFromModel,
-  convertFieldToGraphQL,
-  ComplexTypes,
-  scalarToGraphQL,
   arrayToGraphQL,
+  ComplexTypes,
+  convertFieldToGraphQL,
+  convertModelToGraphQL,
+  deriveComplexType,
+  documentArrayToGraphQL,
   embeddedToGraphQL,
   enumToGraphQL,
-  documentArrayToGraphQL,
+  getFieldsFromModel,
   referenceToGraphQL,
-  convertModelToGraphQL,
+  scalarToGraphQL,
 } from '../fieldsConverter';
 import GraphQLMongoID from '../types/MongoID';
 import GraphQLBSONDecimal from '../types/BSONDecimal';
@@ -38,12 +36,12 @@ describe('fieldConverter', () => {
         const wrongArgs: any = [{ a: 1 }];
         // @ts-expect-error
         getFieldsFromModel(...wrongArgs);
-      }).toThrowError(/incorrect mongoose model/);
+      }).toThrow(/incorrect mongoose model/);
       expect(() => {
         const wrongArgs: any = [{ schema: {} }];
         // @ts-expect-error
         getFieldsFromModel(...wrongArgs);
-      }).toThrowError(/incorrect mongoose model/);
+      }).toThrow(/incorrect mongoose model/);
     });
   });
 
@@ -54,25 +52,25 @@ describe('fieldConverter', () => {
         const wrongArgs: any = [];
         // @ts-expect-error
         deriveComplexType(...wrongArgs);
-      }).toThrowError(err);
+      }).toThrow(err);
       expect(() => {
         const wrongArgs = [123];
         // @ts-expect-error
         deriveComplexType(...wrongArgs);
-      }).toThrowError(err);
+      }).toThrow(err);
       expect(() => {
         const wrongArgs = [{ a: 1 }];
         // @ts-expect-error
         deriveComplexType(...wrongArgs);
-      }).toThrowError(err);
+      }).toThrow(err);
       expect(() => {
         const wrongArgs = [{ path: 'name' }];
         // @ts-expect-error
         deriveComplexType(...wrongArgs);
-      }).toThrowError(err);
+      }).toThrow(err);
       expect(() => {
         deriveComplexType({ path: 'name', instance: 'Abc' });
-      }).not.toThrowError(err);
+      }).not.toThrow(err);
     });
 
     it('should derive DOCUMENT_ARRAY', () => {
@@ -117,6 +115,14 @@ describe('fieldConverter', () => {
 
     it('should derive MIXED mongoose type', () => {
       expect(deriveComplexType(fields.someDynamic)).toBe(ComplexTypes.MIXED);
+    });
+
+    it('should derive Number mongoose type', () => {
+      expect(deriveComplexType(fields.numTest)).toBe(ComplexTypes.SCALAR);
+    });
+
+    it('should derive Enum Number mongoose type', () => {
+      expect(deriveComplexType(fields.statusCode)).toBe(ComplexTypes.SCALAR);
     });
   });
 
@@ -164,6 +170,17 @@ describe('fieldConverter', () => {
       expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('BSONDecimal');
       expect(schemaComposer.has('BSONDecimal')).toBeTruthy();
       expect(schemaComposer.get('BSONDecimal').getType()).toBe(GraphQLBSONDecimal);
+    });
+
+    it('should use Scalar[float] for Enum Numbers', () => {
+      schemaComposer.clear();
+      expect(schemaComposer.has('statusCode')).toBeFalsy();
+      const mongooseField = {
+        path: 'statusCode',
+        instance: 'Number',
+        enumValues: [1, 2, 3],
+      };
+      expect(convertFieldToGraphQL(mongooseField, '', schemaComposer)).toBe('Float');
     });
   });
 

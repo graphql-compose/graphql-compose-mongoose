@@ -1,17 +1,15 @@
-/* eslint-disable no-use-before-define */
-
 import {
-  ObjectTypeComposer,
-  InterfaceTypeComposer,
-  ObjectTypeComposerArgumentConfigMap,
   InputTypeComposer,
+  InterfaceTypeComposer,
+  ObjectTypeComposer,
+  ObjectTypeComposerArgumentConfigMap,
 } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
-import { isObject, toMongoFilterDottedObject, getIndexedFieldNamesForGraphQL } from '../../utils';
+import type { HydratedDocument, Model } from 'mongoose';
+import { getIndexedFieldNamesForGraphQL, isObject, toMongoFilterDottedObject } from '../../utils';
 import type { ExtendedResolveParams } from '../index';
 import {
-  FieldsOperatorsConfig,
   addFilterOperators,
+  FieldsOperatorsConfig,
   processFilterOperators,
 } from './filterOperators';
 import type { NestedAliasesMap } from './aliases';
@@ -66,7 +64,7 @@ export const getFilterHelperArgOptsMap = (): Record<string, string | string[]> =
   removeFields: ['string', 'string[]'],
 });
 
-export function filterHelperArgs<TDoc extends Document = any>(
+export function filterHelperArgs<TDoc extends HydratedDocument<any> = any>(
   typeComposer: ObjectTypeComposer<TDoc, any> | InterfaceTypeComposer<TDoc, any>,
   model: Model<TDoc>,
   opts?: FilterHelperArgsOpts

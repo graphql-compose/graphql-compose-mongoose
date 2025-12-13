@@ -5,7 +5,7 @@ import {
   InputTypeComposer,
 } from 'graphql-compose';
 import { makeFieldsRecursiveNullable } from '../../utils/makeFieldsRecursiveNullable';
-import { Document } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
 export type RecordHelperArgsOpts = {
   /**
@@ -42,7 +42,7 @@ export const getRecordHelperArgsOptsMap = (): Record<string, string> => ({
   requiredFields: 'string[]',
 });
 
-export function recordHelperArgs<TDoc extends Document = any>(
+export function recordHelperArgs<TDoc extends HydratedDocument<any> = any>(
   tc: ObjectTypeComposer<TDoc, any> | InterfaceTypeComposer<TDoc, any>,
   opts?: RecordHelperArgsOpts
 ): ObjectTypeComposerArgumentConfigMapDefinition<{ record: any }> {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { MergeAbleHelperArgsOpts } from '../../resolvers/helpers';
 import { mergeStringAndStringArraysFields } from './mergeCustomizationOptions';
 import { AllResolversOpts } from 'src/resolvers';
@@ -39,21 +38,17 @@ export function mergeFilterOperatorsOptsMap(
     baseOptsTypes[key] = 'string[]';
   }
 
-  /* eslint-disable */
   childFilterOperatorField = mergeMapTypeFields(
     baseFilterOperatorField,
     childFilterOperatorField,
     baseOptsTypes
   );
-  /* eslint-enable */
 
   return childFilterOperatorField;
 }
 
 export function mergeArraysTypeFields(
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   baseField: any,
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   childField: any,
   argOptsType: TypeFieldMap
 ): TypeFieldMap {

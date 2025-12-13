@@ -1,13 +1,11 @@
-/* eslint-disable no-use-before-define, no-param-reassign, global-require */
-
 import type { ObjectTypeComposer, SchemaComposer } from 'graphql-compose';
 import { schemaComposer as globalSchemaComposer } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import type { Document, Model } from 'mongoose';
 import { convertModelToGraphQL } from './fieldsConverter';
-import { resolverFactory, AllResolversOpts } from './resolvers';
+import { AllResolversOpts, resolverFactory } from './resolvers';
 import MongoID from './types/MongoID';
 import { GraphQLResolveInfo } from 'graphql';
-import { TypeConverterInputTypeOpts, prepareFields, createInputType } from './composeMongoose';
+import { createInputType, prepareFields, TypeConverterInputTypeOpts } from './composeMongoose';
 
 export type ComposeWithMongooseOpts<TContext> = {
   schemaComposer?: SchemaComposer<TContext>;

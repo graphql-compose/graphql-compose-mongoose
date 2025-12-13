@@ -25,7 +25,7 @@ describe('Resolver helper `filter` ->', () => {
         const wrongArgs: any = [{}];
         // @ts-expect-error
         filterHelperArgs(...wrongArgs);
-      }).toThrowError('should be instance of ObjectTypeComposer');
+      }).toThrow('should be instance of ObjectTypeComposer');
     });
 
     it('should throw error if second arg is not MongooseModel', () => {
@@ -33,11 +33,11 @@ describe('Resolver helper `filter` ->', () => {
         const wrongArgs: any = [UserTC, {}];
         // @ts-expect-error
         filterHelperArgs(...wrongArgs);
-      }).toThrowError('should be instance of MongooseModel');
+      }).toThrow('should be instance of MongooseModel');
     });
 
     it('should throw error if `opts` is not provided', () => {
-      expect(() => filterHelperArgs(UserTC, UserModel)).toThrowError('provide non-empty options');
+      expect(() => filterHelperArgs(UserTC, UserModel)).toThrow('provide non-empty options');
     });
 
     it('should return filter field', () => {
@@ -146,7 +146,7 @@ describe('Resolver helper `filter` ->', () => {
 
     it('should not call query.where if args.filter is empty', () => {
       filterHelper(resolveParams, aliases);
-      expect(spyWhereFn).not.toBeCalled();
+      expect(spyWhereFn).not.toHaveBeenCalled();
     });
 
     it('should call query.where if args.filter is provided', () => {
@@ -154,7 +154,7 @@ describe('Resolver helper `filter` ->', () => {
         filter: { name: 'nodkz' },
       };
       filterHelper(resolveParams, aliases);
-      expect(spyWhereFn).toBeCalledWith({ n: 'nodkz' });
+      expect(spyWhereFn).toHaveBeenCalledWith({ n: 'nodkz' });
     });
 
     it('should convert deep object in args.filter to dotted object', () => {
@@ -167,7 +167,7 @@ describe('Resolver helper `filter` ->', () => {
         },
       };
       filterHelper(resolveParams, aliases);
-      expect(spyWhereFn).toBeCalledWith({
+      expect(spyWhereFn).toHaveBeenCalledWith({
         'n.first': 'Pavel',
         age: 30,
       });
@@ -180,7 +180,7 @@ describe('Resolver helper `filter` ->', () => {
         },
       };
       filterHelper(resolveParams, aliases);
-      expect(spyWhereFn).toBeCalledWith({ age: { $gt: 10, $lt: 20 } });
+      expect(spyWhereFn).toHaveBeenCalledWith({ age: { $gt: 10, $lt: 20 } });
     });
 
     it('should add rawQuery to query', () => {

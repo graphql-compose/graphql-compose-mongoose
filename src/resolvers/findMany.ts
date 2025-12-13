@@ -1,5 +1,5 @@
 import type { Resolver, ObjectTypeComposer, InterfaceTypeComposer } from 'graphql-compose';
-import type { Model, Document } from 'mongoose';
+import type { Model, HydratedDocument } from 'mongoose';
 import {
   limitHelper,
   limitHelperArgs,
@@ -49,7 +49,7 @@ type TArgs = {
   sort?: string | string[] | Record<string, any>;
 };
 
-export function findMany<TSource = any, TContext = any, TDoc extends Document = any>(
+export function findMany<TSource = any, TContext = any, TDoc extends HydratedDocument<any> = any>(
   model: Model<TDoc>,
   tc: ObjectTypeComposer<TDoc, TContext> | InterfaceTypeComposer<TDoc, TContext>,
   opts?: FindManyResolverOpts

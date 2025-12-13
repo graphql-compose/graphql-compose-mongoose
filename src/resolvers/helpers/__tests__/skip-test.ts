@@ -23,17 +23,17 @@ describe('Resolver helper `skip` ->', () => {
 
     it('should not call query.skip if args.skip is empty', () => {
       skipHelper(resolveParams);
-      expect(spyFn).not.toBeCalled();
+      expect(spyFn).not.toHaveBeenCalled();
     });
     it('should call query.skip if args.skip is provided', () => {
       resolveParams.args = { skip: 333 };
       skipHelper(resolveParams);
-      expect(spyFn).toBeCalledWith(333);
+      expect(spyFn).toHaveBeenCalledWith(333);
     });
     it('should convert skip to int in args.skip', () => {
       resolveParams.args = { skip: '444' };
       skipHelper(resolveParams);
-      expect(spyFn).toBeCalledWith(444);
+      expect(spyFn).toHaveBeenCalledWith(444);
     });
   });
 });

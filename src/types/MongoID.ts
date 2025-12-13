@@ -12,7 +12,7 @@ const GraphQLMongoID = new GraphQLScalarType({
     'But MongoDB also may accepts string or integer as correct values for _id field.',
   serialize: String,
   parseValue(value: any) {
-    if (!ObjectId.isValid(value) && typeof value !== 'string') {
+    if (!ObjectId.isValid(value) && typeof value !== 'string' && typeof value !== 'number') {
       throw new TypeError('Field error: value is an invalid ObjectId');
     }
     return value;

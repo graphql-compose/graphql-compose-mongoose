@@ -16,13 +16,12 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
     "lib": ["es2017", "esnext.asynciterable"],
-    "types": ["node", "jest"],
+    "types": ["node", "jest", "bson"],
     "baseUrl": ".",
-    "rootDir": "./src",
+    "rootDir": "./src"
   },
   "include": ["src/**/*"],
-  "exclude": [
-    "./node_modules"
-  ]
+  "exclude": ["./node_modules"]
 }

@@ -1,8 +1,6 @@
-/* eslint-disable no-param-reassign */
-
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLNonNull } from 'graphql-compose/lib/graphql';
-import { UserModel, IUser } from '../../__mocks__/userModel';
+import { IUser, UserModel } from '../../__mocks__/userModel';
 import { updateById } from '../updateById';
 import GraphQLMongoID from '../../types/MongoID';
 import { convertModelToGraphQL } from '../../fieldsConverter';
@@ -104,7 +102,7 @@ describe('updateById() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrowError('requires args.record');
+      await expect(resolver.resolve({})).rejects.toThrow('requires args.record');
     });
 
     it('should return empty payload.error', async () => {
@@ -148,7 +146,7 @@ describe('updateById() ->', () => {
             record: { name: 'some name', valid: 'AlwaysFails' },
           },
         })
-      ).rejects.toThrowError('User validation failed: valid: this is a validate message');
+      ).rejects.toThrow('User validation failed: valid: this is a validate message');
     });
 
     it('should change data via args.record in model', async () => {

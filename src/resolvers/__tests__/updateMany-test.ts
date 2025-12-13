@@ -133,7 +133,7 @@ describe('updateMany() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrowError('at least one value in args.record');
+      await expect(resolver.resolve({})).rejects.toThrow('at least one value in args.record');
     });
 
     it('should call `beforeQuery` method with non-executed `query` as arg', async () => {

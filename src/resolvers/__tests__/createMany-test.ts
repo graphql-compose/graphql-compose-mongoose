@@ -1,9 +1,7 @@
-/* eslint-disable no-param-reassign,func-names */
-
-import { Resolver, schemaComposer, ObjectTypeComposer } from 'graphql-compose';
+import { ObjectTypeComposer, Resolver, schemaComposer } from 'graphql-compose';
 import { GraphQLList, GraphQLNonNull } from 'graphql-compose/lib/graphql';
 import { mongoose } from '../../__mocks__/mongooseCommon';
-import { UserModel, IUser } from '../../__mocks__/userModel';
+import { IUser, UserModel, UserSchema } from '../../__mocks__/userModel';
 import { convertModelToGraphQL } from '../../fieldsConverter';
 import { createMany } from '../createMany';
 import { ExtendedResolveParams } from '..';
@@ -133,9 +131,7 @@ describe('createMany() ->', () => {
       });
 
       // should throw error if error not requested in graphql query
-      await expect(resolver.resolve({})).rejects.toThrowError(
-        'requires args.records to be an Array'
-      );
+      await expect(resolver.resolve({})).rejects.toThrow('requires args.records to be an Array');
     });
 
     it('should save documents to database', async () => {
@@ -212,12 +208,11 @@ describe('createMany() ->', () => {
 
     it('should execute hooks on save', async () => {
       schemaComposer.clear();
-      const ClonedUserSchema = UserModel.schema.clone();
+      const ClonedUserSchema: typeof UserSchema = UserModel.schema.clone();
 
-      ClonedUserSchema.pre<IUser>('save', function (next) {
+      ClonedUserSchema.pre<IUser>('save', function (this: IUser) {
         this.name = 'ChangedAgain';
         this.age = 18;
-        return next();
       });
 
       const ClonedUserModel = mongoose.model('UserClone', ClonedUserSchema);

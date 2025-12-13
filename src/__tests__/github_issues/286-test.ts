@@ -10,8 +10,7 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   age: { type: Number },
 });
-interface IUser extends Document {
-  _id: number;
+interface IUser extends Document<number> {
   name: string;
   age?: number;
 }
