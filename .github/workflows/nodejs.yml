@@ -58,10 +58,10 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v6
-      - name: Use Node.js 28.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v6
         with:
-          node-version: 28.x
+          node-version: 24.x
       - name: Install node_modules
         run: yarn install
       - name: Build
