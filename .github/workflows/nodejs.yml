@@ -68,7 +68,7 @@ jobs:
       - name: Build
         run: yarn build
       - name: Semantic Release (publish to npm)
-        run: npx semantic-release@19
+        run: npx semantic-release@25
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
